@@ -37,11 +37,19 @@ print("📖 Carregando dados da planilha e do banco legado...")
 df_equipamentos = pd.read_csv(ARQUIVO_IMPORTACAO, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
 
 with engine_legado.connect() as conn:
-    df_orgaos_equipamentos_legado = pd.read_sql("SELECT id, orgao_id, situacao_id FROM aluguel_equipamentos", conn)
+    df_equipamentos_legado = pd.read_sql("SELECT id, orgao_id, situacao_id, created_at, updated_at, deleted_at FROM aluguel_equipamentos", conn)
 
-mapa_equipamento_orgao = dict(zip(df_orgaos_equipamentos_legado['id'], df_orgaos_equipamentos_legado['orgao_id']))
-mapa_equipamento_situacao = dict(zip(df_orgaos_equipamentos_legado['id'], df_orgaos_equipamentos_legado['situacao_id']))
+mapa_equipamento_orgao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['orgao_id']))
+mapa_equipamento_situacao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['situacao_id']))
 now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+mapa_datas_legado = {
+    row['id']: {
+        'created_at': row['created_at'],
+        'updated_at': row['updated_at'],
+        'deleted_at': row['deleted_at']
+    }
+    for _, row in df_equipamentos_legado.iterrows()
+}
 
 lista_fornecedores_legado = df_equipamentos['MARCA_AJUSTADA'].dropna().unique()
 
@@ -67,14 +75,28 @@ for index, row in tqdm(df_equipamentos.iterrows(), total=df_equipamentos.shape[0
     org_destino = descobrir_id_organizacao_destino(id_orgao_legado)
 
     if org_destino not in {1115, 1122, 1311, 1378}:
-        org_destino = 1115        
+        org_destino = 1115
 
-    if id_situacao_legado == 10:
-        deleted_at_destino = now
+    #  EXTRAÇÃO DAS DATAS DO LEGADO
+    datas_legado = mapa_datas_legado.get(id_equipamento_legado, {}) 
+
+    created_at_destino = datas_legado.get('created_at') if datas_legado.get('created_at') else now
+    updated_at_destino = datas_legado.get('updated_at') if datas_legado.get('updated_at') else now
+
+    # CONDICIONAL PARA DELETED_AT
+    if id_situacao_legado == 10 or pd.notna(datas_legado.get('deleted_at')):
+        deleted_at_destino = datas_legado.get('deleted_at') if pd.notna(datas_legado.get('deleted_at')) else now
     else:
-        deleted_at_destino = None
+        deleted_at_destino = None    
+
+    # CONDICIONAL PARA STATUS DO EQUIPAMENTO
+    if id_situacao_legado == 10:
+        status_id_destino = 9
+    else:
+        status_id_destino = 1  
 
     lista_mestre.append({
+        "id_legado":     id_equipamento_legado,
         "TOMBO":         row.get("TOMBO"),
         "NOME_AJUSTADO": row.get("NOME_AJUSTADO"),
         "NUMERO_SERIE":  row.get("NUMERO_SERIE"),
@@ -86,7 +108,10 @@ for index, row in tqdm(df_equipamentos.iterrows(), total=df_equipamentos.shape[0
         "brand_id":      None,
         "tipo":          row.get("TIPO_AJUSTADO")  if pd.notna(row.get("TIPO_AJUSTADO"))  else None,
         "type_id":       None,
+        "status_id":     status_id_destino,
         "org_destino":   org_destino,
+        "created_at":    created_at_destino,
+        "updated_at":    updated_at_destino,
         "deleted_at":    deleted_at_destino,
         "transaction_id": None
     })
@@ -484,22 +509,23 @@ try:
 
                 # 3. Monta equipamento com product_item_id real
                 lista_equipamentos_global.append({
-                    "product_item_id":                product_item_id_gerado,  # ← ID real
+                    "id":                             int(linha_equip['id_legado']),
+                    "product_item_id":                product_item_id_gerado,
                     "transaction_item_id":            int(tx_item_id_gerado),
                     "number":                         linha_equip['TOMBO'],
                     "name":                           linha_equip['product_name'],
                     "serial_number":                  nula(linha_equip['NUMERO_SERIE']),
                     "serial_required":                0,
                     "current_organization_id":        buyer_id_int,
-                    "status_id":                      1,
+                    "status_id":                      linha_equip['status_id'],
                     "address_id":                     mapa_enderecos.get(buyer_id_int, id_fallback),
                     "location_id":                    None,
                     "is_completed":                   1,
                     "completed_by":                   None,
                     "movement_date":                  None,
                     "last_movement_item_customer_id": None,
-                    "created_at":                     now,
-                    "updated_at":                     now,
+                    "created_at":                     linha_equip['created_at'],
+                    "updated_at":                     linha_equip['updated_at'],
                     "deleted_at":                     nula(linha_equip['deleted_at'])
                 })
 
@@ -508,12 +534,12 @@ try:
             print(f"💾 Efetuando inserção em lote de {len(lista_equipamentos_global)} equipamentos...")
             stmt_equip = text("""
                 INSERT INTO equipments (
-                    product_item_id, transaction_item_id, number, name, serial_number, 
+                    id, product_item_id, transaction_item_id, number, name, serial_number, 
                     serial_required, current_organization_id, status_id, address_id, 
                     location_id, is_completed, completed_by, movement_date, 
                     last_movement_item_customer_id, created_at, updated_at, deleted_at
                 ) VALUES (
-                    :product_item_id, :transaction_item_id, :number, :name, :serial_number, 
+                    :id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, 
                     :serial_required, :current_organization_id, :status_id, :address_id, 
                     :location_id, :is_completed, :completed_by, :movement_date, 
                     :last_movement_item_customer_id, :created_at, :updated_at, :deleted_at

@@ -164,20 +164,20 @@ def executar_pipeline_migracao():
         print(f"🛑 [FILTRO] Removidas {linhas_antes - linhas_depois} linhas pertencentes às organizações bloqueadas: {ORGANIZACOES_BLOQUEADAS}")
 
     # 1. CONSTRUÇÃO DOS DICIONÁRIOS HIERÁRQUICOS
-    pais_dict = {}       
-    filhos_dict = {}     
-    netos_dict = {}      
+    prefeitura_dist = {}       
+    secretaria_dit = {}     
+    destino_dist = {}      
 
     for _, row in df.iterrows():
         if pd.notna(row['ID_PREFEITURA']):
             id_pref = int(row['ID_PREFEITURA'])
-            if id_pref not in pais_dict:
-                pais_dict[id_pref] = {"nome": row['PREFEITURA'], "novo_id": None, "row": row}
+            if id_pref not in prefeitura_dist:
+                prefeitura_dist[id_pref] = {"nome": row['PREFEITURA'], "novo_id": None, "row": row}
 
         if pd.notna(row['ID_SECRETARIA']):
             id_sec = int(row['ID_SECRETARIA'])
-            if id_sec not in filhos_dict:
-                filhos_dict[id_sec] = {
+            if id_sec not in secretaria_dit:
+                secretaria_dit[id_sec] = {
                     "nome": row['SECRETARIA'],
                     "id_prefeitura": int(row['ID_PREFEITURA']) if pd.notna(row['ID_PREFEITURA']) else None,
                     "novo_id": None,
@@ -186,15 +186,15 @@ def executar_pipeline_migracao():
 
         if pd.notna(row['ID_CLIENTE']):
             id_cli = int(row['ID_CLIENTE'])
-            if id_cli not in netos_dict:
-                netos_dict[id_cli] = {
+            if id_cli not in destino_dist:
+                destino_dist[id_cli] = {
                     "nome": row['CLIENTE'],
                     "id_secretaria": int(row['ID_SECRETARIA']) if pd.notna(row['ID_SECRETARIA']) else None,
                     "novo_id": None,
                     "row": row
                 }
 
-    print(f"📌 Mapeamento concluído: {len(pais_dict)} Pais, {len(filhos_dict)} Filhos, {len(netos_dict)} Netos estruturados.")
+    print(f"📌 Mapeamento concluído: {len(prefeitura_dist)} Pais, {len(secretaria_dit)} Filhos, {len(destino_dist)} Netos estruturados.")
 
     try:
         limpar_tabela_destino(engine_new)
@@ -258,32 +258,32 @@ def executar_pipeline_migracao():
         # ======================================================================
 
         # PASSO A: Inserir todos os PAIS (Prefeituras) -> Apenas Customer
-        for id_pref, info in tqdm(pais_dict.items(), desc="Inserindo Pais (Prefeituras)", unit="pref"):
+        for id_pref, info in tqdm(prefeitura_dist.items(), desc="Inserindo Pais (Prefeituras)", unit="pref"):
             novo_id = inserir_estrutura_customer(conn_new, info["nome"], parent_id=None, row_data=info["row"])
-            pais_dict[id_pref]["novo_id"] = novo_id
+            prefeitura_dist[id_pref]["novo_id"] = novo_id
             stats["pais"] += 1
 
         # PASSO B: Inserir todos os FILHOS (Secretarias) -> Apenas Customer
-        for id_sec, info in tqdm(filhos_dict.items(), desc="Inserindo Filhos (Secretarias)", unit="sec"):
+        for id_sec, info in tqdm(secretaria_dit.items(), desc="Inserindo Filhos (Secretarias)", unit="sec"):
             id_pai_legado = info["id_prefeitura"]
-            novo_parent_id = pais_dict[id_pai_legado]["novo_id"] if id_pai_legado in pais_dict else None
+            novo_parent_id = prefeitura_dist[id_pai_legado]["novo_id"] if id_pai_legado in prefeitura_dist else None
             
             if id_pai_legado and not novo_parent_id:
                 continue
 
             novo_id = inserir_estrutura_customer(conn_new, info["nome"], parent_id=novo_parent_id, row_data=info["row"])
-            filhos_dict[id_sec]["novo_id"] = novo_id
+            secretaria_dit[id_sec]["novo_id"] = novo_id
             stats["filhos"] += 1
 
         # PASSO C: Inserir os NETOS apenas como ENDEREÇOS vinculados ao sub-cliente (Filho ou Pai)
-        for id_cli, info in tqdm(netos_dict.items(), desc="Inserindo Netos (Endereços)", unit="end"):
+        for id_cli, info in tqdm(destino_dist.items(), desc="Inserindo Netos (Endereços)", unit="end"):
             id_filho_legado = info["id_secretaria"]
             
-            target_customer_id = filhos_dict[id_filho_legado]["novo_id"] if id_filho_legado in filhos_dict else None
+            target_customer_id = secretaria_dit[id_filho_legado]["novo_id"] if id_filho_legado in secretaria_dit else None
             
             if not target_customer_id:
                 id_pai_legado = info["row"]["ID_PREFEITURA"]
-                target_customer_id = pais_dict[id_pai_legado]["novo_id"] if pd.notna(id_pai_legado) and int(id_pai_legado) in pais_dict else None
+                target_customer_id = prefeitura_dist[id_pai_legado]["novo_id"] if pd.notna(id_pai_legado) and int(id_pai_legado) in prefeitura_dist else None
 
             if target_customer_id:
                 row_data = info["row"]
