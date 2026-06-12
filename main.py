@@ -7,6 +7,7 @@ import os
 TAREFAS = {
     "clientes": {"script": "migracao_cliente.py", "pasta": "clientes"},
     "contratos": {"script": "migracao_contratos.py", "pasta": "contratos"},
+    "contratantes": {"script": "migracao_contratantes.py", "pasta": "contratos"},
     "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"}
 }
 
@@ -29,41 +30,35 @@ def rodar_script(nome_tarefa):
 def main():
     parser = argparse.ArgumentParser(description="Pipeline de Migração Individual ou Total")
     
-    # Argumento posicional (sem os traços --). O padrão é "todos" se nada for digitado.
+    # Argumento posicional. O padrão é "todos" se nada for digitado.
     parser.add_argument("alvo", nargs="?", default="todos", 
-                        help="Qual etapa executar? (ex: migracao_cliente.py, contratos, ou todos)")
+                        help="Qual etapa executar? (clientes, contratos, contratantes, equipamentos ou todos)")
     
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
-
-    # Normaliza se o usuário digitar "testes" no plural
-    if alvo == "testes":
-        alvo = "teste"
-
-    # 1. Se o usuário quiser rodar tudo (Apenas scripts de PRODUÇÃO)
-    if alvo in ["todos", "todas"]:
-        for t in TAREFAS.keys():
-            if t == "teste": 
-                continue  # 🛡️ Proteção: impede o script de teste de rodar na migração oficial
-            rodar_script(t)
-        return
-
-    # 2. Se o usuário usou a chave direta (ex: "clientes", "contratos", "teste")
-    if alvo in TAREFAS:
+    
+    # 1. Se o alvo for "todos", executa a esteira na ordem correta de chaves estrangeiras
+    if alvo == "todos":
+        print("⚡ Iniciando a execução completa do pipeline de migração...")
+        ordem_execucao = ["clientes", "contratos", "contratantes", "equipamentos"]
+        for tarefa in ordem_execucao:
+            rodar_script(tarefa)
+        print("\n🏆 PIPELINE EXECUTADO COM SUCESSO TOTAL!")
+        
+    # 2. Se for uma tarefa individual válida (ex: "contratantes")
+    elif alvo in TAREFAS:
         rodar_script(alvo)
-        return
-
-    # 3. Se o usuário digitou o nome do script (ex: "teste_migracao_equipamentos.py")
-    for chave, config in TAREFAS.items():
-        # Aceita o nome exato ou uma variação comum com 's' no plural para evitar erros de digitação
-        if config["script"] == alvo or config["script"].replace(".py", "s.py") == alvo:
-            rodar_script(chave)
-            return
-
-    # 4. Se não encontrou nada
-    print(f"❌ Erro: Comando '{alvo}' não reconhecido.")
-    print("Tente algo como: python executar_migracao.py teste")
-    sys.exit(1)
+        
+    # 3. Comando não reconhecido
+    else:
+        print(f"❌ Erro: Alvo de migração '{alvo}' não reconhecido.")
+        print("\nOpções disponíveis:")
+        print("  python main.py todos        (Roda tudo na sequência certa)")
+        print("  python main.py clientes     (Apenas Clientes)")
+        print("  python main.py contratos    (Apenas Contratos)")
+        print("  python main.py contratantes (Apenas Vínculo de Contratantes)")
+        print("  python main.py equipamentos (Apenas Equipamentos)")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
