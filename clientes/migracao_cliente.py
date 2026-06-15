@@ -289,8 +289,8 @@ def executar_pipeline_migracao():
                 row_data = info["row"]
                 
                 conn_new.execute(text("""
-                    INSERT INTO addresses (addressable_type, addressable_id, alias, zip, street, number, city, state, country, created_at, updated_at)
-                    VALUES ('customer', :id, :nome, :zip, :street, 'S/N', :city, :state, 'Brasil', :now, :now)
+                    INSERT INTO addresses (addressable_type, addressable_id, alias, zip, street, number, city, state, country, legacy_customer_id, created_at, updated_at)
+                    VALUES ('customer', :id, :nome, :zip, :street, 'S/N', :city, :state, 'Brasil', :legacy_customer_id, :now, :now)
                 """), {
                     "id": target_customer_id, 
                     "nome": info["nome"], 
@@ -298,6 +298,7 @@ def executar_pipeline_migracao():
                     "street": row_data['ENDERECO'], 
                     "city": row_data['CIDADE'], 
                     "state": row_data['ESTADO'], 
+                    "legacy_customer_id": int(id_cli),
                     "now": now
                 })
                 
