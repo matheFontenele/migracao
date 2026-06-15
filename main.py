@@ -8,7 +8,8 @@ TAREFAS = {
     "clientes": {"script": "migracao_cliente.py", "pasta": "clientes"},
     "contratos": {"script": "migracao_contratos.py", "pasta": "contratos"},
     "contratantes": {"script": "migracao_contratantes.py", "pasta": "contratos"},
-    "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"}
+    "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"},
+    "movimentos_aluguel": {"script": "migracao_movimentos_aluguel.py", "pasta": "movimentos"}
 }
 
 def rodar_script(nome_tarefa):
@@ -32,7 +33,7 @@ def main():
     
     # Argumento posicional. O padrão é "todos" se nada for digitado.
     parser.add_argument("alvo", nargs="?", default="todos", 
-                        help="Qual etapa executar? (clientes, contratos, contratantes, equipamentos ou todos)")
+                        help="Qual etapa executar? (clientes, contratos, contratantes, equipamentos, movimentos_aluguel ou todos)")
     
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
@@ -40,12 +41,13 @@ def main():
     # 1. Se o alvo for "todos", executa a esteira na ordem correta de chaves estrangeiras
     if alvo == "todos":
         print("⚡ Iniciando a execução completa do pipeline de migração...")
-        ordem_execucao = ["clientes", "contratos", "contratantes", "equipamentos"]
+        # 🎯 Agora a lista bate perfeitamente com as chaves do dicionário TAREFAS
+        ordem_execucao = ["clientes", "contratos", "contratantes", "equipamentos", "movimentos_aluguel"]
         for tarefa in ordem_execucao:
             rodar_script(tarefa)
         print("\n🏆 PIPELINE EXECUTADO COM SUCESSO TOTAL!")
         
-    # 2. Se for uma tarefa individual válida (ex: "contratantes")
+    # 2. Se for uma tarefa individual válida (ex: "movimentos_aluguel")
     elif alvo in TAREFAS:
         rodar_script(alvo)
         
@@ -53,11 +55,12 @@ def main():
     else:
         print(f"❌ Erro: Alvo de migração '{alvo}' não reconhecido.")
         print("\nOpções disponíveis:")
-        print("  python main.py todos        (Roda tudo na sequência certa)")
-        print("  python main.py clientes     (Apenas Clientes)")
-        print("  python main.py contratos    (Apenas Contratos)")
-        print("  python main.py contratantes (Apenas Vínculo de Contratantes)")
-        print("  python main.py equipamentos (Apenas Equipamentos)")
+        print("  python main.py todos               (Roda tudo na sequência certa)")
+        print("  python main.py clientes            (Apenas Clientes)")
+        print("  python main.py contratos           (Apenas Contratos)")
+        print("  python main.py contratantes        (Apenas Vínculo de Contratantes)")
+        print("  python main.py equipamentos        (Apenas Equipamentos)")
+        print("  python main.py movimentos_aluguel  (Apenas Movimentações de Aluguel)") # 🔥 Atualizado na ajuda
         sys.exit(1)
 
 if __name__ == "__main__":
