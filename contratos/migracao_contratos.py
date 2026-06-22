@@ -1,5 +1,5 @@
 import sys
-
+import sqlalchemy as sa
 import pandas as pd
 from sqlalchemy import create_engine, text
 from datetime import datetime
@@ -21,7 +21,8 @@ MAP_EVENT_TYPES = {
     'ADITIVO DE QUANTIDADE': 3,
     'ADITIVO DE REAJUSTE': 4,
     'ADITIVO DE SUPRESSAO': 5,
-    'APOSTILAMENTO': 6
+    'ADITIVO MODIFICAÇÃO DE ITEM': 6,
+    'APOSTILAMENTO': 7
 }
 
 # === DICIONÁRIO DE ABREVIAÇÕES CONHECIDAS ===
@@ -57,6 +58,19 @@ ABBREVIATIONS = {
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE EDUCAÇÃO': 'SEC. MUNICIPAL DA EDUCAÇÃO - FUNDEB - URUOCA',
     'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP'
 }
+# Limpeza de tabelas refatorado
+def limpar_tabelas_equipamentos(engine):
+        with engine.begin() as conn:
+            conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 0"))
+            for tabela in ['contracts', 'contract_items', 'contract_infos',
+                           'contract_jobs', 'event_additives', 'contract_events', 'contract_recipient_customers']:
+                conn.execute(sa.text(f"TRUNCATE TABLE `{tabela}`"))
+            conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 1"))
+
+limpar_tabelas_equipamentos(engine)
+print("✅ Tabelas limpas.")
+
+
 
 #===================================================
 # BLOCO DE LIMPEZA E TRATAMENTO DE DADOS (PANDAS)
