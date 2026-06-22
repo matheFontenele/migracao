@@ -311,7 +311,7 @@ def main():
     # Importa e executa cada módulo de movimento (lazy import para evitar
     # acoplamento circular e permitir rodar só o que for necessário)
     # ----------------------------------------------------------------------
-    from teste import processar_aluguel
+    from migracao_aluguel import processar_aluguel
     processar_aluguel(engine_new, dados_compartilhados)
 
     # Futuro: descomente conforme os módulos forem implementados

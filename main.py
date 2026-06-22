@@ -11,7 +11,6 @@ TAREFAS = {
     "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"},
     "movimentos": {"script": "migracao_movimentos.py", "pasta": "movimentos"},
     "movimentos_aluguel": {"script": "migracao_aluguel.py", "pasta": "movimentos"},
-    # Futuro, conforme forem implementados:
     # "movimentos_devolucao": {"script": "migracao_devolucao.py", "pasta": "movimentos"},
     # "movimentos_substituicao": {"script": "migracao_substituicao.py", "pasta": "movimentos"},
     # "movimentos_reserva": {"script": "migracao_reserva.py", "pasta": "movimentos"},
