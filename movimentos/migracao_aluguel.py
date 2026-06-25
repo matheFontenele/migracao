@@ -10,7 +10,7 @@ ARQUIVO_IMPORTACAO = os.path.join(BASE_DIR, "docs", "equipeAS.csv")
 
 def processar_aluguel(engine_new, dados_compartilhados):
     from migracao_movimentos import (
-        limpar_codigo, normalizar_texto, buscar_ultimo_movimento_por_tombo, engine_legado
+        normalizar_texto, buscar_ultimo_movimento_por_tombo
     )
 
     print("\n" + "-" * 70)

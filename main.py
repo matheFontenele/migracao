@@ -9,11 +9,7 @@ TAREFAS = {
     "contratos": {"script": "migracao_contratos.py", "pasta": "contratos"},
     "contratantes": {"script": "migracao_contratantes.py", "pasta": "contratos"},
     "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"},
-    "movimentos": {"script": "migracao_movimentos.py", "pasta": "movimentos"},
-    "movimentos_aluguel": {"script": "migracao_aluguel.py", "pasta": "movimentos"},
-    # "movimentos_devolucao": {"script": "migracao_devolucao.py", "pasta": "movimentos"},
-    # "movimentos_substituicao": {"script": "migracao_substituicao.py", "pasta": "movimentos"},
-    # "movimentos_reserva": {"script": "migracao_reserva.py", "pasta": "movimentos"},
+    "movimentos": {"script": "orquestrador_movimentos.py", "pasta": "movimentos"},
 }
 
 
