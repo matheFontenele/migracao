@@ -1,8 +1,9 @@
-import os
 import pandas as pd
 import sqlalchemy
+import os
 from sqlalchemy import create_engine, text
 from datetime import datetime
+
 
 # ==============================================================================
 # CONFIGURAÇÕES DE MAPEAMENTO E BLOQUEIO DE ORGANIZAÇÕES
@@ -15,94 +16,8 @@ MAPPING_MOREIA = {1313, 1326, 1328, 1358, 1369}
 MAPPING_AS = {1378}
 ORGANIZACOES_BLOQUEADAS = {1123, 1366}
 
-DB_CONFIG_NEW = {
-    "host": "localhost", "port": "3307", "db": "controle-interno", "user": "root", "pass": "root"
-}
-DB_CONFIG_LEGADO = {
-    "host": "172.16.0.200", "port": "3310", "db": "aluguel_legado", "user": "root", "pass": "1234"
-}
 
-# ==============================================================================
-# ENGINES (compartilhados entre todos os módulos de movimento)
-# ==============================================================================
-engine_new = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_NEW['user']}:{DB_CONFIG_NEW['pass']}@{DB_CONFIG_NEW['host']}:{DB_CONFIG_NEW['port']}/{DB_CONFIG_NEW['db']}"
-)
-engine_legado = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_LEGADO['user']}:{DB_CONFIG_LEGADO['pass']}@{DB_CONFIG_LEGADO['host']}:{DB_CONFIG_LEGADO['port']}/{DB_CONFIG_LEGADO['db']}"
-)
-
-# ==============================================================================
-# FUNÇÕES AUXILIARES GENÉRICAS (usadas por todos os tipos de movimento)
-# ==============================================================================
-def limpar_codigo(val):
-    """Remove .0 de strings numéricas e trata nulos."""
-    if pd.isna(val):
-        return ""
-    s = str(val).strip()
-    return s[:-2] if s.endswith(".0") else s
-
-
-def normalizar_texto(val):
-    """Padroniza string para comparação: remove espaços extras, upper, trata nulos."""
-    if pd.isna(val):
-        return ""
-    return str(val).strip().upper()
-
-
-def descobrir_id_organizacao_destino(id_legado):
-    """Mapeia o ID do legado para o ID correspondente no banco novo."""
-    if pd.isna(id_legado):
-        return 1115
-    id_legado_int = int(id_legado)
-    if id_legado_int in MAPPING_ALUCOM:
-        return 1115
-    elif id_legado_int in MAPPING_IP:
-        return 1311
-    elif id_legado_int in MAPPING_MOREIA:
-        return 1122
-    elif id_legado_int in MAPPING_AS:
-        return 1378
-    return id_legado_int
-
-
-def limpar_tabelas_refatoradas(engine):
-    """Limpa as tabelas de movimentos antes de cada execução."""
-    print("🧹 Iniciando a limpeza das tabelas no banco refatorado...")
-    tabelas_para_limpar = [
-        "service_order_item_extra_equipments",
-        "movement_items",
-        "movements",
-        "service_order_items",
-        "service_orders"
-    ]
-    with engine.connect() as conn:
-        trans = conn.begin()
-        try:
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
-            for tabela in tabelas_para_limpar:
-                conn.execute(text(f"TRUNCATE TABLE {tabela};"))
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
-            trans.commit()
-            print("✅ Tabelas limpas com sucesso.")
-        except Exception as e:
-            trans.rollback()
-            print(f"❌ Erro crítico ao limpar o banco refatorado: {e}")
-            raise e
-
-
-def resetar_saldo_contract_items(engine):
-    """Reseta available_quantity para o valor original antes de cada execução de teste."""
-    print("🔄 Resetando available_quantity de contract_items para o valor original...")
-    with engine.begin() as conn:
-        conn.execute(text("UPDATE contract_items SET available_quantity = quantity"))
-    print("✅ Saldos de contract_items resetados.")
-
-
-# ==============================================================================
-# DADOS COMPARTILHADOS (carregados uma vez, usados por todos os módulos)
-# ==============================================================================
-def carregar_dados_compartilhados():
+def carregar_dados_compartilhados(engine_legado, engine_new):
     print("📖 Carregando dados compartilhados do legado e do banco novo...")
 
     with engine_legado.connect() as conn:
@@ -245,7 +160,7 @@ def carregar_dados_compartilhados():
     }
 
 
-def buscar_ultimo_movimento_por_tombo(lista_tombos):
+def buscar_ultimo_movimento_por_tombo(lista_tombos, engine_legado):
     """
     Recebe uma lista de tombos e retorna um dict com o último movimento
     registrado no legado para cada um deles.
@@ -293,41 +208,99 @@ def buscar_ultimo_movimento_por_tombo(lista_tombos):
 
 
 # ==============================================================================
-# ORQUESTRADOR PRINCIPAL
+# FUNÇÕES AUXILIARES GENÉRICAS (usadas por todos os tipos de movimento)
 # ==============================================================================
-def main():
-    print("=" * 70)
-    print("🚀 INICIANDO PIPELINE DE MIGRAÇÃO DE MOVIMENTOS")
-    print("=" * 70)
-
-    # Reset e limpeza antes de qualquer migração
-    resetar_saldo_contract_items(engine_new)
-    limpar_tabelas_refatoradas(engine_new)
-
-    # Carrega dados compartilhados uma única vez
-    dados_compartilhados = carregar_dados_compartilhados()
-
-    # ----------------------------------------------------------------------
-    # Importa e executa cada módulo de movimento (lazy import para evitar
-    # acoplamento circular e permitir rodar só o que for necessário)
-    # ----------------------------------------------------------------------
-    from migracao_aluguel import processar_aluguel
-    processar_aluguel(engine_new, dados_compartilhados)
-
-    # Futuro: descomente conforme os módulos forem implementados
-    # from migracao_devolucao import processar_devolucao
-    # processar_devolucao(engine_new, dados_compartilhados)
-
-    # from migracao_substituicao import processar_substituicao
-    # processar_substituicao(engine_new, dados_compartilhados)
-
-    # from migracao_reserva import processar_reserva
-    # processar_reserva(engine_new, dados_compartilhados)
-
-    print("\n" + "=" * 70)
-    print("🎉 PIPELINE DE MIGRAÇÃO CONCLUÍDO")
-    print("=" * 70)
+def limpar_codigo(val):
+    """Remove .0 de strings numéricas e trata nulos."""
+    if pd.isna(val):
+        return ""
+    s = str(val).strip()
+    return s[:-2] if s.endswith(".0") else s
 
 
-if __name__ == "__main__":
-    main()
+def normalizar_texto(val):
+    """Padroniza string para comparação: remove espaços extras, upper, trata nulos."""
+    if pd.isna(val):
+        return ""
+    return str(val).strip().upper()
+
+
+def descobrir_id_organizacao_destino(id_legado):
+    """Mapeia o ID do legado para o ID correspondente no banco novo."""
+    if pd.isna(id_legado):
+        return 1115
+    id_legado_int = int(id_legado)
+    if id_legado_int in MAPPING_ALUCOM:
+        return 1115
+    elif id_legado_int in MAPPING_IP:
+        return 1311
+    elif id_legado_int in MAPPING_MOREIA:
+        return 1122
+    elif id_legado_int in MAPPING_AS:
+        return 1378
+    return id_legado_int
+
+
+def limpar_tabelas_refatoradas(engine):
+    """Limpa as tabelas de movimentos antes de cada execução."""
+    print("🧹 Iniciando a limpeza das tabelas no banco refatorado...")
+    tabelas_para_limpar = [
+        "service_order_item_extra_equipments",
+        "movement_items",
+        "movements",
+        "service_order_items",
+        "service_orders"
+    ]
+    with engine.connect() as conn:
+        trans = conn.begin()
+        try:
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
+            for tabela in tabelas_para_limpar:
+                conn.execute(text(f"TRUNCATE TABLE {tabela};"))
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
+            trans.commit()
+            print("✅ Tabelas limpas com sucesso.")
+        except Exception as e:
+            trans.rollback()
+            print(f"❌ Erro crítico ao limpar o banco refatorado: {e}")
+            raise e
+
+
+def resetar_saldo_contract_items(engine):
+    """Reseta available_quantity para o valor original antes de cada execução de teste."""
+    print("🔄 Resetando available_quantity de contract_items para o valor original...")
+    with engine.begin() as conn:
+        conn.execute(text("UPDATE contract_items SET available_quantity = quantity"))
+    print("✅ Saldos de contract_items resetados.")
+
+class BaseMigracaoMovimento:
+    def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=1):
+        self.engine_new = engine_new
+        self.engine_legado = engine_legado
+        self.dados = dados_compartilhados
+        self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        self.servicos_mestre = []
+        self.service_itens_mestre = []
+        self.movimentos_mestre = []
+        self.movimento_itens_mestre = []
+        
+        self.pedidos_pai_inseridos = set()
+        self.equipamentos_alterados = set()
+        
+        self.so_item_id_counter = start_counter
+        self.extra_id_counter = start_counter
+
+    def calcular_saldo(self, contrato_item_id, equipment_id_ref, mov_date):
+        """Método Neutro (Reserva, Devolução não mexem em saldo). Aluguel vai sobrescrever isso."""
+        return 0, None
+
+    def registrar_movimento(self, id_final, recipient_id, cliente_final, usuario_id, 
+                            mov_date, contrato_id, contrato_item_id, equipment_id_ref, 
+                            tipo_movimento_id, operation_type, nome_equipamento):
+        # A lógica unificada de montar os dicionários do Service Order e Movement que desenhamos antes
+        pass
+
+    def salvar_banco(self, id_status_equipamento):
+        # A lógica unificada de inserts e update de equipamentos
+        pass
