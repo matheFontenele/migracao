@@ -1,0 +1,21 @@
+services:
+  migrador:
+    build: .
+    image: tce_engine:v1
+    container_name: tce_engine_cli
+    
+    # A ponte mágica: ensina o Linux do contêiner que "host.docker.internal" é o seu computador físico
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      
+    environment:
+      - DB_HOST_NEW=host.docker.internal
+      
+    # Mapeia a sua pasta local para o contêiner. 
+    # Se o script gerar um arquivo .parquet ou ler um .csv, ele altera o seu HD real em tempo real!
+    volumes:
+      - .:/app
+      
+    # Mantém o terminal aberto para comandos interativos
+    stdin_open: true
+    tty: true

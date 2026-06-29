@@ -1,70 +1,77 @@
 import argparse
-import subprocess
 import sys
 import os
 
-# Mapeamento das tarefas
+from cadastros.contratos import migracao_contratantes
+from config.database import obter_engines
+
+# 1. IMPORTAÇÃO DOS MÓDULOS COMO PACOTES PYTHON
+from cadastros.clientes import migracao_cliente
+from cadastros.contratos import migracao_contratos
+from cadastros.equipamentos import migracao_equipamentos
+from movimentos import orquestrador_movimentos, migracao_aluguel
+
+
+# 2. O MAPEAMENTO AGORA APONTA PARA FUNÇÕES REAIS, NÃO PARA TEXTOS!
 TAREFAS = {
-    "clientes": {"script": "migracao_cliente.py", "pasta": "clientes"},
-    "contratos": {"script": "migracao_contratos.py", "pasta": "contratos"},
-    "contratantes": {"script": "migracao_contratantes.py", "pasta": "contratos"},
-    "equipamentos": {"script": "migracao_equipamentos.py", "pasta": "equipamentos"},
-    "movimentos": {"script": "orquestrador_movimentos.py", "pasta": "movimentos"},
+    "clientes": migracao_cliente.executar,
+    "contratos": migracao_contratos.executar,
+    "contratantes": migracao_contratantes.executar,
+    "equipamentos": migracao_equipamentos.executar,
+    "movimentos": orquestrador_movimentos.executar,
+    "movimentos_aluguel": migracao_aluguel.executar
 }
 
 
-def rodar_script(nome_tarefa):
-    config = TAREFAS[nome_tarefa]
-    script_path = os.path.join(config["pasta"], config["script"])
+def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
+    funcao_alvo = TAREFAS[nome_tarefa]
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
-    print(f"📄 Arquivo: {script_path}")
-
-    # Executa o script. O cwd garante que o script enxergue os arquivos locais dele
-    processo = subprocess.run([sys.executable, config["script"]], cwd=config["pasta"])
-
-    if processo.returncode == 0:
+    try:
+        # A magia acontece aqui: injetamos as engines direto na veia da função
+        funcao_alvo(eng_novo, eng_legado)
         print(f"✅ {nome_tarefa.upper()} concluído com sucesso.")
-    else:
-        print(f"❌ {nome_tarefa.upper()} FALHOU com código {processo.returncode}.")
+        
+    except Exception as e:
+        print(f"\n❌ {nome_tarefa.upper()} ABORTOU COM ERRO CRÍTICO: {e}")
         sys.exit(1)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Pipeline de Migração Individual ou Total")
-
-    parser.add_argument("alvo", nargs="?", default="todos",
-                        help="Qual etapa executar? (clientes, contratos, contratantes, equipamentos, "
-                             "movimentos, movimentos_aluguel ou todos)")
+    parser = argparse.ArgumentParser(description="Pipeline de Migração Orquestrado")
+    parser.add_argument(
+        "alvo", nargs="?", default="todos",
+        help="Opções: clientes, contratos, contratantes, equipamentos, movimentos, movimentos_aluguel ou todos"
+    )
 
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
 
-    # 1. Se o alvo for "todos", executa a esteira na ordem correta de chaves estrangeiras
-    if alvo == "todos":
-        print("⚡ Iniciando a execução completa do pipeline de migração...")
-        # Usa "movimentos" (orquestrador completo) em vez do módulo isolado
-        ordem_execucao = ["clientes", "contratos", "contratantes", "equipamentos", "movimentos"]
-        for tarefa in ordem_execucao:
-            rodar_script(tarefa)
-        print("\n🏆 PIPELINE EXECUTADO COM SUCESSO TOTAL!")
-
-    # 2. Se for uma tarefa individual válida (ex: "movimentos_aluguel")
-    elif alvo in TAREFAS:
-        rodar_script(alvo)
-
-    # 3. Comando não reconhecido
-    else:
-        print(f"❌ Erro: Alvo de migração '{alvo}' não reconhecido.")
-        print("\nOpções disponíveis:")
-        print("  python main.py todos                  (Roda tudo na sequência certa)")
-        print("  python main.py clientes               (Apenas Clientes)")
-        print("  python main.py contratos              (Apenas Contratos)")
-        print("  python main.py contratantes           (Apenas Vínculo de Contratantes)")
-        print("  python main.py equipamentos           (Apenas Equipamentos)")
-        print("  python main.py movimentos             (Todos os tipos de movimento)")
-        print("  python main.py movimentos_aluguel     (Apenas Aluguel, isolado)")
+    if alvo not in TAREFAS and alvo != "todos":
+        print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.")
+        print("\nComandos válidos:")
+        print("  python main.py todos                (Roda a esteira inteira)")
+        print("  python main.py clientes             (Apenas tabela de Clientes)")
+        print("  python main.py movimentos_aluguel   (Apenas Aluguel isolado)")
         sys.exit(1)
+
+    # Liga a usina uma única vez para toda a vida do comando:
+    print("🔌 Orquestrador: Estabelecendo conexões com os bancos...")
+    eng_novo, eng_legado = obter_engines()
+
+    # Esteira Sequencial (Respeitando as Chaves Estrangeiras do MySQL)
+    if alvo == "todos":
+        print("⚡ Disparando migração em lote...")
+        ordem_sre = ["clientes", "contratos", "contratantes", "equipamentos", "movimentos"]
+        
+        for etapa in ordem_sre:
+            despachar_tarefa(etapa, eng_novo, eng_legado)
+            
+        print("\n🏆 PIPELINE COMPLETO FINALIZADO COM 100% DE INTEGRIDADE!")
+
+    # Execução Granular Isolada
+    else:
+        despachar_tarefa(alvo, eng_novo, eng_legado)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import pandas as pd
 import sqlalchemy
 import os
+
+from config.config import CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS
 from sqlalchemy import create_engine, text
 from datetime import datetime
 
@@ -9,12 +11,6 @@ from datetime import datetime
 # CONFIGURAÇÕES DE MAPEAMENTO E BLOQUEIO DE ORGANIZAÇÕES
 # ==============================================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-MAPPING_ALUCOM = {1327, 1329, 1353, 1363, 1365, 1367, 1370, 1373, 1376, 1377}
-MAPPING_IP = {1346, 1349, 1350, 1364, 1368, 1371}
-MAPPING_MOREIA = {1313, 1326, 1328, 1358, 1369}
-MAPPING_AS = {1378}
-ORGANIZACOES_BLOQUEADAS = {1123, 1366}
 
 # ==============================================================================
 # FUNÇÕES AUXILIARES GENÉRICAS (usadas por todos os tipos de movimento)
@@ -225,58 +221,6 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "df_movimento_item_legado": df_movimento_item_legado,
     }
 
-
-def buscar_ultimo_movimento_por_tombo(lista_tombos, engine_legado):
-    """
-    Recebe uma lista de tombos e retorna um dict com o último movimento
-    registrado no legado para cada um deles.
-    """
-    lista_tombos_sql = "(" + ", ".join(map(str, lista_tombos)) + ")"
-    query = f"""
-        SELECT
-            am.id,
-            am.data,
-            am.tipo_id,
-            amt.nome AS tipo_nome,
-            am.cliente_id,
-            am.usuario_id,
-            am.updated_at,
-            am.deleted_at,
-            ae.numero AS tombo
-        FROM aluguel_movimento am
-        INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
-        INNER JOIN aluguel_equipamentos ae ON ae.id = ami.equipamento_id
-        INNER JOIN aluguel_tipos_movimento amt ON amt.id = am.tipo_id
-        WHERE am.deleted_at IS NULL
-          AND ae.numero IN {lista_tombos_sql}
-          AND am.id = (
-              SELECT am2.id
-              FROM aluguel_movimento am2
-              INNER JOIN aluguel_movimento_itens ami2 ON ami2.movimento_id = am2.id
-              WHERE ami2.equipamento_id = ae.id
-                AND am2.deleted_at IS NULL
-              ORDER BY am2.updated_at DESC, am2.data DESC
-              LIMIT 1
-          )
-        ORDER BY ae.numero;
-    """
-    df_resultado = pd.read_sql(query, engine_legado)
-
-    dict_ultimo_movimento = {}
-    for _, row in df_resultado.iterrows():
-        tombo_chave = limpar_codigo(row['tombo'])
-        if tombo_chave and tombo_chave != 'nan':
-            dict_ultimo_movimento[tombo_chave] = {
-                'movimento': row.to_dict(),
-                'data_dt': pd.to_datetime(row['updated_at'] if pd.notna(row['updated_at']) else row['data'])
-            }
-    """Reseta available_quantity para o valor original antes de cada execução de teste."""
-    print("🔄 Resetando available_quantity de contract_items para o valor original...")
-    with engine.begin() as conn:
-        conn.execute(text("UPDATE contract_items SET available_quantity = quantity"))
-    print("✅ Saldos de contract_items resetados.")
-    return dict_ultimo_movimento
-
 # ==============================================================================
 # CLASSE PAI: A ABSTRAÇÃO ABSOLUTA DE MOVIMENTOS
 # ==============================================================================
@@ -302,6 +246,43 @@ class BaseMigracaoMovimento:
         
         self.so_item_id_counter = start_counter
         self.extra_id_counter = start_counter
+
+    def buscar_ultimo_movimento_por_tombo(self, lista_tombos: list) -> dict:
+        if not lista_tombos:
+            return {}
+
+        lista_tombos_sql = "(" + ", ".join(map(str, lista_tombos)) + ")"
+        query = f"""
+            SELECT am.id, am.data, am.tipo_id, amt.nome AS tipo_nome,
+                   am.cliente_id, am.usuario_id, am.updated_at, am.deleted_at,
+                   ae.numero AS tombo
+            FROM aluguel_movimento am
+            INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
+            INNER JOIN aluguel_equipamentos ae ON ae.id = ami.equipamento_id
+            INNER JOIN aluguel_tipos_movimento amt ON amt.id = am.tipo_id
+            WHERE am.deleted_at IS NULL
+              AND ae.numero IN {lista_tombos_sql}
+              AND am.id = (
+                  SELECT am2.id FROM aluguel_movimento am2
+                  INNER JOIN aluguel_movimento_itens ami2 ON ami2.movimento_id = am2.id
+                  WHERE ami2.equipamento_id = ae.id AND am2.deleted_at IS NULL
+                  ORDER BY am2.updated_at DESC, am2.data DESC LIMIT 1
+              )
+            ORDER BY ae.numero;
+        """
+        df_resultado = pd.read_sql(query, self.engine_legado)
+
+        dict_res = {}
+        for _, row in df_resultado.iterrows():
+            tombo_chave = limpar_codigo(row['tombo'])
+            if tombo_chave and tombo_chave != 'nan':
+                dict_res[tombo_chave] = {
+                    'movimento': row.to_dict(),
+                    'data_dt': pd.to_datetime(row['updated_at'] if pd.notna(row['updated_at']) else row['data'])
+                }
+        
+        return dict_res
+
 
     def calcular_saldo(self, contrato_item_id, recipient_id, equipment_id_ref, mov_date, item_servico_id_atual):
         """

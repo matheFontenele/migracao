@@ -18,7 +18,7 @@ DB_CONFIG_NEW = {
     "host": "localhost", "port": "3307", "db": "controle-interno", "user": "root", "pass": "root"
 }
 DB_CONFIG_LEGADO = {
-    "host": "172.16.0.200", "port": "3310", "db": "aluguel_legado", "user": "root", "pass": "1234"
+    "host": "localhost", "port": "3307", "db": "aluguel_legado", "user": "root", "pass": "root"
 }
 
 engine_new = create_engine(
