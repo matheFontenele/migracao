@@ -1,156 +1,254 @@
+import os
 import pandas as pd
 from sqlalchemy import text
-from tqdm import tqdm
 from datetime import datetime
+from tqdm import tqdm
 
-# Herança direta do Motor Pai
-from migracao_movimentos import BaseMigracaoMovimento, limpar_codigo
+def processar_aluguel(engine_new, dados_compartilhados):
+    from migracao_movimentos import (
+        normalizar_texto, buscar_ultimo_movimento_por_tombo
+    )
 
-class MigracaoDevolucao(BaseMigracaoMovimento):
-    """
-    Classe especialista em Devoluções.
-    Varre o histórico do legado, reconstrói a Ida (Aluguel/Reserva) 
-    e consolida a Volta (Devolução) em formato de par cronológico.
-    """
+    print("\n" + "-" * 70)
+    print("📦 MÓDULO: DEVOLUÇÃO")
+    print("-" * 70)
 
-    def _extrair_pares_devolucao(self):
-        """
-        Analisa o histórico contido na RAM compartilhada para agrupar 
-        o último movimento (Devolução) com o seu respectivo penúltimo (Aluguel/Reserva).
-        """
-        print("🔍 Analisando histórico de movimentos para formar os pares (Ida ➔ Volta)...")
-        
-        df_mi = self.dados["df_movimento_item_legado"]
-        df_m = self.dados["df_movimentos_legado"]
-        
-        # Junta os itens com as capas de movimento e ordena (Equipamento + ID decrescente)
-        df_full = pd.merge(df_mi, df_m, left_on='movimento_id', right_on='id')
-        df_full = df_full.sort_values(by=['equipamento_id', 'movimento_id'], ascending=[True, False])
+    # Desempacota os dados compartilhados
+    dict_equip_ref_por_number       = dados_compartilhados["dict_equip_ref_por_number"]
+    dict_cliente_adress             = dados_compartilhados["dict_cliente_adress"]
+    dict_endereco_por_legacy_client = dados_compartilhados["dict_endereco_por_legacy_client"]
+    dict_primeiro_item_por_cliente  = dados_compartilhados["dict_primeiro_item_por_cliente"]
+    dict_primeiro_contrato_por_cliente = dados_compartilhados["dict_primeiro_contrato_por_cliente"]
+    dict_contrato_item_por_chave    = dados_compartilhados["dict_contrato_item_por_chave"]
+    dict_tipo_por_equipamento       = dados_compartilhados["dict_tipo_por_equipamento"]
+    saldos_por_id                   = dados_compartilhados["saldos_por_id"]
 
-        # 1. Isola o ÚLTIMO movimento de cada máquina
-        df_latest = df_full.drop_duplicates(subset=['equipamento_id'], keep='first')
-        
-        # Filtragem crucial: Só nos interessam equipamentos cujo ÚLTIMO estado seja Devolução (tipo_id = 2)
-        df_devolvidos = df_latest[df_latest['tipo_id'] == 2].copy()
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        # 2. Isola o PENÚLTIMO movimento de cada máquina (removendo o último do bolo)
-        df_full_no_latest = df_full[~df_full['movimento_id'].isin(df_latest['movimento_id'])]
-        df_penultimate = df_full_no_latest.drop_duplicates(subset=['equipamento_id'], keep='first')
+    # --------------------------------------------------------------------
+    # Estruturas de saída
+    # --------------------------------------------------------------------
+    servicos_mestre = []
+    service_itens_mestre = []
+    movimentos_mestre = []
+    movimento_itens_mestre = []
+    service_order_item_extra_equipments = []
+    pedidos_pai_inseridos = set()
+    equipamentos_alterados = set()
+    extra_id_counter = 1
+    so_item_id_counter = 1
 
-        # 3. O Cruzamento Perfeito: Junta a Volta com a sua respectiva Ida
-        df_pares = pd.merge(
-            df_devolvidos, df_penultimate, 
-            on='equipamento_id', 
-            suffixes=('_dev', '_ida')
-        )
-        
-        return df_pares
+    # ======================================================================
+    # LOOP PRINCIPAL
+    # ======================================================================
+    for index_csv, row_csv in tqdm(
+        df_planilha_auxiliar.iterrows(), total=df_planilha_auxiliar.shape[0], desc="Processando ALUGUEL"
+    ):
+        contrato_item_equip = str(row_csv['TOMBO']).strip()
+        if contrato_item_equip in ['nan', ''] or pd.isna(row_csv['TOMBO']):
+            continue
 
-    # ==============================================================================
-    # ENTRYPOINT DO MÓDULO DEVOLUÇÃO
-    # ==============================================================================
-    def executar(self):
-        print("\n" + "-" * 70)
-        print("📦 MÓDULO: DEVOLUÇÃO (Fonte: Histórico SQL)")
-        print("-" * 70)
+        contrato_item = str(row_csv['ITEM_DO_CONTRATO']).strip()
+        if contrato_item.lower() == 'nan':
+            continue
 
-        # 1. Extrai os pares ordenados direto da memória RAM
-        df_pares = self._extrair_pares_devolucao()
-        
-        if df_pares.empty:
-            print("⚠️ Nenhuma devolução com histórico de ida encontrada para migrar.")
-            return
-            
-        print(f"   ✅ {len(df_pares)} equipamentos prontos para reconstituição de ciclo completo.")
+        nome_contrato_csv = normalizar_texto(row_csv.get('CONTRATO'))
+        descricao_item_csv = normalizar_texto(row_csv.get('DESCRICAO_ITEM'))
+        cliente_legado_csv = row_csv['CLIENTE_ID']
+        name_item_final = row_csv['EQUIPAMENTO_NOME']
+        ultimo_mov_info = dict_ultimo_movimento_por_tombo.get(contrato_item_equip)
 
-        # 2. Laço principal de processamento do Par
-        for _, row in tqdm(df_pares.iterrows(), total=df_pares.shape[0], desc="Processando DEVOLUÇÕES"):
-            
-            equip_id_legado = row['equipamento_id']
-            tombo = self.dados["dict_tombo_por_equip_id"].get(equip_id_legado)
-            equipment_id_ref = self.dados["dict_equip_ref_por_number"].get(tombo)
-            
-            # Se o equipamento não existir no sistema refatorado, pula
-            if not equipment_id_ref: 
-                continue
+        if ultimo_mov_info is None:
+            continue
 
-            # Dados extraídos da IDA (Penúltimo Movimento)
-            id_mov_ida = int(row['movimento_id_ida'])
-            tipo_ida_legado = int(row['tipo_id_ida'])
-            cliente_id_legado_ida = int(row['cliente_id_ida'])
-            usuario_ida = int(row['usuario_id_ida']) if row['usuario_id_ida'] else 1
-            data_ida = row['updated_at_ida'] if pd.notna(row['updated_at_ida']) else self.now
+        row_mov = ultimo_mov_info['movimento']
 
-            # Dados extraídos da VOLTA (Último Movimento - Devolução)
-            id_mov_dev = int(row['movimento_id_dev'])
-            usuario_dev = int(row['usuario_id_dev']) if row['usuario_id_dev'] else 1
-            data_dev = row['updated_at_dev'] if pd.notna(row['updated_at_dev']) else self.now
+        # Filtro de tipos válidos para ALUGUEL (Alugado=1, Substituição Alugado=5)
+        if row_mov['tipo_id'] not in {1, 5}:
+            continue
 
-            # Localiza os endereçamentos do cliente baseado na época da Ida
-            recipient_id = self.dados["dict_cliente_adress"].get(cliente_id_legado_ida)
-            cliente_final = self.dados["dict_endereco_por_legacy_client"].get(cliente_id_legado_ida)
-            
-            if not recipient_id: 
-                continue
+        id_final = row_mov['id']
+        cliente_id_legado = row_mov['cliente_id']
+        recipient_id = dict_cliente_adress.get(int(cliente_id_legado)) if pd.notna(cliente_id_legado) else None
 
-            # Mapeia contratos de amarração básicos
-            contrato_id = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
-            contrato_item_id = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+        if not recipient_id:
+            continue
 
-            # ==================================================================
-            # FASE 1: RECONSTITUIÇÃO DA IDA (Aluguel ou Reserva Histórica)
-            # ==================================================================
-            # Regra de corte baseada no tipo do movimento penúltimo:
-            if tipo_ida_legado == 7:
-                tipo_movimento_ida_novo = 4  # Tipo 4 no refatorado = Reserva
-                operation_type_ida = 'RESERVA_HISTORICA'
-                detalhe_ida = "Histórico Migrado - Ida em Reserva"
-            elif tipo_ida_legado in {1, 5}:
-                tipo_movimento_ida_novo = 1  # Tipo 1 no refatorado = Aluguel
-                operation_type_ida = 'ALUGUEL_HISTORICO'
-                detalhe_ida = "Histórico Migrado - Ida em Aluguel"
+        usuario_id = row_mov['usuario_id']
+        if pd.isna(usuario_id) or usuario_id == 0:
+            usuario_id = 1
+        else:
+            usuario_id = int(usuario_id)
+
+        mov_date = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else now
+        deleted_at_mov = row_mov['deleted_at'] if pd.notna(row_mov.get('deleted_at')) else None
+        equipment_id_ref = dict_equip_ref_por_number.get(contrato_item_equip)
+        cliente_final = dict_endereco_por_legacy_client.get(int(cliente_legado_csv)) if pd.notna(cliente_legado_csv) else None
+
+        # ------------------------------------------------------------------
+        # Match do contrato (chave composta)
+        # ------------------------------------------------------------------
+        item_contrato_info = None
+        contrato_id_final = None
+        if contrato_item and recipient_id:
+            chave_busca = (int(recipient_id), nome_contrato_csv, contrato_item.upper(), descricao_item_csv)
+            item_contrato_info = dict_contrato_item_por_chave.get(chave_busca)
+
+        if item_contrato_info:
+            contrato_id_final = item_contrato_info['contract_id']
+        else:
+            contrato_id_final = dict_primeiro_contrato_por_cliente.get(int(recipient_id))
+
+        # 1️⃣ Service Order + Movement (pai)
+        if id_final not in pedidos_pai_inseridos:
+            servicos_mestre.append({
+                "id": id_final, "status_id": 3, "movement_type_id": 1, "contract_id": contrato_id_final,
+                "user_id": usuario_id, "destination_order_id": None, "mode_transport_id": 1,
+                "organization_id": 1378, "recipient_customer_id": recipient_id, "deadline": now,
+                "details": "Migração", "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+            })
+            movimentos_mestre.append({
+                "id": id_final, "number": id_final, "movement_date": mov_date, "service_order_id": id_final,
+                "recipient_customer_id": recipient_id, "migrate_customer_id": None, "organization_id": 1378,
+                "status_id": 3, "created_by": usuario_id, "details": "Migração",
+                "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+            })
+            pedidos_pai_inseridos.add(id_final)
+
+        # ------------------------------------------------------------------
+        # Controle de saldo / item extra
+        # ------------------------------------------------------------------
+        extra_id_atual = None
+        is_extra_flag = 0
+        item_servico_id_atual = so_item_id_counter
+        so_item_id_counter += 1
+        contrato_item_id = None
+
+        if item_contrato_info:
+            contrato_item_id = item_contrato_info['id']
+            if saldos_por_id[contrato_item_id] > 0:
+                saldos_por_id[contrato_item_id] -= 1
             else:
-                # Se for qualquer outro tipo estranho de movimento anterior, ignoramos o par por segurança
-                continue
+                is_extra_flag = 1
+                extra_id_atual = extra_id_counter
+                service_order_item_extra_equipments.append({
+                    "id": extra_id_atual, "service_order_item_id": item_servico_id_atual,
+                    "contract_item_id": contrato_item_id,
+                    "type_id": dict_tipo_por_equipamento.get(equipment_id_ref),
+                    "quantity": 1, "removed_quantity": 0,
+                    "created_at": mov_date, "updated_at": mov_date, "deleted_at": None
+                })
+                extra_id_counter += 1
+        else:
+            fallback_contract_item_id = dict_primeiro_item_por_cliente.get(int(recipient_id))
+            if fallback_contract_item_id:
+                is_extra_flag = 1
+                contrato_item_id = int(fallback_contract_item_id)
+                extra_id_atual = extra_id_counter
+                service_order_item_extra_equipments.append({
+                    "id": extra_id_atual, "service_order_item_id": item_servico_id_atual,
+                    "contract_item_id": contrato_item_id,
+                    "type_id": dict_tipo_por_equipamento.get(equipment_id_ref),
+                    "quantity": 1, "removed_quantity": 0,
+                    "created_at": mov_date, "updated_at": mov_date, "deleted_at": None
+                })
+                extra_id_counter += 1
+            else:
+                print(f"⚠️ [Aviso] Cliente ID {recipient_id} sem contratos ativos no sistema.")
 
-            # Invoca o motor Pai para registrar a Ida
-            self.registrar_movimento(
-                id_final=id_mov_ida,
-                recipient_id=recipient_id,
-                cliente_final=cliente_final,
-                usuario_id=usuario_ida,
-                mov_date=data_ida,
-                deleted_at_mov=None,
-                contrato_id=contrato_id,
-                contrato_item_id=contrato_item_id,
-                equipment_id_ref=equipment_id_ref,
-                tipo_movimento_id=tipo_movimento_ida_novo,
-                operation_type=operation_type_ida,
-                nome_equipamento=None,
-                alias_item=None,
-                detalhes_item=detalhe_ida
-            )
+        if equipment_id_ref:
+            equipamentos_alterados.add(equipment_id_ref)
 
-            # ==================================================================
-            # FASE 2: CONSOLIDAÇÃO DA VOLTA (Devolução Real)
-            # ==================================================================
-            # Invoca o motor Pai para registrar a Volta (Tipo 3 = Devolução)
-            self.registrar_movimento(
-                id_final=id_mov_dev,
-                recipient_id=recipient_id,
-                cliente_final=cliente_final,
-                usuario_id=usuario_dev,
-                mov_date=data_dev,
-                deleted_at_mov=None,
-                contrato_id=contrato_id,
-                contrato_item_id=contrato_item_id,
-                equipment_id_ref=equipment_id_ref,
-                tipo_movimento_id=3,
-                operation_type='DEVOLUCAO',
-                nome_equipamento=None,
-                alias_item=None,
-                detalhes_item="Migração Automática - Devolução Realizada"
-            )
+        # 2️⃣ Service Order Item
+        service_itens_mestre.append({
+            "id": item_servico_id_atual, "status_id": 3, "service_order_id": id_final,
+            "department_id": 2, "movement_type_id": 1, "contract_item_id": contrato_item_id,
+            "alias": None if contrato_item == '' else contrato_item,
+            "equipment_id": equipment_id_ref, "type_id": None, "product_id": None,
+            "is_exchange": 0, "is_extra": is_extra_flag, "quantity_product": None,
+            "fulfilled_quantity_product": 0, "quantity": 1,
+            "details": None if item_contrato_info else "Item Extra (Sem Match de Contrato)",
+            "address_id": cliente_final, "location_id": None,
+            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+        })
 
-        # 3. Salva todo o bloco no banco novo (Status do equipamento 8 = Devolvido/Disponível em Estoque)
-        self.salvar_banco(id_status_equipamento=8)
+        # 4️⃣ Movement Item
+        movimento_itens_mestre.append({
+            "movement_id": id_final, "movement_type_id": 1, "service_order_item_id": item_servico_id_atual,
+            "equipment_id": equipment_id_ref, "extra_id": extra_id_atual, "status_id": 3,
+            "product_item_id": None, "alias": name_item_final,
+            "old_organization_id": None, "new_organization_id": None, "operation_type": 'ALUGUEL',
+            "confirmed_at": None, "confirmed_by": None,
+            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+        })
+
+    # ======================================================================
+    # SALVAMENTO
+    # ======================================================================
+    print("\n🚀 Persistindo dados de ALUGUEL no banco...")
+    with engine_new.connect() as conn:
+        trans = conn.begin()
+        try:
+            if servicos_mestre:
+                pd.DataFrame(servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
+                print(f"  ✔️ {len(servicos_mestre)} Registros em 'service_orders'.")
+
+            if service_itens_mestre:
+                pd.DataFrame(service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
+                print(f"  ✔️ {len(service_itens_mestre)} Registros em 'service_order_items'.")
+
+            if movimentos_mestre:
+                pd.DataFrame(movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)
+                print(f"  ✔️ {len(movimentos_mestre)} Registros em 'movements'.")
+
+            if movimento_itens_mestre:
+                pd.DataFrame(movimento_itens_mestre).to_sql("movement_items", con=conn, if_exists="append", index=False)
+                print(f"  ✔️ {len(movimento_itens_mestre)} Registros em 'movement_items'.")
+
+            if service_order_item_extra_equipments:
+                pd.DataFrame(service_order_item_extra_equipments).to_sql(
+                    "service_order_item_extra_equipments", con=conn, if_exists="append", index=False
+                )
+                print(f"  ✔️ {len(service_order_item_extra_equipments)} Registros em 'service_order_item_extra_equipments'.")
+
+            if equipamentos_alterados:
+                lista_equip_ids = list(equipamentos_alterados)
+                for i in range(0, len(lista_equip_ids), 500):
+                    bloco = lista_equip_ids[i:i + 500]
+                    conn.execute(text("UPDATE equipments SET status_id = 2 WHERE id IN :ids"), {"ids": tuple(bloco)})
+                print(f"  ✔️ {len(lista_equip_ids)} Equipamentos atualizados para status ALUGADO.")
+
+            # Atualização de saldo dos contract_items
+            itens_contrato_modificados = []
+            ids_ja_processados = set()
+            for dados in dict_contrato_item_por_chave.values():
+                item_id = dados['id']
+                qtd_original = dados['original_quantity']
+                qtd_atual = saldos_por_id[item_id]
+                if qtd_atual != qtd_original and item_id not in ids_ja_processados:
+                    itens_contrato_modificados.append({"id": item_id, "nova_qtd": qtd_atual})
+                    ids_ja_processados.add(item_id)
+
+            if itens_contrato_modificados:
+                for item in itens_contrato_modificados:
+                    conn.execute(
+                        text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"),
+                        {"nova_qtd": item['nova_qtd'], "id": item['id']}
+                    )
+                print(f"  ✔️ {len(itens_contrato_modificados)} contract_items atualizados.")
+
+            trans.commit()
+            print("🎉 ALUGUEL concluído com sucesso!")
+
+        except Exception as e:
+            trans.rollback()
+            print(f"❌ Erro crítico no módulo ALUGUEL: {e}")
+            raise e
+
+    # ----------------------------------------------------------------------
+    print("\n--- 🏁 Resumo ALUGUEL ---")
+    print(f"📦 Serviços Criados: {len(servicos_mestre)}")
+    print(f"📦 Movimentos Criados: {len(movimentos_mestre)}")
+    print(f"📦 Itens de Serviços: {len(service_itens_mestre)}")
+    print(f"📦 Itens de Movimentos: {len(movimento_itens_mestre)}")
+    print(f"📦 Equipamentos Extras: {len(service_order_item_extra_equipments)}")

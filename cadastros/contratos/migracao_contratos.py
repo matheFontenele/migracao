@@ -6,94 +6,39 @@ from datetime import datetime
 import re
 import unicodedata
 
-# 1. Configuração da Conexão (Docker Localhost:3307)
-engine = create_engine("mysql+pymysql://root:root@localhost:3307/controle-interno")
+from config.config import CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, FALSOS_RESERVAS
 
-# Dicionários de Mapeamento (Seus Enums)
-MAP_TIPO = {'LICITACAO': 1, 'PESSOA JURIDICA': 2, 'PESSOA FISICA': 3}
-MAP_STATUS = {'AGUARDANDO INICIO': 1, 'EM ANDAMENTO': 2, 'ENCERRADO': 3}
-MAP_ORGANIZACAO = {'ALUCOM': 1115, 'MOREIA': 1122, 'IP SERVIÇOS': 1311, 'AS SISTEMAS': 1378}
+from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, ultra_normalizar
 
-# ENUMS EVENT
-MAP_EVENT_TYPES = {
-    'CADASTRO': 1,
-    'ADITIVO DE PRAZO': 2,
-    'ADITIVO DE QUANTIDADE': 3,
-    'ADITIVO DE REAJUSTE': 4,
-    'ADITIVO DE SUPRESSAO': 5,
-    'ADITIVO MODIFICAÇÃO DE ITEM': 6,
-    'APOSTILAMENTO': 7
-}
+# Lista de tabelas a serem utilizadas
+TABELAS_CONTRATOS = [
+    'contracts', 
+    'contract_items', 
+    'contract_infos',
+    'contract_jobs', 
+    'event_additives', 
+    'contract_events', 
+    'contract_recipient_customers'
+]
 
-# === DICIONÁRIO DE ABREVIAÇÕES CONHECIDAS ===
-ABBREVIATIONS = {
-    'ESPCEX': 'ESCOLA PREPARATÓRIA DE CADETES DO EXÉRCITO',
-    'FUNASA': 'FUNDAÇÃO NACIONAL DE SAÚDE',
-    '20º RCB': '20º REGIMENTO DE CAVALARIA BLINDADO - CAMPO GRANDE',
-    '20 RCB': '20º REGIMENTO DE CAVALARIA BLINDADO - CAMPO GRANDE',
-    'CRN1': 'CONSELHO REGIONAL DE NUTRIÇÃO 1ª REGIÃO (CRN-1)',
-    'CLA': 'COMANDO DA AERONÁUTICA - CENTRO DE LANÇAMENTO DE ALCÂNTARA - BASE SÃO LUIS',
-    'CREF': 'CONSELHO REGIONAL DE EDUCAÇÃO FISICA DA 3º REGIÃO - SC',
-    'COREN DF': 'CONSELHO REGIONAL DE ENFERMAGEM DO DISTRITO FEDERAL',
-    'CINDACTA I': 'MINISTÉRIO DA DEFESA - CINDACTA I - GRUPAMENTO DE APOIO - DF',
-    'CISNORDESTE SC': 'CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA',
-    'CISNORDESTE': 'CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA',
-    'ALECE': 'ASSEMBLEIA LEGISLATIVA DO ESTADO DO CEARÁ',
-    'CMFOR': 'COMANDO DA MARINHA EM FORTALEZA',
-    'EAMCE': 'ESCOLA DE APRENDIZES-MARINHEIROS DO CEARÁ',
-    'UFC': 'UNIVERSIDADE FEDERAL DO CEARÁ',
-    'IFCE': 'INSTITUTO FEDERAL DE EDUCAÇÃO E TECNOLOGIA - IFCE',
-    '10A REGIAO MILITAR': '10ª REGIÃO MILITAR',
-    '10ª REGIAO MILITAR': '10ª REGIÃO MILITAR',
-    'ANA KALINCA': 'ANA KALINCA',
-    'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM': 'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM',
-    'H F DA ROCHA COMERCIO SERVIÇOS': 'HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA',
-    'SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA−SEMUSC': 'PREFEITURA MUNICIPAL DE SAO LUIS',
-    'MARANHÃO PARCEIRIAS - MAPA': 'MARANHÃO PARCERIAS S.A - SÃO LUÍS',
-    'CONSELHO FEDERAL DE FARMÁCIA': 'CONSELHO FEDERAL DE FARMCIA - DF',
-    'TRIBUNAL REGIONAL ELEITORAL O RIO DE JANEIRO': 'TRIBUNAL REGIONAL ELEITORAL DO RIO DE JANEIRO - TRE - RIO DE JANEIRO',
-    'JOANA D ARC CLAUDIO BRASIL DOD': 'JOANA DARC CLAUDIO BRASIL DODO',
-    'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA': 'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA',
-    'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE SAÚDE': 'SEC. MUNICIPAL DA SAÚDE - URUOCA',
-    'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE EDUCAÇÃO': 'SEC. MUNICIPAL DA EDUCAÇÃO - FUNDEB - URUOCA',
-    'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP'
-}
 # Limpeza de tabelas refatorado
-def limpar_tabelas_equipamentos(engine):
-        with engine.begin() as conn:
-            conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 0"))
-            for tabela in ['contracts', 'contract_items', 'contract_infos',
-                           'contract_jobs', 'event_additives', 'contract_events', 'contract_recipient_customers']:
-                conn.execute(sa.text(f"TRUNCATE TABLE `{tabela}`"))
-            conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 1"))
+def executar_truncate_tabelas(engine, lista_tabelas: list):
+    """Executa faxina estrutural desativando chaves estrangeiras temporariamente."""
+    if not lista_tabelas:
+        return
+    print(f"🧹 Iniciando a limpeza de {len(lista_tabelas)} tabelas no banco novo...")
+    with engine.begin() as conn:
+        conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 0"))
+        for tabela in lista_tabelas:
+            conn.execute(sa.text(f"TRUNCATE TABLE `{tabela}`"))
+        conn.execute(sa.text("SET FOREIGN_KEY_CHECKS = 1"))
+    print("✅ Tabelas limpas com sucesso.")
 
-limpar_tabelas_equipamentos(engine)
-print("✅ Tabelas limpas.")
-
-
+executar_truncate_tabelas(engine, TABELAS_CONTRATOS)
 
 #===================================================
 # BLOCO DE LIMPEZA E TRATAMENTO DE DADOS (PANDAS)
 #===================================================
-def limpar_valor_inteiro(valor):
-    if pd.isna(valor) or str(valor).strip() in ('', '-', '–', '—'):
-        return 0
-    try:
-        return int(float(valor))
-    except (ValueError, TypeError):
-        return 0
-
-def ultra_normalizar(texto):
-    """Normalização profunda para ignorar acentos, símbolos e padronizar termos."""
-    if pd.isna(texto): return ""
-    texto = str(texto).upper()
-    substituicoes = {'º': ' ', '°': ' ', 'ª': ' ', '§': ' ', '(': ' ', ')': ' ', '/': ' ', '-': ' ', '.': ' ', ',': ' '}
-    for char, rep in substituicoes.items():
-        texto = texto.replace(char, rep)
-    texto = re.sub(r'\bPREF\b', 'PREFEITURA', texto)
-    texto = ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
-    texto = re.sub(r'[^A-Z0-9 ]', '', texto)
-    return ' '.join(texto.split())
 
 def validar_conflito_estrito(tokens_alvo, tokens_banco):
     num_alvo = {t for t in tokens_alvo if t.isdigit()}
@@ -157,14 +102,6 @@ def get_hierarchical_customer(nome_planilha, customer_cache):
 
     print(f"❌ Cliente não localizado: {nome_planilha}")
     return None
-
-def limpar_valor_numerico(valor):
-    if pd.isna(valor) or valor == '': return 0.0
-    if isinstance(valor, (int, float)): return float(valor)
-    texto = str(valor).replace('R$', '').replace('.', '').replace(',', '.').replace(' ', '').strip()
-    try: return float(texto)
-    except: return 0.0
-
 
 def migrar_completo_upsert():
     """

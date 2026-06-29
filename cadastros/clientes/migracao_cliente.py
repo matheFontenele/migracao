@@ -1,16 +1,176 @@
-import os
 import re
-import unicodedata
 import pandas as pd
-import sqlalchemy
-import unicodedata
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from datetime import datetime
 from tqdm import tqdm
 
-# ==============================================================================
-# MOTOR DE HIGIENIZAÇÃO PARA MATCH DE STRINGS
-# ==============================================================================
+from config.config import (
+    CLIENTES_BLOQUEADOS,
+    ORGANIZACOES_BLOQUEADAS,
+    FALSOS_RESERVAS,
+    DEPARA_EXCECOES,
+    MAPA_SAO_LUIS,
+)
+from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
+from utils.mapeador import descobrir_id_organizacao
+
+TABELAS_CLIENTES = [
+    'addresses', 
+    'customers'
+]
+
+
+class MigracaoClientes:
+
+    def __init__(self, engine_new, engine_legado):
+        self.engine_new = engine_new
+        self.engine_legado = engine_legado
+        self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.stats = {"pais": 0, "filhos": 0, "enderecos": 0}
+
+    #Inicio de extração
+    def extrair_dados_legado(engine):
+        query = """
+        SELECT
+            ald.id as ID_PREFEITURA,
+            ald.nome as PREFEITURA,
+            als.id as ID_SECRETARIA,
+            als.nome as SECRETARIA,
+            ac.id as ID_CLIENTE,
+            ac.nome_razao_social as CLIENTE,
+            ac.cpf_cnpj as CNPJ,
+            ac.orgao_id as ORGANIZACAO,
+            ac.cep as CEP,
+            ac.endereco as ENDERECO,
+            ac.estado as ESTADO,
+            ac.cidade as CIDADE,
+            ac.telefone as PHONE
+        FROM aluguel_clientes ac
+        LEFT JOIN aluguel_setor als ON als.id = ac.setor_id
+        LEFT JOIN aluguel_departamento ald ON ald.id = als.departamento_id
+        WHERE ac.deleted_at IS NULL
+        AND als.deleted_at IS NULL
+        AND ald.deleted_at IS NULL
+        ORDER BY
+            CASE
+                WHEN ald.id IS NOT NULL AND als.id IS NOT NULL THEN 1
+                WHEN ac.id IS NOT NULL THEN 2
+                ELSE 3
+            END,
+            ald.nome,
+            als.nome,
+            ac.nome_razao_social;
+        """
+        with engine.connect() as conn:
+            return pd.read_sql(text(query), conn)
+        
+
+    #Funções de padronização de São Luis e PCPB
+    def unificar_sao_luis(df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+        
+        mask_sl = df_modificado['id_clean'].isin(MAPA_SAO_LUIS.keys())
+        
+        for idx, row in df_modificado[mask_sl].iterrows():
+            id_cliente = int(row['id_clean'])
+            id_sec_alvo, nome_sec_alvo = MAPA_SAO_LUIS[id_cliente]
+            
+            # Remove o sufixo "2026" do nome do cliente final (Neto) e limpa espaços
+            nome_cliente = str(row['CLIENTE'])
+            nome_cliente_limpo = re.sub(r'\b2026\b', '', nome_cliente).strip()
+            
+            # Aplica a unificação na linha
+            df_modificado.at[idx, 'ID_PREFEITURA'] = SAO_LUIS_CONFIG['ID_PREF_ALVo']
+            df_modificado.at[idx, 'PREFEITURA'] = SAO_LUIS_CONFIG['NOME_PREF_ALVO']
+            df_modificado.at[idx, 'ID_SECRETARIA'] = id_sec_alvo
+            df_modificado.at[idx, 'SECRETARIA'] = nome_sec_alvo
+            df_modificado.at[idx, 'CLIENTE'] = nome_cliente_limpo
+        return df_modificado
+    def regionalizar_pcpb(df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+        
+        mask_pcpb = (df_modificado['ID_PREFEITURA'].astype(str).str.strip() == '320') | \
+                    (df_modificado['CLIENTE'].str.contains('PCPB', na=False))
+        
+        for idx, row in df_modificado[mask_pcpb].iterrows():
+            nome_cliente = str(row['CLIENTE']).upper()
+            nome_cliente_limpo = unicodedata.normalize('NFD', nome_cliente).encode('ascii', 'ignore').decode('utf-8')
+            
+            regiao_encontrada = "SEDE / OUTROS"
+            for termo_busca, regiao_oficial in MAPA_REGIOS_PCPB.items():
+                if termo_busca in nome_cliente_limpo:
+                    regiao_encontrada = regiao_oficial
+                    break
+                    
+            id_sintetico = MAPA_IDS_SINTETICOS_PCPB[regiao_encontrada]
+            
+            df_modificado.at[idx, 'ID_SECRETARIA'] = id_sintetico
+            df_modificado.at[idx, 'SECRETARIA'] = f"POLÍCIA CIVIL - {regiao_encontrada}"
+        return df_modificado
+
+    # ==============================================================================
+    # INICIO DE MOTOR DE TRANSFORMAÇÃO
+    # ==============================================================================
+    def _transformar(self, df):
+        print("🧹 Iniciando limpeza e aplicação de regras de negócio...")
+        df_clean = df.copy()
+        
+        # Limpeza básica
+        colunas_texto = ['PREFEITURA', 'SECRETARIA', 'CLIENTE', 'CEP', 'ENDERECO', 'ESTADO', 'CIDADE', 'CNPJ']
+        for col in colunas_texto:
+            if col in df_clean.columns:
+                df_clean[col] = df_clean[col].astype(str).str.strip().replace(['nan', 'None', ''], None)
+        
+        df_clean['CEP'] = df_clean['CEP'].fillna('NULO')
+        df_clean['ENDERECO'] = df_clean['ENDERECO'].fillna('NÃO INFORMADO')
+        df_clean['ESTADO'] = df_clean['ESTADO'].fillna('NÃO INFORMADO')
+        df_clean['CIDADE'] = df_clean['CIDADE'].fillna('NÃO INFORMADO')
+        
+        df_clean['ORG_DESTINO'] = df_clean['ORGANIZACAO'].apply(self._descobrir_organizacao)
+        df_clean = df_clean[~df_clean['ORG_DESTINO'].isin(ORGANIZACOES_BLOQUEADAS)]
+        df_clean['id_clean'] = pd.to_numeric(df_clean['ID_CLIENTE'], errors='coerce').fillna(0).astype(int)
+        df_clean = df_clean[~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)]
+
+        # --- APLICA EXCEÇÕES (São Luís e PCPB) ---
+        mask_sl = df_clean['id_clean'].isin(MAPA_SAO_LUIS.keys())
+        for idx, row in df_clean[mask_sl].iterrows():
+            id_sec_alvo, nome_sec_alvo = MAPA_SAO_LUIS[int(row['id_clean'])]
+            df_clean.at[idx, 'ID_PREFEITURA'] = 287
+            df_clean.at[idx, 'PREFEITURA'] = "PREFEITURA MUNICIPAL DE SÃO LUÍS"
+            df_clean.at[idx, 'ID_SECRETARIA'] = id_sec_alvo
+            df_clean.at[idx, 'SECRETARIA'] = nome_sec_alvo
+            df_clean.at[idx, 'CLIENTE'] = re.sub(r'\b2026\b', '', str(row['CLIENTE'])).strip()
+
+        mask_pcpb = (df_clean['ID_PREFEITURA'].astype(str).str.strip() == '320') | (df_clean['CLIENTE'].str.contains('PCPB', na=False))
+        for idx, row in df_clean[mask_pcpb].iterrows():
+            nome_limpo = unicodedata.normalize('NFD', str(row['CLIENTE']).upper()).encode('ascii', 'ignore').decode('utf-8')
+            regiao = next((ro for tb, ro in MAPA_REGIOES_PCPB.items() if tb in nome_limpo), "SEDE / OUTROS")
+            df_clean.at[idx, 'ID_SECRETARIA'] = MAPA_IDS_SINTETICOS_PCPB[regiao]
+            df_clean.at[idx, 'SECRETARIA'] = f"POLÍCIA CIVIL - {regiao}"
+
+        # --- MERGE DE RESERVAS ---
+        mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
+        df_normais = df_clean[~mask_reserva].copy()
+        df_reservas = df_clean[mask_reserva].copy()
+
+        df_normais['nome_ajustado'] = df_normais['CLIENTE'].apply(normalizar_para_match)
+        df_reservas['nome_ajustado'] = df_reservas['CLIENTE'].apply(normalizar_para_match)
+        df_normais['escopo_pai'] = df_normais['ID_SECRETARIA'].fillna(df_normais['ID_PREFEITURA'])
+        df_reservas['escopo_pai'] = df_reservas['ID_SECRETARIA'].fillna(df_reservas['ID_PREFEITURA'])
+
+        df_reservas_lookup = df_reservas[['escopo_pai', 'nome_ajustado', 'id_clean']].rename(columns={'id_clean': 'reserved_customer_id'}).drop_duplicates()
+        df_merged = pd.merge(df_normais, df_reservas_lookup, on=['escopo_pai', 'nome_ajustado'], how='left')
+
+        for id_reserva, id_titular in DEPARA_EXCECOES.items():
+            df_merged.loc[df_merged['id_clean'] == id_titular, 'reserved_customer_id'] = id_reserva
+
+        reservas_pareadas = df_merged['reserved_customer_id'].dropna().unique()
+        df_orfas = df_reservas[~df_reservas['id_clean'].isin(reservas_pareadas)].copy()
+        df_orfas['reserved_customer_id'] = None
+
+        return pd.concat([df_merged, df_orfas], ignore_index=True), df_clean
+
+
 def normalizar_para_match(nome: str) -> str:
     if not nome or pd.isna(nome): return ""
     s = unicodedata.normalize('NFD', str(nome))
@@ -18,128 +178,7 @@ def normalizar_para_match(nome: str) -> str:
     s = re.sub(r'[\-\(\s]*\b(RESERVA|RESERVADO)\b[\)\s]*', '', s)
     s = re.sub(r'[^\w\s]', '', s)
     return re.sub(r'\s+', ' ', s).strip()
-# ==============================================================================
-# NORMALIZADORES DE EXCESSÕES
-# ==============================================================================
-def unificar_sao_luis(df: pd.DataFrame) -> pd.DataFrame:
-    print("🚨 Interceptando lote de São Luís (IPAM, SEMUSC, SMTT, SEMFAZ) via IDs específicos...")
-    df_modificado = df.copy()
-    
-    # ID unificado para o PAI (Prefeitura Municipal de São Luís)
-    ID_PREF_ALVO = 287
-    NOME_PREF_ALVO = "PREFEITURA MUNICIPAL DE SÃO LUÍS"
-    
-    # Mapeamento consolidado: ID_DO_NETO -> (ID_DA_SECRETARIA_ALVO, NOME_DA_SECRETARIA)
-    mapa_sao_luis = {
-        # === IPAM (Secretaria 1194) ===
-        11791: (1194, "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM"),
-        4467:  (1194, "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM"),
-        4465:  (1194, "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM"),
-        11932: (1194, "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM"),
-        11933: (1194, "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM"),
-        
-        # === SEMUSC (Secretaria 1197) ===
-        4464:  (1197, "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"),
-        4466:  (1197, "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"),
-        10502: (1197, "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"),
-        10513: (1197, "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"),
-        11924: (1197, "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"),
-        
-        # === SMTT (Secretaria 1303) ===
-        10714: (1303, "SECRETARIA DE TRÂNSITO E TRANSPORTES - SMTT"),
-        10591: (1303, "SECRETARIA DE TRÂNSITO E TRANSPORTES - SMTT"),
-        11928: (1303, "SECRETARIA DE TRÂNSITO E TRANSPORTES - SMTT"),
-        
-        # === SEMFAZ / PM SÃO LUIS (Secretaria 1220) ===
-        10400: (1220, "SECRETARIA DA FAZENDA - SEMFAZ"),
-        10401: (1220, "SECRETARIA DA FAZENDA - SEMFAZ"),
-        11919: (1220, "SECRETARIA DA FAZENDA - SEMFAZ"),
-        11920: (1220, "SECRETARIA DA FAZENDA - SEMFAZ"),
-    }
-    
-    # Cria a máscara para varrer APENAS os IDs que estão no dicionário acima
-    mask_sl = df_modificado['id_clean'].isin(mapa_sao_luis.keys())
-    
-    for idx, row in df_modificado[mask_sl].iterrows():
-        id_cliente = int(row['id_clean'])
-        id_sec_alvo, nome_sec_alvo = mapa_sao_luis[id_cliente]
-        
-        # Remove o sufixo "2026" do nome do cliente final (Neto) e limpa espaços
-        nome_cliente = str(row['CLIENTE'])
-        nome_cliente_limpo = re.sub(r'\b2026\b', '', nome_cliente).strip()
-        
-        # Aplica a unificação na linha
-        df_modificado.at[idx, 'ID_PREFEITURA'] = ID_PREF_ALVO
-        df_modificado.at[idx, 'PREFEITURA'] = NOME_PREF_ALVO
-        df_modificado.at[idx, 'ID_SECRETARIA'] = id_sec_alvo
-        df_modificado.at[idx, 'SECRETARIA'] = nome_sec_alvo
-        df_modificado.at[idx, 'CLIENTE'] = nome_cliente_limpo
-        
-    print(f"✅ Consolidação de São Luís concluída! {len(mapa_sao_luis)} registros unificados sob a Prefeitura ID {ID_PREF_ALVO}.")
-    return df_modificado
-def regionalizar_pcpb(df: pd.DataFrame) -> pd.DataFrame:
-    df_modificado = df.copy()
-    
-    # Mapeamento de termos encontrados no texto do legado para nomes oficiais
-    mapa_regioes = {
-        "CAMPINA GRANDE": "CAMPINA GRANDE",
-        "GUARABIRA": "GUARABIRA",
-        "JOAO PESSOA": "JOÃO PESSOA",
-        "CAPITAL": "JOÃO PESSOA",
-        "MANGABEIRA": "JOÃO PESSOA",
-        "PATOS": "PATOS",
-        "SANTA RITA": "SANTA RITA",
-        "ALHANDRA": "ALHANDRA",
-        "CAAPORA": "CAAPORÃ",
-        "MAMANGUAPE": "MAMANGUAPE",
-        "CONDE": "CONDE",
-        "PEDRAS DE FOGO": "PEDRAS DE FOGO",
-        "PITIMBU": "PITIMBU",
-        "PILAR": "PILAR",
-        "PILOES": "PILÕES",
-        "JERICO": "JERICÓ"
-    }
-    
-    # Faixa de IDs estáveis para as secretarias sintéticas (900.000)
-    mapa_ids_sinteticos = {
-        "JOÃO PESSOA": 900001,
-        "CAMPINA GRANDE": 900002,
-        "GUARABIRA": 900003,
-        "PATOS": 900004,
-        "SANTA RITA": 900005,
-        "ALHANDRA": 900006,
-        "CAAPORÃ": 900007,
-        "MAMANGUAPE": 900008,
-        "CONDE": 900009,
-        "PEDRAS DE FOGO": 900010,
-        "PITIMBU": 900011,
-        "PILAR": 900012,
-        "PILÕES": 900013,
-        "JERICÓ": 900014,
-        "SEDE / OUTROS": 900015
-    }
-    
-    mask_pcpb = (df_modificado['ID_PREFEITURA'].astype(str).str.strip() == '320') | \
-                (df_modificado['CLIENTE'].str.contains('PCPB', na=False))
-    
-    for idx, row in df_modificado[mask_pcpb].iterrows():
-        nome_cliente = str(row['CLIENTE']).upper()
-        nome_cliente_limpo = unicodedata.normalize('NFD', nome_cliente).encode('ascii', 'ignore').decode('utf-8')
-        
-        regiao_encontrada = "SEDE / OUTROS"
-        for termo_busca, regiao_oficial in mapa_regioes.items():
-            if termo_busca in nome_cliente_limpo:
-                regiao_encontrada = regiao_oficial
-                break
-                
-        id_sintetico = mapa_ids_sinteticos[regiao_encontrada]
-        
-        df_modificado.at[idx, 'ID_SECRETARIA'] = id_sintetico
-        df_modificado.at[idx, 'SECRETARIA'] = f"POLÍCIA CIVIL - {regiao_encontrada}"
-        
-    print(f"✅ Divisão regionalizada concluída! {len(mapa_ids_sinteticos)} regionais injetadas.")
-    return df_modificado
-# ==============================================================================
+
 # LIMPEZA E TRATAMENTO DE DADOS
 # ==============================================================================
 def limpar_e_tratar_dados(df: pd.DataFrame) -> pd.DataFrame:
@@ -165,110 +204,14 @@ def limpar_e_tratar_dados(df: pd.DataFrame) -> pd.DataFrame:
 
     print(f"✅ Tratamento concluído! {len(df_clean)} linhas prontas para processamento hierárquico.")
     return df_clean
-# ==============================================================================
-# CONFIGURAÇÕES DE MAPEAMENTO E BLOQUEIO DE ORGANIZAÇÕES
-# ==============================================================================
-# Grupos do legado (IDs de origem)
-MAPPING_ALUCOM = {1327, 1329, 1353, 1363, 1365, 1367, 1370, 1373, 1376, 1377}
-MAPPING_IP = {1346, 1349, 1350, 1364, 1368, 1371}
-MAPPING_MOREIA = {1313, 1326, 1328, 1358, 1369}
-MAPPING_AS = {1378}
-ORGANIZACOES_BLOQUEADAS = {1123, 1366}
-CLIENTES_BLOQUEADOS = {2131, 2707}
-FALSOS_RESERVAS = {10487}
 
 
-# Configurações de Conexão
-DB_CONFIG_NEW = {
-    "host": "localhost",
-    "port": "3307",
-    "db": "controle-interno",
-    "user": "root",
-    "pass": "root"
-}
-
-DB_CONFIG_LEGADO = {
-    "host": "172.16.0.200",
-    "port": "3310",
-    "db": "aluguel_legado",
-    "user": "root",
-    "pass": "1234"
-}
-
-# Criação das Engines
-engine_new = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_NEW['user']}:{DB_CONFIG_NEW['pass']}@{DB_CONFIG_NEW['host']}:{DB_CONFIG_NEW['port']}/{DB_CONFIG_NEW['db']}"
-)
-engine_legado = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_LEGADO['user']}:{DB_CONFIG_LEGADO['pass']}@{DB_CONFIG_LEGADO['host']}:{DB_CONFIG_LEGADO['port']}/{DB_CONFIG_LEGADO['db']}"
-)
-
-print("Conexão com os bancos estabelecida.")
+  # Retorna o próprio ID caso não esteja nos mapeamentos de grupo
 
 
-def descobrir_id_organizacao_destino(id_legado):
-    """Mapeia o ID do legado para o ID correspondente no banco novo."""
-    if pd.isna(id_legado):
-        return 1115  # Padrão caso seja nulo
-    
-    id_legado_int = int(id_legado)
-    if id_legado_int in MAPPING_ALUCOM:
-        return 1115
-    elif id_legado_int in MAPPING_IP:
-        return 1311
-    elif id_legado_int in MAPPING_MOREIA:
-        return 1122
-    elif id_legado_int in MAPPING_AS:
-        return 1378
-    
-    return id_legado_int  # Retorna o próprio ID caso não esteja nos mapeamentos de grupo
+executar_truncate_tabelas(engine, TABELAS_CLIENTES)
 
-
-def extrair_dados_legado(engine):
-    query = """
-    SELECT
-        ald.id as ID_PREFEITURA,
-        ald.nome as PREFEITURA,
-        als.id as ID_SECRETARIA,
-        als.nome as SECRETARIA,
-        ac.id as ID_CLIENTE,
-        ac.nome_razao_social as CLIENTE,
-        ac.cpf_cnpj as CNPJ,
-        ac.orgao_id as ORGANIZACAO,
-        ac.cep as CEP,
-        ac.endereco as ENDERECO,
-        ac.estado as ESTADO,
-        ac.cidade as CIDADE,
-        ac.telefone as PHONE
-    FROM aluguel_clientes ac
-    LEFT JOIN aluguel_setor als ON als.id = ac.setor_id
-    LEFT JOIN aluguel_departamento ald ON ald.id = als.departamento_id
-    WHERE ac.deleted_at IS NULL
-    AND als.deleted_at IS NULL
-    AND ald.deleted_at IS NULL
-    ORDER BY
-        CASE
-            WHEN ald.id IS NOT NULL AND als.id IS NOT NULL THEN 1
-            WHEN ac.id IS NOT NULL THEN 2
-            ELSE 3
-        END,
-        ald.nome,
-        als.nome,
-        ac.nome_razao_social;
-    """
-    with engine.connect() as conn:
-        return pd.read_sql(text(query), conn)
-
-
-def limpar_tabela_destino(engine):
-    with engine.begin() as conn:
-        conn.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
-        conn.execute(text("TRUNCATE TABLE addresses"))
-        conn.execute(text("TRUNCATE TABLE customers"))
-        conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
-
-
-def executar_pipeline_migracao():
+def executar_pipeline_migracao(engine_new, engine_legado):
     try:
         df_bruto = extrair_dados_legado(engine_legado)
     except Exception as e:
@@ -324,23 +267,6 @@ def executar_pipeline_migracao():
 
     # 6. O MERGE CANÔNICO (Left Join)
     df_merged = pd.merge(df_normais, df_reservas_lookup, on=['escopo_pai', 'nome_ajustado'], how='left')
-
-    # 6.1. Ajustes em clientes específicos com DEPARA
-    DEPARA_EXCECOES = {
-        10824: 10711,
-        4182: 4174,
-        10450: 3915,
-        10427: 10414,
-        10853: 10806,
-        10434: 3634,
-        3362: 3332,
-        4439: 2879,
-        4467: 4465,
-        4464: 4466,
-        11920: 11919,
-        10935: 10823,
-
-    }
 
     for id_reserva, id_titular in DEPARA_EXCECOES.items():
         # Força a colagem do ID reserva diretamente no colo do titular utilizando a coluna id_clean
