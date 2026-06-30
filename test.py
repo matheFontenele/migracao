@@ -1,77 +1,41 @@
 import sys
-import sqlalchemy as sa
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from datetime import datetime
 
-from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, ultra_normalizar
-from utils.mapeador import descobrir_id_organizacao
+# ==============================================================================
+# IMPORTAÇÕES (Verifique se todos esses MAPS existem no seu config.config)
+# ==============================================================================
+from config.config import (
+    CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, 
+    MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, FALSOS_RESERVAS,
+    ABBREVIATIONS, MAP_ORGANIZACAO, MAP_TIPO, MAP_STATUS, MAP_EVENT_TYPES
+)
 
-# Lista de tabelas a serem utilizadas
+from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, ultra_normalizar
+
 TABELAS_CONTRATOS = [
-    'contracts', 
-    'contract_items', 
-    'contract_infos',
-    'contract_jobs', 
-    'event_additives', 
+    'contract_recipient_customers',
     'contract_events', 
-    'contract_recipient_customers'
+    'event_additives', 
+    'contract_infos',
+    'contract_items', 
+    'contract_jobs', 
+    'contracts'
 ]
 
-# DICIONARIOS DE/PARA
-ABBREVIATIONS = {
-    'ESPCEX': 'ESCOLA PREPARATÓRIA DE CADETES DO EXÉRCITO',
-    'FUNASA': 'FUNDAÇÃO NACIONAL DE SAÚDE',
-    '20º RCB': '20º REGIMENTO DE CAVALARIA BLINDADO - CAMPO GRANDE',
-    '20 RCB': '20º REGIMENTO DE CAVALARIA BLINDADO - CAMPO GRANDE',
-    'CRN1': 'CONSELHO REGIONAL DE NUTRIÇÃO 1ª REGIÃO (CRN-1)',
-    'CLA': 'COMANDO DA AERONÁUTICA - CENTRO DE LANÇAMENTO DE ALCÂNTARA - BASE SÃO LUIS',
-    'CREF': 'CONSELHO REGIONAL DE EDUCAÇÃO FISICA DA 3º REGIÃO - SC',
-    'COREN DF': 'CONSELHO REGIONAL DE ENFERMAGEM DO DISTRITO FEDERAL',
-    'CINDACTA I': 'MINISTÉRIO DA DEFESA - CINDACTA I - GRUPAMENTO DE APOIO - DF',
-    'CISNORDESTE SC': 'CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA',
-    'CISNORDESTE': 'CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA',
-    'ALECE': 'ASSEMBLEIA LEGISLATIVA DO ESTADO DO CEARÁ',
-    'CMFOR': 'COMANDO DA MARINHA EM FORTALEZA',
-    'EAMCE': 'ESCOLA DE APRENDIZES-MARINHEIROS DO CEARÁ',
-    'UFC': 'UNIVERSIDADE FEDERAL DO CEARÁ',
-    'IFCE': 'INSTITUTO FEDERAL DE EDUCAÇÃO E TECNOLOGIA - IFCE',
-    '10A REGIAO MILITAR': '10ª REGIÃO MILITAR',
-    '10ª REGIAO MILITAR': '10ª REGIÃO MILITAR',
-    'ANA KALINCA': 'ANA KALINCA',
-    'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM': 'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM',
-    'H F DA ROCHA COMERCIO SERVIÇOS': 'HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA',
-    'SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA−SEMUSC': 'PREFEITURA MUNICIPAL DE SAO LUIS',
-    'MARANHÃO PARCEIRIAS - MAPA': 'MARANHÃO PARCERIAS S.A - SÃO LUÍS',
-    'CONSELHO FEDERAL DE FARMÁCIA': 'CONSELHO FEDERAL DE FARMCIA - DF',
-    'TRIBUNAL REGIONAL ELEITORAL O RIO DE JANEIRO': 'TRIBUNAL REGIONAL ELEITORAL DO RIO DE JANEIRO - TRE - RIO DE JANEIRO',
-    'JOANA D ARC CLAUDIO BRASIL DOD': 'JOANA DARC CLAUDIO BRASIL DODO',
-    'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA': 'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA',
-    'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE SAÚDE': 'SEC. MUNICIPAL DA SAÚDE - URUOCA',
-    'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE EDUCAÇÃO': 'SEC. MUNICIPAL DA EDUCAÇÃO - FUNDEB - URUOCA',
-    'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP'
-}
-MAP_EVENT_TYPES = {
-    'CADASTRO': 1,
-    'ADITIVO DE PRAZO': 2,
-    'ADITIVO DE QUANTIDADE': 3,
-    'ADITIVO DE REAJUSTE': 4,
-    'ADITIVO DE SUPRESSAO': 5,
-    'ADITIVO MODIFICAÇÃO DE ITEM': 6,
-    'APOSTILAMENTO': 7
-}
-MAP_STATUS = {'AGUARDANDO INICIO': 1, 'EM ANDAMENTO': 2, 'ENCERRADO': 3}
-MAP_TIPO = {'LICITACAO': 1, 'PESSOA JURIDICA': 2, 'PESSOA FISICA': 3}
-MAP_ORGANIZACAO = {'ALUCOM': 1115, 'MOREIA': 1122, 'IP': 1311, 'AS SISTEMAS': 1378}
-
 class MigracaoContratos:
+    """
+    Pipeline ETL Orientado a Objetos para Migração de Contratos e Aditivos.
+    Lê de planilhas Excel e realiza UPSERTs com clonagem de histórico no MySQL.
+    """
 
     def __init__(self, engine_new, engine_legado):
         self.engine_new = engine_new
         self.engine_legado = engine_legado
-        self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.agora = datetime.now()
         self.caminho_planilha = './docs/Contratos.xlsx'
-
+        
         self.stats = {
             'contratos_criados': 0, 'contratos_atualizados': 0, 'contratos_ignorados': 0,
             'eventos_criados': 0, 'eventos_ignorados': 0, 'aditivos_criados': 0,
@@ -240,7 +204,7 @@ class MigracaoContratos:
                 'contract_status_id': MAP_STATUS.get(ultra_normalizar(row['STATUS_CONTRATO']), 2),
                 'organization_id': org_id, 'customer_id': int(cust_id),
                 'object': str(row['OBJETO_DO_CONTRATO'])[:500] if not pd.isna(row['OBJETO_DO_CONTRATO']) else "NÃO INFORMADO",
-                'updated_at': self.now
+                'updated_at': self.agora
             }
 
             if contract_info:
@@ -253,7 +217,7 @@ class MigracaoContratos:
                 """), {**dados_contrato, 'id': contract_id, 'number': numero_contrato})
                 self.stats['contratos_atualizados'] += 1
             else:
-                dados_contrato['created_at'] = self.now
+                dados_contrato['created_at'] = self.agora
                 res = conn.execute(text("""
                     INSERT INTO contracts (name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, created_at, updated_at)
                     VALUES (:name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :created_at, :updated_at)
@@ -304,7 +268,7 @@ class MigracaoContratos:
                 event_id = self.events_cache[contract_id][idx_evento_atual]
             else:
                 res = conn.execute(text("INSERT INTO contract_events (contract_id, created_at, updated_at) VALUES (:c_id, :now, :now)"), 
-                                   {"c_id": contract_id, "now": self.now})
+                                   {"c_id": contract_id, "now": self.agora})
                 event_id = res.lastrowid
                 if contract_id not in self.events_cache:
                     self.events_cache[contract_id] = []
@@ -322,7 +286,7 @@ class MigracaoContratos:
                     additive_id = self.additives_cache[chave_aditivo]
                 else:
                     res = conn.execute(text("INSERT INTO event_additives (event_id, contract_event_type_id, created_at, updated_at) VALUES (:e_id, :t_id, :now, :now)"), 
-                                       {"e_id": event_id, "t_id": t_id, "now": self.now})
+                                       {"e_id": event_id, "t_id": t_id, "now": self.agora})
                     additive_id = res.lastrowid
                     self.additives_cache[chave_aditivo] = additive_id
                     self.stats['aditivos_criados'] += 1
@@ -330,9 +294,9 @@ class MigracaoContratos:
                     antigo_additive_id = self.ultimo_aditivo_por_contrato.get(contract_id)
                     if antigo_additive_id:
                         print(f"      📋 Clonando dados do aditivo ({antigo_additive_id}) para o novo ({additive_id})...")
-                        conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) SELECT :novo_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, :now, :now FROM contract_infos WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
-                        conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now FROM contract_items WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
-                        conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
+                        conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) SELECT :novo_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, :now, :now FROM contract_infos WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.agora})
+                        conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now FROM contract_items WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.agora})
+                        conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.agora})
 
                 self.ultimo_aditivo_por_contrato[contract_id] = additive_id
                 if id_evento_planilha not in self.additive_lookup or t_id in [1, 3, 4, 5]:
@@ -354,7 +318,7 @@ class MigracaoContratos:
                 'quantity': limpar_valor_numerico(row['QUANTIDADE']),
                 'available_quantity': limpar_valor_numerico(row['QUANTIDADE']),
                 'price': limpar_valor_numerico(row['VALOR_UNITARIO']),
-                'updated_at': self.now
+                'updated_at': self.agora
             }
 
             if exists:
@@ -362,7 +326,7 @@ class MigracaoContratos:
                 self.stats['itens_atualizados'] += 1
             else:
                 dados_item['event_additive_id'] = aid
-                dados_item['created_at'] = self.now
+                dados_item['created_at'] = self.agora
                 conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) VALUES (:event_additive_id, :alias, :description, :quantity, :available_quantity, :price, :created_at, :updated_at)"), dados_item)
                 self.stats['itens_criados'] += 1
 
@@ -380,7 +344,7 @@ class MigracaoContratos:
                 'description': str(row['DESCRICAO'])[:500] if pd.notna(row['DESCRICAO']) else '',
                 'quantity': limpar_valor_numerico(row['QUANTIDADE']),
                 'price': limpar_valor_numerico(row['VALOR_UNITARIO']),
-                'updated_at': self.now
+                'updated_at': self.agora
             }
 
             if exists:
@@ -388,7 +352,7 @@ class MigracaoContratos:
                 self.stats['jobs_atualizados'] += 1
             else:
                 dados_job['event_additive_id'] = aid
-                dados_job['created_at'] = self.now
+                dados_job['created_at'] = self.agora
                 conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) VALUES (:event_additive_id, :alias, :description, :quantity, :price, :created_at, :updated_at)"), dados_job)
                 self.stats['jobs_criados'] += 1
 
@@ -408,7 +372,7 @@ class MigracaoContratos:
                 'duration': limpar_valor_inteiro(row['DURAÇÃO (MESES)']),
                 'max_duration': limpar_valor_inteiro(row['DURAÇÃO_MAXIMA (MESES)']) or 60,
                 'total_amount': limpar_valor_numerico(row['VALOR TOTAL']),
-                'updated_at': self.now
+                'updated_at': self.agora
             }
 
             if exists:
@@ -416,7 +380,7 @@ class MigracaoContratos:
                 self.stats['infos_atualizadas'] += 1
             else:
                 dados_info['event_additive_id'] = aid
-                dados_info['created_at'] = self.now
+                dados_info['created_at'] = self.agora
                 conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) VALUES (:event_additive_id, :start_date, :end_date, :max_end_date, :duration, :max_duration, :total_amount, :created_at, :updated_at)"), dados_info)
                 self.stats['infos_criadas'] += 1
 
@@ -425,11 +389,11 @@ class MigracaoContratos:
     # ==============================================================================
     def executar(self):
         print("\n" + "=" * 80)
-        print("🚀 MODO UPSERT - HISTÓRICO CONSOLIDADO (SNAPSHOTS)")
+        print("🚀 MODO UPSERT - HISTÓRICO CONSOLIDADO (SNAPSTHOTS)")
         print("=" * 80)
         
         try:
-            # 🧹 O Truncate voltou para cá, garantindo a limpeza autossuficiente do módulo!
+            # 🧹 CASO VOCÊ QUEIRA LIMPAR O BANCO E INICIAR DO ZERO, DESCOMENTE A LINHA ABAIXO:
             executar_truncate_tabelas(self.engine_new, TABELAS_CONTRATOS)
 
             print(f"\n📖 Lendo abas da planilha {self.caminho_planilha}...")
