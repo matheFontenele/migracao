@@ -4,6 +4,10 @@ import unicodedata
 import pandas as pd
 from sqlalchemy import text
 
+def limpar_cnpj(cnpj_raw):
+        c = re.sub(r'\D', '', str(cnpj_raw))
+        return c if c else '00000000000000'
+
 def normalizar_para_match(nome: str) -> str:
     if not nome or str(nome).lower() == 'nan': return ""
     s = unicodedata.normalize('NFD', str(nome))
