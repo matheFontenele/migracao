@@ -1,8 +1,8 @@
 import os
-from sqlalchemy import create_engine
+import sys
 from migracao_movimentos import (
     carregar_dados_compartilhados,
-    limpar_tabelas_refatoradas,
+    executar_truncate_tabelas,
     resetar_saldo_contract_items
 )
 
@@ -11,55 +11,59 @@ from migracao_reserva import MigracaoReserva
 # from migracao_devolucao import MigracaoDevolucao
 # from migracao_substituicao import MigracaoSubstituicao
 
-# ==============================================================================
-# CONFIGURAÇÃO DOS BANCOS DE DADOS
-# ==============================================================================
-DB_CONFIG_NEW = {
-    "host": "localhost", "port": "3307", "db": "controle-interno", "user": "root", "pass": "root"
-}
-DB_CONFIG_LEGADO = {
-    "host": "localhost", "port": "3307", "db": "aluguel_legado", "user": "root", "pass": "root"
-}
-
-engine_new = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_NEW['user']}:{DB_CONFIG_NEW['pass']}@{DB_CONFIG_NEW['host']}:{DB_CONFIG_NEW['port']}/{DB_CONFIG_NEW['db']}"
-)
-engine_legado = create_engine(
-    f"mysql+pymysql://{DB_CONFIG_LEGADO['user']}:{DB_CONFIG_LEGADO['pass']}@{DB_CONFIG_LEGADO['host']}:{DB_CONFIG_LEGADO['port']}/{DB_CONFIG_LEGADO['db']}"
-)
-
+TABELAS = []
 # ==============================================================================
 # ORQUESTRADOR PRINCIPAL
 # ==============================================================================
-def main():
-    print("=" * 70)
-    print("🚀 INICIANDO ORQUESTRAÇÃO DE MOVIMENTOS (POO)")
-    print("=" * 70)
+class OrquestradorMovimentos:
 
-    # 1. Reset e limpeza antes de qualquer migração
-    resetar_saldo_contract_items(engine_new)
-    limpar_tabelas_refatoradas(engine_new)
+    def __init__(self, engine_new, engine_legado):
+        self.engine_new = engine_new
+        self.engine_legado = engine_legado
 
-    # 2. Carrega dados compartilhados na RAM uma única vez
-    dados_compartilhados = carregar_dados_compartilhados(engine_legado, engine_new)
+    def executar(self):
+        print("\n" + "=" * 80)
+        print("🚀 INICIANDO ORQUESTRAÇÃO DE MOVIMENTOS (POO)")
+        print("=" * 80)
 
-    # 3. Execução Isolada por Módulo (Passando a RAM compartilhada)
-    print("\n▶️ Iniciando Módulo: ALUGUEL")
-    aluguel = MigracaoAluguel(engine_new, engine_legado, dados_compartilhados, start_counter=1)
-    aluguel.executar()
+        try:
+            # 1. Reset e limpeza antes de qualquer migração
+            print("\n🧹 Executando faxina e reset de saldos (Contract Items)...")
+            resetar_saldo_contract_items(self.engine_new)
+            executar_truncate_tabelas(self.engine_new, TABELAS)
+            print("   ✅ Limpeza de movimentos concluída.")
 
-    print("\n▶️ Iniciando Módulo: RESERVA")
-    reserva = MigracaoReserva(engine_new, engine_legado, dados_compartilhados, start_counter=500000)
-    reserva.executar()
+            # 2. Carrega dados compartilhados na RAM uma única vez
+            print("\n🧠 Carregando dados compartilhados na RAM (Caches)...")
+            dados_compartilhados = carregar_dados_compartilhados(self.engine_legado, self.engine_new)
 
-    # print("\n▶️ Iniciando Módulo: DEVOLUÇÃO")
-    # devolucao = MigracaoDevolucao(engine_new, engine_legado, dados_compartilhados, start_counter=1000000)
-    # devolucao.executar()
+            # 3. Execução Isolada por Módulo (Injetando a RAM)
+            print("\n▶️ Iniciando Módulo: ALUGUEL")
+            aluguel = MigracaoAluguel(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1)
+            aluguel.executar()
 
-    print("\n" + "=" * 70)
-    print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO")
-    print("=" * 70)
+            print("\n▶️ Iniciando Módulo: RESERVA")
+            reserva = MigracaoReserva(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=500000)
+            reserva.executar()
+
+            # print("\n▶️ Iniciando Módulo: DEVOLUÇÃO")
+            # devolucao = MigracaoDevolucao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1000000)
+            # devolucao.executar()
+
+            print("\n" + "=" * 80)
+            print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")
+            print("=" * 80)
+
+        except Exception as e:
+            print(f"\n❌ ERRO CRÍTICO NO ORQUESTRADOR DE MOVIMENTOS: {e}")
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
 
 
-if __name__ == "__main__":
-    main()
+# ==============================================================================
+# WRAPPER (Ponte para a execução dinâmica do main.py)
+# ==============================================================================
+def executar(eng_novo, eng_legado):
+    orquestrador = OrquestradorMovimentos(eng_novo, eng_legado)
+    orquestrador.executar()

@@ -29,6 +29,10 @@ def iniciar_aluguel(eng_novo, eng_legado):
     from movimentos import migracao_aluguel
     migracao_aluguel.executar(eng_novo, eng_legado)
 
+def iniciar_reserva(eng_novo, eng_legado):
+    from movimentos import migracao_reserva
+    migracao_reserva.executar(eng_novo, eng_legado)
+
 def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
     orquestrador_movimentos.executar(eng_novo, eng_legado)
@@ -42,6 +46,7 @@ TAREFAS = {
     "contratantes": iniciar_contratantes,
     "equipamentos": iniciar_equipamentos,
     "movimentos_aluguel": iniciar_aluguel,
+    "movimentos_reserva": iniciar_reserva,
     "movimentos": iniciar_movimentos
 }
 
@@ -55,14 +60,13 @@ def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
     try:
-        # A mágica acontece aqui: injetamos as engines direto na veia da função
         funcao_alvo(eng_novo, eng_legado)
         print(f"✅ {nome_tarefa.upper()} concluído com sucesso.")
         
     except Exception as e:
         print(f"\n❌ {nome_tarefa.upper()} ABORTOU COM ERRO CRÍTICO: {e}")
         import traceback
-        traceback.print_exc()  # Ajuda muito no debug local para ver onde a classe quebrou!
+        traceback.print_exc()
         sys.exit(1)
 
 # ==============================================================================

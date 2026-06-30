@@ -1,247 +1,167 @@
-import os
 import pandas as pd
 from sqlalchemy import text
-from datetime import datetime
 from tqdm import tqdm
 
-# ==============================================================================
-# EXTRAÇÕES SQL
-# ==============================================================================
+from movimentos.migracao_movimentos import BaseMigracaoMovimento
 
-def extrair_frente_1_clientes_reservados(engine_legado):
-    print("📖 Extraindo Frente 1: Clientes Reservados (Tipos 1 e 7)...")
-    query = """
-        SELECT
-            eq.id AS ID_EQUIPAMENTO, eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-            ac.id AS ID_CLIENTE, ac.nome_razao_social AS CLIENTE,
-            mov.id as MOVIMENTO_ID, mov.tipo_id AS TIPO_MOVIMENTO, mov.usuario_id,
-            mov.data AS DATA_ALUGUEL, mov.created_at, mov.updated_at, mov.deleted_at
-        FROM aluguel_equipamentos eq
-        INNER JOIN (
-            SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-            FROM aluguel_movimento_itens mi
-            INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-            WHERE m.deleted_at IS NULL
-            GROUP BY mi.equipamento_id
-        ) ult_mov ON ult_mov.equipamento_id = eq.id
-        INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
-        LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
-        WHERE eq.deleted_at IS NULL AND ac.deleted_at IS NULL AND eq.situacao_id IN (1, 15)
-          AND ac.nome_razao_social LIKE '%RESERV%' AND ac.id != 10487
-          AND mov.tipo_id IN (1, 7)
-    """
-    with engine_legado.connect() as conn:
-        return pd.read_sql(text(query), conn)
+class MigracaoReserva(BaseMigracaoMovimento):
+    def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=500000):
+        # start_counter=500000 garante que os IDs dos itens não conflitem com o Aluguel
+        super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
+        self.consumir_saldos = False  # 🛡️ Proteção: Reserva não subtrai saldo de contrato
 
-def extrair_frente_2_movimentos_gerais(engine_legado):
-    """
-    FRENTE 2: Clientes normais (Sem Like '%RESERV%' ou Falso Positivo).
-    Puxa APENAS movimentos do tipo 7. O Match no Python será pelo legacy_customer_id.
-    """
-    print("📖 Extraindo Frente 2: Movimentos Gerais de Reserva (Apenas Tipo 7)...")
-    query = """
-        SELECT
-            eq.id AS ID_EQUIPAMENTO, eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-            ac.id AS ID_CLIENTE, ac.nome_razao_social AS CLIENTE,
-            mov.id as MOVIMENTO_ID, mov.tipo_id AS TIPO_MOVIMENTO, mov.usuario_id,
-            mov.data AS DATA_ALUGUEL, mov.created_at, mov.updated_at, mov.deleted_at
-        FROM aluguel_equipamentos eq
-        INNER JOIN (
-            SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-            FROM aluguel_movimento_itens mi
-            INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-            WHERE m.deleted_at IS NULL
-            GROUP BY mi.equipamento_id
-        ) ult_mov ON ult_mov.equipamento_id = eq.id
-        INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
-        LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
-        WHERE eq.deleted_at IS NULL AND ac.deleted_at IS NULL AND eq.situacao_id IN (1, 15)
-          AND (ac.nome_razao_social NOT LIKE '%RESERV%' OR ac.id = 10487)
-          AND mov.tipo_id = 7
-    """
-    with engine_legado.connect() as conn:
-        return pd.read_sql(text(query), conn)
+    def calcular_saldo(
+        self, contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+        item_servico_id_atual, fallback_contract_item_id=None, forcar_extra=False
+    ):
+        """
+        POLIMORFISMO: Substitui a regra do Aluguel. 
+        Reservas não consomem saldo e não geram itens extras na tabela.
+        """
+        return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
 
-# ==============================================================================
-# PROCESSAMENTO PRINCIPAL
-# ==============================================================================
-
-def processar_reservas(engine_new, engine_legado, dados_compartilhados):
-    print("\n" + "=" * 70)
-    print("📦 MÓDULO: ALOCAÇÃO DE RESERVAS (ESTOQUE E CLIENTES)")
-    print("=" * 70)
-
-    # Desempacota dicionários tradicionais do legacy_customer_id
-    dict_equip_ref_por_number          = dados_compartilhados["dict_equip_ref_por_number"]
-    dict_cliente_adress                = dados_compartilhados["dict_cliente_adress"]
-    dict_endereco_por_legacy_client    = dados_compartilhados["dict_endereco_por_legacy_client"]
-    dict_primeiro_item_por_cliente     = dados_compartilhados["dict_primeiro_item_por_cliente"]
-    dict_primeiro_contrato_por_cliente = dados_compartilhados["dict_primeiro_contrato_por_cliente"]
-
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # 1. Busca os Dicionários da Frente 1 (Match pelo reserved_customer_id) direto no Banco Novo
-    dict_recipient_por_reserved = {}
-    dict_endereco_por_reserved = {}
-    with engine_new.connect() as conn:
-        print("🔍 Mapeando dicionários de reserved_customer_id...")
-        res = conn.execute(text("""
-            SELECT addressable_id, id, reserved_customer_id 
-            FROM addresses 
-            WHERE addressable_type = 'customer' AND reserved_customer_id IS NOT NULL
-        """))
-        for r in res.mappings():
-            res_id = int(r['reserved_customer_id'])
-            dict_recipient_por_reserved[res_id] = int(r['addressable_id'])
-            dict_endereco_por_reserved[res_id] = int(r['id'])
-
-    # 2. Carrega as duas extrações
-    df_frente1 = extrair_frente_1_clientes_reservados(engine_legado)
-    df_frente2 = extrair_frente_2_movimentos_gerais(engine_legado)
-
-    if df_frente1.empty and df_frente2.empty:
-        print("Nenhum movimento de reserva encontrado nas duas frentes.")
-        return
-
-    # 3. Estruturas de saída
-    servicos_mestre = []
-    service_itens_mestre = []
-    movimentos_mestre = []
-    movimento_itens_mestre = []
-    
-    pedidos_pai_inseridos = set()
-    equipamentos_alterados = set()
-    so_item_id_counter = 500000 
-    MOVEMENT_TYPE_RESERVA = 4
-
-    # ----------------------------------------------------------------------
-    # FUNÇÃO INTERNA DE PROCESSAMENTO DA LINHA (Serve para ambas as frentes)
-    # ----------------------------------------------------------------------
-    def processar_linha(row, frente):
-        nonlocal so_item_id_counter
+    def _extrair_dados_reserva(self, frente):
+        """
+        Padrão DRY: Extrai os dados do MySQL Legado variando apenas a regra de negócio (WHERE).
+        """
+        print(f"   📖 Extraindo Frente {frente} de Reservas...")
         
-        id_final = int(row['MOVIMENTO_ID'])
-        tombo = str(row['TOMBO']).strip()
-        cliente_id_legado = int(row['ID_CLIENTE'])
-        name_item_final = row['NOME_EQUIPAMENTO']
-        
-        equipment_id_ref = dict_equip_ref_por_number.get(tombo)
-        if not equipment_id_ref: return
-
+        # O %% escapa o % no SQLAlchemy para não bugar a query
         if frente == 1:
-            recipient_id = dict_recipient_por_reserved.get(cliente_id_legado)
-            cliente_final = dict_endereco_por_reserved.get(cliente_id_legado)
+            filtro_where = "ac.nome_razao_social LIKE '%%RESERV%%' AND ac.id != 10487 AND mov.tipo_id IN (1, 7)"
         else:
-            recipient_id = dict_cliente_adress.get(cliente_id_legado)
-            cliente_final = dict_endereco_por_legacy_client.get(cliente_id_legado)
+            filtro_where = "(ac.nome_razao_social NOT LIKE '%%RESERV%%' OR ac.id = 10487) AND mov.tipo_id = 7"
 
-        if not recipient_id: return
-
-        usuario_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
-        mov_date = row['updated_at'] if pd.notna(row['updated_at']) else now
-        deleted_at_mov = row['deleted_at'] if pd.notna(row['deleted_at']) else None
-
-        contrato_id_final = dict_primeiro_contrato_por_cliente.get(recipient_id)
-        contrato_item_id = dict_primeiro_item_por_cliente.get(recipient_id)
-
-        if id_final not in pedidos_pai_inseridos:
-            servicos_mestre.append({
-                "id": id_final,
-                 "status_id": 3,
-                 "movement_type_id": MOVEMENT_TYPE_RESERVA, 
-                "contract_id": contrato_id_final,
-                "user_id": usuario_id,
-                "destination_order_id": None, 
-                "mode_transport_id": 1,
-                "organization_id": 1378,
-                "recipient_customer_id": recipient_id, 
-                "deadline": now,
-                "details": f"Migração - Reserva (Frente {frente})", 
-                "created_at": mov_date,
-                "updated_at": mov_date,
-                "deleted_at": deleted_at_mov
-            })
-            movimentos_mestre.append({
-                "id": id_final,
-                "number": id_final,
-                "movement_date": mov_date,
-                "service_order_id": id_final,
-                "recipient_customer_id": recipient_id,
-                "migrate_customer_id": None,
-                "organization_id": 1378,
-                "status_id": 3,
-                "created_by": usuario_id,
-                "details": f"Migração - Reserva (Frente {frente})",
-                "created_at": mov_date,
-                "updated_at": mov_date,
-                "deleted_at": deleted_at_mov
-            })
-            pedidos_pai_inseridos.add(id_final)
-
-        item_servico_id_atual = so_item_id_counter
-        so_item_id_counter += 1
-
-        service_itens_mestre.append({
-            "id": item_servico_id_atual, "status_id": 3, "service_order_id": id_final,
-            "department_id": 2, "movement_type_id": MOVEMENT_TYPE_RESERVA, "contract_item_id": contrato_item_id,
-            "alias": None, "equipment_id": equipment_id_ref, "type_id": None, "product_id": None,
-            "is_exchange": 0, "is_extra": 0, "quantity_product": None,
-            "fulfilled_quantity_product": 0, "quantity": 1,
-            "details": f"Alocação de Reserva (Frente {frente})",
-            "address_id": cliente_final, "location_id": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
-        })
-
-        movimento_itens_mestre.append({
-            "movement_id": id_final, "movement_type_id": MOVEMENT_TYPE_RESERVA, "service_order_item_id": item_servico_id_atual,
-            "equipment_id": equipment_id_ref, "extra_id": None, "status_id": 3,
-            "product_item_id": None, "alias": name_item_final,
-            "old_organization_id": None, "new_organization_id": None, "operation_type": 'RESERVA',
-            "confirmed_at": None, "confirmed_by": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
-        })
-
-        equipamentos_alterados.add(equipment_id_ref)
-
-    # 4. Executa os loops
-    for _, row in tqdm(df_frente1.iterrows(), total=df_frente1.shape[0], desc="Executando FRENTE 1"):
-        processar_linha(row, frente=1)
+        query = f"""
+            SELECT
+                eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
+                ac.id AS ID_CLIENTE, mov.id as MOVIMENTO_ID, 
+                mov.usuario_id, mov.updated_at, mov.deleted_at
+            FROM aluguel_equipamentos eq
+            INNER JOIN (
+                SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
+                FROM aluguel_movimento_itens mi
+                INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+                WHERE m.deleted_at IS NULL
+                GROUP BY mi.equipamento_id
+            ) ult_mov ON ult_mov.equipamento_id = eq.id
+            INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
+            LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
+            WHERE eq.deleted_at IS NULL 
+              AND ac.deleted_at IS NULL 
+              AND eq.situacao_id IN (1, 15)
+              AND {filtro_where}
+        """
         
-    for _, row in tqdm(df_frente2.iterrows(), total=df_frente2.shape[0], desc="Executando FRENTE 2"):
-        processar_linha(row, frente=2)
+        with self.engine_legado.connect() as conn:
+            return pd.read_sql(text(query), conn)
 
-    # ======================================================================
-    # SALVAMENTO NO BANCO NOVO
-    # ======================================================================
-    print("\n🚀 Persistindo dados de RESERVA no banco...")
-    with engine_new.connect() as conn:
-        trans = conn.begin()
-        try:
-            if servicos_mestre:
-                pd.DataFrame(servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
-            if service_itens_mestre:
-                pd.DataFrame(service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
-            if movimentos_mestre:
-                pd.DataFrame(movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)
-            if movimento_itens_mestre:
-                pd.DataFrame(movimento_itens_mestre).to_sql("movement_items", con=conn, if_exists="append", index=False)
+    def executar(self):
+        print("\n" + "=" * 70)
+        print("📦 MÓDULO: ALOCAÇÃO DE RESERVAS (ESTOQUE E CLIENTES)")
+        print("=" * 70)
 
-            if equipamentos_alterados:
-                lista_equip_ids = list(equipamentos_alterados)
-                for i in range(0, len(lista_equip_ids), 500):
-                    bloco = lista_equip_ids[i:i + 500]
-                    conn.execute(text("UPDATE equipments SET status_id = 3 WHERE id IN :ids"), {"ids": tuple(bloco)})
+        # 1. Carrega o mapeamento específico para a Frente 1 (clientes reservados)
+        dict_recipient_por_reserved = {}
+        dict_endereco_por_reserved = {}
+        with self.engine_new.connect() as conn:
+            res = conn.execute(text("""
+                SELECT addressable_id, id, reserved_customer_id 
+                FROM addresses 
+                WHERE addressable_type = 'customer' AND reserved_customer_id IS NOT NULL
+            """))
+            for r in res.mappings():
+                res_id = int(r['reserved_customer_id'])
+                dict_recipient_por_reserved[res_id] = int(r['addressable_id'])
+                dict_endereco_por_reserved[res_id] = int(r['id'])
 
-            trans.commit()
-            print("🎉 MÓDULO RESERVA concluído com sucesso!")
+        # 2. Executa as Extrações (Frente 1 e Frente 2)
+        df_frente1 = self._extrair_dados_reserva(frente=1)
+        df_frente2 = self._extrair_dados_reserva(frente=2)
 
-        except Exception as e:
-            trans.rollback()
-            print(f"❌ Erro crítico no módulo RESERVA: {e}")
-            raise e
+        if df_frente1.empty and df_frente2.empty:
+            print("⚠️ Nenhum movimento de reserva encontrado nas duas frentes.")
+            return
 
-    print("\n--- 🏁 Resumo RESERVAS ---")
-    print(f"📦 Extração Frente 1 (Clientes Reserva): {len(df_frente1)}")
-    print(f"📦 Extração Frente 2 (Movimentos Tipo 7): {len(df_frente2)}")
-    print(f"📦 Serviços/Movimentos Pais Criados: {len(servicos_mestre)}")
-    print(f"📦 Itens Criados: {len(service_itens_mestre)}")
+        rejeitados = 0
+
+        # 3. Lógica central de processamento linha a linha
+        def processar_linha(row, frente):
+            nonlocal rejeitados
+            id_final = int(row['MOVIMENTO_ID'])
+            tombo = str(row['TOMBO']).strip()
+            cliente_id_legado = int(row['ID_CLIENTE'])
+            
+            equipment_id_ref = self.dados["dict_equip_ref_por_number"].get(tombo)
+            if not equipment_id_ref:
+                rejeitados += 1
+                return
+
+            # Roteamento baseado na Frente
+            if frente == 1:
+                recipient_id = dict_recipient_por_reserved.get(cliente_id_legado)
+                cliente_final = dict_endereco_por_reserved.get(cliente_id_legado)
+            else:
+                recipient_id = self.dados["dict_cliente_adress"].get(cliente_id_legado)
+                cliente_final = self.dados["dict_endereco_por_legacy_client"].get(cliente_id_legado)
+
+            if not recipient_id: 
+                rejeitados += 1
+                return
+
+            usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
+            mov_date = row['updated_at'] if pd.notna(row['updated_at']) else self.now
+
+            # Fallback Padrão da Reserva: Puxa o primeiro contrato/item disponível do cliente
+            contrato_id_res = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
+            item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+
+            # Envia para a fábrica da Classe Pai criar os registros nas 4 tabelas mestre
+            self.registrar_movimento(
+                id_final=id_final,
+                recipient_id=recipient_id,
+                cliente_final_address_id=cliente_final,
+                usuario_id=usr_id,
+                mov_date=mov_date,
+                deleted_at_mov=row['deleted_at'] if pd.notna(row['deleted_at']) else None,
+                contrato_id=contrato_id_res,
+                contrato_item_id=item_id_res,
+                equipment_id_ref=equipment_id_ref,
+                tipo_movimento_id=4, # 4 = ID de Reserva no banco novo
+                operation_type='RESERVA',
+                alias_item=None,
+                alias_movimento=row['NOME_EQUIPAMENTO'],
+                details_capa=f"Migração - Reserva (Frente {frente})",
+                details_item=f"Alocação de Reserva (Frente {frente})"
+            )
+
+        # 4. Iteração sobre os DataFrames extraídos
+        for _, row in tqdm(df_frente1.iterrows(), total=df_frente1.shape[0], desc="Processando FRENTE 1"):
+            processar_linha(row, frente=1)
+            
+        for _, row in tqdm(df_frente2.iterrows(), total=df_frente2.shape[0], desc="Processando FRENTE 2"):
+            processar_linha(row, frente=2)
+
+        print(f"\n⚠️ Registros rejeitados (Sem equipamento ou sem endereço): {rejeitados}")
+
+        # 5. Salva em lote no banco (Status 3 = Reservado)
+        self.salvar_banco(id_status_equipamento=3)
+
+# ==============================================================================
+# WRAPPER (A porta de entrada do orquestrador ou terminal)
+# ==============================================================================
+def executar(eng_novo, eng_legado):
+    from movimentos.migracao_movimentos import carregar_dados_compartilhados
+
+    print("\n" + "="*70)
+    print("🚀 MODO DEBUG: Disparando teste isolado de RESERVA")
+    print("="*70)
+
+    # 🛑 IMPORTANTE: A Reserva não chama o `executar_truncate_tabelas`.
+    # Ela herda a sujeira do Aluguel de propósito, adicionando seus dados por cima.
+
+    print("\n🧠 Carregando dados compartilhados na RAM (Caches)...")
+    dados_ram = carregar_dados_compartilhados(eng_legado, eng_novo)
+
+    app_teste = MigracaoReserva(eng_novo, eng_legado, dados_ram, start_counter=500000)
+    app_teste.executar()

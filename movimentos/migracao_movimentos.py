@@ -3,9 +3,11 @@ import sqlalchemy
 import os
 
 from config.config import CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from datetime import datetime
 
+# Importa a função oficial de higienização do projeto
+from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, normalizar_para_match
 
 # ==============================================================================
 # CONFIGURAÇÕES DE MAPEAMENTO E BLOQUEIO DE ORGANIZAÇÕES
@@ -21,11 +23,6 @@ def limpar_codigo(val):
     s = str(val).strip()
     return s[:-2] if s.endswith(".0") else s
 
-
-def normalizar_texto(val):
-    if pd.isna(val):
-        return ""
-    return str(val).strip().upper()
 
 
 def descobrir_id_organizacao_destino(id_legado):
@@ -43,38 +40,11 @@ def descobrir_id_organizacao_destino(id_legado):
         return 1378
     return id_legado_int
 
-
-def limpar_tabelas_refatoradas(engine):
-    """Limpa as tabelas de movimentos antes de cada execução."""
-    print("🧹 Iniciando a limpeza das tabelas no banco refatorado...")
-    tabelas_para_limpar = [
-        "service_order_item_extra_equipments",
-        "movement_items",
-        "movements",
-        "service_order_items",
-        "service_orders"
-    ]
-    with engine.connect() as conn:
-        trans = conn.begin()
-        try:
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
-            for tabela in tabelas_para_limpar:
-                conn.execute(text(f"TRUNCATE TABLE {tabela};"))
-            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
-            trans.commit()
-            print("✅ Tabelas limpas com sucesso.")
-        except Exception as e:
-            trans.rollback()
-            print(f"❌ Erro crítico ao limpar o banco refatorado: {e}")
-            raise e
-
-
 def resetar_saldo_contract_items(engine):
-    print("🔄 Resetando available_quantity de contract_items para o valor original...")
+    print("🔄 Resetando available_quantity de contract_items para o valor original (quantity)...")
     with engine.begin() as conn:
         conn.execute(text("UPDATE contract_items SET available_quantity = quantity"))
-    print("✅ Saldos resetados.")
-
+    print("   ✅ Saldos reestabelecidos.")
 
 # ==============================================================================
 # CARGA DE DADOS COMPARTILHADOS
@@ -143,6 +113,17 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_primeiro_item = pd.read_sql(query_primeiro_item, conn)
         df_primeiro_item = df_primeiro_item.drop_duplicates(subset=['customer_id'], keep='first')
 
+        query_primeiro_item_por_contrato = text("""
+            SELECT c.id AS contract_id, ci.id AS contract_item_id
+            FROM contract_items ci
+            JOIN event_additives ea ON ea.id = ci.event_additive_id
+            JOIN contract_events ce ON ce.id = ea.event_id
+            JOIN contracts c ON c.id = ce.contract_id
+            ORDER BY c.id ASC, ci.id ASC
+        """)
+        df_primeiro_item_por_contrato = pd.read_sql(query_primeiro_item_por_contrato, conn)
+        df_primeiro_item_por_contrato = df_primeiro_item_por_contrato.drop_duplicates(subset=['contract_id'], keep='first')
+
         query_tipo_equipamentos = text("""
             SELECT e.id AS equipment_id, p.type_id 
             FROM equipments e
@@ -181,31 +162,79 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_primeiro_item['customer_id'].astype(int),
         df_primeiro_item['contract_id'].astype(int)
     ))
+    dict_primeiro_item_por_contrato = dict(zip(
+        df_primeiro_item_por_contrato['contract_id'].astype(int),
+        df_primeiro_item_por_contrato['contract_item_id'].astype(int)
+    ))
 
     # Dicionário de contrato_item com chave composta (cliente, contrato, item, descrição)
     dict_contrato_item_por_chave = {
         (
             int(row['cliente_id']),
-            normalizar_texto(row['contract_name']),
-            normalizar_texto(row['alias_item_contract']),
-            normalizar_texto(row['description'])
+            normalizar_para_match(row['contract_name']),
+            normalizar_para_match(row['alias_item_contract']),
+            normalizar_para_match(row['description'])
         ): {
             'id': int(row['contract_item_id']),
             'contract_id': int(row['contract_id']),
-            'available_quantity': int(row['available_quantity']) if pd.notna(row['available_quantity']) else 0,
-            'original_quantity': int(row['available_quantity']) if pd.notna(row['available_quantity']) else 0
+            'available_quantity': limpar_valor_numerico(row['available_quantity']),
+            'original_quantity': limpar_valor_numerico(row['available_quantity'])
         }
         for _, row in df_contratos_itens.iterrows()
         if pd.notna(row['alias_item_contract']) and pd.notna(row['cliente_id'])
     }
+
+    dict_contrato_item_aluguel_por_chave = {}
+    dict_contrato_aluguel_por_chave = {}
+    for _, row in df_contratos_itens.iterrows():
+        if pd.isna(row['legacy_client_id']) or pd.isna(row['alias_item_contract']):
+            continue
+
+        legacy_client_id = limpar_valor_inteiro(row['legacy_client_id'])
+        contract_id = limpar_valor_inteiro(row['contract_id'])
+        contract_item_id = limpar_valor_inteiro(row['contract_item_id'])
+        if not legacy_client_id or not contract_id or not contract_item_id:
+            continue
+
+        info_item = {
+            'id': contract_item_id,
+            'contract_id': contract_id,
+            'available_quantity': limpar_valor_numerico(row['available_quantity']),
+            'original_quantity': limpar_valor_numerico(row['available_quantity'])
+        }
+
+        nomes_contrato = [row.get('contract_alias'), row.get('contract_name')]
+        for nome_contrato in nomes_contrato:
+            contrato_norm = normalizar_para_match(nome_contrato)
+            if not contrato_norm:
+                continue
+
+            chave_contrato = (legacy_client_id, contrato_norm)
+            dict_contrato_aluguel_por_chave.setdefault(chave_contrato, {
+                'contract_id': contract_id,
+                'first_contract_item_id': dict_primeiro_item_por_contrato.get(contract_id, contract_item_id)
+            })
+
+            chave_item = (
+                legacy_client_id,
+                contrato_norm,
+                normalizar_para_match(row['alias_item_contract']),
+                normalizar_para_match(row['description'])
+            )
+            dict_contrato_item_aluguel_por_chave.setdefault(chave_item, info_item)
 
     saldos_por_id = {}
     for dados in dict_contrato_item_por_chave.values():
         item_id = dados['id']
         if item_id not in saldos_por_id:
             saldos_por_id[item_id] = dados['available_quantity']
+    for dados in dict_contrato_item_aluguel_por_chave.values():
+        item_id = dados['id']
+        if item_id not in saldos_por_id:
+            saldos_por_id[item_id] = dados['available_quantity']
 
     print(f"   ✅ {len(dict_contrato_item_por_chave)} combinações (cliente, contrato, item, descrição) indexadas.")
+    print(f"   ✅ {len(dict_contrato_item_aluguel_por_chave)} combinações de aluguel por legacy_customer_id indexadas.")
 
     return {
         "dict_tombo_por_equip_id": dict_tombo_por_equip_id,
@@ -215,7 +244,10 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_endereco_por_legacy_client": dict_endereco_por_legacy_client,
         "dict_primeiro_item_por_cliente": dict_primeiro_item_por_cliente,
         "dict_primeiro_contrato_por_cliente": dict_primeiro_contrato_por_cliente,
+        "dict_primeiro_item_por_contrato": dict_primeiro_item_por_contrato,
         "dict_contrato_item_por_chave": dict_contrato_item_por_chave,
+        "dict_contrato_item_aluguel_por_chave": dict_contrato_item_aluguel_por_chave,
+        "dict_contrato_aluguel_por_chave": dict_contrato_aluguel_por_chave,
         "dict_tipo_por_equipamento": dict_tipo_por_equipamento,
         "saldos_por_id": saldos_por_id,
         "df_movimento_item_legado": df_movimento_item_legado,
@@ -226,11 +258,12 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
 # ==============================================================================
 
 class BaseMigracaoMovimento:
-    def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=1):
+    def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=1, limpar_ambiente = False):
         self.engine_new = engine_new
         self.engine_legado = engine_legado
         self.dados = dados_compartilhados
         self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.limpar_ambiente = limpar_ambiente
         
         self.servicos_mestre = []
         self.service_itens_mestre = []
@@ -246,6 +279,9 @@ class BaseMigracaoMovimento:
         
         self.so_item_id_counter = start_counter
         self.extra_id_counter = start_counter
+
+    def limpar_tabelas_movimento(self):
+        pass
 
     def buscar_ultimo_movimento_por_tombo(self, lista_tombos: list) -> dict:
         if not lista_tombos:
@@ -284,7 +320,10 @@ class BaseMigracaoMovimento:
         return dict_res
 
 
-    def calcular_saldo(self, contrato_item_id, recipient_id, equipment_id_ref, mov_date, item_servico_id_atual):
+    def calcular_saldo(
+        self, contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+        item_servico_id_atual, fallback_contract_item_id=None, forcar_extra=False
+    ):
         """
         Por padrão (Reserva, Devolução, Substituição), movimentos NÃO consomem saldo.
         Retorna: (is_extra = 0, extra_id = None, contrato_item_id_mantido)
@@ -296,7 +335,8 @@ class BaseMigracaoMovimento:
         usuario_id: int, mov_date: str, deleted_at_mov: str, contrato_id: int,
         contrato_item_id: int, equipment_id_ref: int, tipo_movimento_id: int,
         operation_type: str, alias_item: str = None, alias_movimento: str = None,
-        details_capa: str = "Migração Automática", details_item: str = None
+        details_capa: str = "Migração Automática", details_item: str = None,
+        fallback_contract_item_id: int = None, forcar_extra: bool = False
     ):
         
         # 1️⃣ CAPAS PAI (Service Order + Movement)
@@ -320,7 +360,8 @@ class BaseMigracaoMovimento:
         self.so_item_id_counter += 1
 
         is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
-            contrato_item_id, recipient_id, equipment_id_ref, mov_date, item_servico_id_atual
+            contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+            item_servico_id_atual, fallback_contract_item_id, forcar_extra
         )
 
         # 3️⃣ SERVICE ORDER ITEM
@@ -328,22 +369,43 @@ class BaseMigracaoMovimento:
 
         self.service_itens_mestre.append({
             "id": item_servico_id_atual, "status_id": 3, "service_order_id": id_final,
-            "department_id": 2, "movement_type_id": tipo_movimento_id, "contract_item_id": contrato_item_id_resolvido,
-            "alias": alias_item, "equipment_id": equipment_id_ref, "type_id": None, "product_id": None,
-            "is_exchange": 0, "is_extra": is_extra_flag, "quantity_product": None,
-            "fulfilled_quantity_product": 0, "quantity": 1, "details": txt_detalhe_final,
-            "address_id": cliente_final_address_id, "location_id": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+            "department_id": 2,
+            "movement_type_id": tipo_movimento_id,
+            "contract_item_id": contrato_item_id_resolvido,
+            "alias": alias_item,
+            "equipment_id": equipment_id_ref,
+            "type_id": None,
+            "product_id": None,
+            "is_exchange": 0,
+            "is_extra": is_extra_flag,
+            "quantity_product": None,
+            "fulfilled_quantity_product": 0,
+            "quantity": 1, "details": txt_detalhe_final,
+            "address_id": cliente_final_address_id,
+            "location_id": None,
+            "created_at": mov_date,
+            "updated_at": mov_date,
+            "deleted_at": deleted_at_mov
         })
 
         # 4️⃣ MOVEMENT ITEM
         self.movimento_itens_mestre.append({
-            "movement_id": id_final, "movement_type_id": tipo_movimento_id, "service_order_item_id": item_servico_id_atual,
-            "equipment_id": equipment_id_ref, "extra_id": extra_id_atual, "status_id": 3,
-            "product_item_id": None, "alias": alias_movimento,
-            "old_organization_id": None, "new_organization_id": None, "operation_type": operation_type,
-            "confirmed_at": None, "confirmed_by": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+            "movement_id": id_final,
+            "movement_type_id": tipo_movimento_id,
+            "service_order_item_id": item_servico_id_atual,
+            "equipment_id": equipment_id_ref,
+            "extra_id": extra_id_atual,
+            "status_id": 3,
+            "product_item_id": None,
+            "alias": alias_movimento,
+            "old_organization_id": None,
+            "new_organization_id": None,
+            "operation_type": operation_type,
+            "confirmed_at": None,
+            "confirmed_by": None,
+            "created_at": mov_date,
+            "updated_at": mov_date,
+            "deleted_at": deleted_at_mov
         })
 
         if equipment_id_ref:
