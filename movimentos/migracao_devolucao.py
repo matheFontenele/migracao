@@ -1,254 +1,75 @@
-import os
-import pandas as pd
-from sqlalchemy import text
-from datetime import datetime
-from tqdm import tqdm
+from movimentos.migracao_aluguel import MigracaoAluguel
+from movimentos.migracao_reserva import MigracaoReserva
+from movimentos.migracao_movimentos import BaseMigracaoMovimento
 
-def processar_aluguel(engine_new, dados_compartilhados):
-    from migracao_movimentos import (
-        normalizar_texto, buscar_ultimo_movimento_por_tombo
-    )
+class MigracaoDevolucao(BaseMigracaoMovimento):
+    def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=800000):
+        super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
+        
+        # Novas tabelas exclusivas da Devolução
+        self.shipments = []
+        self.shipment_movements = []
+        self.shipment_items = []
+        
+        # Contadores de IDs
+        self.shipment_id_counter = 1
+        self.shipment_item_id_counter = 1
 
-    print("\n" + "-" * 70)
-    print("📦 MÓDULO: DEVOLUÇÃO")
-    print("-" * 70)
+    def reconstruir_passado(self, tipo_movimento_anterior, dados_linha):
+        """
+        O Poder do Modo Fantasma: Invoca o Aluguel ou Reserva 
+        sem limpar o banco e sem descontar saldo!
+        """
+        if tipo_movimento_anterior == 'ALUGUEL':
+            fantasma = MigracaoAluguel(
+                self.engine_new, self.engine_legado, self.dados, consumir_saldos=False
+            )
+            # Injeta os dados específicos daquele movimento passado e manda executar
+            
+        elif tipo_movimento_anterior == 'RESERVA':
+            fantasma = MigracaoReserva(
+                self.engine_new, self.engine_legado, self.dados
+            )
+            # Injeta os dados...
 
-    # Desempacota os dados compartilhados
-    dict_equip_ref_por_number       = dados_compartilhados["dict_equip_ref_por_number"]
-    dict_cliente_adress             = dados_compartilhados["dict_cliente_adress"]
-    dict_endereco_por_legacy_client = dados_compartilhados["dict_endereco_por_legacy_client"]
-    dict_primeiro_item_por_cliente  = dados_compartilhados["dict_primeiro_item_por_cliente"]
-    dict_primeiro_contrato_por_cliente = dados_compartilhados["dict_primeiro_contrato_por_cliente"]
-    dict_contrato_item_por_chave    = dados_compartilhados["dict_contrato_item_por_chave"]
-    dict_tipo_por_equipamento       = dados_compartilhados["dict_tipo_por_equipamento"]
-    saldos_por_id                   = dados_compartilhados["saldos_por_id"]
-
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # --------------------------------------------------------------------
-    # Estruturas de saída
-    # --------------------------------------------------------------------
-    servicos_mestre = []
-    service_itens_mestre = []
-    movimentos_mestre = []
-    movimento_itens_mestre = []
-    service_order_item_extra_equipments = []
-    pedidos_pai_inseridos = set()
-    equipamentos_alterados = set()
-    extra_id_counter = 1
-    so_item_id_counter = 1
-
-    # ======================================================================
-    # LOOP PRINCIPAL
-    # ======================================================================
-    for index_csv, row_csv in tqdm(
-        df_planilha_auxiliar.iterrows(), total=df_planilha_auxiliar.shape[0], desc="Processando ALUGUEL"
-    ):
-        contrato_item_equip = str(row_csv['TOMBO']).strip()
-        if contrato_item_equip in ['nan', ''] or pd.isna(row_csv['TOMBO']):
-            continue
-
-        contrato_item = str(row_csv['ITEM_DO_CONTRATO']).strip()
-        if contrato_item.lower() == 'nan':
-            continue
-
-        nome_contrato_csv = normalizar_texto(row_csv.get('CONTRATO'))
-        descricao_item_csv = normalizar_texto(row_csv.get('DESCRICAO_ITEM'))
-        cliente_legado_csv = row_csv['CLIENTE_ID']
-        name_item_final = row_csv['EQUIPAMENTO_NOME']
-        ultimo_mov_info = dict_ultimo_movimento_por_tombo.get(contrato_item_equip)
-
-        if ultimo_mov_info is None:
-            continue
-
-        row_mov = ultimo_mov_info['movimento']
-
-        # Filtro de tipos válidos para ALUGUEL (Alugado=1, Substituição Alugado=5)
-        if row_mov['tipo_id'] not in {1, 5}:
-            continue
-
-        id_final = row_mov['id']
-        cliente_id_legado = row_mov['cliente_id']
-        recipient_id = dict_cliente_adress.get(int(cliente_id_legado)) if pd.notna(cliente_id_legado) else None
-
-        if not recipient_id:
-            continue
-
-        usuario_id = row_mov['usuario_id']
-        if pd.isna(usuario_id) or usuario_id == 0:
-            usuario_id = 1
-        else:
-            usuario_id = int(usuario_id)
-
-        mov_date = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else now
-        deleted_at_mov = row_mov['deleted_at'] if pd.notna(row_mov.get('deleted_at')) else None
-        equipment_id_ref = dict_equip_ref_por_number.get(contrato_item_equip)
-        cliente_final = dict_endereco_por_legacy_client.get(int(cliente_legado_csv)) if pd.notna(cliente_legado_csv) else None
-
-        # ------------------------------------------------------------------
-        # Match do contrato (chave composta)
-        # ------------------------------------------------------------------
-        item_contrato_info = None
-        contrato_id_final = None
-        if contrato_item and recipient_id:
-            chave_busca = (int(recipient_id), nome_contrato_csv, contrato_item.upper(), descricao_item_csv)
-            item_contrato_info = dict_contrato_item_por_chave.get(chave_busca)
-
-        if item_contrato_info:
-            contrato_id_final = item_contrato_info['contract_id']
-        else:
-            contrato_id_final = dict_primeiro_contrato_por_cliente.get(int(recipient_id))
-
-        # 1️⃣ Service Order + Movement (pai)
-        if id_final not in pedidos_pai_inseridos:
-            servicos_mestre.append({
-                "id": id_final, "status_id": 3, "movement_type_id": 1, "contract_id": contrato_id_final,
-                "user_id": usuario_id, "destination_order_id": None, "mode_transport_id": 1,
-                "organization_id": 1378, "recipient_customer_id": recipient_id, "deadline": now,
-                "details": "Migração", "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
-            })
-            movimentos_mestre.append({
-                "id": id_final, "number": id_final, "movement_date": mov_date, "service_order_id": id_final,
-                "recipient_customer_id": recipient_id, "migrate_customer_id": None, "organization_id": 1378,
-                "status_id": 3, "created_by": usuario_id, "details": "Migração",
-                "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
-            })
-            pedidos_pai_inseridos.add(id_final)
-
-        # ------------------------------------------------------------------
-        # Controle de saldo / item extra
-        # ------------------------------------------------------------------
-        extra_id_atual = None
-        is_extra_flag = 0
-        item_servico_id_atual = so_item_id_counter
-        so_item_id_counter += 1
-        contrato_item_id = None
-
-        if item_contrato_info:
-            contrato_item_id = item_contrato_info['id']
-            if saldos_por_id[contrato_item_id] > 0:
-                saldos_por_id[contrato_item_id] -= 1
-            else:
-                is_extra_flag = 1
-                extra_id_atual = extra_id_counter
-                service_order_item_extra_equipments.append({
-                    "id": extra_id_atual, "service_order_item_id": item_servico_id_atual,
-                    "contract_item_id": contrato_item_id,
-                    "type_id": dict_tipo_por_equipamento.get(equipment_id_ref),
-                    "quantity": 1, "removed_quantity": 0,
-                    "created_at": mov_date, "updated_at": mov_date, "deleted_at": None
-                })
-                extra_id_counter += 1
-        else:
-            fallback_contract_item_id = dict_primeiro_item_por_cliente.get(int(recipient_id))
-            if fallback_contract_item_id:
-                is_extra_flag = 1
-                contrato_item_id = int(fallback_contract_item_id)
-                extra_id_atual = extra_id_counter
-                service_order_item_extra_equipments.append({
-                    "id": extra_id_atual, "service_order_item_id": item_servico_id_atual,
-                    "contract_item_id": contrato_item_id,
-                    "type_id": dict_tipo_por_equipamento.get(equipment_id_ref),
-                    "quantity": 1, "removed_quantity": 0,
-                    "created_at": mov_date, "updated_at": mov_date, "deleted_at": None
-                })
-                extra_id_counter += 1
-            else:
-                print(f"⚠️ [Aviso] Cliente ID {recipient_id} sem contratos ativos no sistema.")
-
-        if equipment_id_ref:
-            equipamentos_alterados.add(equipment_id_ref)
-
-        # 2️⃣ Service Order Item
-        service_itens_mestre.append({
-            "id": item_servico_id_atual, "status_id": 3, "service_order_id": id_final,
-            "department_id": 2, "movement_type_id": 1, "contract_item_id": contrato_item_id,
-            "alias": None if contrato_item == '' else contrato_item,
-            "equipment_id": equipment_id_ref, "type_id": None, "product_id": None,
-            "is_exchange": 0, "is_extra": is_extra_flag, "quantity_product": None,
-            "fulfilled_quantity_product": 0, "quantity": 1,
-            "details": None if item_contrato_info else "Item Extra (Sem Match de Contrato)",
-            "address_id": cliente_final, "location_id": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+    def executar(self):
+        # 1. Loop nas devoluções do legado (Frente única)
+        # ...
+        
+        # 2. Roteia a reconstrução do passado
+        # self.reconstruir_passado(...)
+        
+        # 3. Registra a Devolução atual
+        # self.registrar_movimento(operation_type='DEVOLUCAO', ...)
+        
+        # 4. Alimenta as 3 tabelas de Shipments
+        shipment_id = self.shipment_id_counter
+        self.shipment_id_counter += 1
+        
+        self.shipments.append({
+            "id": shipment_id,
+            "status_id": 1,
+            "created_by": usuario_id_do_movimento, # ID do usuário, não a data
+            "updated_by": usuario_id_do_movimento,
+            "created_at": data_do_movimento,       # A data entra aqui!
+            "updated_at": data_do_movimento
         })
-
-        # 4️⃣ Movement Item
-        movimento_itens_mestre.append({
-            "movement_id": id_final, "movement_type_id": 1, "service_order_item_id": item_servico_id_atual,
-            "equipment_id": equipment_id_ref, "extra_id": extra_id_atual, "status_id": 3,
-            "product_item_id": None, "alias": name_item_final,
-            "old_organization_id": None, "new_organization_id": None, "operation_type": 'ALUGUEL',
-            "confirmed_at": None, "confirmed_by": None,
-            "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+        
+        self.shipment_movements.append({
+            # id auto-increment no banco
+            "shipment_id": shipment_id,
+            "movement_id": id_do_movimento_devolucao 
         })
+        
+        self.shipment_items.append({
+            "id": self.shipment_item_id_counter,
+            "shipment_id": shipment_id,
+            "status_id": 1,
+            "movement_item_id": id_do_item_do_movimento, # ⚠️ Ponto de atenção aqui
+            "volume_id": None,
+            "details": f"Item de migração devolvido na data {data_do_movimento_formatada}",
+            "address_id": 1378 # ID da Organização AS
+        })
+        self.shipment_item_id_counter += 1
 
-    # ======================================================================
-    # SALVAMENTO
-    # ======================================================================
-    print("\n🚀 Persistindo dados de ALUGUEL no banco...")
-    with engine_new.connect() as conn:
-        trans = conn.begin()
-        try:
-            if servicos_mestre:
-                pd.DataFrame(servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
-                print(f"  ✔️ {len(servicos_mestre)} Registros em 'service_orders'.")
-
-            if service_itens_mestre:
-                pd.DataFrame(service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
-                print(f"  ✔️ {len(service_itens_mestre)} Registros em 'service_order_items'.")
-
-            if movimentos_mestre:
-                pd.DataFrame(movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)
-                print(f"  ✔️ {len(movimentos_mestre)} Registros em 'movements'.")
-
-            if movimento_itens_mestre:
-                pd.DataFrame(movimento_itens_mestre).to_sql("movement_items", con=conn, if_exists="append", index=False)
-                print(f"  ✔️ {len(movimento_itens_mestre)} Registros em 'movement_items'.")
-
-            if service_order_item_extra_equipments:
-                pd.DataFrame(service_order_item_extra_equipments).to_sql(
-                    "service_order_item_extra_equipments", con=conn, if_exists="append", index=False
-                )
-                print(f"  ✔️ {len(service_order_item_extra_equipments)} Registros em 'service_order_item_extra_equipments'.")
-
-            if equipamentos_alterados:
-                lista_equip_ids = list(equipamentos_alterados)
-                for i in range(0, len(lista_equip_ids), 500):
-                    bloco = lista_equip_ids[i:i + 500]
-                    conn.execute(text("UPDATE equipments SET status_id = 2 WHERE id IN :ids"), {"ids": tuple(bloco)})
-                print(f"  ✔️ {len(lista_equip_ids)} Equipamentos atualizados para status ALUGADO.")
-
-            # Atualização de saldo dos contract_items
-            itens_contrato_modificados = []
-            ids_ja_processados = set()
-            for dados in dict_contrato_item_por_chave.values():
-                item_id = dados['id']
-                qtd_original = dados['original_quantity']
-                qtd_atual = saldos_por_id[item_id]
-                if qtd_atual != qtd_original and item_id not in ids_ja_processados:
-                    itens_contrato_modificados.append({"id": item_id, "nova_qtd": qtd_atual})
-                    ids_ja_processados.add(item_id)
-
-            if itens_contrato_modificados:
-                for item in itens_contrato_modificados:
-                    conn.execute(
-                        text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"),
-                        {"nova_qtd": item['nova_qtd'], "id": item['id']}
-                    )
-                print(f"  ✔️ {len(itens_contrato_modificados)} contract_items atualizados.")
-
-            trans.commit()
-            print("🎉 ALUGUEL concluído com sucesso!")
-
-        except Exception as e:
-            trans.rollback()
-            print(f"❌ Erro crítico no módulo ALUGUEL: {e}")
-            raise e
-
-    # ----------------------------------------------------------------------
-    print("\n--- 🏁 Resumo ALUGUEL ---")
-    print(f"📦 Serviços Criados: {len(servicos_mestre)}")
-    print(f"📦 Movimentos Criados: {len(movimentos_mestre)}")
-    print(f"📦 Itens de Serviços: {len(service_itens_mestre)}")
-    print(f"📦 Itens de Movimentos: {len(movimento_itens_mestre)}")
-    print(f"📦 Equipamentos Extras: {len(service_order_item_extra_equipments)}")
+        # 5. Salvar as 4 tabelas mestre + 3 tabelas de shipment no banco

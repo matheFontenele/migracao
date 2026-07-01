@@ -2,11 +2,38 @@ import argparse
 import sys
 import os
 
+from sqlalchemy import text
 from config.database import obter_engines
 
 # ==============================================================================
 # 1. WRAPPERS COM LAZY LOADING (Importação Tardia)
 # ==============================================================================
+
+def iniciar_reset_banco(eng_novo, eng_legado):
+    """Executa o TRUNCATE apenas nas tabelas listadas no array TABELAS_PARA_LIMPAR"""
+    print("\n⚠️ ATENÇÃO: Iniciando limpeza das tabelas selecionadas no banco NOVO...")
+    with eng_novo.connect() as conn:
+        trans = conn.begin()
+        try:
+            # 1. Desliga chaves estrangeiras
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
+            
+            # 2. Trunca as tabelas do array
+            for tabela in TABELAS:
+                conn.execute(text(f"TRUNCATE TABLE `{tabela}`;"))
+                print(f"  🗑️ Tabela `{tabela}` truncada.")
+                
+            # 3. Religa chaves estrangeiras
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
+            
+            trans.commit()
+            print(f"\n☢️ LIMPEZA CONCLUÍDA: {len(TABELAS)} tabelas zeradas com sucesso.")
+            
+        except Exception as e:
+            trans.rollback()
+            # Tenta religar por segurança em caso de erro no meio do processo
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
+            raise e
 
 def iniciar_clientes(eng_novo, eng_legado):
     from cadastros.clientes.migracao_cliente import MigracaoClientes
@@ -40,7 +67,31 @@ def iniciar_movimentos(eng_novo, eng_legado):
 # ==============================================================================
 # 2. MAPEAMENTO DE TAREFAS E GRUPOS
 # ==============================================================================
+TABELAS = [
+    'shipment_items',
+    'shipment_movements',
+    'shipments',
+    'service_order_item_extra_equipments',
+    'movement_items',
+    'movements',
+    'service_order_items',
+    'service_orders',
+    'equipments',
+    'transaction_items',
+    'transactions',
+    'product_items',
+    'products',
+    'types',
+    'brands',
+    'groups',
+    'contract_items',
+    'contracts',
+    'addresses',
+    'suppliers'
+    ]
+
 TAREFAS = {
+    "reset_banco": iniciar_reset_banco,
     "clientes": iniciar_clientes,
     "contratos": iniciar_contratos,
     "contratantes": iniciar_contratantes,

@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlalchemy as sa
+import os
 import time
 import sys
 from datetime import datetime
@@ -7,7 +8,7 @@ from tqdm import tqdm
 from sqlalchemy import text
 
 from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA
-from utils.sanetizador import executar_truncate_tabelas
+from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico
 
 TABELAS = [
     'equipments', 
@@ -63,7 +64,86 @@ class MigracaoEquipamentos:
         df_equipamentos = pd.read_csv(self.ARQUIVO_IMPORTACAO, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
 
         with self.engine_legado.connect() as conn:
-            df_equipamentos_legado = pd.read_sql("SELECT id, orgao_id, situacao_id, created_at, updated_at, deleted_at FROM aluguel_equipamentos", conn)
+            df_equipamentos_legado = pd.read_sql("SELECT id, numero, orgao_id, situacao_id, created_at, updated_at, deleted_at FROM aluguel_equipamentos", conn)
+
+       # ==============================================================================
+        # 🕵️ AUDITORIA DE DUPLICATAS DE TOMBO NO LEGADO (IGNORANDO LIXEIRA)
+        # ==============================================================================
+        de_para_mov = {
+            1: "Alugado",
+            2: "Devolução",
+            3: "Substituição Devolução",
+            4: "Baixado",
+            5: "Substituição Alugado",
+            6: "Transferência",
+            7: "Reserva",
+            8: "Uso Interno"
+        }
+
+
+        df_validos = df_equipamentos_legado[
+            (df_equipamentos_legado['numero'].notna()) & 
+            (df_equipamentos_legado['deleted_at'].isna())
+        ].copy()
+        
+        duplicatas = df_validos[df_validos.duplicated(subset=['numero'], keep=False)]
+
+        if not duplicatas.empty:
+            print("🚨 ATENÇÃO: DUPLICATAS DE TOMBO ATIVOS ENCONTRADAS NO BANCO LEGADO!")
+            
+            # 1. Pega apenas os IDs que estão dando conflito
+            ids_conflitantes = tuple(duplicatas['id'].tolist())
+            
+            # 2. Query para buscar o "contexto" de cada equipamento clonado
+            query_relatorio = text("""
+                SELECT
+                    aq.id AS ID,
+                    aq.numero AS TOMBO,
+                    aq.nome AS EQUIPAMENTO,
+                    al.id AS ID_CLIENTE,
+                    al.nome_razao_social AS CLIENTE,
+                    alm.nome AS TIPO_MOV,
+                    mov.id AS ID_ULTI_MOVI,
+                    mov.tipo_id AS MOV_TIPO_ID,
+                    mov.data AS DATA_ULTI_MOVI
+                FROM aluguel_equipamentos aq
+                LEFT JOIN (
+                    SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
+                    FROM aluguel_movimento_itens mi
+                    INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+                    WHERE m.deleted_at IS NULL
+                    GROUP BY mi.equipamento_id
+                ) ult_mov ON ult_mov.equipamento_id = aq.id
+                LEFT JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
+                LEFT JOIN aluguel_tipos_movimento alm ON mov.tipo_id = alm.id
+                LEFT JOIN aluguel_clientes al ON al.id = mov.cliente_id
+                WHERE aq.id IN :ids
+                ORDER BY aq.numero, aq.id
+            """)
+            
+            with self.engine_legado.connect() as conn:
+                df_relatorio = pd.read_sql(query_relatorio, conn, params={"ids": ids_conflitantes})
+
+            df_relatorio['MOVIMENTO_TIPO'] = df_relatorio['MOV_TIPO_ID'].map(de_para_mov).fillna("Sem Movimento")
+            colunas_inteiras = ['ID_CLIENTE', 'ID_ULTI_MOVI', 'MOV_TIPO_ID']
+            for col in colunas_inteiras:
+                df_relatorio[col] = df_relatorio[col].astype("Int64")
+            
+            # 3. Exporta o DataFrame para CSV
+            os.makedirs("docs", exist_ok=True)
+            caminho_csv = os.path.join("docs", "relatorio_duplicatas_tombos.csv")
+            df_relatorio.to_csv(caminho_csv, index=False, encoding="utf-8")
+            
+            # 4. Exibe o resumo final
+            grupo_duplicatas = duplicatas.groupby('numero')['id'].apply(list).reset_index()
+            
+            print(f"   📄 Relatório detalhado gerado com sucesso em: '{caminho_csv}'")
+            print("-" * 70)
+            print("📊 RESUMO DA AUDITORIA:")
+            print(f"   Total de Tombos repetidos: {len(grupo_duplicatas)}")
+        else:
+            print("   ✅ Auditoria concluída: Nenhuma duplicata de TOMBO (ativo) encontrada no banco legado.")
+        # ==============================================================================
 
         mapa_equipamento_orgao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['orgao_id']))
         mapa_equipamento_situacao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['situacao_id']))
