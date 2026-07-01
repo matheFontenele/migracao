@@ -219,6 +219,12 @@ class MigracaoContratos:
             if pd.isna(row['CONTRATANTE']) or pd.isna(row['APELIDO_CONTRATO']): 
                 self.stats['contratos_ignorados'] += 1
                 continue
+
+            id_contrato_excel = limpar_valor_inteiro(row.get('ID'))
+            if id_contrato_excel == 0:
+                print(f"   ⚠️ Contrato ignorado: A linha não possui um 'ID' válido.")
+                self.stats['contratos_ignorados'] += 1
+                continue
             
             cust_id = self._get_hierarchical_customer(row['CONTRATANTE'])
             if not cust_id:
@@ -235,10 +241,13 @@ class MigracaoContratos:
                 contract_info = self.contracts_by_number.get(numero_contrato)
 
             dados_contrato = {
-                'name': nome_contrato, 'number': numero_contrato,
+                "id": id_contrato_excel,
+                'name': nome_contrato,
+                'number': numero_contrato,
                 'contract_type_id': MAP_TIPO.get(ultra_normalizar(row['TIPO_CONTRATO']), 1),
                 'contract_status_id': MAP_STATUS.get(ultra_normalizar(row['STATUS_CONTRATO']), 2),
-                'organization_id': org_id, 'customer_id': int(cust_id),
+                'organization_id': org_id,
+                'customer_id': int(cust_id),
                 'object': str(row['OBJETO_DO_CONTRATO'])[:500] if not pd.isna(row['OBJETO_DO_CONTRATO']) else "NÃO INFORMADO",
                 'updated_at': self.now
             }
@@ -255,11 +264,11 @@ class MigracaoContratos:
             else:
                 dados_contrato['created_at'] = self.now
                 res = conn.execute(text("""
-                    INSERT INTO contracts (name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, created_at, updated_at)
-                    VALUES (:name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :created_at, :updated_at)
+                    INSERT INTO contracts (id, name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, created_at, updated_at)
+                    VALUES (:id, :name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :created_at, :updated_at)
                 """), dados_contrato)
                 
-                contract_id = res.lastrowid
+                contract_id = id_contrato_excel
                 novo_cache = {'id': contract_id, 'customer_id': cust_id}
                 self.contracts_cache[chave_contrato] = novo_cache
                 if numero_contrato != "SEM_NUMERO":
