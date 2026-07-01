@@ -7,8 +7,10 @@ from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA
-from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico
+from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC
+from utils.sanetizador import executar_truncate_tabelas
+
+TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
 
 TABELAS = [
     'equipments', 
@@ -51,9 +53,10 @@ class MigracaoEquipamentos:
         if pd.isna(id_legado): return 1115
         id_legado_int = int(id_legado)
         if id_legado_int in MAPPING_ALUCOM: return 1115
-        if id_legado_int in MAPPING_IP: return 1311
-        if id_legado_int in MAPPING_MOREIA: return 1122
-        if id_legado_int in MAPPING_AS: return 1378
+        if id_legado_int in MAPPING_IP: return 1115
+        if id_legado_int in MAPPING_MOREIA: return 1115
+        if id_legado_int in MAPPING_AS: return 1115
+        if id_legado_int in MAPPING_SC: return 1115
         return id_legado_int
     
     # ==============================================================================
@@ -83,7 +86,9 @@ class MigracaoEquipamentos:
 
         df_validos = df_equipamentos_legado[
             (df_equipamentos_legado['numero'].notna()) & 
-            (df_equipamentos_legado['deleted_at'].isna())
+            (df_equipamentos_legado['deleted_at'].isna()) &
+            (df_equipamentos_legado['orgao_id'].isin(TODOS_ORGAOS_MAPEADOS)) &
+            (~df_equipamentos_legado['numero'].astype(str).str.strip().isin(['0', '0.0', '0.00'])) # 👈 O novo filtro entra aqui!
         ].copy()
         
         duplicatas = df_validos[df_validos.duplicated(subset=['numero'], keep=False)]
@@ -158,8 +163,15 @@ class MigracaoEquipamentos:
 
         lista_mestre = []
         for index, row in tqdm(df_equipamentos.iterrows(), total=df_equipamentos.shape[0], desc="Refatorando dados"):
+
+            tombo_atual = row.get("TOMBO")
+            if pd.notna(tombo_atual) and str(tombo_atual).strip() in ['0', '0.0', '0.00']:
+                continue
+
             id_equipamento_legado = row.get("ID_LEGADO")
             id_orgao_legado = mapa_equipamento_orgao.get(id_equipamento_legado, None)
+            if id_orgao_legado not in TODOS_ORGAOS_MAPEADOS:
+                continue
             id_situacao_legado = mapa_equipamento_situacao.get(id_equipamento_legado, None)
             org_destino = self._descobrir_id_organizacao_destino(id_orgao_legado)
 
@@ -178,7 +190,7 @@ class MigracaoEquipamentos:
 
             lista_mestre.append({
                 "id_legado":     id_equipamento_legado,
-                "TOMBO":         row.get("TOMBO"),
+                "TOMBO":         tombo_atual,
                 "NOME_AJUSTADO": row.get("NOME_AJUSTADO"),
                 "NUMERO_SERIE":  row.get("NUMERO_SERIE"),
                 "codigo_item":   row.get("codigo_item"),
@@ -198,38 +210,6 @@ class MigracaoEquipamentos:
             })
 
         return pd.DataFrame(lista_mestre).reset_index(drop=True)
-
-    # ==============================================================================
-    # ETL: CARGA DE DEPENDÊNCIAS BASE (ENDEREÇOS)
-    # ==============================================================================
-    def _criar_estoques_padroes(self):
-        print("\n📦 Criando estoques padrões...")
-        dados_enderecos_bases = [
-            {"addressable_id": 1115, "alias": "ALUCOM - BASE", "number": "40"},
-            {"addressable_id": 1122, "alias": "MOREIA - BASE", "number": "50"},
-            {"addressable_id": 1311, "alias": "IP - BASE", "number": "60"},
-            {"addressable_id": 1378, "alias": "AS SISTEMAS - BASE", "number": "70"}
-        ]
-
-        with self.engine_new.begin() as conn:
-            for base in dados_enderecos_bases:
-                conn.execute(text("""
-                    INSERT IGNORE INTO addresses (addressable_type, addressable_id, alias, zip, street, number, city, state, country, created_at, updated_at)
-                    VALUES ('organization', :addressable_id, :alias, '60175205', 'RUA RIACHUELO PAPICU', :number, 'FORTALEZA', 'CE', 'Brazil', :now, :now)
-                """), {**base, "now": self.now})
-
-        df_enderecos = pd.read_sql("""
-            SELECT id AS address_id, addressable_id 
-            FROM addresses WHERE addressable_type = 'organization' 
-            AND addressable_id IN (1115, 1122, 1311, 1378) ORDER BY id ASC
-        """, self.engine_new)
-        
-        self.mapa_enderecos = dict(zip(df_enderecos['addressable_id'], df_enderecos['address_id']))
-        self.id_fallback = int(df_enderecos['address_id'].iloc[0]) if not df_enderecos.empty else 1
-
-        print("   ✅ Estoques criados e mapa de endereços montado:")
-        for org_id, addr_id in self.mapa_enderecos.items():
-            print(f"      -> Org {org_id} → address_id: {addr_id}")
 
     # ==============================================================================
     # ETL: CARGA DE CADASTROS BÁSICOS E PRODUTOS
@@ -453,7 +433,6 @@ class MigracaoEquipamentos:
 
             # Pipeline
             df_master = self._extrair_e_transformar()
-            self._criar_estoques_padroes()
             df_master = self._carregar_tabelas_dimensionais(df_master)
             df_master = self._tratar_fornecedores(df_master)
             self._gerar_inventario(df_master)

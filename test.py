@@ -1,94 +1,80 @@
-def executar(self):
-        print("\n" + "=" * 70)
-        print("📦 MÓDULO: DEVOLUÇÃO (ESTOQUE E LOGÍSTICA)")
-        print("=" * 70)
+def _processar_contratos(self, conn, df_ex_contract):
+        print("\n🔄 Processando Contratos (UPSERT)...")
+        for idx, row in df_ex_contract.iterrows():
+            if pd.isna(row['CONTRATANTE']) or pd.isna(row['APELIDO_CONTRATO']): 
+                self.stats['contratos_ignorados'] += 1
+                continue
+            
+            # ==============================================================================
+            # 1️⃣ CAPTURA DO ID DA PLANILHA
+            # ==============================================================================
+            id_contrato_excel = limpar_valor_inteiro(row.get('ID_CONTRATO'))
+            
+            # Se a linha não tiver um ID válido, nós pulamos para não quebrar o banco
+            if id_contrato_excel == 0:
+                print(f"   ⚠️ Contrato ignorado: A linha não possui um 'ID_CONTRATO' válido.")
+                self.stats['contratos_ignorados'] += 1
+                continue
+            # ==============================================================================
 
-        # 1. Extração dos dados de devolução do legado (Frente Única)
-        df_devolucoes = self._extrair_dados_devolucao()
-        
-        if df_devolucoes.empty:
-            print("⚠️ Nenhum movimento de devolução encontrado.")
-            return
-
-        print(f"📖 Processando {len(df_devolucoes)} devoluções...")
-        
-        for _, row in tqdm(df_devolucoes.iterrows(), total=df_devolucoes.shape[0], desc="Processando DEVOLUÇÕES"):
-            tombo = str(row['TOMBO']).strip()
-            id_movimento_legado = int(row['MOVIMENTO_ID'])
-            cliente_id_legado = int(row['ID_CLIENTE'])
-            data_mov_legado = row['updated_at'] if pd.notna(row['updated_at']) else self.now
-
-            # Cadastros de infraestrutura do cache em RAM
-            equipment_id_ref = self.dados["dict_equip_ref_por_number"].get(tombo)
-            recipient_id = self.dados["dict_cliente_adress"].get(cliente_id_legado)
-            cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cliente_id_legado)
-
-            if not equipment_id_ref or not recipient_id:
+            cust_id = self._get_hierarchical_customer(row['CONTRATANTE'])
+            if not cust_id:
+                self.stats['contratos_ignorados'] += 1
                 continue
 
-            # Contratos de Fallback padrão para a Capa da OS
-            contrato_id_res = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
-            item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
-            usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
+            nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
+            numero_contrato = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
+            org_id = MAP_ORGANIZACAO.get(row['CONTRATADO'], 1115)
+            chave_contrato = f"{nome_contrato}|{numero_contrato}|{org_id}"
 
-            # ==================================================================
-            # PASSO 1: CRIAÇÃO DO PROCESSO EXISTENTE (SERVICE_ORDER E MOVEMENTS)
-            # ==================================================================
-            id_mov, id_mov_item = self.registrar_movimento(
-                id_final=id_movimento_legado,
-                recipient_id=recipient_id,
-                cliente_final_address_id=cliente_final_address,
-                usuario_id=usr_id,
-                mov_date=data_mov_legado,
-                deleted_at_mov=row['deleted_at'] if pd.notna(row['deleted_at']) else None,
-                contrato_id=contrato_id_res,
-                contrato_item_id=item_id_res,
-                equipment_id_ref=equipment_id_ref,
-                tipo_movimento_id=2,  # 2 = ID de Devolução no banco novo
-                operation_type='DEVOLUCAO',
-                alias_item=None,
-                alias_movimento=row['NOME_EQUIPAMENTO'],
-                details_capa="Migração - Devolução",
-                details_item="Item de Ordem de Devolução"
-            )
+            contract_info = self.contracts_cache.get(chave_contrato)
+            if not contract_info and numero_contrato != "SEM_NUMERO":
+                contract_info = self.contracts_by_number.get(numero_contrato)
 
-            # ==================================================================
-            # PASSO 2: NASCIMENTO DOS SHIPMENTS (REAPROVEITANDO OS IDS ACIMA)
-            # ==================================================================
-            shipment_id_atual = self.shipment_id_counter
-            self.shipment_id_counter += 1
+            dados_contrato = {
+                'id': id_contrato_excel, # 👈 O ID forçado entra aqui no dicionário de dados
+                'name': nome_contrato, 
+                'number': numero_contrato,
+                'contract_type_id': MAP_TIPO.get(ultra_normalizar(row['TIPO_CONTRATO']), 1),
+                'contract_status_id': MAP_STATUS.get(ultra_normalizar(row['STATUS_CONTRATO']), 2),
+                'organization_id': org_id, 
+                'customer_id': int(cust_id),
+                'object': str(row['OBJETO_DO_CONTRATO'])[:500] if not pd.isna(row['OBJETO_DO_CONTRATO']) else "NÃO INFORMADO",
+                'updated_at': self.now
+            }
 
-            # A) Tabela: shipments
-            self.shipments.append({
-                "id": shipment_id_atual,
-                "status_id": 1,
-                "created_at": data_mov_legado,
-                "updated_at": data_mov_legado
-            })
+            if contract_info:
+                contract_id = contract_info['id']
+                conn.execute(text("""
+                    UPDATE contracts 
+                    SET name = :name, contract_type_id = :contract_type_id, contract_status_id = :contract_status_id,
+                        customer_id = :customer_id, object = :object, updated_at = :updated_at
+                    WHERE id = :id AND number = :number
+                """), {**dados_contrato, 'id': contract_id, 'number': numero_contrato})
+                self.stats['contratos_atualizados'] += 1
+            else:
+                dados_contrato['created_at'] = self.now
+                
+                # ==============================================================================
+                # 2️⃣ INJEÇÃO DO ID NO INSERT
+                # Adicionamos a coluna 'id' no comando SQL para forçar a criação com o número da planilha
+                # ==============================================================================
+                conn.execute(text("""
+                    INSERT INTO contracts (id, name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, created_at, updated_at)
+                    VALUES (:id, :name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :created_at, :updated_at)
+                """), dados_contrato)
+                
+                # 3️⃣ A variável que armazena o id criado não usa mais `res.lastrowid`, usa o valor do Excel
+                contract_id = id_contrato_excel 
+                
+                novo_cache = {'id': contract_id, 'customer_id': cust_id}
+                self.contracts_cache[chave_contrato] = novo_cache
+                if numero_contrato != "SEM_NUMERO":
+                    self.contracts_by_number[numero_contrato] = novo_cache
+                self.stats['contratos_criados'] += 1
 
-            # B) Tabela: shipment_movements (A amarra da capa)
-            self.shipment_movements.append({
-                "shipment_id": shipment_id_atual,
-                "movement_id": id_mov # Reaproveitando o ID retornado pelo Pai
-            })
+            conn.execute(text("INSERT IGNORE INTO contract_recipient_customers (contract_id, customer_id) VALUES (:c_id, :cust_id)"), 
+                         {'c_id': int(contract_id), 'cust_id': int(cust_id)})
 
-            # C) Tabela: shipment_items (A amarra do item físico)
-            self.shipment_items.append({
-                "id": self.shipment_item_id_counter,
-                "shipment_id": shipment_id_atual,
-                "status_id": 1,
-                "movement_item_id": id_mov_item, # Reaproveitando o ID do item retornado pelo Pai
-                "volume_id": None,
-                "details": f"Item de migração devolvido na data {data_mov_legado}",
-                "address_id": 1378  # ID da Organização AS Sistemas
-            })
-            self.shipment_item_id_counter += 1
-
-        # ==================================================================
-        # PASSO 3: PERSISTÊNCIA EM LOTE NO BANCO (Mestre + Shipments)
-        # ==================================================================
-        # Salva as 4 tabelas base e atualiza o equipamento para DISPONÍVEL (1)
-        self.salvar_banco(id_status_equipamento=1) 
-        
-        # Salva as 3 tabelas de logística exclusivas da devolução
-        self._salvar_tabelas_logistica()
+            # Esse mapa agora guarda exatamente o ID que veio da planilha para repassar aos eventos e aditivos!
+            self.contract_id_map[nome_contrato] = contract_id
