@@ -8,7 +8,8 @@ from tqdm import tqdm
 from config.config import (
     CLIENTES_BLOQUEADOS,
     ORGANIZACOES_BLOQUEADAS,
-    FALSOS_RESERVAS
+    FALSOS_RESERVAS,
+    BASES_AVULSOS
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
@@ -292,6 +293,32 @@ class MigracaoClientes:
             {"type": "organization", "id": 1311, "alias": "IP - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "60", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
             {"type": "organization", "id": 1378, "alias": "AS SISTEMAS - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "70", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None}
         ]
+
+        # ==============================================================================
+        # 🏢 CRIAÇÃO DE ENDEREÇOS DE BOX/ESTOQUES PARA CADA ORGANIZAÇÃO
+        # ==============================================================================
+        
+        organizacoes = [end for end in enderecos_batch if end.get("type") == "organization"]
+        
+        # 2. Criamos uma lista temporária para não quebrar a iteração
+        novos_boxes = []
+
+        for base in organizacoes:
+            for box in BASES_AVULSOS.values():
+                novos_boxes.append({
+                    "type": "organization",
+                    "id": base["id"],
+                    "alias": box["alias"],
+                    "zip": box["zip"],
+                    "street": box["street"],
+                    "num": box["number"],
+                    "city": box["city"],
+                    "state": box["state"],
+                    "leg_id": None,
+                    "res_id": None
+                })
+        
+        enderecos_batch.extend(novos_boxes)
 
         print("🚀 Gravando dados no banco de dados...")
         with self.engine_new.begin() as conn:
