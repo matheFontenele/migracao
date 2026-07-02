@@ -331,12 +331,23 @@ class BaseMigracaoMovimento:
         return 0, None, contrato_item_id
 
     def registrar_movimento(
-        self, id_final: int, recipient_id: int, cliente_final_address_id: int,
-        usuario_id: int, mov_date: str, deleted_at_mov: str, contrato_id: int,
-        contrato_item_id: int, equipment_id_ref: int, tipo_movimento_id: int,
-        operation_type: str, alias_item: str = None, alias_movimento: str = None,
-        details_capa: str = "Migração Automática", details_item: str = None,
-        fallback_contract_item_id: int = None, forcar_extra: bool = False
+        self, id_final: int,
+        recipient_id: int,
+        cliente_final_address_id: int,
+        usuario_id: int,
+        mov_date: str,
+        deleted_at_mov: str,
+        contrato_id: int,
+        contrato_item_id: int,
+        equipment_id_ref: int,
+        tipo_movimento_id: int,
+        operation_type: str,
+        alias_item: str = None,
+        alias_movimento: str = None,
+        details_capa: str = "Migração Automática",
+        details_item: str = None,
+        fallback_contract_item_id: int = None,
+        forcar_extra: bool = False,
     ):
         
         # 1️⃣ CAPAS PAI (Service Order + Movement)
@@ -358,11 +369,17 @@ class BaseMigracaoMovimento:
         # 2️⃣ GATILHO DE SALDO E EXTRAS
         item_servico_id_atual = self.so_item_id_counter
         self.so_item_id_counter += 1
-
-        is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
-            contrato_item_id, recipient_id, equipment_id_ref, mov_date,
-            item_servico_id_atual, fallback_contract_item_id, forcar_extra
-        )
+        
+        if tipo_movimento_id == 7:
+            is_extra_flag = False
+            extra_id_atual = None
+            contrato_item_id_resolvido = None
+        else:
+            # Só calcula o saldo se NÃO for avulso
+            is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
+                contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+                item_servico_id_atual, fallback_contract_item_id, forcar_extra
+            )
 
         # 3️⃣ SERVICE ORDER ITEM
         txt_detalhe_final = details_item if details_item else ("Item Extra (Sem Match de Contrato)" if is_extra_flag else None)

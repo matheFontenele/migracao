@@ -55,7 +55,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             self.itens_extras_mestre.append({
                 "id": extra_id, 
                 "service_order_item_id": item_servico_id_atual,
-                "contract_item_id": contrato_item_id, # Aqui está blindado, nunca será None!
+                "contract_item_id": contrato_item_id,
                 "type_id": dict_tipo.get(equipment_id_ref),
                 "quantity": 1, 
                 "removed_quantity": 0, 
@@ -101,7 +101,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         print("-" * 70)
 
         self.limpar_tabelas_movimento()
-        caminho_csv = "./docs/equipeAS.csv"
+        caminho_csv = "./docs/EquipAS.csv"
         
         print("📖 Carregando planilha auxiliar de aluguel...")
         df_csv = pd.read_csv(caminho_csv, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
@@ -111,6 +111,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         df_csv['CLIENTE_ID'] = df_csv['CLIENTE_ID'].astype(str).str.replace('.0', '', regex=False)
         df_csv['ITEM_DO_CONTRATO'] = df_csv['ITEM_DO_CONTRATO'].astype(str).str.strip().str.replace(r'\.0$', '', regex=True)
         df_csv = df_csv[df_csv['ITEM_DO_CONTRATO'].str.lower() != 'nan']
+        df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
 
         tombos = df_csv['TOMBO'].astype(int).unique().tolist()
         dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos)
@@ -147,55 +148,71 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
             # ==================================================================
             # A CASCATA DE MATCHING E FALLBACKS INTELIGENTES
-            # ==================================================================
+            # ==================================================================      
             
-            # Normalização rigorosa para cruzar com as chaves que você montou
-            nome_c = normalizar_para_match(row_csv.get('CONTRATO'))
+            # 1️⃣ Captura direta e segura do ID do Contrato
+            try:
+                contrato_id_res = int(float(row_csv.get('CONTRACT_ID')))
+            except (ValueError, TypeError):
+                contrato_id_res = None
+
             desc_i = normalizar_para_match(row_csv.get('DESCRICAO_ITEM'))
             item_c = normalizar_para_match(row_csv.get('ITEM_DO_CONTRATO'))
             
-            contrato_id_res = None
             item_id_res = None
             teve_match_perfeito = False
+            is_avulso = False
 
-            # 1️⃣ Tenta o Match Rigoroso (ID Cliente Novo)
-            chave_rigida = (int(recipient_id), nome_c, item_c, desc_i)
-            match_info = self.dados["dict_contrato_item_por_chave"].get(chave_rigida)
+            # Bloco de tentativas de mattch (ID_Cliente -> ID_Contrato -> Item -> Descrição)
+            if contrato_id_res:
+                chave_rigida = (int(recipient_id), contrato_id_res, item_c, desc_i)
+                match_info = self.dados["dict_contrato_item_por_chave"].get(chave_rigida)
 
-            # 2️⃣ Tenta o Match Rigoroso (ID Cliente Legado do CSV)
-            if not match_info:
-                chave_legado = (cli_legado_id, nome_c, item_c, desc_i)
-                match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get(chave_legado)
+                if not match_info:
+                    chave_legado = (cli_legado_id, contrato_id_res, item_c, desc_i)
+                    match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get(chave_legado)
 
-            # RESOLUÇÃO DO MATCH PERFEITO
-            if match_info:
-                contrato_id_res = match_info['contract_id']
-                item_id_res = match_info['id']
-                teve_match_perfeito = True
-                
-            # RESOLUÇÃO VIA FALLBACK (Quando a descrição ou item vieram zoados na planilha)
-            else:
-                # Loga o erro, mas NÃO aborta o fluxo (continua para o Fallback)
+            # RESOLUÇÃO DO MATCH PERFEITO DO ITEM
+                if match_info:
+                    item_id_res = match_info['id']
+                    teve_match_perfeito = True
+                    
+            # ==================================================================
+            # TRATAMENTO DE FALHAS (OS FALLBACKS E A BLINDAGEM)
+            # ==================================================================
+            if not teve_match_perfeito:
+                # Loga a divergência
                 log_nao_match.append({
                     "tombo": tombo,
                     "cliente_legado": cli_legado_id,
-                    "contrato_csv": row_csv.get('CONTRATO'),
+                    "contract_id_csv": contrato_id_res if contrato_id_res else "VAZIO_OU_INVALIDO",
                     "item_csv": row_csv.get('ITEM_DO_CONTRATO'),
                     "descricao_csv": row_csv.get('DESCRICAO_ITEM')
                 })
 
-                # 3️⃣ Fallback A: O cliente existe, o contrato bateu pelo nome, mas o item não. 
-                # Solução: Vincula ao primeiro item daquele contrato.
-                fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, nome_c))
+                # Fallback A: O contrato está garantido! Pega o primeiro item vinculado a ele
+                fallback_contrato = None
+                if contrato_id_res:
+                    fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, contrato_id_res))
                 
                 if fallback_contrato:
-                    contrato_id_res = fallback_contrato['contract_id']
                     item_id_res = fallback_contrato['first_contract_item_id']
+                
                 else:
-                    # 4️⃣ Fallback B: Nem o nome do contrato bateu. 
-                    # Solução: Pega o primeiro contrato/item que o cliente tiver na base refatorada.
-                    contrato_id_res = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
-                    item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+                    # Fallback B: Cliente não possui esse contrato no dicionário legado. 
+                    # Pega o primeiro contrato/item genérico do cliente.
+                    primeiro_contrato_cli = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
+                    
+                    if primeiro_contrato_cli:
+                        contrato_id_res = primeiro_contrato_cli
+                        item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+                    
+                    else:
+                        #  Fallback C: O ULTIMO RECURSO (BLINDAGEM AVULSO)
+                        # Cliente sem nenhum contrato na base. Força para movimento avulso.
+                        contrato_id_res = None
+                        item_id_res = None
+                        is_avulso = True
 
             # ==================================================================
             # REGISTRO DO MOVIMENTO
@@ -204,6 +221,12 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
             dt_mov = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else self.now
 
+            detalhes_item = None
+            if is_avulso:
+                detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)"
+            elif not teve_match_perfeito:
+                detalhes_item = "Item Extra (Fallback de Contrato/Item)"
+
             self.registrar_movimento(
                 id_final=int(row_mov['id']),
                 recipient_id=recipient_id,
@@ -211,15 +234,17 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 usuario_id=usr_id,
                 mov_date=dt_mov,
                 deleted_at_mov=row_mov['deleted_at'] if pd.notna(row_mov['deleted_at']) else None,
+                
                 contrato_id=contrato_id_res,
-                contrato_item_id=item_id_res, # Pode ser None. A função calcular_saldo lida com isso agora!
+                contrato_item_id=item_id_res, 
+                
                 equipment_id_ref=self.dados["dict_equip_ref_por_number"].get(tombo),
-                tipo_movimento_id=1,
-                operation_type='ALUGUEL',
-                alias_item=str(row_csv.get('ITEM_DO_CONTRATO')).strip() if row_csv.get('ITEM_DO_CONTRATO') else None,
-                alias_movimento=row_csv['EQUIPAMENTO_NOME'],
+                tipo_movimento_id= 7 if is_avulso else 1,
+                operation_type='AVULSO' if is_avulso else 'ALUGUEL',
+                alias_item=str(row_csv.get('ITEM_DO_CONTRATO')).strip() if pd.notna(row_csv.get('ITEM_DO_CONTRATO')) else None,
+                alias_movimento=row_csv.get('EQUIPAMENTO_NOME'),
                 details_capa="Migração",
-                details_item=None if teve_match_perfeito else "Item Extra (Sem Match de Contrato)"
+                details_item=detalhes_item
             )
             
         # ==================================================================
