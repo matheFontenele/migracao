@@ -147,24 +147,49 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 continue
 
             # ==================================================================
-            # A CASCATA DE MATCHING E FALLBACKS INTELIGENTES
+            # 1. CAPTURA E NORMALIZAÇÃO DOS DADOS DA PLANILHA
             # ==================================================================      
-            
-            # 1️⃣ Captura direta e segura do ID do Contrato
             try:
-                contrato_id_res = int(float(row_csv.get('CONTRACT_ID')))
+                csv_contract_id = int(float(row_csv.get('CONTRACT_ID')))
             except (ValueError, TypeError):
-                contrato_id_res = None
+                csv_contract_id = None
 
             desc_i = normalizar_para_match(row_csv.get('DESCRICAO_ITEM'))
             item_c = normalizar_para_match(row_csv.get('ITEM_DO_CONTRATO'))
             
+            contrato_id_res = None
             item_id_res = None
             teve_match_perfeito = False
             is_avulso = False
 
-            # Bloco de tentativas de mattch (ID_Cliente -> ID_Contrato -> Item -> Descrição)
-            if contrato_id_res:
+            # ==================================================================
+            # 2. VALIDAÇÃO DO CONTRATO (A Chave de Ouro)
+            # ==================================================================
+            # Busca a lista de contratos REAIS que pertencem a este cliente no banco novo
+            contratos_validos_banco = self.dados["dict_contratos_vinculados"].get(recipient_id, [])
+
+            # Variável central para registrar se houve algum desvio do caminho feliz
+            motivo_divergencia = None
+
+            if csv_contract_id in contratos_validos_banco:
+                # SUCESSO: O contrato do CSV é legítimo e pertence a este cliente!
+                contrato_id_res = csv_contract_id
+                
+            elif contratos_validos_banco:
+                # FALLBACK A: Contrato CSV errado, mas cliente tem contrato ativo.
+                contrato_id_res = contratos_validos_banco[0]
+                motivo_divergencia = f"Contrato da planilha ({csv_contract_id}) não pertence ao cliente. Forçado para o real: {contrato_id_res}"
+                
+            else:
+                # BLINDAGEM AVULSO: Cliente sem nenhum contrato no banco novo.
+                contrato_id_res = None
+                is_avulso = True
+                motivo_divergencia = "Cliente não possui nenhum contrato ativo no banco. Forçado para AVULSO."
+
+            # ==================================================================
+            # 3. MATCH DOS ITENS (Só executa se houver um contrato validado)
+            # ==================================================================
+            if contrato_id_res and not is_avulso:
                 chave_rigida = (int(recipient_id), contrato_id_res, item_c, desc_i)
                 match_info = self.dados["dict_contrato_item_por_chave"].get(chave_rigida)
 
@@ -172,52 +197,46 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     chave_legado = (cli_legado_id, contrato_id_res, item_c, desc_i)
                     match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get(chave_legado)
 
-            # RESOLUÇÃO DO MATCH PERFEITO DO ITEM
                 if match_info:
+                    # SUCESSO ABSOLUTO: Contrato validado e Item casado perfeitamente!
                     item_id_res = match_info['id']
                     teve_match_perfeito = True
-                    
+                else:
+                    # FALLBACK DE ITEM: Contrato está certo, mas a descrição do item falhou.
+                    fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, contrato_id_res))
+                    if fallback_contrato:
+                        item_id_res = fallback_contrato['first_contract_item_id']
+                    else:
+                        item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+                        
+                    # Só registra esse erro de item se não houve um erro mais grave de contrato antes
+                    if not motivo_divergencia: 
+                        motivo_divergencia = "Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Fallback."
+
             # ==================================================================
-            # TRATAMENTO DE FALHAS (OS FALLBACKS E A BLINDAGEM)
+            # GRAVAÇÃO DO LOG RICO DE DIVERGÊNCIAS
             # ==================================================================
-            if not teve_match_perfeito:
-                # Loga a divergência
+            if motivo_divergencia:
                 log_nao_match.append({
-                    "tombo": tombo,
-                    "cliente_legado": cli_legado_id,
-                    "contract_id_csv": contrato_id_res if contrato_id_res else "VAZIO_OU_INVALIDO",
-                    "item_csv": row_csv.get('ITEM_DO_CONTRATO'),
-                    "descricao_csv": row_csv.get('DESCRICAO_ITEM')
+                    "TOMBO": tombo,
+                    "EQUIPAMENTO_CSV": row_csv.get('EQUIPAMENTO_NOME', 'NÃO INFORMADO'),
+                    "ID_CLIENTE_LEGADO": cli_legado_id,
+                    "ID_CLIENTE_NOVO": recipient_id,
+                    
+                    "CONTRACT_ID_CSV": csv_contract_id if csv_contract_id else "VAZIO",
+                    "CONTRATO_RESOLVIDO": contrato_id_res if contrato_id_res else "NENHUM (AVULSO)",
+                    
+                    "ITEM_CSV": row_csv.get('ITEM_DO_CONTRATO', 'VAZIO'),
+                    "DESC_ITEM_CSV": row_csv.get('DESCRICAO_ITEM', 'VAZIO'),
+                    "ITEM_RESOLVIDO_ID": item_id_res if item_id_res else "NENHUM",
+                    
+                    "STATUS_FINAL": "AVULSO" if is_avulso else "ALUGUEL (ITEM EXTRA)",
+                    "MOTIVO_EXATO": motivo_divergencia
                 })
 
-                # Fallback A: O contrato está garantido! Pega o primeiro item vinculado a ele
-                fallback_contrato = None
-                if contrato_id_res:
-                    fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, contrato_id_res))
-                
-                if fallback_contrato:
-                    item_id_res = fallback_contrato['first_contract_item_id']
-                
-                else:
-                    # Fallback B: Cliente não possui esse contrato no dicionário legado. 
-                    # Pega o primeiro contrato/item genérico do cliente.
-                    primeiro_contrato_cli = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
-                    
-                    if primeiro_contrato_cli:
-                        contrato_id_res = primeiro_contrato_cli
-                        item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
-                    
-                    else:
-                        #  Fallback C: O ULTIMO RECURSO (BLINDAGEM AVULSO)
-                        # Cliente sem nenhum contrato na base. Força para movimento avulso.
-                        contrato_id_res = None
-                        item_id_res = None
-                        is_avulso = True
-
             # ==================================================================
-            # REGISTRO DO MOVIMENTO
+            # 4. REGISTRO DO MOVIMENTO
             # ==================================================================
-            
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
             dt_mov = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else self.now
 
@@ -236,31 +255,31 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 deleted_at_mov=row_mov['deleted_at'] if pd.notna(row_mov['deleted_at']) else None,
                 
                 contrato_id=contrato_id_res,
-                contrato_item_id=item_id_res, 
-                
+                contrato_item_id=item_id_res,
                 equipment_id_ref=self.dados["dict_equip_ref_por_number"].get(tombo),
-                tipo_movimento_id= 7 if is_avulso else 1,
+                
+                tipo_movimento_id=7 if is_avulso else 1,
+                
                 operation_type='AVULSO' if is_avulso else 'ALUGUEL',
                 alias_item=str(row_csv.get('ITEM_DO_CONTRATO')).strip() if pd.notna(row_csv.get('ITEM_DO_CONTRATO')) else None,
                 alias_movimento=row_csv.get('EQUIPAMENTO_NOME'),
                 details_capa="Migração",
                 details_item=detalhes_item
             )
-            
+
         # ==================================================================
         # FINALIZAÇÃO E LOGS
         # ==================================================================
         print(f"\n⚠️ Registros rejeitados (Sem movimento ou sem endereço no novo banco): {rejeitados}")
         
         if log_nao_match:
-            print(f"📝 {len(log_nao_match)} itens precisaram de Fallback. Salvando log...")
+            print(f"📝 {len(log_nao_match)} divergências registradas. Salvando log...")
             df_erros = pd.DataFrame(log_nao_match)
-            df_erros.to_csv("log_divergencias_aluguel.csv", index=False)
+            df_erros.to_csv("log_divergencias_aluguel.csv", index=False, encoding="utf-8")
             print("   📄 Log salvo em 'log_divergencias_aluguel.csv'")
 
         self.salvar_banco(id_status_equipamento=2)
         self._atualizar_saldos_mysql()
-
 # ==============================================================================
 # WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
 # ==============================================================================
