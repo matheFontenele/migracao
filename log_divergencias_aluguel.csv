@@ -1,47 +1,21 @@
-tombo,cliente_legado,contract_id_csv,item_csv,descricao_csv
-55057,11190,256,Outsourcing de Impressão - Locação de Equipamento JATO DE TINTA,Canon G4110
-54819,11190,256,Outsourcing de Impressão - Locação de Equipamento JATO DE TINTA,Canon G4110
-64067,11190,256,Outsourcing de Impressão - Locação de Equipamento COLOR,Kyocera ECOSYS_MA3500cix
-62815,11190,256,Outsourcing de Impressão - Locação de Equipamento MONO,Kyocera ECOSYS_M2640idw
-69719,11623,VAZIO_OU_INVALIDO,,
-83887,11623,259,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83900,11583,VAZIO_OU_INVALIDO,,
-83896,11583,VAZIO_OU_INVALIDO,,
-83894,11583,VAZIO_OU_INVALIDO,,
-83893,11583,VAZIO_OU_INVALIDO,,
-83884,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83883,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88800,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88797,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88794,11583,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88793,11583,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83891,11583,261,Outsourcing de Impressão Colorida,CANON 6010
-88792,11583,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88791,11583,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88789,11583,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88788,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88787,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83889,11583,261,Outsourcing de Impressão Colorida,CANON 6010
-88783,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83872,11583,VAZIO_OU_INVALIDO,,
-83871,11583,VAZIO_OU_INVALIDO,,
-83870,11583,VAZIO_OU_INVALIDO,,
-87563,11583,VAZIO_OU_INVALIDO,,
-87549,11583,VAZIO_OU_INVALIDO,,
-86914,11583,VAZIO_OU_INVALIDO,,
-86912,11583,VAZIO_OU_INVALIDO,,
-86911,11583,VAZIO_OU_INVALIDO,,
-86909,11583,VAZIO_OU_INVALIDO,,
-68739,11583,VAZIO_OU_INVALIDO,,
-68740,11583,VAZIO_OU_INVALIDO,,
-53009,11583,257,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-86913,11581,VAZIO_OU_INVALIDO,,
-54806,11581,259,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83888,11582,258,Outsourcing de Impressão Colorida,CANON 6010
-79303,11584,VAZIO_OU_INVALIDO,,
-83898,11584,VAZIO_OU_INVALIDO,,
-83897,11584,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-83885,11584,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88786,11584,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88785,11584,260,Outsourcing de Impressão P&B,PANTUM BM5100FDW
-88615,11584,VAZIO_OU_INVALIDO,,
+TOMBO,EQUIPAMENTO_CSV,ID_CLIENTE_LEGADO,ID_CLIENTE_NOVO,CONTRACT_ID_CSV,CONTRATO_RESOLVIDO,ITEM_CSV,DESC_ITEM_CSV,ITEM_RESOLVIDO_ID,STATUS_FINAL,MOTIVO_EXATO
+69719,TRANSFORMADOR 2000VA FORCELINE,11623,929,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83900,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83896,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83894,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83893,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83872,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83871,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83870,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+87563,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+87549,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86914,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86912,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86911,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86909,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+68739,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+68740,TRANSFORMADOR 2000VA FORCELINE,11583,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86913,TRANSFORMADOR 2000VA FORCELINE,11581,925,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+79303,TRANSFORMADOR 2000VA FORCELINE,11584,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83898,TRANSFORMADOR 2000VA FORCELINE,11584,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88615,TRANSFORMADOR 2000VA FORCELINE,11584,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257

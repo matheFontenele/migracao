@@ -69,6 +69,9 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         )
 
     with engine_new.connect() as conn:
+
+        df_vinculos = pd.read_sql("SELECT customer_id, contract_id FROM contract_recipient_customers", conn)
+
         query_contratos_itens = text("""
             SELECT
                 crc.customer_id AS cliente_id,
@@ -168,6 +171,8 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
     ))
 
     # Dicionário de contrato_item com chave composta (cliente, contrato, item, descrição)
+    dict_contratos_vinculados = df_vinculos.groupby('customer_id')['contract_id'].apply(list).to_dict()
+
     dict_contrato_item_por_chave = {
         (
             int(row['cliente_id']),
@@ -186,6 +191,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
 
     dict_contrato_item_aluguel_por_chave = {}
     dict_contrato_aluguel_por_chave = {}
+
     for _, row in df_contratos_itens.iterrows():
         if pd.isna(row['legacy_client_id']) or pd.isna(row['alias_item_contract']):
             continue
@@ -203,25 +209,19 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
             'original_quantity': limpar_valor_numerico(row['available_quantity'])
         }
 
-        nomes_contrato = [row.get('contract_alias'), row.get('contract_name')]
-        for nome_contrato in nomes_contrato:
-            contrato_norm = normalizar_para_match(nome_contrato)
-            if not contrato_norm:
-                continue
-
-            chave_contrato = (legacy_client_id, contrato_norm)
-            dict_contrato_aluguel_por_chave.setdefault(chave_contrato, {
-                'contract_id': contract_id,
-                'first_contract_item_id': dict_primeiro_item_por_contrato.get(contract_id, contract_item_id)
+        chave_contrato = (legacy_client_id, contract_id)
+        dict_contrato_aluguel_por_chave.setdefault(chave_contrato, {
+            'contract_id': contract_id,
+            'first_contract_item_id': dict_primeiro_item_por_contrato.get(contract_id, contract_item_id)
             })
 
-            chave_item = (
-                legacy_client_id,
-                contrato_norm,
-                normalizar_para_match(row['alias_item_contract']),
-                normalizar_para_match(row['description'])
-            )
-            dict_contrato_item_aluguel_por_chave.setdefault(chave_item, info_item)
+        chave_item = (
+            legacy_client_id,
+            contract_id,
+            normalizar_para_match(row['alias_item_contract']),
+            normalizar_para_match(row['description'])
+        )
+        dict_contrato_item_aluguel_por_chave.setdefault(chave_item, info_item)
 
     saldos_por_id = {}
     for dados in dict_contrato_item_por_chave.values():
@@ -245,6 +245,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_primeiro_item_por_cliente": dict_primeiro_item_por_cliente,
         "dict_primeiro_contrato_por_cliente": dict_primeiro_contrato_por_cliente,
         "dict_primeiro_item_por_contrato": dict_primeiro_item_por_contrato,
+        "dict_contratos_vinculados": dict_contratos_vinculados,
         "dict_contrato_item_por_chave": dict_contrato_item_por_chave,
         "dict_contrato_item_aluguel_por_chave": dict_contrato_item_aluguel_por_chave,
         "dict_contrato_aluguel_por_chave": dict_contrato_aluguel_por_chave,

@@ -49,6 +49,7 @@ ABBREVIATIONS = {
     'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA': 'ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA',
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE SAÚDE': 'SEC. MUNICIPAL DA SAÚDE - URUOCA',
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE EDUCAÇÃO': 'SEC. MUNICIPAL DA EDUCAÇÃO - FUNDEB - URUOCA',
+    'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE ASSISTENCIA SOCIAL E CIDADANIA': 'SEC. DESENVOLVIMENTO SOCIAL, TRABALHO, EMPREENDORISMO E RENDA - URUOCA',
     'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP'
 }
 MAP_EVENT_TYPES = {
@@ -80,6 +81,7 @@ class MigracaoContratos:
         }
 
         # Caches em Memória
+        self.dict_legacy_to_customer = {}
         self.customer_cache = {}
         self.contracts_cache = {}
         self.contracts_by_number = {}
@@ -90,6 +92,80 @@ class MigracaoContratos:
         self.contract_event_counters = {}
         self.ultimo_aditivo_por_contrato = {}
 
+        # ==============================================================================
+    # CARREGAMENTO DE CACHES DO BANCO DE DADOS
+    # ==============================================================================
+    def _construir_caches(self, conn):
+        print("\n🔍 Carregando dados existentes do banco para memória (Caches)...")
+        
+        # 1. Cache de Contratos
+        res_contracts = conn.execute(text("SELECT id, name, number, organization_id, customer_id FROM contracts")).fetchall()
+        for r in res_contracts:
+            chave = f"{r[1]}|{r[2]}|{r[3]}"
+            dados_cache = {"id": r[0], "customer_id": r[4]}
+            self.contracts_cache[chave] = dados_cache
+            if r[2] and r[2] != "SEM_NUMERO":
+                self.contracts_by_number[r[2]] = dados_cache
+        print(f"   📋 {len(self.contracts_cache)} contratos em cache")
+
+        # 2. Cache de Eventos
+        res_events = conn.execute(text("SELECT id, contract_id FROM contract_events")).fetchall()
+        for r in res_events:
+            if r[1] not in self.events_cache:
+                self.events_cache[r[1]] = []
+            self.events_cache[r[1]].append(r[0])
+        print(f"   📅 {len(res_events)} eventos em cache")
+
+        # 3. Cache de Aditivos
+        res_additives = conn.execute(text("SELECT id, event_id, contract_event_type_id FROM event_additives")).fetchall()
+        for r in res_additives:
+            self.additives_cache[f"{r[1]}|{r[2]}"] = r[0]
+        print(f"   📝 {len(self.additives_cache)} aditivos em cache")
+
+        # 4. Cache de Clientes (Matches Complexos)
+        print("   🔍 Mapeando Hierarquia de Clientes e IDs Legados...")
+        query_clientes = text("""
+            SELECT 
+                cup.id AS id_pai,
+                cu.id AS id_cliente,
+                cu.alias AS cliente_nome,
+                cu.name AS razao_social,
+                ad.legacy_customer_id AS id_legado,
+                ad.alias AS endereco_nome,
+                ad.city AS cidade
+            FROM customers cu
+            LEFT JOIN customers cup ON cu.parent_id = cup.id
+            LEFT JOIN addresses ad ON ad.addressable_id = cu.id AND ad.addressable_type = 'customer'
+        """)
+        res_cust = conn.execute(query_clientes).fetchall()
+        
+        for r in res_cust:
+            id_pai, id_cliente, cliente_nome, razao_social, id_legado, endereco_nome, cidade = r
+            
+            info = {'id': id_cliente, 'parent_id': id_pai, 'debug': cliente_nome}
+            
+            # A. Âncora Absoluta: ID Legado (Se a planilha enviar, não tem como errar!)
+            if id_legado:
+                self.dict_legacy_to_customer[int(id_legado)] = info
+
+            # B. Âncoras de Texto Exato (Múltiplas combinações seguras baseadas no banco)
+            combos = [cliente_nome, razao_social, endereco_nome]
+            if cliente_nome and cidade: combos.append(f"{cliente_nome} {cidade}")
+            if endereco_nome and cidade: combos.append(f"{endereco_nome} {cidade}")
+            
+            for txt in combos:
+                if txt:  # Evita tentar normalizar textos nulos
+                    norm = ultra_normalizar(txt)
+                    if norm: self.customer_cache[norm] = info
+                    
+        print(f"   👥 {len(self.dict_legacy_to_customer)} IDs legados atrelados e {len(self.customer_cache)} variações de nomes em cache")
+
+        print("   🔄 Expandindo cache com abreviações conhecidas...")
+        for abbr, full_name in ABBREVIATIONS.items():
+            norm_abbr = ultra_normalizar(abbr)
+            norm_full = ultra_normalizar(full_name)
+            if norm_full in self.customer_cache:
+                self.customer_cache[norm_abbr] = self.customer_cache[norm_full]   
     # ==============================================================================
     # MOTORES DE MATCH E BUSCA (HELPER METHODS)
     # ==============================================================================
@@ -139,76 +215,21 @@ class MigracaoContratos:
 
     def _get_hierarchical_customer(self, nome_planilha):
         nome_alvo = ultra_normalizar(nome_planilha)
-        if not nome_alvo: 
-            print(f"❌ Cliente não localizado: {nome_planilha} (vazio)")
-            return None
+        if not nome_alvo: return None
 
         if nome_alvo in self.customer_cache:
             d = self.customer_cache[nome_alvo]
-            print(f"   ✅ Match (Exato): '{nome_planilha}' -> '{d['debug']}'")
-            return d['parent_id'] if d['parent_id'] else d['id']
-
+            print(f"   ✅ Match (Nome Exato): '{nome_planilha}' -> '{d['debug']}'")
+            return d
+        
         match_tokens = self._match_por_tokens(nome_alvo)
         if match_tokens:
-            d = match_tokens
-            print(f"   ✅ Match (Tokens): '{nome_planilha}' -> '{d['debug']}'")
-            return d['parent_id'] if d['parent_id'] else d['id']
+            print(f"   ✅ Match (Fuzzy Seguro): '{nome_planilha}' -> '{match_tokens['debug']}'")
+            return match_tokens
 
-        print(f"   ❌ Cliente não localizado: {nome_planilha}")
         return None
 
-    # ==============================================================================
-    # CARREGAMENTO DE CACHES DO BANCO DE DADOS
-    # ==============================================================================
-    def _construir_caches(self, conn):
-        print("\n🔍 Carregando dados existentes do banco para memória (Caches)...")
-        
-        # 1. Cache de Contratos
-        res_contracts = conn.execute(text("SELECT id, name, number, organization_id, customer_id FROM contracts")).fetchall()
-        for r in res_contracts:
-            chave = f"{r[1]}|{r[2]}|{r[3]}"
-            dados_cache = {"id": r[0], "customer_id": r[4]}
-            self.contracts_cache[chave] = dados_cache
-            if r[2] and r[2] != "SEM_NUMERO":
-                self.contracts_by_number[r[2]] = dados_cache
-        print(f"   📋 {len(self.contracts_cache)} contratos em cache")
 
-        # 2. Cache de Eventos
-        res_events = conn.execute(text("SELECT id, contract_id FROM contract_events")).fetchall()
-        for r in res_events:
-            if r[1] not in self.events_cache:
-                self.events_cache[r[1]] = []
-            self.events_cache[r[1]].append(r[0])
-        print(f"   📅 {len(res_events)} eventos em cache")
-
-        # 3. Cache de Aditivos
-        res_additives = conn.execute(text("SELECT id, event_id, contract_event_type_id FROM event_additives")).fetchall()
-        for r in res_additives:
-            self.additives_cache[f"{r[1]}|{r[2]}"] = r[0]
-        print(f"   📝 {len(self.additives_cache)} aditivos em cache")
-
-        # 4. Cache de Clientes (Matches Complexos)
-        res_cust = conn.execute(text("""
-            SELECT c.id, c.name, c.alias, c.parent_id, a.city, a.alias as addr_alias 
-            FROM customers c 
-            LEFT JOIN addresses a ON a.addressable_id = c.id AND a.addressable_type = 'customer'
-        """)).fetchall()
-        
-        for r in res_cust:
-            info = {'id': r[0], 'parent_id': r[3], 'debug': r[1]}
-            combos = [r[1], r[2]]
-            if r[1] and r[4]: combos.append(f"{r[1]} {r[4]}")
-            if r[1] and r[5]: combos.append(f"{r[1]} {r[5]}")
-            for txt in combos:
-                norm = ultra_normalizar(txt)
-                if norm: self.customer_cache[norm] = info
-
-        print("   🔄 Expandindo cache com abreviações conhecidas...")
-        for abbr, full_name in ABBREVIATIONS.items():
-            norm_abbr = ultra_normalizar(abbr)
-            norm_full = ultra_normalizar(full_name)
-            if norm_full in self.customer_cache:
-                self.customer_cache[norm_abbr] = self.customer_cache[norm_full]
 
     # ==============================================================================
     # PROCESSAMENTO DE ENTIDADES (UPSERT)
@@ -225,12 +246,34 @@ class MigracaoContratos:
                 print(f"   ⚠️ Contrato ignorado: A linha não possui um 'ID' válido.")
                 self.stats['contratos_ignorados'] += 1
                 continue
+
+            cust_info = None
+
+            # 1. Tenta pelo ID Legado (Se a coluna existir na planilha é sucesso instantâneo)
+            for col_id in ['CLIENTE_ID', 'ID_CLIENTE', 'LEGACY_CUSTOMER_ID', 'ID_LEGADO']:
+                if col_id in row and pd.notna(row[col_id]):
+                    legacy_id = limpar_valor_inteiro(row[col_id])
+                    if legacy_id in self.dict_legacy_to_customer:
+                        cust_info = self.dict_legacy_to_customer[legacy_id]
+                        print(f"   🎯 Match (ID Ouro): [{legacy_id}] -> '{cust_info['debug']}'")
+                        break
             
-            cust_id = self._get_hierarchical_customer(row['CONTRATANTE'])
-            if not cust_id:
+            # 2. Se não tinha ID na planilha, tenta pelos nomes gerados pelo SQL
+            if not cust_info:
+                cust_info = self._get_hierarchical_customer(row['CONTRATANTE'])
+
+            # 3. Falhou em todos os testes
+            if not cust_info:
+                print(f"   ❌ Cliente não localizado no banco: {row['CONTRATANTE']}")
                 self.stats['contratos_ignorados'] += 1
                 continue
 
+            # Resolve se fica na Secretaria ou joga pro Pai/Prefeitura
+            cust_id = cust_info['parent_id'] if cust_info['parent_id'] else cust_info['id']
+            
+            # ==================================================================
+            # GRAVAÇÃO DO CONTRATO
+            # ==================================================================
             nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
             numero_contrato = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
             org_id = MAP_ORGANIZACAO.get(row['CONTRATADO'], 1115)
