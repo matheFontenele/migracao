@@ -99,7 +99,10 @@ MAPA_IDS_SINTETICOS_PCPB = {
     "JERICÓ": 900014,
     "SEDE / OUTROS": 900015
 }
-
+MAPA_MINISTERIO_RELACOES = {
+    "PREFEITURA": (375, 322),
+    "SECRETARIA": (1424, 1347)
+}
 
 class MigracaoClientes:
 
@@ -153,7 +156,7 @@ class MigracaoClientes:
 
      # ==============================================================================
     #==============================================================================
-    # 2. TRANSFORMAÇÕES E REGRAS DE NEGÓCIO
+    # 2. APLICANDO REGRAS DE EXCEÇÃO E LIMPEZA DE DADOS
     # ==============================================================================
     def _unificar_sao_luis(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
@@ -196,7 +199,37 @@ class MigracaoClientes:
             df_modificado.at[idx, 'ID_SECRETARIA'] = id_sintetico
             df_modificado.at[idx, 'SECRETARIA'] = f"POLÍCIA CIVIL - {regiao_encontrada}"
         return df_modificado
-    
+    def _unificar_ministerio_relacoes(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+
+        pref_alvo, pref_origem = MAPA_MINISTERIO_RELACOES["PREFEITURA"]
+        sec_alvo, sec_origem = MAPA_MINISTERIO_RELACOES["SECRETARIA"]
+
+        id_pref_serie = pd.to_numeric(df_modificado['ID_PREFEITURA'], errors='coerce')
+        id_sec_serie = pd.to_numeric(df_modificado['ID_SECRETARIA'], errors='coerce')
+        
+        mask_pref = id_pref_serie == pref_origem
+        
+        if mask_pref.any():
+            nomes_pref_alvo = df_modificado.loc[id_pref_serie == pref_alvo, 'PREFEITURA']
+            nome_pref_padrao = nomes_pref_alvo.iloc[0] if not nomes_pref_alvo.empty else "MINISTÉRIO DAS RELAÇÕES EXTERIORES"
+            
+            df_modificado.loc[mask_pref, 'ID_PREFEITURA'] = pref_alvo
+            df_modificado.loc[mask_pref, 'PREFEITURA'] = nome_pref_padrao
+
+        mask_sec = id_sec_serie == sec_origem  # Busca quem é 1347
+        
+        if mask_sec.any():
+            nomes_sec_alvo = df_modificado.loc[id_sec_serie == sec_alvo, 'SECRETARIA']
+            nome_sec_padrao = nomes_sec_alvo.iloc[0] if not nomes_sec_alvo.empty else "SECRETARIA MRE"
+            
+            df_modificado.loc[mask_sec, 'ID_SECRETARIA'] = sec_alvo
+            df_modificado.loc[mask_sec, 'SECRETARIA'] = nome_sec_padrao
+        
+        return df_modificado
+
+
+
     def _limpar_cnpj(self, cnpj_raw):
         c = re.sub(r'\D', '', str(cnpj_raw))
         return c if c else '00000000000000'
@@ -225,6 +258,7 @@ class MigracaoClientes:
         # --- APLICA EXCEÇÕES (São Luís e PCPB) ---
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
+        df_clean = self._unificar_ministerio_relacoes(df_clean)
 
         # --- MERGE DE RESERVAS ---
         mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
