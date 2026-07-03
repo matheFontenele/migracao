@@ -288,6 +288,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 # WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
 # ==============================================================================
 def executar(eng_novo, eng_legado):
+    from movimentos.migracao_aluguel import resetar_saldo_contract_items, carregar_dados_compartilhados
 
     print("\n" + "="*70)
     print("🚀 MODO DEBUG: Disparando teste isolado de ALUGUEL")

@@ -8,7 +8,7 @@ from movimentos.migracao_movimentos import carregar_dados_compartilhados, reseta
 
 class MigracaoReserva(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=500000):
-        # start_counter=500000 garante que os IDs dos itens não conflitem com o Aluguel
+
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
         self.consumir_saldos = False  # 🛡️ Proteção: Reserva não subtrai saldo de contrato
 
@@ -23,9 +23,6 @@ class MigracaoReserva(BaseMigracaoMovimento):
         return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
 
     def _extrair_dados_reserva(self, frente):
-        """
-        Padrão DRY: Extrai os dados do MySQL Legado variando apenas a regra de negócio (WHERE).
-        """
         print(f"   📖 Extraindo Frente {frente} de Reservas...")
         
         # O %% escapa o % no SQLAlchemy para não bugar a query
@@ -154,6 +151,7 @@ class MigracaoReserva(BaseMigracaoMovimento):
 # WRAPPER (A porta de entrada do orquestrador ou terminal)
 # ==============================================================================
 def executar(eng_novo, eng_legado):
+    from movimentos.migracao_reserva import resetar_saldo_contract_items, carregar_dados_compartilhados
 
     print("\n" + "="*70)
     print("🚀 MODO DEBUG: Disparando teste isolado de RESERVA")

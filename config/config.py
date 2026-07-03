@@ -16,6 +16,15 @@ ORGANIZACOES_BLOQUEADAS = {1123, 1366}
 CLIENTES_BLOQUEADOS = {2131, 2707}
 FALSOS_RESERVAS = {10487}
 
+# =========================================================================
+# ENDEREÇOS BASES (ORGANIZAÇÕES)
+# =========================================================================
+ENDERECOS_BASES = [
+            {"type": "organization", "id": 1115, "alias": "ALUCOM - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "40", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
+            {"type": "organization", "id": 1122, "alias": "MOREIA - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "50", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
+            {"type": "organization", "id": 1311, "alias": "IP - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "60", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
+            {"type": "organization", "id": 1378, "alias": "AS SISTEMAS - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "70", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None}
+        ]
 
 # =========================================================================
 # ENDEREÇOS BASES MESCLADAS
