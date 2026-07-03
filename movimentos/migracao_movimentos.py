@@ -271,7 +271,22 @@ class BaseMigracaoMovimento:
         self.dados = dados_compartilhados
         self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.limpar_ambiente = limpar_ambiente
+
+        with self.engine_new.connect() as conn:
+            max_so = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_orders")).scalar()
+            max_mov = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM movements")).scalar()
+            max_so_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_items")).scalar()
+            max_mov_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM movement_items")).scalar()
+            max_extra = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_item_extra_equipments")).scalar()
+        
+        # Contadores blindados
+        self.so_capa_id_counter = max(max_so, max_mov) + 1
         self.mov_item_id_counter = start_counter
+        self.so_item_id_counter = start_counter
+        self.extra_id_counter = start_counter
+        
+        # Dicionário para gerenciar os IDs gerados em memória
+        self.mapa_ids_capa = {}
         
         self.servicos_mestre = []
         self.service_itens_mestre = []
@@ -281,12 +296,6 @@ class BaseMigracaoMovimento:
         
         self.pedidos_pai_inseridos = set()
         self.equipamentos_alterados = []
-        
-        self.so_item_id_counter = start_counter
-        self.extra_id_counter = start_counter
-        
-        self.so_item_id_counter = start_counter
-        self.extra_id_counter = start_counter
 
     def limpar_tabelas_movimento(self):
         pass
@@ -387,21 +396,37 @@ class BaseMigracaoMovimento:
         forcar_extra: bool = False,
     ):
         
+        if id_final not in self.mapa_ids_capa:
+            novo_id_capa = self.so_capa_id_counter
+            self.so_capa_id_counter += 1
+            self.mapa_ids_capa[id_final] = novo_id_capa
+        
         # 1️⃣ CAPAS PAI (Service Order + Movement)
-        if id_final not in self.pedidos_pai_inseridos:
             self.servicos_mestre.append({
-                "id": id_final, "status_id": 3, "movement_type_id": tipo_movimento_id, "contract_id": contrato_id,
+                "id": novo_id_capa,
+                "status_id": 3, "movement_type_id": tipo_movimento_id, "contract_id": contrato_id,
                 "user_id": usuario_id, "destination_order_id": None, "mode_transport_id": 1,
                 "organization_id": 1378, "recipient_customer_id": recipient_id, "deadline": mov_date,
                 "details": details_capa, "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
             })
             self.movimentos_mestre.append({
-                "id": id_final, "number": id_final, "movement_date": mov_date, "service_order_id": id_final,
-                "recipient_customer_id": recipient_id, "migrate_customer_id": None, "organization_id": 1378,
-                "status_id": 3, "created_by": usuario_id, "details": details_capa,
-                "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+                "id": novo_id_capa,
+                "number": id_final,
+                "movement_date": mov_date,
+                "service_order_id": novo_id_capa,
+                "recipient_customer_id": recipient_id,
+                "migrate_customer_id": None,
+                "organization_id": 1378,
+                "status_id": 3,
+                "created_by": usuario_id,
+                "details": details_capa,
+                "created_at": mov_date,
+                "updated_at": mov_date,
+                "deleted_at": deleted_at_mov
             })
             self.pedidos_pai_inseridos.add(id_final)
+
+        id_capa_atual = self.mapa_ids_capa[id_final]
 
         # 2️⃣ GATILHO DE SALDO E EXTRAS
         item_servico_id_atual = self.so_item_id_counter
@@ -424,7 +449,7 @@ class BaseMigracaoMovimento:
         self.service_itens_mestre.append({
             "id": item_servico_id_atual,
             "status_id": 3,
-            "service_order_id": id_final,
+            "service_order_id": id_capa_atual,
             "department_id": 2,
             "movement_type_id": tipo_movimento_id,
             "contract_item_id": contrato_item_id_resolvido,
@@ -449,7 +474,7 @@ class BaseMigracaoMovimento:
         self.mov_item_id_counter += 1
         self.movimento_itens_mestre.append({
             "id": item_mov_id_atual,
-            "movement_id": id_final,
+            "movement_id": id_capa_atual,
             "movement_type_id": tipo_movimento_id,
             "service_order_item_id": item_servico_id_atual,
             "equipment_id": equipment_id_ref,
