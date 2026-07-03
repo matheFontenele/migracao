@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy import create_engine, text
 from tqdm import tqdm
+import sys
 
 
 TABELAS = [
