@@ -4,6 +4,8 @@ from tqdm import tqdm
 
 from movimentos.migracao_movimentos import BaseMigracaoMovimento
 
+from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
+
 class MigracaoReserva(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=500000):
         # start_counter=500000 garante que os IDs dos itens não conflitem com o Aluguel
@@ -146,15 +148,12 @@ class MigracaoReserva(BaseMigracaoMovimento):
 
         # 5. Salva em lote no banco (Status 3 = Reservado)
         self.salvar_movimentos_banco()
-        self.atualizar_equipamentos_banco(id_status_equipamento=3)
+        self.atualizar_equipamentos_banco(id_status_equipamento=3, lista_dicionarios=self.equipamentos_alterados)
         
-        self._atualizar_saldos_mysql()
-
 # ==============================================================================
 # WRAPPER (A porta de entrada do orquestrador ou terminal)
 # ==============================================================================
 def executar(eng_novo, eng_legado):
-    from movimentos.migracao_movimentos import carregar_dados_compartilhados
 
     print("\n" + "="*70)
     print("🚀 MODO DEBUG: Disparando teste isolado de RESERVA")
