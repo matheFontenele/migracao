@@ -4,6 +4,7 @@ from sqlalchemy import text
 from datetime import datetime
 from tqdm import tqdm
 
+from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, normalizar_para_match
 
@@ -114,8 +115,14 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
 
         tombos = df_csv['TOMBO'].astype(int).unique().tolist()
+
+        # 1. Busca os movimentos no banco Legado
         dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos)
         print(f"   ✅ {len(dict_ultimo_mov)} tombos indexados no legado.")
+
+        # 2. Busca os IDs dos equipamentos no banco Novo (Usando o SQL Otimizado!)
+        dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
+        print(f"   ✅ {len(dict_equipamentos_novo)} equipamentos correspondentes encontrados no banco novo.")
 
         log_nao_match = []
         rejeitados = 0
@@ -147,6 +154,15 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 continue
 
             # ==================================================================
+            # VALIDAÇÃO DO EQUIPAMENTO (Consultando o dicionário do SQL Otimizado)
+            # ==================================================================
+            equipment_id_ref = dict_equipamentos_novo.get(tombo)
+            if not equipment_id_ref:
+                print(f"\n⚠️ Ignorado: Tombo {tombo} não encontrado na tabela equipments do banco novo.")
+                rejeitados += 1
+                continue
+
+            # ==================================================================
             # 1. CAPTURA E NORMALIZAÇÃO DOS DADOS DA PLANILHA
             # ==================================================================      
             try:
@@ -165,23 +181,15 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             # ==================================================================
             # 2. VALIDAÇÃO DO CONTRATO (A Chave de Ouro)
             # ==================================================================
-            # Busca a lista de contratos REAIS que pertencem a este cliente no banco novo
             contratos_validos_banco = self.dados["dict_contratos_vinculados"].get(recipient_id, [])
-
-            # Variável central para registrar se houve algum desvio do caminho feliz
             motivo_divergencia = None
 
             if csv_contract_id in contratos_validos_banco:
-                # SUCESSO: O contrato do CSV é legítimo e pertence a este cliente!
                 contrato_id_res = csv_contract_id
-                
             elif contratos_validos_banco:
-                # FALLBACK A: Contrato CSV errado, mas cliente tem contrato ativo.
                 contrato_id_res = contratos_validos_banco[0]
                 motivo_divergencia = f"Contrato da planilha ({csv_contract_id}) não pertence ao cliente. Forçado para o real: {contrato_id_res}"
-                
             else:
-                # BLINDAGEM AVULSO: Cliente sem nenhum contrato no banco novo.
                 contrato_id_res = None
                 is_avulso = True
                 motivo_divergencia = "Cliente não possui nenhum contrato ativo no banco. Forçado para AVULSO."
@@ -198,18 +206,15 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get(chave_legado)
 
                 if match_info:
-                    # SUCESSO ABSOLUTO: Contrato validado e Item casado perfeitamente!
                     item_id_res = match_info['id']
                     teve_match_perfeito = True
                 else:
-                    # FALLBACK DE ITEM: Contrato está certo, mas a descrição do item falhou.
                     fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, contrato_id_res))
                     if fallback_contrato:
                         item_id_res = fallback_contrato['first_contract_item_id']
                     else:
                         item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
                         
-                    # Só registra esse erro de item se não houve um erro mais grave de contrato antes
                     if not motivo_divergencia: 
                         motivo_divergencia = "Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Fallback."
 
@@ -222,20 +227,17 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     "EQUIPAMENTO_CSV": row_csv.get('EQUIPAMENTO_NOME', 'NÃO INFORMADO'),
                     "ID_CLIENTE_LEGADO": cli_legado_id,
                     "ID_CLIENTE_NOVO": recipient_id,
-                    
                     "CONTRACT_ID_CSV": csv_contract_id if csv_contract_id else "VAZIO",
                     "CONTRATO_RESOLVIDO": contrato_id_res if contrato_id_res else "NENHUM (AVULSO)",
-                    
                     "ITEM_CSV": row_csv.get('ITEM_DO_CONTRATO', 'VAZIO'),
                     "DESC_ITEM_CSV": row_csv.get('DESCRICAO_ITEM', 'VAZIO'),
                     "ITEM_RESOLVIDO_ID": item_id_res if item_id_res else "NENHUM",
-                    
                     "STATUS_FINAL": "AVULSO" if is_avulso else "ALUGUEL (ITEM EXTRA)",
                     "MOTIVO_EXATO": motivo_divergencia
                 })
 
             # ==================================================================
-            # 4. REGISTRO DO MOVIMENTO
+            # 4. REGISTRO DO MOVIMENTO (Limpo e sem erros de sintaxe)
             # ==================================================================
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
             dt_mov = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else self.now
@@ -256,7 +258,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
-                equipment_id_ref=self.dados["dict_equip_ref_por_number"].get(tombo),
+                equipment_id_ref=equipment_id_ref,
                 
                 tipo_movimento_id=7 if is_avulso else 1,
                 
@@ -278,16 +280,14 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             df_erros.to_csv("log_divergencias_aluguel.csv", index=False, encoding="utf-8")
             print("   📄 Log salvo em 'log_divergencias_aluguel.csv'")
 
-        self.salvar_banco(id_status_equipamento=2)
+        self.salvar_movimentos_banco()
+        self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=self.equipamentos_alterados)
+        
         self._atualizar_saldos_mysql()
 # ==============================================================================
 # WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
 # ==============================================================================
 def executar(eng_novo, eng_legado):
-    from movimentos.migracao_movimentos import (
-        carregar_dados_compartilhados, 
-        resetar_saldo_contract_items
-    )
 
     print("\n" + "="*70)
     print("🚀 MODO DEBUG: Disparando teste isolado de ALUGUEL")

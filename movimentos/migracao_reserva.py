@@ -145,7 +145,10 @@ class MigracaoReserva(BaseMigracaoMovimento):
         print(f"\n⚠️ Registros rejeitados (Sem equipamento ou sem endereço): {rejeitados}")
 
         # 5. Salva em lote no banco (Status 3 = Reservado)
-        self.salvar_banco(id_status_equipamento=3)
+        self.salvar_movimentos_banco()
+        self.atualizar_equipamentos_banco(id_status_equipamento=3)
+        
+        self._atualizar_saldos_mysql()
 
 # ==============================================================================
 # WRAPPER (A porta de entrada do orquestrador ou terminal)
@@ -157,8 +160,6 @@ def executar(eng_novo, eng_legado):
     print("🚀 MODO DEBUG: Disparando teste isolado de RESERVA")
     print("="*70)
 
-    # 🛑 IMPORTANTE: A Reserva não chama o `executar_truncate_tabelas`.
-    # Ela herda a sujeira do Aluguel de propósito, adicionando seus dados por cima.
 
     print("\n🧠 Carregando dados compartilhados na RAM (Caches)...")
     dados_ram = carregar_dados_compartilhados(eng_legado, eng_novo)
