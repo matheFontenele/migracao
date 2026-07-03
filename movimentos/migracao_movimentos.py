@@ -278,12 +278,16 @@ class BaseMigracaoMovimento:
             max_so_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_items")).scalar()
             max_mov_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM movement_items")).scalar()
             max_extra = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_item_extra_equipments")).scalar()
+
+            # Busca usuários válidos para fallback global (evita quebra de Foreign Key)
+            res_users = conn.execute(text("SELECT id FROM users")).fetchall()
+            self.usuarios_validos = set(row[0] for row in res_users)
         
         # Contadores blindados
         self.so_capa_id_counter = max(max_so, max_mov) + 1
-        self.mov_item_id_counter = start_counter
-        self.so_item_id_counter = start_counter
-        self.extra_id_counter = start_counter
+        self.so_item_id_counter = max_so_item + 1
+        self.mov_item_id_counter = max_mov_item + 1
+        self.extra_id_counter = max_extra + 1
         
         # Dicionário para gerenciar os IDs gerados em memória
         self.mapa_ids_capa = {}
@@ -396,6 +400,12 @@ class BaseMigracaoMovimento:
         forcar_extra: bool = False,
     ):
         
+        #Blindagem para usuarios inexistentes
+        if hasattr(self, 'usuarios_validos') and usuario_id in self.usuarios_validos:
+            usuario_seguro = usuario_id
+        else:
+            usuario_seguro = 1
+        
         if id_final not in self.mapa_ids_capa:
             novo_id_capa = self.so_capa_id_counter
             self.so_capa_id_counter += 1
@@ -405,7 +415,7 @@ class BaseMigracaoMovimento:
             self.servicos_mestre.append({
                 "id": novo_id_capa,
                 "status_id": 3, "movement_type_id": tipo_movimento_id, "contract_id": contrato_id,
-                "user_id": usuario_id, "destination_order_id": None, "mode_transport_id": 1,
+                "user_id": usuario_seguro, "destination_order_id": None, "mode_transport_id": 1,
                 "organization_id": 1378, "recipient_customer_id": recipient_id, "deadline": mov_date,
                 "details": details_capa, "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
             })
@@ -418,7 +428,7 @@ class BaseMigracaoMovimento:
                 "migrate_customer_id": None,
                 "organization_id": 1378,
                 "status_id": 3,
-                "created_by": usuario_id,
+                "created_by": usuario_seguro,
                 "details": details_capa,
                 "created_at": mov_date,
                 "updated_at": mov_date,
@@ -494,6 +504,56 @@ class BaseMigracaoMovimento:
 
         self.equipamentos_alterados.append({int(equipment_id_ref): item_mov_id_atual})
 
+        return id_capa_atual, item_servico_id_atual, item_mov_id_atual
+
+    def buscar_historico_devolucao_por_tombo(self, lista_tombos: list) -> dict:
+        """
+        Busca os dois últimos movimentos de uma máquina (A Devolução e a sua Origem).
+        Retorna: { 'tombo': { 'ultimo': {dados}, 'penultimo': {dados} } }
+        """
+        if not lista_tombos:
+            return {}
+
+        tombos_formatados = [f"'{str(t).strip()}'" for t in lista_tombos]
+        lista_tombos_sql = "(" + ", ".join(tombos_formatados) + ")"
+
+        query = f"""
+            WITH MovimentosOrdenados AS (
+                SELECT 
+                    ae.numero AS tombo,
+                    am.id AS movimento_id,
+                    am.tipo_id,
+                    amt.nome AS tipo_nome,
+                    am.data,
+                    am.updated_at,
+                    am.deleted_at,
+                    am.cliente_id,
+                    am.usuario_id,
+                    ROW_NUMBER() OVER(PARTITION BY ami.equipamento_id ORDER BY am.updated_at DESC, am.data DESC, am.id DESC) as rn
+                FROM aluguel_movimento am
+                INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
+                INNER JOIN aluguel_equipamentos ae ON ae.id = ami.equipamento_id
+                INNER JOIN aluguel_tipos_movimento amt ON amt.id = am.tipo_id
+                WHERE am.deleted_at IS NULL AND ae.deleted_at IS NULL
+            )
+            SELECT * FROM MovimentosOrdenados 
+            WHERE rn IN (1, 2) AND tombo IN {lista_tombos_sql}
+        """
+        
+        df_resultado = pd.read_sql(text(query), self.engine_legado)
+        
+        dict_historico = {}
+        for _, row in df_resultado.iterrows():
+            tombo = limpar_codigo(row['tombo'])
+            if tombo not in dict_historico:
+                dict_historico[tombo] = {'ultimo': None, 'penultimo': None}
+                
+            if row['rn'] == 1:
+                dict_historico[tombo]['ultimo'] = row.to_dict()
+            elif row['rn'] == 2:
+                dict_historico[tombo]['penultimo'] = row.to_dict()
+
+        return dict_historico
    # ==========================================================================
     # 1. PERSISTÊNCIA DE NOVOS REGISTROS (INSERT EM MASSA)
     # ==========================================================================

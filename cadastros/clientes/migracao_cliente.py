@@ -9,7 +9,7 @@ from config.config import (
     CLIENTES_BLOQUEADOS,
     ORGANIZACOES_BLOQUEADAS,
     FALSOS_RESERVAS,
-    BASES_AVULSOS
+    BASES_AVULSOS, ENDERECOS_BASES
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
@@ -320,17 +320,10 @@ class MigracaoClientes:
                     "res_id": int(row['reserved_customer_id']) if pd.notna(row['reserved_customer_id']) else None, "row": row
                 }
 
-        # O Lote de Endereços que será inserido de uma só vez (Vetorizado na Inserção)
-        enderecos_batch = [
-            {"type": "organization", "id": 1115, "alias": "ALUCOM - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "40", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
-            {"type": "organization", "id": 1122, "alias": "MOREIA - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "50", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
-            {"type": "organization", "id": 1311, "alias": "IP - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "60", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None},
-            {"type": "organization", "id": 1378, "alias": "AS SISTEMAS - BASE", "zip": "60175205", "street": "RUA RIACHUELO PAPICU", "num": "70", "city": "FORTALEZA", "state": "CE", "leg_id": None, "res_id": None}
-        ]
-
         # ==============================================================================
         # 🏢 CRIAÇÃO DE ENDEREÇOS DE BOX/ESTOQUES PARA CADA ORGANIZAÇÃO
         # ==============================================================================
+        enderecos_batch = ENDERECOS_BASES.copy()
         
         organizacoes = [end for end in enderecos_batch if end.get("type") == "organization"]
         

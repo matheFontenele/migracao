@@ -8,7 +8,7 @@ from migracao_movimentos import (
 
 from migracao_aluguel import MigracaoAluguel
 from migracao_reserva import MigracaoReserva
-# from migracao_devolucao import MigracaoDevolucao
+from migracao_devolucao import MigracaoDevolucao
 # from migracao_substituicao import MigracaoSubstituicao
 
 TABELAS = []
@@ -46,9 +46,9 @@ class OrquestradorMovimentos:
             reserva = MigracaoReserva(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=500000)
             reserva.executar()
 
-            # print("\n▶️ Iniciando Módulo: DEVOLUÇÃO")
-            # devolucao = MigracaoDevolucao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1000000)
-            # devolucao.executar()
+            print("\n▶️ Iniciando Módulo: DEVOLUÇÃO")
+            devolucao = MigracaoDevolucao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1000000)
+            devolucao.executar()
 
             print("\n" + "=" * 80)
             print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")

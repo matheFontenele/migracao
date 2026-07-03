@@ -86,6 +86,10 @@ def iniciar_reserva(eng_novo, eng_legado):
     from movimentos import migracao_reserva
     migracao_reserva.executar(eng_novo, eng_legado)
 
+def iniciar_devolucao(eng_novo, eng_legado):
+    from movimentos import migracao_devolucao
+    migracao_devolucao.executar(eng_novo, eng_legado)
+
 def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
     orquestrador_movimentos.executar(eng_novo, eng_legado)
@@ -135,6 +139,7 @@ TAREFAS = {
     "equipamentos": iniciar_equipamentos,
     "movimentos_aluguel": iniciar_aluguel,
     "movimentos_reserva": iniciar_reserva,
+    "movimentos_devolucao": iniciar_devolucao,
     "movimentos": iniciar_movimentos,
     "reset_movimentos": iniciar_reset_movimentos
 }
