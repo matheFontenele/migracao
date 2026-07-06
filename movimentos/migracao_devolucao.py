@@ -13,8 +13,6 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         
         # 1. Contadores Inteligentes para Shipments
         with self.engine_new.connect() as conn:
-            max_ship = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipments")).scalar()
-            max_ship_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipment_items")).scalar()
 
             # 🎯 Extrai todos os IDs de Organização do config.py
             org_ids = [str(org['id']) for org in ENDERECOS_BASES]
@@ -33,13 +31,6 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # Dicionário em memória: {ID_DA_ORG: ID_DO_ENDERECO}
             self.dict_enderecos_base_org = {row.addressable_id: row.address_id for row in result_ends}
             
-        self.shipment_id_counter = max_ship + 1
-        self.shipment_item_id_counter = max_ship_item + 1
-        
-        # 2. Listas de Persistência Exclusivas
-        self.shipments_mestre = []
-        self.shipment_movements_mestre = []
-        self.shipment_items_mestre = []
 
     def salvar_shipments_banco(self):
         if not self.shipments_mestre:
@@ -195,6 +186,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 contrato_id=contrato_id_ativo,
                 contrato_item_id=item_id_ativo,
                 equipment_id_ref=equip_id_novo,
+                status_shipment=2,
                 tipo_movimento_id=tipo_mov_novo,
                 operation_type=op_type,
                 organization_id=org_id_destino,
@@ -210,58 +202,24 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             dt_dev = row['DEV_DATA']
             usr_dev = int(row['DEV_USR_ID'])
 
-            # Registra a Devolução e captura os IDs gerados
-            id_capa_dev, id_serv_item_dev, id_mov_item_dev = self.registrar_movimento(
+            self.registrar_movimento(
                 id_final=id_mov_dev,
                 recipient_id=recipient_id, 
-                cliente_final_address_id=endereco_base_id, # Retorna para a base física
+                cliente_final_address_id=endereco_base_id,
                 usuario_id=usr_dev,
                 mov_date=dt_dev,
                 deleted_at_mov=row['DEV_DEL'] if pd.notna(row['DEV_DEL']) else None,
                 contrato_id=None,
                 contrato_item_id=None,
                 equipment_id_ref=equip_id_novo,
-                tipo_movimento_id=3, # 3 = ID de Devolução
+                status_shipment=1, 
+                tipo_movimento_id=3,
                 operation_type='DEVOLUCAO',
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
                 details_item="Retorno para a Base"
             )
-
-            # =========================================================
-            # 🚚 FASE 3: GERAR O SHIPMENT (GUIA DE TRANSPORTE DE VOLTA)
-            # =========================================================
-            # Blindagem local do usuário do Shipment para evitar quebras de FK externa
-            usr_shipment = usr_dev if hasattr(self, 'usuarios_validos') and usr_dev in self.usuarios_validos else 1
-            
-            ship_id_atual = self.shipment_id_counter
-            self.shipment_id_counter += 1
-            
-            self.shipments_mestre.append({
-                "id": ship_id_atual,
-                "status_id": 1,
-                "created_by": usr_shipment,
-                "created_at": dt_dev,
-                "updated_at": dt_dev,
-                "deleted_at": None
-            })
-            
-            self.shipment_items_mestre.append({
-                "id": self.shipment_item_id_counter,
-                "shipment_id": ship_id_atual,
-                "status_id": 1,
-                "movement_item_id": id_mov_item_dev,
-                "volume_id": None,
-                "details": f"Devolução referente a movimento {id_mov_dev}",
-                "address_id": endereco_base_id 
-            })
-            self.shipment_item_id_counter += 1
-
-            self.shipment_movements_mestre.append({
-                "shipment_id": ship_id_atual,
-                "movement_id": id_capa_dev
-            })
 
         # ==================================================================
         # FINALIZAÇÃO: SALVAR TUDO
@@ -270,9 +228,6 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             print(f"\n⚠️ Equipamentos rejeitados (Não encontrados no banco novo): {rejeitados}")
 
         self.salvar_movimentos_banco()
-        self.salvar_shipments_banco()
-        
-        # O Status 8 na tabela de equipments representa "Devolvido / Disponível na Base"
         self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=self.equipamentos_alterados)
 
 # ==============================================================================

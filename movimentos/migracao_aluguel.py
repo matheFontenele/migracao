@@ -95,7 +95,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 for item in modificados:
                     conn.execute(text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"), item)
             print(f"  ✔️ {len(modificados)} saldos de contrato atualizados no MySQL (Valores negativos travados em 0).")
-
+    
     def executar(self):
         print("\n" + "-" * 70)
         print("📦 MÓDULO: ALUGUEL (Fonte: CSV)")
@@ -261,6 +261,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 contrato_item_id=item_id_res,
                 equipment_id_ref=equipment_id_ref,
                 
+                status_shipment=2,
                 tipo_movimento_id=7 if is_avulso else 1,
                 
                 operation_type='AVULSO' if is_avulso else 'ALUGUEL',
@@ -283,8 +284,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         self.salvar_movimentos_banco()
         self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=self.equipamentos_alterados)
-        
+
         self._atualizar_saldos_mysql()
+        
 # ==============================================================================
 # WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
 # ==============================================================================

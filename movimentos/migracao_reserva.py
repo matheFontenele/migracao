@@ -110,6 +110,9 @@ class MigracaoReserva(BaseMigracaoMovimento):
             
             org_id_destino = descobrir_id_organizacao_destino(cliente_id_legado)
 
+            if org_id_destino not in [1115, 1311, 1122, 1378]:
+                org_id_destino = 1115
+
             usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
             mov_date = row['updated_at'] if pd.notna(row['updated_at']) else self.now
 
@@ -128,6 +131,7 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
                 equipment_id_ref=equipment_id_ref,
+                status_shipment=2,
                 tipo_movimento_id=4,
                 organization_id=org_id_destino,
                 operation_type='RESERVA',
