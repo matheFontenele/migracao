@@ -53,38 +53,74 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         print("   ✅ Shipments salvos com sucesso.")
 
     def _extrair_dados_devolucao(self):
-        print("   📖 Extraindo movimentos de Devolução do legado...")
+        print("   📖 Extraindo histórico (Ordenação Cronológica via Pandas)...")
+        
+        # 1. Traz o histórico bruto, mas apenas dos equipamentos que estão devolvidos
         query = """
             SELECT
                 eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-                ac.id AS ID_CLIENTE, mov.id as MOVIMENTO_ID,
-                mov.usuario_id, mov.updated_at, mov.deleted_at
+                mov.id AS MOVIMENTO_ID, ac.id AS CLIENTE_ID,
+                COALESCE(NULLIF(mov.usuario_id, 0), 1) AS USR_ID,
+                COALESCE(mov.updated_at, mov.data) AS DATA_MOV,
+                mov.deleted_at AS DEL_MOV,
+                mov.tipo_id AS TIPO_LEGADO,
+                mov.data AS DATA_REAL_ORDENACAO
             FROM aluguel_equipamentos eq
-            INNER JOIN (
-                SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-                FROM aluguel_movimento_itens mi
-                INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-                WHERE m.deleted_at IS NULL
-                GROUP BY mi.equipamento_id
-            ) ult_mov ON ult_mov.equipamento_id = eq.id
-            INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
+            INNER JOIN aluguel_movimento_itens ami ON ami.equipamento_id = eq.id
+            INNER JOIN aluguel_movimento mov ON mov.id = ami.movimento_id
             LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
             WHERE eq.deleted_at IS NULL
-              AND ac.deleted_at IS NULL
+              AND mov.deleted_at IS NULL
               AND eq.situacao_id = 14
         """
         with self.engine_legado.connect() as conn:
-            return pd.read_sql(text(query), conn)
+            df = pd.read_sql(text(query), conn)
+
+        if df.empty:
+            return pd.DataFrame()
+
+        print("   🧠 Ordenando a linha do tempo e validando as origens...")
+        
+        # 2. Ordena cronologicamente pela data real do fato lançado
+        df.sort_values(by=['TOMBO', 'DATA_REAL_ORDENACAO', 'MOVIMENTO_ID'], ascending=[True, False, False], inplace=True)
+
+        # 🎯 O PRESENTE: Pega o movimento absoluto MAIS RECENTE de todos (Que é o responsável pelo status 14)
+        df_presente = df.groupby('TOMBO').first().reset_index()
+        df_presente.rename(columns={
+            'MOVIMENTO_ID': 'DEV_MOV_ID', 'CLIENTE_ID': 'DEV_CLIENTE_ID',
+            'USR_ID': 'DEV_USR_ID', 'DATA_MOV': 'DEV_DATA', 'DEL_MOV': 'DEV_DEL'
+        }, inplace=True)
+
+        # 🎯 O PASSADO (A ORIGEM): Filtra SÓ por Aluguel(1) ou Reserva(7) no histórico, 
+        # e então pega o MAIS RECENTE dentre eles (ignorando transferências intermediárias).
+        df_historico_origens = df[df['TIPO_LEGADO'].isin([1, 7])]
+        df_passado = df_historico_origens.groupby('TOMBO').first().reset_index()
+        df_passado.rename(columns={
+            'MOVIMENTO_ID': 'ORIG_MOV_ID', 'CLIENTE_ID': 'ORIG_CLIENTE_ID',
+            'USR_ID': 'ORIG_USR_ID', 'DATA_MOV': 'ORIG_DATA', 'DEL_MOV': 'ORIG_DEL',
+            'TIPO_LEGADO': 'ORIG_TIPO_LEGADO'
+        }, inplace=True)
+
+        # Mescla os dois momentos em uma única linha.
+        # O 'inner' garante que só faremos a devolução se acharmos uma origem válida no histórico.
+        df_final = pd.merge(
+            df_presente, 
+            df_passado[['TOMBO', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_USR_ID', 'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO']], 
+            on='TOMBO', 
+            how='inner' 
+        )
+
+        return df_final
 
     def executar(self):
         print("\n" + "=" * 70)
-        print("📦 MÓDULO: DEVOLUÇÃO (RECONSTRUÇÃO HISTÓRICA)")
+        print("📦 MÓDULO: DEVOLUÇÃO (RECONSTRUÇÃO BIFÁSICA)")
         print("=" * 70)
 
-        # 1. Extrai o DataFrame completo do Legado usando o seu SQL!
+        # 1. Extrai o DataFrame estruturado com Presente e Passado na mesma linha
         df_devolucoes = self._extrair_dados_devolucao()
         if df_devolucoes.empty:
-            print("⚠️ Nenhuma Devolução encontrada no banco legado.")
+            print("⚠️ Nenhuma Devolução válida com histórico de aluguel/reserva encontrada.")
             return
 
         # 2. Busca os IDs do banco novo baseados nos tombos extraídos
@@ -104,65 +140,110 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 continue
 
             # =========================================================
-            # 🎯 REGRA REAPROVEITADA DO ALUGUEL: RECIPIENT_ID DO CLIENTE
+            # 🎯 RESOLVENDO O CLIENTE E A ORGANIZAÇÃO (Roteamento)
             # =========================================================
-            cli_legado_id = int(row['ID_CLIENTE']) if pd.notna(row['ID_CLIENTE']) else 0
+            # Prioriza o cliente da transação original (Passado) para amarrar os contratos corretos
+            if pd.notna(row.get('ORIG_CLIENTE_ID')):
+                cli_legado_id = int(row['ORIG_CLIENTE_ID'])
+            else:
+                cli_legado_id = int(row['DEV_CLIENTE_ID']) if pd.notna(row.get('DEV_CLIENTE_ID')) else 0
+                
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
+            cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id)
             
             if not recipient_id:
                 rejeitados += 1
                 continue
 
             # =========================================================
-            # ROTEAMENTO INTELIGENTE (Qual base vai receber?)
+            # ROTEAMENTO INTELIGENTE FISICO (Qual base vai receber o frete?)
             # =========================================================
-            cli_legado_id = int(row['ID_CLIENTE']) if pd.notna(row['ID_CLIENTE']) else 0
             org_id_destino = descobrir_id_organizacao_destino(cli_legado_id)
-            
             endereco_base_id = self.dict_enderecos_base_org.get(org_id_destino)
             
-            # Fallback de segurança (Se falhar, vai para AS Sistemas - 1378)
+            # Fallback de segurança (Se falhar, vai para a Base Principal - 1115)
             if not endereco_base_id:
                 endereco_base_id = self.dict_enderecos_base_org.get(1115, 1) 
                 org_id_destino = 1115
 
-            # =========================================================
-            # REGISTRAR A DEVOLUÇÃO (O PRESENTE)
-            # =========================================================
-            usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
-            dt_mov = row['updated_at'] if pd.notna(row['updated_at']) else self.now
-            id_mov_legado = int(row['MOVIMENTO_ID'])
+            # Carrega contratos de Fallback para a Fase 1 e Fase 2
+            contrato_id_ativo = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
+            item_id_ativo = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
 
-            # Chama a função e captura os IDs gerados em memória
+            # =========================================================
+            # 🕰️ FASE 1: RECONSTRUIR O PASSADO (ALUGUEL / RESERVA)
+            # =========================================================
+            id_mov_origem = int(row['ORIG_MOV_ID'])
+            tipo_legado_origem = int(row['ORIG_TIPO_LEGADO'])
+            dt_origem = row['ORIG_DATA']
+            usr_origem = int(row['ORIG_USR_ID'])
+            
+            if tipo_legado_origem == 1:
+                tipo_mov_novo = 1
+                op_type = 'ALUGUEL'
+            else:
+                tipo_mov_novo = 4
+                op_type = 'RESERVA'
+
+            self.registrar_movimento(
+                id_final=id_mov_origem,
+                recipient_id=recipient_id,
+                cliente_final_address_id=cliente_final_address, # Vai para o endereço do cliente
+                usuario_id=usr_origem,
+                mov_date=dt_origem,
+                deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
+                contrato_id=contrato_id_ativo,
+                contrato_item_id=item_id_ativo,
+                equipment_id_ref=equip_id_novo,
+                tipo_movimento_id=tipo_mov_novo,
+                operation_type=op_type,
+                organization_id=org_id_destino,
+                alias_movimento=row['NOME_EQUIPAMENTO'],
+                details_capa=f"Migração (Reconstrução): {op_type} Histórico",
+                details_item="Alocado no Cliente (Histórico)"
+            )
+
+            # =========================================================
+            # 📦 FASE 2: REGISTRAR A DEVOLUÇÃO (O PRESENTE)
+            # =========================================================
+            id_mov_dev = int(row['DEV_MOV_ID'])
+            dt_dev = row['DEV_DATA']
+            usr_dev = int(row['DEV_USR_ID'])
+
+            # Registra a Devolução e captura os IDs gerados
             id_capa_dev, id_serv_item_dev, id_mov_item_dev = self.registrar_movimento(
-                id_final=id_mov_legado,
-                recipient_id=recipient_id, # 👈 Amarração resolvida no Cliente!
-                cliente_final_address_id=endereco_base_id, # 👈 Endereço Físico na Base!
-                usuario_id=usr_id,
-                mov_date=dt_mov,
-                deleted_at_mov=row['deleted_at'] if pd.notna(row['deleted_at']) else None,
+                id_final=id_mov_dev,
+                recipient_id=recipient_id, 
+                cliente_final_address_id=endereco_base_id, # Retorna para a base física
+                usuario_id=usr_dev,
+                mov_date=dt_dev,
+                deleted_at_mov=row['DEV_DEL'] if pd.notna(row['DEV_DEL']) else None,
                 contrato_id=None,
                 contrato_item_id=None,
                 equipment_id_ref=equip_id_novo,
                 tipo_movimento_id=3, # 3 = ID de Devolução
                 operation_type='DEVOLUCAO',
+                organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
                 details_item="Retorno para a Base"
             )
 
             # =========================================================
-            # GERAR O SHIPMENT (GUIA DE TRANSPORTE)
+            # 🚚 FASE 3: GERAR O SHIPMENT (GUIA DE TRANSPORTE DE VOLTA)
             # =========================================================
+            # Blindagem local do usuário do Shipment para evitar quebras de FK externa
+            usr_shipment = usr_dev if hasattr(self, 'usuarios_validos') and usr_dev in self.usuarios_validos else 1
+            
             ship_id_atual = self.shipment_id_counter
             self.shipment_id_counter += 1
             
             self.shipments_mestre.append({
                 "id": ship_id_atual,
                 "status_id": 1,
-                "created_by": 1,
-                "created_at": dt_mov,
-                "updated_at": dt_mov,
+                "created_by": usr_shipment,
+                "created_at": dt_dev,
+                "updated_at": dt_dev,
                 "deleted_at": None
             })
             
@@ -172,7 +253,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 "status_id": 1,
                 "movement_item_id": id_mov_item_dev,
                 "volume_id": None,
-                "details": f"Devolução referente a movimento {id_mov_legado}",
+                "details": f"Devolução referente a movimento {id_mov_dev}",
                 "address_id": endereco_base_id 
             })
             self.shipment_item_id_counter += 1
@@ -191,8 +272,9 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         self.salvar_movimentos_banco()
         self.salvar_shipments_banco()
         
-        # O Status 1 na tabela de equipments representa "Em Estoque / Base"
+        # O Status 8 na tabela de equipments representa "Devolvido / Disponível na Base"
         self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=self.equipamentos_alterados)
+
 # ==============================================================================
 # WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
 # ==============================================================================
@@ -203,7 +285,6 @@ def executar(eng_novo, eng_legado):
     print("🚀 MODO DEBUG: Disparando teste isolado de DEVOLUÇÃO")
     print("="*70)
 
-    # 1. Faxina pré-teste no banco novo
     print("\n🧹 Executando faxina e reset de saldos...")
 
     print("\n🧠 Carregando dados compartilhados na RAM (Caches)...")

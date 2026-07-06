@@ -253,6 +253,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 recipient_id=recipient_id,
                 cliente_final_address_id=self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id),
                 usuario_id=usr_id,
+                organization_id=1378,
                 mov_date=dt_mov,
                 deleted_at_mov=row_mov['deleted_at'] if pd.notna(row_mov['deleted_at']) else None,
                 

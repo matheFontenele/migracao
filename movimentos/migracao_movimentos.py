@@ -388,6 +388,7 @@ class BaseMigracaoMovimento:
         mov_date: str,
         deleted_at_mov: str,
         contrato_id: int,
+        organization_id: int,
         contrato_item_id: int,
         equipment_id_ref: int,
         tipo_movimento_id: int,
@@ -414,10 +415,19 @@ class BaseMigracaoMovimento:
         # 1️⃣ CAPAS PAI (Service Order + Movement)
             self.servicos_mestre.append({
                 "id": novo_id_capa,
-                "status_id": 3, "movement_type_id": tipo_movimento_id, "contract_id": contrato_id,
-                "user_id": usuario_seguro, "destination_order_id": None, "mode_transport_id": 1,
-                "organization_id": 1378, "recipient_customer_id": recipient_id, "deadline": mov_date,
-                "details": details_capa, "created_at": mov_date, "updated_at": mov_date, "deleted_at": deleted_at_mov
+                "status_id": 3,
+                "movement_type_id": tipo_movimento_id,
+                "contract_id": contrato_id,
+                "user_id": usuario_seguro,
+                "destination_order_id": None,
+                "mode_transport_id": 1,
+                "organization_id": organization_id,
+                "recipient_customer_id": recipient_id,
+                "deadline": mov_date,
+                "details": details_capa,
+                "created_at": mov_date,
+                "updated_at": mov_date,
+                "deleted_at": deleted_at_mov
             })
             self.movimentos_mestre.append({
                 "id": novo_id_capa,
@@ -426,7 +436,7 @@ class BaseMigracaoMovimento:
                 "service_order_id": novo_id_capa,
                 "recipient_customer_id": recipient_id,
                 "migrate_customer_id": None,
-                "organization_id": 1378,
+                "organization_id": organization_id,
                 "status_id": 3,
                 "created_by": usuario_seguro,
                 "details": details_capa,
@@ -493,7 +503,7 @@ class BaseMigracaoMovimento:
             "product_item_id": None,
             "alias": alias_movimento,
             "old_organization_id": None,
-            "new_organization_id": None,
+            "new_organization_id": organization_id,
             "operation_type": operation_type,
             "confirmed_at": None,
             "confirmed_by": None,
@@ -506,54 +516,6 @@ class BaseMigracaoMovimento:
 
         return id_capa_atual, item_servico_id_atual, item_mov_id_atual
 
-    def buscar_historico_devolucao_por_tombo(self, lista_tombos: list) -> dict:
-        """
-        Busca os dois últimos movimentos de uma máquina (A Devolução e a sua Origem).
-        Retorna: { 'tombo': { 'ultimo': {dados}, 'penultimo': {dados} } }
-        """
-        if not lista_tombos:
-            return {}
-
-        tombos_formatados = [f"'{str(t).strip()}'" for t in lista_tombos]
-        lista_tombos_sql = "(" + ", ".join(tombos_formatados) + ")"
-
-        query = f"""
-            WITH MovimentosOrdenados AS (
-                SELECT 
-                    ae.numero AS tombo,
-                    am.id AS movimento_id,
-                    am.tipo_id,
-                    amt.nome AS tipo_nome,
-                    am.data,
-                    am.updated_at,
-                    am.deleted_at,
-                    am.cliente_id,
-                    am.usuario_id,
-                    ROW_NUMBER() OVER(PARTITION BY ami.equipamento_id ORDER BY am.updated_at DESC, am.data DESC, am.id DESC) as rn
-                FROM aluguel_movimento am
-                INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
-                INNER JOIN aluguel_equipamentos ae ON ae.id = ami.equipamento_id
-                INNER JOIN aluguel_tipos_movimento amt ON amt.id = am.tipo_id
-                WHERE am.deleted_at IS NULL AND ae.deleted_at IS NULL
-            )
-            SELECT * FROM MovimentosOrdenados 
-            WHERE rn IN (1, 2) AND tombo IN {lista_tombos_sql}
-        """
-        
-        df_resultado = pd.read_sql(text(query), self.engine_legado)
-        
-        dict_historico = {}
-        for _, row in df_resultado.iterrows():
-            tombo = limpar_codigo(row['tombo'])
-            if tombo not in dict_historico:
-                dict_historico[tombo] = {'ultimo': None, 'penultimo': None}
-                
-            if row['rn'] == 1:
-                dict_historico[tombo]['ultimo'] = row.to_dict()
-            elif row['rn'] == 2:
-                dict_historico[tombo]['penultimo'] = row.to_dict()
-
-        return dict_historico
    # ==========================================================================
     # 1. PERSISTÊNCIA DE NOVOS REGISTROS (INSERT EM MASSA)
     # ==========================================================================

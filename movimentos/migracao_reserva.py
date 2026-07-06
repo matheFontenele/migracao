@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import text
 from tqdm import tqdm
 
-from movimentos.migracao_movimentos import BaseMigracaoMovimento
+from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino
 
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
 
@@ -107,6 +107,8 @@ class MigracaoReserva(BaseMigracaoMovimento):
             if not recipient_id: 
                 rejeitados += 1
                 return
+            
+            org_id_destino = descobrir_id_organizacao_destino(cliente_id_legado)
 
             usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
             mov_date = row['updated_at'] if pd.notna(row['updated_at']) else self.now
@@ -126,7 +128,8 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
                 equipment_id_ref=equipment_id_ref,
-                tipo_movimento_id=4, # 4 = ID de Reserva no banco novo
+                tipo_movimento_id=4,
+                organization_id=org_id_destino,
                 operation_type='RESERVA',
                 alias_item=None,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
