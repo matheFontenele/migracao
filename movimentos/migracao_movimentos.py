@@ -279,6 +279,10 @@ class BaseMigracaoMovimento:
             max_mov_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM movement_items")).scalar()
             max_extra = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_item_extra_equipments")).scalar()
 
+            # Pegando os MAX IDs das tabelas de SHIPMENT (Transporte) 🎯
+            max_ship = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipments")).scalar()
+            max_ship_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipment_items")).scalar()
+
             # Busca usuários válidos para fallback global (evita quebra de Foreign Key)
             res_users = conn.execute(text("SELECT id FROM users")).fetchall()
             self.usuarios_validos = set(row[0] for row in res_users)
@@ -288,6 +292,10 @@ class BaseMigracaoMovimento:
         self.so_item_id_counter = max_so_item + 1
         self.mov_item_id_counter = max_mov_item + 1
         self.extra_id_counter = max_extra + 1
+
+        # Contadores de Carregamento de Transporte (Shipment)
+        self.shipment_id_counter = max_ship + 1
+        self.shipment_item_id_counter = max_ship_item + 1
         
         # Dicionário para gerenciar os IDs gerados em memória
         self.mapa_ids_capa = {}
@@ -300,6 +308,10 @@ class BaseMigracaoMovimento:
         
         self.pedidos_pai_inseridos = set()
         self.equipamentos_alterados = []
+
+        self.shipments_mestre = []
+        self.shipment_movements_mestre = []
+        self.shipment_items_mestre = []
 
     def limpar_tabelas_movimento(self):
         pass
@@ -392,6 +404,7 @@ class BaseMigracaoMovimento:
         contrato_item_id: int,
         equipment_id_ref: int,
         tipo_movimento_id: int,
+        status_shipment: int,
         operation_type: str,
         alias_item: str = None,
         alias_movimento: str = None,
@@ -399,6 +412,7 @@ class BaseMigracaoMovimento:
         details_item: str = None,
         fallback_contract_item_id: int = None,
         forcar_extra: bool = False,
+        is_exchange: bool = False
     ):
         
         #Blindagem para usuarios inexistentes
@@ -477,7 +491,7 @@ class BaseMigracaoMovimento:
             "equipment_id": equipment_id_ref,
             "type_id": None,
             "product_id": None,
-            "is_exchange": 0,
+            "is_exchange": 1 if is_exchange else 0,
             "is_extra": is_extra_flag,
             "quantity_product": None,
             "fulfilled_quantity_product": 0,
@@ -512,6 +526,35 @@ class BaseMigracaoMovimento:
             "deleted_at": deleted_at_mov
         })
 
+        # 5️⃣ SHIPMENTS
+        ship_id_atual = self.shipment_id_counter
+        self.shipment_id_counter += 1
+        
+        self.shipments_mestre.append({
+            "id": ship_id_atual,
+            "status_id": status_shipment,
+            "created_by": usuario_seguro,
+            "created_at": mov_date,
+            "updated_at": mov_date,
+            "deleted_at": deleted_at_mov
+        })
+        
+        self.shipment_items_mestre.append({
+            "id": self.shipment_item_id_counter,
+            "shipment_id": ship_id_atual,
+            "status_id": status_shipment,
+            "movement_item_id": item_mov_id_atual,
+            "volume_id": None,
+            "details": f"Guia de transporte (Operação: {operation_type})",
+            "address_id": cliente_final_address_id # O destino da máquina
+        })
+        self.shipment_item_id_counter += 1
+
+        self.shipment_movements_mestre.append({
+            "shipment_id": ship_id_atual,
+            "movement_id": id_capa_atual
+        })
+
         self.equipamentos_alterados.append({int(equipment_id_ref): item_mov_id_atual})
 
         return id_capa_atual, item_servico_id_atual, item_mov_id_atual
@@ -524,10 +567,20 @@ class BaseMigracaoMovimento:
         print(f"\n🚀 Persistindo capas e itens de movimento no MySQL...")
         with self.engine_new.begin() as conn:
             if self.servicos_mestre: pd.DataFrame(self.servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
+
             if self.service_itens_mestre: pd.DataFrame(self.service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
+
             if self.movimentos_mestre: pd.DataFrame(self.movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)
+
             if self.movimento_itens_mestre: pd.DataFrame(self.movimento_itens_mestre).to_sql("movement_items", con=conn, if_exists="append", index=False)
+
             if self.itens_extras_mestre: pd.DataFrame(self.itens_extras_mestre).to_sql("service_order_item_extra_equipments", con=conn, if_exists="append", index=False)
+
+            if self.shipments_mestre: pd.DataFrame(self.shipments_mestre).to_sql("shipments", con=conn, if_exists="append", index=False)
+
+            if self.shipment_movements_mestre: pd.DataFrame(self.shipment_movements_mestre).to_sql("shipment_movements", con=conn, if_exists="append", index=False)
+
+            if self.shipment_items_mestre: pd.DataFrame(self.shipment_items_mestre).to_sql("shipment_items", con=conn, if_exists="append", index=False)
 
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
         print(f"📦 Capas Pais Criadas: {len(self.servicos_mestre)}")
@@ -547,7 +600,6 @@ class BaseMigracaoMovimento:
         print(f"\n🚀 Atualizando status e cliente em {len(lista_dicionarios)} equipamentos...")
         with self.engine_new.begin() as conn:
             
-            # Varre a lista de dicionários e traduz para a sintaxe do executemany
             updates = []
             for dicionario in lista_dicionarios:
                 for e_id, c_id in dicionario.items():
@@ -557,7 +609,6 @@ class BaseMigracaoMovimento:
                         "c_id": int(c_id)
                     })
 
-            # Executa o Bulk Update nativo de alta velocidade
             conn.execute(
                 text("UPDATE equipments SET status_id = :s_id, last_movement_item_customer_id = :c_id WHERE id = :e_id"),
                 updates

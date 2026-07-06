@@ -4,6 +4,7 @@ import os
 
 from sqlalchemy import text
 from config.database import obter_engines
+from movimentos import migracao_devolucao
 
 # ==============================================================================
 # 1. WRAPPERS COM LAZY LOADING (Importação Tardia)
@@ -89,6 +90,10 @@ def iniciar_reserva(eng_novo, eng_legado):
 def iniciar_devolucao(eng_novo, eng_legado):
     from movimentos import migracao_devolucao
     migracao_devolucao.executar(eng_novo, eng_legado)
+    
+def iniciar_substituicao(eng_novo, eng_legado):
+    from movimentos import migracao_substituicao
+    migracao_substituicao.executar(eng_novo, eng_legado)
 
 def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
@@ -140,6 +145,7 @@ TAREFAS = {
     "movimentos_aluguel": iniciar_aluguel,
     "movimentos_reserva": iniciar_reserva,
     "movimentos_devolucao": iniciar_devolucao,
+    "movimentos_substituicao": iniciar_substituicao,
     "movimentos": iniciar_movimentos,
     "reset_movimentos": iniciar_reset_movimentos
 }
