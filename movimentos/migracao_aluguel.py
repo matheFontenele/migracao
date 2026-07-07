@@ -102,6 +102,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         print("-" * 70)
 
         self.limpar_tabelas_movimento()
+        
         caminho_csv = "./docs/EquipAS.csv"
         
         print("📖 Carregando planilha auxiliar de aluguel...")

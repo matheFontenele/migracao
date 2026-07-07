@@ -122,6 +122,7 @@ TABELAS = [
     'contract_items',
     'contracts',
     'addresses',
+    'customers',
     'suppliers'
     ]
 

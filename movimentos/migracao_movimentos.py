@@ -181,7 +181,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
     dict_contrato_item_por_chave = {
         (
             int(row['cliente_id']),
-            normalizar_para_match(row['contract_name']),
+            int(row['contract_id']),
             normalizar_para_match(row['alias_item_contract']),
             normalizar_para_match(row['description'])
         ): {
@@ -478,7 +478,7 @@ class BaseMigracaoMovimento:
             )
 
         # 3️⃣ SERVICE ORDER ITEM
-        txt_detalhe_final = details_item if details_item else ("Item Extra (Sem Match de Contrato)" if is_extra_flag else None)
+        txt_detalhe_final = details_item if details_item else ("Item Extra (Saldo do Item de Contrato Esgotado)" if is_extra_flag else None)
 
         self.service_itens_mestre.append({
             "id": item_servico_id_atual,

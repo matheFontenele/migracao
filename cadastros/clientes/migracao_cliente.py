@@ -207,29 +207,31 @@ class MigracaoClientes:
 
         id_pref_serie = pd.to_numeric(df_modificado['ID_PREFEITURA'], errors='coerce')
         id_sec_serie = pd.to_numeric(df_modificado['ID_SECRETARIA'], errors='coerce')
+
+        mask_ministerio = id_pref_serie.isin([pref_origem, pref_alvo]) | id_sec_serie.isin([sec_origem, sec_alvo])
         
-        mask_pref = id_pref_serie == pref_origem
-        
-        if mask_pref.any():
+        if mask_ministerio.any():
             nomes_pref_alvo = df_modificado.loc[id_pref_serie == pref_alvo, 'PREFEITURA']
             nome_pref_padrao = nomes_pref_alvo.iloc[0] if not nomes_pref_alvo.empty else "MINISTÉRIO DAS RELAÇÕES EXTERIORES"
             
-            df_modificado.loc[mask_pref, 'ID_PREFEITURA'] = pref_alvo
-            df_modificado.loc[mask_pref, 'PREFEITURA'] = nome_pref_padrao
+            # ======================================================================
+            # 1️⃣ UNIFICA A PREFEITURA (Redireciona tudo para o alvo)
+            # ======================================================================
+            df_modificado.loc[mask_ministerio, 'ID_PREFEITURA'] = pref_alvo
+            df_modificado.loc[mask_ministerio, 'PREFEITURA'] = nome_pref_padrao
 
-        mask_sec = id_sec_serie == sec_origem  # Busca quem é 1347
-        
-        if mask_sec.any():
-            nomes_sec_alvo = df_modificado.loc[id_sec_serie == sec_alvo, 'SECRETARIA']
-            nome_sec_padrao = nomes_sec_alvo.iloc[0] if not nomes_sec_alvo.empty else "SECRETARIA MRE"
-            
-            df_modificado.loc[mask_sec, 'ID_SECRETARIA'] = sec_alvo
-            df_modificado.loc[mask_sec, 'SECRETARIA'] = nome_sec_padrao
+            # ======================================================================
+            # 2️⃣ ACHATAMENTO DA HIERARQUIA (Elimina a Secretaria)
+            # ======================================================================
+            df_modificado.loc[mask_ministerio, 'ID_SECRETARIA'] = None
+            df_modificado.loc[mask_ministerio, 'SECRETARIA'] = None
         
         return df_modificado
 
 
-
+    # ==============================================================================
+    # FUNÇÕES AUXILIARES DE SANETIZAÇÃO
+    # ==============================================================================
     def _limpar_cnpj(self, cnpj_raw):
         c = re.sub(r'\D', '', str(cnpj_raw))
         return c if c else '00000000000000'
@@ -300,6 +302,42 @@ class MigracaoClientes:
         return pd.concat([df_merged, df_orfas], ignore_index=True), df_clean
 
     # ==============================================================================
+    # PROMOÇÃO HIERÁRQUICA PARA PREEITURAS NULAS
+    # ==============================================================================
+    def _promover_hierarquia(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Sobe a secretaria ou o cliente de nível caso falte um pai estrutural"""
+        df_mod = df.copy()
+        print("   🌳 Remodelando hierarquia (Promoção de Secretarias e Clientes para Pais)...")
+
+        # Geramos IDs formatados em string (Ex: P_10, S_10, C_10) para evitar que o Python confunda 
+        # a Prefeitura 10 com o Cliente 10 na hora de montar o dicionário
+        id_pref_orig = df_mod['ID_PREFEITURA']
+        id_sec_orig = df_mod['ID_SECRETARIA']
+        id_cli_orig = df_mod['ID_CLIENTE']
+
+        df_mod['ID_PREF_STR'] = id_pref_orig.apply(lambda x: f"P_{int(x)}" if pd.notna(x) and str(x).strip() != '' else None)
+        df_mod['ID_SEC_STR'] = id_sec_orig.apply(lambda x: f"S_{int(x)}" if pd.notna(x) and str(x).strip() != '' else None)
+        df_mod['ID_CLI_STR'] = id_cli_orig.apply(lambda x: f"C_{int(x)}" if pd.notna(x) and str(x).strip() != '' else None)
+
+        # 🎯 REGRA 1: Se a PREFEITURA é nula, a SECRETARIA é promovida a Prefeitura!
+        mask_sem_pref = df_mod['ID_PREF_STR'].isna() & df_mod['ID_SEC_STR'].notna()
+        df_mod.loc[mask_sem_pref, 'ID_PREF_STR'] = df_mod.loc[mask_sem_pref, 'ID_SEC_STR']
+        df_mod.loc[mask_sem_pref, 'PREFEITURA'] = df_mod.loc[mask_sem_pref, 'SECRETARIA']
+        df_mod.loc[mask_sem_pref, 'ID_SEC_STR'] = None # Esvazia a secretaria para ela não duplicar
+        df_mod.loc[mask_sem_pref, 'SECRETARIA'] = None
+
+        # 🎯 REGRA 2: Se não sobrou nem PREFEITURA nem SECRETARIA, o CLIENTE assume a liderança!
+        mask_tudo_nulo = df_mod['ID_PREF_STR'].isna() & df_mod['ID_SEC_STR'].isna()
+        df_mod.loc[mask_tudo_nulo, 'ID_PREF_STR'] = df_mod.loc[mask_tudo_nulo, 'ID_CLI_STR']
+        df_mod.loc[mask_tudo_nulo, 'PREFEITURA'] = df_mod.loc[mask_tudo_nulo, 'CLIENTE']
+
+        # Repassa os IDs String blindados para as colunas oficiais
+        df_mod['ID_PREFEITURA'] = df_mod['ID_PREF_STR']
+        df_mod['ID_SECRETARIA'] = df_mod['ID_SEC_STR']
+
+        df_mod = df_mod.drop(columns=['ID_PREF_STR', 'ID_SEC_STR', 'ID_CLI_STR'])
+        return df_mod
+    # ==============================================================================
     # 3. CARGA (Bulk Inserts)
     # ==============================================================================
     def _carregar(self, df_enderecos_finais, df_bruto):
@@ -309,6 +347,7 @@ class MigracaoClientes:
         for _, row in df_bruto.iterrows():
             if pd.notna(row['ID_PREFEITURA']):
                 prefeituras[int(row['ID_PREFEITURA'])] = {"nome": row['PREFEITURA'], "row": row}
+
             if pd.notna(row['ID_SECRETARIA']):
                 secretarias[int(row['ID_SECRETARIA'])] = {"nome": row['SECRETARIA'], "id_pai": int(row['ID_PREFEITURA']) if pd.notna(row['ID_PREFEITURA']) else None, "row": row}
 
