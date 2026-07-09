@@ -58,9 +58,18 @@ MAP_EVENT_TYPES = {
     'ADITIVO DE QUANTIDADE': 3,
     'ADITIVO DE REAJUSTE': 4,
     'ADITIVO DE SUPRESSAO': 5,
-    'ADITIVO MODIFICAÇÃO DE ITEM': 6,
+    'ADITIVO MODIFICACAO DE ITEM': 6,
     'APOSTILAMENTO': 7
 }
+TERMOS_EVENT_TYPES = [
+    ('PRAZO', 2),
+    ('QUANTIDADE', 3),
+    ('REAJUSTE', 4),
+    ('SUPRESSAO', 5),
+    ('MODIFICACAO DE ITEM', 6),
+    ('APOSTILAMENTO', 7),
+]
+TIPOS_ADITIVOS_COM_DADOS = {1, 3, 4, 5, 6}
 MAP_STATUS = {'AGUARDANDO INICIO': 1, 'EM ANDAMENTO': 2, 'ENCERRADO': 3}
 MAP_TIPO = {'LICITACAO': 1, 'PESSOA JURIDICA': 2, 'PESSOA FISICA': 3}
 MAP_ORGANIZACAO = {'ALUCOM': 1115, 'MOREIA': 1122, 'IP': 1311, 'AS SISTEMAS': 1378}
@@ -234,6 +243,27 @@ class MigracaoContratos:
     # ==============================================================================
     # PROCESSAMENTO DE ENTIDADES (UPSERT)
     # ==============================================================================
+    def _resolver_tipos_evento(self, tipo_planilha):
+        tipo_normalizado = ultra_normalizar(tipo_planilha)
+
+        if not tipo_normalizado:
+            return [MAP_EVENT_TYPES['CADASTRO']]
+
+        if tipo_normalizado in MAP_EVENT_TYPES:
+            return [MAP_EVENT_TYPES[tipo_normalizado]]
+
+        tipos = [
+            event_type_id
+            for termo, event_type_id in TERMOS_EVENT_TYPES
+            if termo in tipo_normalizado
+        ]
+
+        if tipos:
+            return tipos
+
+        print(f"   ⚠️ Tipo de evento não mapeado: '{tipo_planilha}'. Usando CADASTRO.")
+        return [MAP_EVENT_TYPES['CADASTRO']]
+
     def _processar_contratos(self, conn, df_ex_contract):
         print("\n🔄 Processando Contratos (UPSERT)...")
         for idx, row in df_ex_contract.iterrows():
@@ -344,7 +374,6 @@ class MigracaoContratos:
                     continue
 
             contract_id = self.contract_id_map[nome_contrato]
-            tipo_planilha = ultra_normalizar(row['TIPO']) if pd.notna(row['TIPO']) else 'CADASTRO'
             id_evento_planilha = row['ID']
 
             if contract_id not in self.contract_event_counters:
@@ -365,7 +394,7 @@ class MigracaoContratos:
 
             self.contract_event_counters[contract_id] += 1
 
-            tipos_aditivos = [2, 4] if "REAJUSTE" in tipo_planilha and "PRAZO" in tipo_planilha else [MAP_EVENT_TYPES.get(tipo_planilha, 1)]
+            tipos_aditivos = self._resolver_tipos_evento(row['TIPO'])
 
             for t_id in tipos_aditivos:
                 chave_aditivo = f"{event_id}|{t_id}"
@@ -387,7 +416,7 @@ class MigracaoContratos:
                         conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
 
                 self.ultimo_aditivo_por_contrato[contract_id] = additive_id
-                if id_evento_planilha not in self.additive_lookup or t_id in [1, 3, 4, 5]:
+                if id_evento_planilha not in self.additive_lookup or t_id in TIPOS_ADITIVOS_COM_DADOS:
                     self.additive_lookup[id_evento_planilha] = additive_id
 
     def _processar_itens(self, conn, df_ex_itens):
