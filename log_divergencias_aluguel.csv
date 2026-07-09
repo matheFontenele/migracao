@@ -1,21 +1,50 @@
 TOMBO,EQUIPAMENTO_CSV,ID_CLIENTE_LEGADO,ID_CLIENTE_NOVO,CONTRACT_ID_CSV,CONTRATO_RESOLVIDO,ITEM_CSV,DESC_ITEM_CSV,ITEM_RESOLVIDO_ID,STATUS_FINAL,MOTIVO_EXATO
-69719,TRANSFORMADOR 2000VA FORCELINE,11623,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83900,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83896,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83894,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83893,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83872,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83871,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-83870,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-87563,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-87549,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-86914,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-86912,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+69981,TRANSFORMADOR 2000VA FORCELINE,12020,208,VAZIO,NENHUM (AVULSO),,,NENHUM,AVULSO,Cliente não possui nenhum contrato ativo no banco. Forçado para AVULSO.
+91084,TRANSFORMADOR 2000VA FORCELINE,12020,208,VAZIO,NENHUM (AVULSO),,,NENHUM,AVULSO,Cliente não possui nenhum contrato ativo no banco. Forçado para AVULSO.
+83887,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011P,11623,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83891,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23470,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83891,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23470,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83891,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23470,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83887,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011P,11623,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83891,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23470,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88786,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0012M,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
 86911,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-86909,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-68739,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-68740,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-86913,TRANSFORMADOR 2000VA FORCELINE,11581,924,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-79303,TRANSFORMADOR 2000VA FORCELINE,11584,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83889,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23468,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83893,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83894,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88800,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00117,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83883,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00141,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83896,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83886,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00125,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83900,TRANSFORMADOR 2000VA FORCELINE,11583,926,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88786,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0012M,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88789,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83884,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011U,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83891,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23470,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83886,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00125,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+53009,IMPRESSORA MULTIFUNCIONAL LASER KYOCERA ECOSYS M2040DN NS VR92804919,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+92773,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV000QA,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+86722,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV000PU,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83884,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011U,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83886,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00125,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83886,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00125,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83884,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011U,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83886,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV00125,11583,926,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+82737,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS MA5500IFX NS,11232,285,27,27,,,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+69582,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS MA5500IFX NS WDS3809338,11111,304,27,27,IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4,KYOCERA ECOSYS MA4500ix+OCR,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+82734,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS MA5500IFX NS WDS4X42769,11213,285,27,27,IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4,KYOCERA ECOSYS MA4500ix+OCR,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+82733,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS MA5500IFX NS WDS4Y47878,11213,285,27,27,IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4,KYOCERA ECOSYS MA4500ix+OCR,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+61172,TRANSFORMADOR 200VA SLIM PREMIUM S/N,11353,299,27,27,,,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+82729,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS MA5500IFX NS WDS4Y47877,11215,285,27,27,IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4,KYOCERA ECOSYS MA4500ix+OCR,68,ALUGUEL (ITEM EXTRA),"Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+93413,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23341,11582,925,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+93414,MULTIFUNCIONAL JATO DE TINTA CANON GX7010 NS KNDX23335,11582,925,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83885,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
 83898,TRANSFORMADOR 2000VA FORCELINE,11584,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
-88615,TRANSFORMADOR 2000VA FORCELINE,11584,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83897,TRANSFORMADOR 2000VA FORCELINE,11584,927,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88786,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0012M,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88784,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011H,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88784,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011H,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+88784,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011H,11584,927,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+54806,MULTIFUNCIONAL LASER MONO KYOCERA ECOSYS M2040DN NS VR92X06710,11581,924,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+83887,MULTIFUNCIONAL LASER MONO PANTUM BM5110ADW NS CR7RV0011P,11623,928,VAZIO,257,,,2489,EXCEDENTE,Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257
+69719,TRANSFORMADOR 2000VA FORCELINE,11623,928,VAZIO,257,,,2489,ALUGUEL (ITEM EXTRA),Contrato da planilha (None) não pertence ao cliente. Forçado para o real: 257

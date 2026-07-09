@@ -179,16 +179,22 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             self.registrar_movimento(
                 id_final=id_mov_origem,
                 recipient_id=recipient_id,
-                cliente_final_address_id=cliente_final_address, # Vai para o endereço do cliente
+                cliente_final_address_id=cliente_final_address,
                 usuario_id=usr_origem,
                 mov_date=dt_origem,
                 deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
+
                 contrato_id=contrato_id_ativo,
                 contrato_item_id=item_id_ativo,
                 equipment_id_ref=equip_id_novo,
+                
                 status_shipment=2,
                 tipo_movimento_id=tipo_mov_novo,
                 operation_type=op_type,
+
+                status_equipment_id=2, 
+                history_reason='SHIPPING_CONFIRMED_SEPARATE',
+                
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa=f"Migração (Reconstrução): {op_type} Histórico",
@@ -209,12 +215,18 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 usuario_id=usr_dev,
                 mov_date=dt_dev,
                 deleted_at_mov=row['DEV_DEL'] if pd.notna(row['DEV_DEL']) else None,
+                
                 contrato_id=None,
                 contrato_item_id=None,
                 equipment_id_ref=equip_id_novo,
+                
+                status_equipment_id=8,
+                history_reason='RECEIPT_CONFIRMED_RETURN',
+                
                 status_shipment=1, 
                 tipo_movimento_id=3,
                 operation_type='DEVOLUCAO',
+                
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",

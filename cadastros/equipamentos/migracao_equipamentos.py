@@ -13,7 +13,9 @@ from utils.sanetizador import executar_truncate_tabelas
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
 
 TABELAS = [
-    'equipments', 
+    'equipments',
+    'equipment_history',
+    'suppliers', 
     'transaction_items', 
     'product_items',
     'products', 
@@ -40,7 +42,7 @@ class MigracaoEquipamentos:
         # Estatísticas
         self.stats = {
             "grupos": 0, "brands": 0, "types": 0, "products": 0,
-            "suppliers": 0, "transactions": 0, "transaction_items": 0, "equipments": 0
+            "suppliers": 0, "transactions": 0, "transaction_items": 0, "equipments": 0, "history": 0
         }
 
     # ==============================================================================
@@ -356,6 +358,7 @@ class MigracaoEquipamentos:
         contagem_grupos = df_validos.groupby(['supplier_id', 'org_destino']).size().to_dict()
 
         lista_equipamentos_global = []
+        lista_historico_global = []
         contador_codigo_unico = 1000000
 
         with self.engine_new.begin() as conn:
@@ -392,6 +395,10 @@ class MigracaoEquipamentos:
                     
                     self.stats["transaction_items"] += 1
 
+                    # Variáveis compartilhadas
+                    eq_id = int(linha_equip['id_legado'])
+                    eq_created_at = linha_equip['created_at']
+
                     # D. Equipamento
                     lista_equipamentos_global.append({
                         "id": int(linha_equip['id_legado']),
@@ -411,13 +418,43 @@ class MigracaoEquipamentos:
                         "deleted_at": self._nula(linha_equip['deleted_at'])
                     })
 
+                    # E. Histórico
+                    lista_historico_global.append({
+                        "equipment_id": eq_id,
+                        "status_id": 1,
+                        "occurred_at": eq_created_at,
+                        "movement_item_id": None,
+                        "service_order_item_id": None,
+                        "contract_item_id": None,
+                        "shipment_item_id": None,
+                        "is_conversion": 0,
+                        "reason": "TRANSACTION_ENTRANCE_EQUIPMENT",
+                        "user_id": 1 
+                    })
+
             # E. BULK INSERT EQUIPAMENTOS
             if lista_equipamentos_global:
+                print("💾 Inserindo equipamentos no MySQL...")
                 conn.execute(text("""
                     INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at) 
                     VALUES (:id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, :serial_required, :current_organization_id, :status_id, :address_id, :location_id, :is_completed, :created_at, :updated_at, :deleted_at)
                 """), lista_equipamentos_global)
-                self.stats["equipments"] = len(lista_equipamentos_global)
+                self.stats["equipments"] += len(lista_equipamentos_global)
+
+            if lista_historico_global:
+                print("💾 Inserindo logs de histórico no MySQL...")
+                conn.execute(text("""
+                    INSERT INTO equipment_history (
+                        equipment_id, status_id, occurred_at, movement_item_id, 
+                        service_order_item_id, contract_item_id, shipment_item_id, 
+                        is_conversion, reason, user_id
+                    ) VALUES (
+                        :equipment_id, :status_id, :occurred_at, :movement_item_id, 
+                        :service_order_item_id, :contract_item_id, :shipment_item_id, 
+                        :is_conversion, :reason, :user_id
+                    )
+                """), lista_historico_global)
+                self.stats["history"] += len(lista_historico_global)
 
     # ==============================================================================
     # ORQUESTRADOR PRINCIPAL DA CLASSE
@@ -448,6 +485,7 @@ class MigracaoEquipamentos:
             print(f"📑 Transações-Mãe:       {self.stats['transactions']}")
             print(f"🧩 Itens de Transação:   {self.stats['transaction_items']}")
             print(f"💻 Equipamentos salvos:  {self.stats['equipments']}")
+            print(f"📜 Logs de Entrada (TX): {self.stats['history']}")
             print("=" * 50)
 
         except Exception as e:

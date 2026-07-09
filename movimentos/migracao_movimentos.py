@@ -312,6 +312,7 @@ class BaseMigracaoMovimento:
         self.shipments_mestre = []
         self.shipment_movements_mestre = []
         self.shipment_items_mestre = []
+        self.equipment_histories_mestre = []
 
     def limpar_tabelas_movimento(self):
         pass
@@ -406,13 +407,18 @@ class BaseMigracaoMovimento:
         tipo_movimento_id: int,
         status_shipment: int,
         operation_type: str,
+        status_equipment_id: int,
+        history_reason: str,
         alias_item: str = None,
         alias_movimento: str = None,
         details_capa: str = "Migração Automática",
         details_item: str = None,
         fallback_contract_item_id: int = None,
         forcar_extra: bool = False,
-        is_exchange: bool = False
+        is_exchange: bool = False,
+        consumir_saldo: bool = True,
+        is_kit_override: bool = None,
+        type_id_override: int = None
     ):
         
         #Blindagem para usuarios inexistentes
@@ -470,12 +476,28 @@ class BaseMigracaoMovimento:
             is_extra_flag = False
             extra_id_atual = None
             contrato_item_id_resolvido = None
+        elif not consumir_saldo:
+            is_extra_flag = False
+            extra_id_atual = None
+            contrato_item_id_resolvido = (
+                int(contrato_item_id)
+                if contrato_item_id is not None and pd.notna(contrato_item_id)
+                else None
+            )
         else:
             # Só calcula o saldo se NÃO for avulso
-            is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
-                contrato_item_id, recipient_id, equipment_id_ref, mov_date,
-                item_servico_id_atual, fallback_contract_item_id, forcar_extra
-            )
+            if is_kit_override is None and type_id_override is None:
+                is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
+                    contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+                    item_servico_id_atual, fallback_contract_item_id, forcar_extra
+                )
+            else:
+                is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
+                    contrato_item_id, recipient_id, equipment_id_ref, mov_date,
+                    item_servico_id_atual, fallback_contract_item_id, forcar_extra,
+                    is_kit_override=is_kit_override,
+                    type_id_override=type_id_override
+                )
 
         # 3️⃣ SERVICE ORDER ITEM
         txt_detalhe_final = details_item if details_item else ("Item Extra (Saldo do Item de Contrato Esgotado)" if is_extra_flag else None)
@@ -491,7 +513,7 @@ class BaseMigracaoMovimento:
             "equipment_id": equipment_id_ref,
             "type_id": None,
             "product_id": None,
-            "is_exchange": 1 if is_exchange else 0,
+            "is_exchange": is_exchange,
             "is_extra": is_extra_flag,
             "quantity_product": None,
             "fulfilled_quantity_product": 0,
@@ -539,6 +561,7 @@ class BaseMigracaoMovimento:
             "deleted_at": deleted_at_mov
         })
         
+        shipment_item_id_atual = self.shipment_item_id_counter
         self.shipment_items_mestre.append({
             "id": self.shipment_item_id_counter,
             "shipment_id": ship_id_atual,
@@ -556,6 +579,22 @@ class BaseMigracaoMovimento:
         })
 
         self.equipamentos_alterados.append({int(equipment_id_ref): item_mov_id_atual})
+
+        # ==============================================================================
+        # 6️⃣ HISTÓRICO DO EQUIPAMENTO
+        # ==============================================================================
+        self.equipment_histories_mestre.append({
+            "equipment_id": equipment_id_ref,
+            "status_id": status_equipment_id,
+            "occurred_at": mov_date,
+            "movement_item_id": item_mov_id_atual,
+            "service_order_item_id": item_servico_id_atual,
+            "contract_item_id": contrato_item_id_resolvido,
+            "shipment_item_id": shipment_item_id_atual,
+            "is_conversion": 0,
+            "reason": history_reason,
+            "user_id": usuario_seguro
+        })
 
         return id_capa_atual, item_servico_id_atual, item_mov_id_atual
 
@@ -582,11 +621,13 @@ class BaseMigracaoMovimento:
 
             if self.shipment_items_mestre: pd.DataFrame(self.shipment_items_mestre).to_sql("shipment_items", con=conn, if_exists="append", index=False)
 
+            if self.equipment_histories_mestre: pd.DataFrame(self.equipment_histories_mestre).to_sql("equipment_history", con=conn, if_exists="append", index=False)
+
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
         print(f"📦 Capas Pais Criadas: {len(self.servicos_mestre)}")
         print(f"📦 Itens Criados: {len(self.service_itens_mestre)}")
         print(f"📦 Itens Extras Inseridos: {len(self.itens_extras_mestre)}")
-
+        print(f"📦 Histórico do Equipamento Criado: {len(self.equipment_histories_mestre)}")
 
     # ==========================================================================
     # 2. ATUALIZAÇÃO DO PARQUE FÍSICO (UPDATE EM MASSA)
