@@ -4,14 +4,13 @@ import os
 
 from sqlalchemy import text
 from config.database import obter_engines
-from movimentos import migracao_devolucao
 
 # ==============================================================================
 # 1. WRAPPERS COM LAZY LOADING (Importação Tardia)
 # ==============================================================================
 
 def iniciar_reset_banco(eng_novo, eng_legado):
-    """Executa o TRUNCATE apenas nas tabelas listadas no array TABELAS_PARA_LIMPAR"""
+    """Executa o TRUNCATE apenas nas tabelas listadas no array TABELAS"""
     print("\n⚠️ ATENÇÃO: Iniciando limpeza das tabelas selecionadas no banco NOVO...")
     with eng_novo.connect() as conn:
         trans = conn.begin()
@@ -32,12 +31,11 @@ def iniciar_reset_banco(eng_novo, eng_legado):
             
         except Exception as e:
             trans.rollback()
-            # Tenta religar por segurança em caso de erro no meio do processo
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
             raise e
         
 def iniciar_reset_movimentos(eng_novo, eng_legado):
-    """Executa o TRUNCATE apenas nas tabelas listadas no array TABELAS_PARA_LIMPAR"""
+    """Executa o TRUNCATE apenas nas tabelas listadas no array TABELAS_MOVIMENTOS"""
     print("\n⚠️ ATENÇÃO: Iniciando limpeza das tabelas referentes aos movimentos no banco NOVO...")
     with eng_novo.connect() as conn:
         trans = conn.begin()
@@ -58,7 +56,6 @@ def iniciar_reset_movimentos(eng_novo, eng_legado):
             
         except Exception as e:
             trans.rollback()
-            # Tenta religar por segurança em caso de erro no meio do processo
             conn.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
             raise e
 
@@ -99,6 +96,10 @@ def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
     orquestrador_movimentos.executar(eng_novo, eng_legado)
 
+def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
+    from movimentos import atualizacao_contratos_data
+    atualizacao_contratos_data.executar(eng_novo, eng_legado)
+
 # ==============================================================================
 # 2. MAPEAMENTO DE TAREFAS E GRUPOS
 # ==============================================================================
@@ -125,9 +126,9 @@ TABELAS = [
     'customers',
     'suppliers',
     'equipment_history'
-    ]
+]
 
-TABELAS_MOVIMENTOS= [
+TABELAS_MOVIMENTOS = [
     'shipment_items',
     'shipment_movements',
     'shipments',
@@ -136,8 +137,8 @@ TABELAS_MOVIMENTOS= [
     'movements',
     'service_order_items',
     'service_orders',
-    'equipment_history'
-    ]
+    'equipment_history' # 🎯 Adicionado aqui para limpar nos resets parciais
+]
 
 TAREFAS = {
     "reset_banco": iniciar_reset_banco,
@@ -150,12 +151,13 @@ TAREFAS = {
     "movimentos_devolucao": iniciar_devolucao,
     "movimentos_substituicao": iniciar_substituicao,
     "movimentos": iniciar_movimentos,
-    "reset_movimentos": iniciar_reset_movimentos
+    "reset_movimentos": iniciar_reset_movimentos,
+    "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato
 }
 
 GRUPOS = {
     "cadastros": ["clientes", "contratos", "contratantes", "equipamentos"],
-    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "movimentos"]
+    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "movimentos", "atualizar_datas_contrato"]
 }
 
 def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
@@ -185,7 +187,6 @@ def main():
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
 
-    # Validação do Argumento
     if alvo not in TAREFAS and alvo not in GRUPOS:
         print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.\n")
         print("Comandos válidos para Lote:")
@@ -196,11 +197,9 @@ def main():
             print(f"  python main.py {t}")
         sys.exit(1)
 
-    # Liga a usina uma única vez para toda a vida do comando:
     print("🔌 Orquestrador: Estabelecendo conexões com os bancos...")
     eng_novo, eng_legado = obter_engines()
 
-    # Se o alvo for um grupo (ex: 'cadastros' ou 'todos'), iteramos sobre a lista correspondente
     if alvo in GRUPOS:
         lista_execucao = GRUPOS[alvo]
         print(f"⚡ Disparando migração em lote: {alvo.upper()}...")
@@ -210,7 +209,6 @@ def main():
             
         print(f"\n🏆 LOTE '{alvo.upper()}' FINALIZADO COM 100% DE INTEGRIDADE!")
         
-    # Se o alvo for uma tarefa específica, executamos de forma isolada
     else:
         print(f"🐛 Modo Debug Ativado: Execução isolada.")
         despachar_tarefa(alvo, eng_novo, eng_legado)
