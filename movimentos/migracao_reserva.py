@@ -128,11 +128,17 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 usuario_id=usr_id,
                 mov_date=mov_date,
                 deleted_at_mov=row['deleted_at'] if pd.notna(row['deleted_at']) else None,
+
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
                 equipment_id_ref=equipment_id_ref,
+                
                 status_shipment=2,
                 tipo_movimento_id=4,
+
+                status_equipment_id=3, 
+                history_reason='SHIPPING_CONFIRMED_RESERVED',
+                
                 organization_id=org_id_destino,
                 operation_type='RESERVA',
                 alias_item=None,

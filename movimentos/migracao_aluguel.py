@@ -1,4 +1,5 @@
 import os
+import glob
 import pandas as pd
 from sqlalchemy import text
 from datetime import datetime
@@ -16,7 +17,6 @@ TABELAS = [
     "service_orders"
 ]
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ARQUIVO_IMPORTACAO = os.path.join(BASE_DIR, "docs", "equipeAS.csv")
 
 class MigracaoAluguel(BaseMigracaoMovimento):
 
@@ -33,23 +33,29 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         self, contrato_item_id, recipient_id, equipment_id_ref, mov_date,
         item_servico_id_atual, fallback_contract_item_id=None, forcar_extra=False
     ):
-        # 1. Modo Fantasma: (Proteção para quando a Devolução reaproveitar esta classe)
+        # 1. Modo Fantasma:
         if getattr(self, 'consumir_saldos', None) is False:
             return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
 
         if pd.isna(contrato_item_id) or not contrato_item_id:
             return 0, None, None
 
-        # 3. SE DEU MATCH: Aplica a lógica clássica de desconto de saldo
         contrato_item_id = int(contrato_item_id)
         saldos = self.dados["saldos_por_id"]
         dict_tipo = self.dados["dict_tipo_por_equipamento"]
-        
-        # Diminui o saldo da memória (Igual ao -= 1 do seu código antigo)
-        saldos[contrato_item_id] = saldos.get(contrato_item_id, 0) - 1
+        saldo_atual = saldos.get(contrato_item_id, 0)
+        type_id = dict_tipo.get(equipment_id_ref)
+        is_kit = self.dict_is_kit.get(type_id, 0)
 
-        # 4. A REGRA DO EXTRA: Só joga para a tabela de Extras se o saldo ficou negativo
-        if saldos[contrato_item_id] < 0:
+        # Regra caso seja não seja KIT e o saldo esteja zerado = Excedente
+        if saldo_atual <= 0 and is_kit == 0:
+            return 0, None, contrato_item_id
+        
+        # SE FOR KIT OU TIVER SALDO: Aplica a lógica clássica de desconto
+        saldos[contrato_item_id] = saldo_atual - 1
+
+        # 4. A REGRA DO EXTRA: Só joga para a tabela de Extras se o saldo ficou negativo e estiver dentro da regra de kits
+        if saldos[contrato_item_id] < 0 and is_kit == 1:
             extra_id = self.extra_id_counter
             self.extra_id_counter += 1
 
@@ -103,10 +109,37 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         self.limpar_tabelas_movimento()
         
-        caminho_csv = "./docs/EquipAS.csv"
+        # ======================================================================
+        # CARREGAMENTO DO DICIONÁRIO TYPES.CSV
+        # ======================================================================
+        caminho_types = "./docs/types.csv"
+        if os.path.exists(caminho_types):
+            print("📖 Carregando mapeamento de Tipos e Kits (types.csv)...")
+            df_types = pd.read_csv(caminho_types, sep=",", encoding="utf-8")
+            # Mapeia {id: is_kit}
+            self.dict_is_kit = {int(row['id']): int(row['is_kit']) for _, row in df_types.iterrows() if pd.notna(row['id'])}
+        else:
+            print("⚠️ Arquivo types.csv não encontrado. Todos os equipamentos assumirão is_kit = 0.")
+            self.dict_is_kit = {}
+
+        # ======================================================================
+        # CARREGAMENTO DOS ARQUIVOS PARQUET
+        # ======================================================================
+        pasta_parquets = "./docs/parquets"
+        arquivos_parquet = glob.glob(os.path.join(pasta_parquets, "*.parquet"))
+
+        if not arquivos_parquet:
+            print("❌ Nenhum arquivo .parquet encontrado na pasta 'docs/'.")
+            return
+
+        print(f"📖 Lendo dados de {len(arquivos_parquet)} arquivos Parquet...")
+        lista_dfs = []
+        for arq in arquivos_parquet:
+            lista_dfs.append(pd.read_parquet(arq))
         
-        print("📖 Carregando planilha auxiliar de aluguel...")
-        df_csv = pd.read_csv(caminho_csv, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
+        # Consolida tudo num único Mega DataFrame
+        df_csv = pd.concat(lista_dfs, ignore_index=True)
+
         df_csv['TOMBO'] = pd.to_numeric(df_csv['TOMBO'], errors='coerce')
         df_csv = df_csv.dropna(subset=['TOMBO'])
         df_csv['TOMBO'] = df_csv['TOMBO'].astype(int).astype(str)
@@ -117,16 +150,15 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         tombos = df_csv['TOMBO'].astype(int).unique().tolist()
 
-        # 1. Busca os movimentos no banco Legado
         dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos)
         print(f"   ✅ {len(dict_ultimo_mov)} tombos indexados no legado.")
 
-        # 2. Busca os IDs dos equipamentos no banco Novo (Usando o SQL Otimizado!)
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
         print(f"   ✅ {len(dict_equipamentos_novo)} equipamentos correspondentes encontrados no banco novo.")
 
         log_nao_match = []
         rejeitados = 0
+        
 
         for _, row_csv in tqdm(df_csv.iterrows(), total=df_csv.shape[0], desc="Processando ALUGUEL"):
 
@@ -217,11 +249,18 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                         item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
                         
                     if not motivo_divergencia: 
-                        motivo_divergencia = "Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Fallback."
+                        motivo_divergencia = "Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
 
-            # ==================================================================
-            # GRAVAÇÃO DO LOG RICO DE DIVERGÊNCIAS
-            # ==================================================================
+            is_excedente = False
+            if contrato_id_res and item_id_res and not is_avulso:
+                saldo_verificacao = self.dados["saldos_por_id"].get(item_id_res, 0)
+                type_id_verificacao = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
+                is_kit_verificacao = self.dict_is_kit.get(type_id_verificacao, 0)
+                
+                # Se não tem saldo e não é kit, ativamos a flag is_exchange!
+                if saldo_verificacao <= 0 and is_kit_verificacao == 0:
+                    is_excedente = True
+
             if motivo_divergencia:
                 log_nao_match.append({
                     "TOMBO": tombo,
@@ -233,21 +272,20 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     "ITEM_CSV": row_csv.get('ITEM_DO_CONTRATO', 'VAZIO'),
                     "DESC_ITEM_CSV": row_csv.get('DESCRICAO_ITEM', 'VAZIO'),
                     "ITEM_RESOLVIDO_ID": item_id_res if item_id_res else "NENHUM",
-                    "STATUS_FINAL": "AVULSO" if is_avulso else "ALUGUEL (ITEM EXTRA)",
+                    "STATUS_FINAL": "EXCEDENTE" if is_excedente else ("AVULSO" if is_avulso else "ALUGUEL (ITEM EXTRA)"),
                     "MOTIVO_EXATO": motivo_divergencia
                 })
 
-            # ==================================================================
-            # 4. REGISTRO DO MOVIMENTO (Limpo e sem erros de sintaxe)
-            # ==================================================================
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
             dt_mov = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else self.now
 
             detalhes_item = None
             if is_avulso:
                 detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)"
+            elif is_excedente:
+                detalhes_item = "Equipamento Excedente (Contrato sem saldo, item is_kit=0)"
             elif not teve_match_perfeito:
-                detalhes_item = "Item Extra (Fallback de Contrato/Item)"
+                detalhes_item = "Item Extra Oficial (Fallback de Contrato/Item)"
 
             self.registrar_movimento(
                 id_final=int(row_mov['id']),
@@ -261,11 +299,16 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
                 equipment_id_ref=equipment_id_ref,
-                
+
                 status_shipment=2,
                 tipo_movimento_id=7 if is_avulso else 1,
-                
                 operation_type='AVULSO' if is_avulso else 'ALUGUEL',
+                
+                status_equipment_id=2, 
+                history_reason='SHIPPING_CONFIRMED_SEPARATE' if is_avulso else 'SHIPPING_CONFIRMED_RENT',
+
+                is_exchange=is_excedente,
+                
                 alias_item=str(row_csv.get('ITEM_DO_CONTRATO')).strip() if pd.notna(row_csv.get('ITEM_DO_CONTRATO')) else None,
                 alias_movimento=row_csv.get('EQUIPAMENTO_NOME'),
                 details_capa="Migração",

@@ -123,7 +123,8 @@ TABELAS = [
     'contracts',
     'addresses',
     'customers',
-    'suppliers'
+    'suppliers',
+    'equipment_history'
     ]
 
 TABELAS_MOVIMENTOS= [
@@ -135,6 +136,7 @@ TABELAS_MOVIMENTOS= [
     'movements',
     'service_order_items',
     'service_orders',
+    'equipment_history'
     ]
 
 TAREFAS = {
