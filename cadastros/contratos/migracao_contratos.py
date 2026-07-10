@@ -20,6 +20,7 @@ TABELAS_CONTRATOS = [
 
 # DICIONARIOS DE/PARA
 ABBREVIATIONS = {
+    'MT': 'MINISTÉRIO DOS TRANSPORTES - DF',
     'ESPCEX': 'ESCOLA PREPARATÓRIA DE CADETES DO EXÉRCITO',
     'FUNASA': 'FUNDAÇÃO NACIONAL DE SAÚDE',
     '20º RCB': '20º REGIMENTO DE CAVALARIA BLINDADO - CAMPO GRANDE',
@@ -110,11 +111,18 @@ class MigracaoContratos:
         # 1. Cache de Contratos
         res_contracts = conn.execute(text("SELECT id, name, number, organization_id, customer_id FROM contracts")).fetchall()
         for r in res_contracts:
-            chave = f"{r[1]}|{r[2]}|{r[3]}"
+            nome_contrato_banco = str(r[1]).strip().upper()
+            
+            # NOME/APELIDO do Contrato
+            # (Adicionamos o customer_id como fallback para evitar nomes duplicados em clientes diferentes)
+            chave = f"{nome_contrato_banco}|{r[4]}" 
+            chave_simples = f"{nome_contrato_banco}"
+            
             dados_cache = {"id": r[0], "customer_id": r[4]}
+            
             self.contracts_cache[chave] = dados_cache
-            if r[2] and r[2] != "SEM_NUMERO":
-                self.contracts_by_number[r[2]] = dados_cache
+            self.contracts_cache[chave_simples] = dados_cache # Permite a busca só pelo nome
+            
         print(f"   📋 {len(self.contracts_cache)} contratos em cache")
 
         # 2. Cache de Eventos
@@ -305,13 +313,21 @@ class MigracaoContratos:
             # GRAVAÇÃO DO CONTRATO
             # ==================================================================
             nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
-            numero_contrato = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
-            org_id = MAP_ORGANIZACAO.get(row['CONTRATADO'], 1115)
-            chave_contrato = f"{nome_contrato}|{numero_contrato}|{org_id}"
+            numero_original = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
+            if numero_original != "SEM_NUMERO":
+                # Limita a 255 caracteres caso o nome seja muito grande
+                numero_contrato = numero_original
+            else:
+                numero_contrato = f"SEM_NUMERO ({nome_contrato})"[:255]
 
-            contract_info = self.contracts_cache.get(chave_contrato)
-            if not contract_info and numero_contrato != "SEM_NUMERO":
-                contract_info = self.contracts_by_number.get(numero_contrato)
+            org_id = MAP_ORGANIZACAO.get(row['CONTRATADO'], 1115)
+            
+            # Chaves rigorosas
+            chave_contrato = f"{nome_contrato}|{cust_id}"
+            chave_simples = f"{nome_contrato}"
+
+            # Busca no cache (Tenta a chave forte, se não achar, tenta só pelo nome)
+            contract_info = self.contracts_cache.get(chave_contrato) or self.contracts_cache.get(chave_simples)
 
             dados_contrato = {
                 "id": id_contrato_excel,
@@ -330,9 +346,9 @@ class MigracaoContratos:
                 conn.execute(text("""
                     UPDATE contracts 
                     SET contract_type_id = :contract_type_id, contract_status_id = :contract_status_id,
-                        customer_id = :customer_id, object = :object, updated_at = :updated_at
-                    WHERE id = :id AND number = :number
-                """), {**dados_contrato, 'id': contract_id, 'number': numero_contrato})
+                        customer_id = :customer_id, object = :object, updated_at = :updated_at, number = :number
+                    WHERE id = :id
+                """), {**dados_contrato, 'id': contract_id})
                 self.stats['contratos_atualizados'] += 1
             else:
                 dados_contrato['created_at'] = self.now
@@ -342,15 +358,17 @@ class MigracaoContratos:
                 """), dados_contrato)
                 
                 contract_id = id_contrato_excel
+                
+                # Salva no cache com as duas chaves para o próximo laço conseguir achar
                 novo_cache = {'id': contract_id, 'customer_id': cust_id}
                 self.contracts_cache[chave_contrato] = novo_cache
-                if numero_contrato != "SEM_NUMERO":
-                    self.contracts_by_number[numero_contrato] = novo_cache
+                self.contracts_cache[chave_simples] = novo_cache
                 self.stats['contratos_criados'] += 1
 
             conn.execute(text("INSERT IGNORE INTO contract_recipient_customers (contract_id, customer_id) VALUES (:c_id, :cust_id)"), 
                          {'c_id': int(contract_id), 'cust_id': int(cust_id)})
 
+            # O mapa para a aba de Eventos usar:
             self.contract_id_map[nome_contrato] = contract_id
 
     def _processar_eventos(self, conn, df_ex_events):
@@ -362,18 +380,23 @@ class MigracaoContratos:
             
             nome_contrato = str(row['CONTRATO']).strip().upper()
             
-            if nome_contrato not in self.contract_id_map:
-                found = False
-                for chave, dados in self.contracts_cache.items():
-                    if chave.startswith(nome_contrato + "|"):
-                        self.contract_id_map[nome_contrato] = dados['id']
-                        found = True
-                        break
-                if not found:
-                    self.stats['eventos_ignorados'] += 1
-                    continue
+            # 1. Tenta pegar o ID no mapa da aba 1 (Criados/Atualizados nesta execução)
+            contract_id = self.contract_id_map.get(nome_contrato)
+            
+            # 2. Se não achou no mapa atual, tenta achar no Cache do Banco de Dados
+            if not contract_id:
+                cache_info = self.contracts_cache.get(nome_contrato)
+                if cache_info:
+                    contract_id = cache_info['id']
+                    # Adiciona no mapa local para as próximas linhas acharem mais rápido
+                    self.contract_id_map[nome_contrato] = contract_id
+            
+            # 3. Se ainda assim não achou, é porque o contrato não existe (falhou na aba 1)
+            if not contract_id:
+                print(f"   ⚠️ Evento ignorado. Contrato '{nome_contrato}' não encontrado no banco/cache.")
+                self.stats['eventos_ignorados'] += 1
+                continue
 
-            contract_id = self.contract_id_map[nome_contrato]
             id_evento_planilha = row['ID']
 
             if contract_id not in self.contract_event_counters:
