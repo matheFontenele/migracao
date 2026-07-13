@@ -94,6 +94,25 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
             ORDER BY ci.created_at DESC;
         """)
         df_contratos_itens = pd.read_sql(query_contratos_itens, conn)
+        df_saldos_contract_items = pd.read_sql(
+            "SELECT id AS contract_item_id, available_quantity FROM contract_items",
+            conn
+        )
+
+        query_saldos = text("""
+            SELECT
+                coi.id AS contract_item_id,
+                coi.alias AS contract_item_alias,
+                con.id AS contract_id,
+                con.name AS contract_name,
+                coi.quantity,
+                coi.available_quantity
+            FROM contract_items coi
+            INNER JOIN event_additives ev ON coi.event_additive_id = ev.id
+            INNER JOIN contract_events cov ON ev.event_id = cov.id
+            INNER JOIN contracts con ON cov.contract_id = con.id
+        """)
+        df_saldos_contract_items = pd.read_sql(query_saldos, conn)
 
         df_equipamentos_refatorado = pd.read_sql(
             "SELECT id, number, name, current_organization_id, deleted_at FROM equipments", conn
@@ -228,15 +247,11 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         )
         dict_contrato_item_aluguel_por_chave.setdefault(chave_item, info_item)
 
-    saldos_por_id = {}
-    for dados in dict_contrato_item_por_chave.values():
-        item_id = dados['id']
-        if item_id not in saldos_por_id:
-            saldos_por_id[item_id] = dados['available_quantity']
-    for dados in dict_contrato_item_aluguel_por_chave.values():
-        item_id = dados['id']
-        if item_id not in saldos_por_id:
-            saldos_por_id[item_id] = dados['available_quantity']
+    saldos_por_id = {
+        int(row['contract_item_id']): limpar_valor_numerico(row['available_quantity'])
+        for _, row in df_saldos_contract_items.iterrows()
+        if pd.notna(row['contract_item_id'])
+    }
 
     print(f"   ✅ {len(dict_contrato_item_por_chave)} combinações (cliente, contrato, item, descrição) indexadas.")
     print(f"   ✅ {len(dict_contrato_item_aluguel_por_chave)} combinações de aluguel por legacy_customer_id indexadas.")

@@ -103,6 +103,9 @@ MAPA_MINISTERIO_RELACOES = {
     "PREFEITURA": (375, 322),
     "SECRETARIA": (1424, 1347)
 }
+MAPA_MINISTERIO_TRANSPORTES = {
+    "PREFEITURA": (337, 330)
+}
 
 class MigracaoClientes:
 
@@ -227,7 +230,24 @@ class MigracaoClientes:
             df_modificado.loc[mask_ministerio, 'SECRETARIA'] = None
         
         return df_modificado
+    def _unificar_ministerio_transportes(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
 
+        pref_alvo, pref_origem = MAPA_MINISTERIO_TRANSPORTES["PREFEITURA"]
+        id_pref_serie = pd.to_numeric(df_modificado['ID_PREFEITURA'], errors='coerce')
+
+        mask_transportes = id_pref_serie.isin([pref_origem, pref_alvo])
+        
+        if mask_transportes.any():
+            # 1️⃣ UNIFICA A PREFEITURA (Redireciona RJ para DF)
+            df_modificado.loc[mask_transportes, 'ID_PREFEITURA'] = pref_alvo
+            df_modificado.loc[mask_transportes, 'PREFEITURA'] = "MINISTÉRIO DOS TRANSPORTES"
+
+            # 2️⃣ ACHATAMENTO TOTAL DA HIERARQUIA 
+            df_modificado.loc[mask_transportes, 'ID_SECRETARIA'] = None
+            df_modificado.loc[mask_transportes, 'SECRETARIA'] = None
+        
+        return df_modificado
 
     # ==============================================================================
     # FUNÇÕES AUXILIARES DE SANETIZAÇÃO
@@ -261,6 +281,7 @@ class MigracaoClientes:
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
+        df_clean = self._unificar_ministerio_transportes(df_clean)
 
         # --- MERGE DE RESERVAS ---
         mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
@@ -284,16 +305,6 @@ class MigracaoClientes:
         reservas_pareadas = df_merged['reserved_customer_id'].dropna().unique()
         df_orfas = df_reservas[~df_reservas['id_clean'].isin(reservas_pareadas)].copy()
         df_orfas['reserved_customer_id'] = None
-
-            # --- 🖨️ PRINT TEMPORÁRIO DE AUDITORIA ---
-        sucessos = df_merged[df_merged['reserved_customer_id'].notna()]
-        print("\n" + "="*75)
-        print("🕵️ RELATÓRIO DE AUDITORIA: MESCLAGEM DEFINITIVA (PANDAS MERGE)")
-        print("="*75)
-        print(f"✔️ SUCESSO ({len(sucessos)} reservas acopladas para dentro do titular):")
-        for _, r in sucessos.head(15).iterrows():
-            print(f"   🎯 TITULAR: [{r['id_clean']}] {r['CLIENTE'][:32].ljust(32)} <-- EMBUTIU: [{int(r['reserved_customer_id'])}] {r['nome_reserva_original']}")
-        if len(sucessos) > 15: print(f"   ... (e mais {len(sucessos) - 15} ocultos)")
 
         print(f"\n❌ ÓRFÃS ({len(df_orfas)} viraram endereços avulsos):")
         for _, r in df_orfas.iterrows(): print(f"   ⚠️ ÓRFÃ: [{r['id_clean']}] '{r['CLIENTE']}'")

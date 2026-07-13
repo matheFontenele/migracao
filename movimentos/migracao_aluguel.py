@@ -24,6 +24,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter, limpar_ambiente)
 
+        self.saldos_modificados = set()
+
     def limpar_tabelas_movimento(self):
         if self.limpar_ambiente:
             print("\n🧹 [ALUGUEL] Iniciando faxina estrutural nas tabelas transacionais...")
@@ -33,74 +35,34 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         self, contrato_item_id, recipient_id, equipment_id_ref, mov_date,
         item_servico_id_atual, fallback_contract_item_id=None, forcar_extra=False
     ):
-        # 1. Modo Fantasma:
-        if getattr(self, 'consumir_saldos', None) is False:
-            return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
-
-        if pd.isna(contrato_item_id) or not contrato_item_id:
-            return 0, None, None
-
-        contrato_item_id = int(contrato_item_id)
-        saldos = self.dados["saldos_por_id"]
-        dict_tipo = self.dados["dict_tipo_por_equipamento"]
-        saldo_atual = saldos.get(contrato_item_id, 0)
-        type_id = dict_tipo.get(equipment_id_ref)
-        is_kit = self.dict_is_kit.get(type_id, 0)
-
-        # Regra caso seja não seja KIT e o saldo esteja zerado = Excedente
-        if saldo_atual <= 0 and is_kit == 0:
-            return 0, None, contrato_item_id
-        
-        # SE FOR KIT OU TIVER SALDO: Aplica a lógica clássica de desconto
-        saldos[contrato_item_id] = saldo_atual - 1
-
-        # 4. A REGRA DO EXTRA: Só joga para a tabela de Extras se o saldo ficou negativo e estiver dentro da regra de kits
-        if saldos[contrato_item_id] < 0 and is_kit == 1:
-            extra_id = self.extra_id_counter
-            self.extra_id_counter += 1
-
-            self.itens_extras_mestre.append({
-                "id": extra_id, 
-                "service_order_item_id": item_servico_id_atual,
-                "contract_item_id": contrato_item_id,
-                "type_id": dict_tipo.get(equipment_id_ref),
-                "quantity": 1, 
-                "removed_quantity": 0, 
-                "created_at": mov_date, 
-                "updated_at": mov_date, 
-                "deleted_at": None
-            })
-            return 1, extra_id, contrato_item_id 
-
-        # 5. Sucesso absoluto (Match feito e saldo positivo)
-        return 0, None, contrato_item_id
+        return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
     
     def _atualizar_saldos_mysql(self):
-        
-        # 1. MODO FANTASMA: Se for chamado pela Devolução no futuro, não altera o banco!
         if getattr(self, 'consumir_saldos', None) is False:
             return
 
-        saldos = self.dados["saldos_por_id"]
-        modificados = []
-        vistos = set()
+        if not self.saldos_modificados:
+            print("\n💾 Nenhum saldo precisou ser atualizado no banco de dados.")
+            return
 
-        for info in self.dados["dict_contrato_item_por_chave"].values():
-            c_id = info['id']
-            qtd_orig = info['original_quantity']
-            qtd_atual = saldos.get(c_id, qtd_orig)
+        print(f"\n💾 Sincronizando {len(self.saldos_modificados)} saldos modificados com o MySQL...")
+        
+        atualizados = 0
+        with self.engine_new.begin() as conn:
+            for c_id in self.saldos_modificados:
+                # Pega a quantidade nova calculada na RAM e protege contra número negativo
+                qtd_final_banco = max(0, int(self.dados["saldos_por_id"][c_id]))
+                
+                # Executa o UPDATE direto e certeiro
+                res = conn.execute(
+                    text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"), 
+                    {"nova_qtd": qtd_final_banco, "id": c_id}
+                )
+                
+                if res.rowcount > 0:
+                    atualizados += 1
 
-            qtd_final_banco = max(0, qtd_atual)
-
-            if qtd_final_banco != qtd_orig and c_id not in vistos:
-                modificados.append({"id": c_id, "nova_qtd": qtd_final_banco})
-                vistos.add(c_id)
-
-        if modificados:
-            with self.engine_new.begin() as conn:
-                for item in modificados:
-                    conn.execute(text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"), item)
-            print(f"  ✔️ {len(modificados)} saldos de contrato atualizados no MySQL (Valores negativos travados em 0).")
+        print(f"  ✔️ {atualizados} itens de contrato atualizados com sucesso!")
     
     def executar(self):
         print("\n" + "-" * 70)
@@ -135,7 +97,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         print(f"📖 Lendo dados de {len(arquivos_parquet)} arquivos Parquet...")
         lista_dfs = []
         for arq in arquivos_parquet:
-            lista_dfs.append(pd.read_parquet(arq))
+            df_temp = pd.read_parquet(arq)
+            df_temp.columns = df_temp.columns.str.upper() 
+            lista_dfs.append(df_temp)
         
         # Consolida tudo num único Mega DataFrame
         df_csv = pd.concat(lista_dfs, ignore_index=True)
@@ -144,8 +108,11 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         df_csv = df_csv.dropna(subset=['TOMBO'])
         df_csv['TOMBO'] = df_csv['TOMBO'].astype(int).astype(str)
         df_csv['CLIENTE_ID'] = df_csv['CLIENTE_ID'].astype(str).str.replace('.0', '', regex=False)
-        df_csv['ITEM_DO_CONTRATO'] = df_csv['ITEM_DO_CONTRATO'].astype(str).str.strip().str.replace(r'\.0$', '', regex=True)
-        df_csv = df_csv[df_csv['ITEM_DO_CONTRATO'].str.lower() != 'nan']
+        
+        if 'ITEM_DO_CONTRATO' in df_csv.columns:
+            df_csv['ITEM_DO_CONTRATO'] = df_csv['ITEM_DO_CONTRATO'].astype(str).str.strip().str.replace(r'\.0$', '', regex=True)
+            df_csv = df_csv[df_csv['ITEM_DO_CONTRATO'].str.lower() != 'nan']
+            
         df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
 
         tombos = df_csv['TOMBO'].astype(int).unique().tolist()
@@ -155,6 +122,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
         print(f"   ✅ {len(dict_equipamentos_novo)} equipamentos correspondentes encontrados no banco novo.")
+
+
 
         log_nao_match = []
         rejeitados = 0
@@ -198,13 +167,30 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             # ==================================================================
             # 1. CAPTURA E NORMALIZAÇÃO DOS DADOS DA PLANILHA
             # ==================================================================      
-            try:
-                csv_contract_id = int(float(row_csv.get('CONTRACT_ID')))
-            except (ValueError, TypeError):
+            raw_contract_id = row_csv.get('CONTRACT_ID')
+            if pd.isna(raw_contract_id) or str(raw_contract_id).strip() in ['None', 'nan', '']:
                 csv_contract_id = None
+            else:
+                try:
+                    csv_contract_id = int(float(raw_contract_id))
+                except (ValueError, TypeError):
+                    csv_contract_id = None
 
-            desc_i = normalizar_para_match(row_csv.get('DESCRICAO_ITEM'))
-            item_c = normalizar_para_match(row_csv.get('ITEM_DO_CONTRATO'))
+            # Captura do ID do Item direto da planilha
+            raw_item_id = row_csv.get('CONTRACT_ITEM_ID')
+            if pd.isna(raw_item_id) or str(raw_item_id).strip() in ['None', 'nan', '']:
+                csv_item_id = None
+            else:
+                try:
+                    csv_item_id = int(float(raw_item_id))
+                except (ValueError, TypeError):
+                    csv_item_id = None
+            
+            contrato_id_res = None
+            item_id_res = None
+            teve_match_perfeito = False
+            is_avulso = False
+            motivo_divergencia = None
             
             contrato_id_res = None
             item_id_res = None
@@ -212,54 +198,63 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             is_avulso = False
 
             # ==================================================================
-            # 2. VALIDAÇÃO DO CONTRATO (A Chave de Ouro)
+            # 2. VALIDAÇÃO DO CONTRATO (A Chave de Ouro é o Parquet)
             # ==================================================================
-            contratos_validos_banco = self.dados["dict_contratos_vinculados"].get(recipient_id, [])
             motivo_divergencia = None
 
-            if csv_contract_id in contratos_validos_banco:
+            if csv_contract_id is not None:
                 contrato_id_res = csv_contract_id
-            elif contratos_validos_banco:
-                contrato_id_res = contratos_validos_banco[0]
-                motivo_divergencia = f"Contrato da planilha ({csv_contract_id}) não pertence ao cliente. Forçado para o real: {contrato_id_res}"
             else:
-                contrato_id_res = None
                 is_avulso = True
-                motivo_divergencia = "Cliente não possui nenhum contrato ativo no banco. Forçado para AVULSO."
+                motivo_divergencia = "Planilha definiu equipamento sem contrato (None). Mantido como AVULSO."
 
             # ==================================================================
             # 3. MATCH DOS ITENS (Só executa se houver um contrato validado)
             # ==================================================================
             if contrato_id_res and not is_avulso:
-                chave_rigida = (int(recipient_id), contrato_id_res, item_c, desc_i)
-                match_info = self.dados["dict_contrato_item_por_chave"].get(chave_rigida)
-
-                if not match_info:
-                    chave_legado = (cli_legado_id, contrato_id_res, item_c, desc_i)
-                    match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get(chave_legado)
-
-                if match_info:
-                    item_id_res = match_info['id']
+                if csv_item_id is not None:
+                    item_id_res = csv_item_id
                     teve_match_perfeito = True
                 else:
-                    fallback_contrato = self.dados["dict_contrato_aluguel_por_chave"].get((cli_legado_id, contrato_id_res))
-                    if fallback_contrato:
-                        item_id_res = fallback_contrato['first_contract_item_id']
-                    else:
+                    # 🚨 FALLBACK BLINDADO (Caso falte a coluna CONTRACT_ITEM_ID no Parquet)
+                    item_id_res = next(
+                        (info['id'] for chave, info in self.dados["dict_contrato_item_por_chave"].items() if chave[1] == contrato_id_res),
+                        None
+                    )
+
+                    if not item_id_res:
+                         item_id_res = next(
+                            (info['id'] for chave, info in self.dados["dict_contrato_item_aluguel_por_chave"].items() if chave[1] == contrato_id_res),
+                            None
+                        )
+
+                    if not item_id_res:
                         item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
                         
                     if not motivo_divergencia: 
-                        motivo_divergencia = "Contrato OK, mas descrição/item da planilha não casou. Forçado para Item Extra/Excedente."
+                        motivo_divergencia = "ID do Item ausente no Parquet. Forçado para o 1º item do contrato."
 
+            # ==================================================================
+            # 4. GESTÃO DE SALDOS E EXCEDENTES (A Matemática Real)
+            # ==================================================================
             is_excedente = False
+
             if contrato_id_res and item_id_res and not is_avulso:
-                saldo_verificacao = self.dados["saldos_por_id"].get(item_id_res, 0)
-                type_id_verificacao = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
-                is_kit_verificacao = self.dict_is_kit.get(type_id_verificacao, 0)
+                # Força tipo Inteiro para casar com as chaves do dicionário do Base
+                item_id_res_int = int(item_id_res)
                 
-                # Se não tem saldo e não é kit, ativamos a flag is_exchange!
-                if saldo_verificacao <= 0 and is_kit_verificacao == 0:
+                saldo_atual = self.dados["saldos_por_id"].get(item_id_res_int, 0)
+                type_id_atual = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
+                is_kit_atual = self.dict_is_kit.get(type_id_atual, 0)
+                
+                if saldo_atual <= 0 and is_kit_atual == 0:
                     is_excedente = True
+                    if not motivo_divergencia:
+                        motivo_divergencia = "Saldo do item esgotado. Mantido no contrato como excedente."
+                else:
+                    # 📉 Abate o saldo da memória e RASTREIA a mudança!
+                    self.dados["saldos_por_id"][item_id_res_int] = saldo_atual - 1
+                    self.saldos_modificados.add(item_id_res_int)
 
             if motivo_divergencia:
                 log_nao_match.append({
