@@ -106,6 +106,22 @@ MAPA_MINISTERIO_RELACOES = {
 MAPA_MINISTERIO_TRANSPORTES = {
     "PREFEITURA": (337, 330)
 }
+DETRAN_CONFIG = {
+    "ID_PAI_SINTETICO": 910000,
+    "NOME_PAI": "DEPARTAMENTO ESTADUAL DE TRÂNSITO - DETRAN",
+    "UNIDADES": {
+        416: {
+            "id_filho_sintetico": 910001,
+            "nome_filho": "DETRAN/CE",
+            "uf": "CE",
+        },
+        361: {
+            "id_filho_sintetico": 910002,
+            "nome_filho": "DETRAN/MA",
+            "uf": "MA",
+        },
+    },
+}
 
 class MigracaoClientes:
 
@@ -248,7 +264,39 @@ class MigracaoClientes:
             df_modificado.loc[mask_transportes, 'SECRETARIA'] = None
         
         return df_modificado
+    def _reestruturar_detran(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
 
+        ids_prefeitura = pd.to_numeric(
+            df_modificado["ID_PREFEITURA"],
+            errors="coerce"
+        )
+
+        for id_prefeitura_legado, unidade in DETRAN_CONFIG["UNIDADES"].items():
+            mask_detran = ids_prefeitura.eq(id_prefeitura_legado)
+
+            if not mask_detran.any():
+                continue
+
+            # Cliente pai unico DETRAN.
+            df_modificado.loc[
+                mask_detran,
+                ["ID_PREFEITURA", "PREFEITURA"]
+            ] = [
+                DETRAN_CONFIG["ID_PAI_SINTETICO"],
+                DETRAN_CONFIG["NOME_PAI"],
+            ]
+
+            # Subcliente que recebera os addresses dos clientes atrelados no legado.
+            df_modificado.loc[
+                mask_detran,
+                ["ID_SECRETARIA", "SECRETARIA"]
+            ] = [
+                unidade["id_filho_sintetico"],
+                unidade["nome_filho"],
+            ]
+
+        return df_modificado
     # ==============================================================================
     # FUNÇÕES AUXILIARES DE SANETIZAÇÃO
     # ==============================================================================
@@ -282,6 +330,7 @@ class MigracaoClientes:
         df_clean = self._unificar_sao_luis(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
         df_clean = self._unificar_ministerio_transportes(df_clean)
+        df_clean = self._reestruturar_detran(df_clean)
 
         # --- MERGE DE RESERVAS ---
         mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
