@@ -1,15 +1,16 @@
 import os
 import sys
-from migracao_movimentos import (
+
+from movimentos.migracao_movimentos import (
     carregar_dados_compartilhados,
     executar_truncate_tabelas,
     resetar_saldo_contract_items
 )
 
-from migracao_aluguel import MigracaoAluguel
-from migracao_reserva import MigracaoReserva
-from migracao_devolucao import MigracaoDevolucao
-from migracao_substituicao import MigracaoSubstituicao
+from movimentos.migracao_aluguel import MigracaoAluguel
+from movimentos.migracao_reserva import MigracaoReserva
+from movimentos.migracao_devolucao import MigracaoDevolucao
+from movimentos.migracao_substituicao import MigracaoSubstituicao
 
 TABELAS = []
 # ==============================================================================

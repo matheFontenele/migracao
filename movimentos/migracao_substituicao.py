@@ -109,10 +109,13 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
 
         dataframes = [pd.read_parquet(arquivo) for arquivo in arquivos_parquet]
         df_itens = pd.concat(dataframes, ignore_index=True).drop_duplicates().copy()
+        
+        # Padroniza as colunas para UPPERCASE
+        df_itens.columns = df_itens.columns.str.upper()
 
         colunas_obrigatorias = {
-            "TOMBO", "CLIENTE_ID", "CONTRACT_ID", "ITEM_DO_CONTRATO",
-            "DESCRICAO_ITEM", "EQUIPAMENTO_NOME",
+            "TOMBO", "CLIENTE_ID", "CONTRACT_ID",
+            "EQUIPAMENTO_NOME",
         }
         colunas_ausentes = colunas_obrigatorias - set(df_itens.columns)
         if colunas_ausentes:
@@ -123,12 +126,11 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         df_itens["TOMBO"] = pd.to_numeric(df_itens["TOMBO"], errors="coerce")
         df_itens = df_itens.dropna(subset=["TOMBO"])
         df_itens["TOMBO"] = df_itens["TOMBO"].astype(int).astype(str)
-        df_itens["CLIENTE_ID_NORMALIZADO"] = pd.to_numeric(
-            df_itens["CLIENTE_ID"], errors="coerce"
-        ).astype("Int64")
+        
         df_itens["COMPLETUDE_CONTRATO"] = df_itens[
-            ["CONTRACT_ID", "ITEM_DO_CONTRATO", "DESCRICAO_ITEM"]
+            ["CONTRACT_ID"]
         ].notna().sum(axis=1)
+        
         return df_itens
 
     def calcular_saldo(
@@ -198,11 +200,118 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     conn.execute(text("UPDATE contract_items SET available_quantity = :nova_qtd WHERE id = :id"), item)
             print(f"  ✔️ {len(modificados)} saldos de contrato atualizados no MySQL (Valores negativos travados em 0).")
 
-    def _extrair_dados_substituicao(self, lista_mov_ids):
+    def _extrair_dados_substituicao_por_movimentos(self, lista_mov_ids, tombos_novos=None):
+        lista_sql = "(" + ", ".join(map(str, lista_mov_ids)) + ")"
+
+        # Registros recentes guardam IDs de movimento nas colunas de substituição.
+        query_subst = f"""
+            SELECT
+                als.id AS SUBST_ID,
+                mov_novo.id as MOV_NOVO_ID,
+                COALESCE(mov_novo.updated_at, mov_novo.data) AS DATA_SUBST,
+                COALESCE(NULLIF(mov_novo.usuario_id, 0), 1) AS USR_SUBST,
+                mov_novo.deleted_at AS DEL_SUBST,
+
+                mov_dev.id as MOV_DEV_ID,
+                ac.id as CLIENTE_ID
+            FROM aluguel_substituicao als
+            INNER JOIN aluguel_movimento mov_dev ON mov_dev.id = als.substituicao_aluguel_id
+            INNER JOIN aluguel_movimento mov_novo ON mov_novo.id = als.substituicao_devolucao_id
+            LEFT JOIN aluguel_clientes ac ON ac.id = mov_novo.cliente_id
+            WHERE mov_novo.id IN {lista_sql}
+              AND mov_dev.tipo_id = 3
+              AND mov_novo.tipo_id = 5
+        """
+
+        with self.engine_legado.connect() as conn:
+            df_subst_movs = pd.read_sql(text(query_subst), conn)
+
+        if df_subst_movs.empty:
+            return pd.DataFrame()
+
+        movs_itens = sorted(set(
+            df_subst_movs["MOV_NOVO_ID"].dropna().astype(int).tolist()
+            + df_subst_movs["MOV_DEV_ID"].dropna().astype(int).tolist()
+        ))
+        movs_itens_sql = "(" + ", ".join(map(str, movs_itens)) + ")"
+
+        query_itens = f"""
+            SELECT
+                ami.movimento_id AS MOV_ID,
+                ami.id AS MOV_ITEM_ID,
+                eq.numero AS TOMBO,
+                eq.nome AS NOME
+            FROM aluguel_movimento_itens ami
+            INNER JOIN aluguel_equipamentos eq ON eq.id = ami.equipamento_id
+            WHERE ami.movimento_id IN {movs_itens_sql}
+              AND eq.deleted_at IS NULL
+        """
+
+        with self.engine_legado.connect() as conn:
+            df_itens_movs = pd.read_sql(text(query_itens), conn)
+
+        if df_itens_movs.empty:
+            return pd.DataFrame()
+
+        df_novos = df_itens_movs.merge(
+            df_subst_movs[["SUBST_ID", "MOV_NOVO_ID"]],
+            left_on="MOV_ID",
+            right_on="MOV_NOVO_ID",
+            how="inner",
+        )
+        df_novos.sort_values(["SUBST_ID", "MOV_ITEM_ID"], inplace=True)
+        df_novos["POSICAO_SUBST"] = df_novos.groupby("SUBST_ID").cumcount()
+        df_novos["TOMBO_KEY"] = df_novos["TOMBO"].apply(limpar_codigo)
+
+        if tombos_novos is not None:
+            tombos_novos_key = {limpar_codigo(t) for t in tombos_novos}
+            df_novos = df_novos[df_novos["TOMBO_KEY"].isin(tombos_novos_key)]
+
+        df_antigos = df_itens_movs.merge(
+            df_subst_movs[["SUBST_ID", "MOV_DEV_ID"]],
+            left_on="MOV_ID",
+            right_on="MOV_DEV_ID",
+            how="inner",
+        )
+        df_antigos.sort_values(["SUBST_ID", "MOV_ITEM_ID"], inplace=True)
+        df_antigos["POSICAO_SUBST"] = df_antigos.groupby("SUBST_ID").cumcount()
+
+        df_pares = df_novos.merge(
+            df_antigos[["SUBST_ID", "POSICAO_SUBST", "TOMBO", "NOME"]],
+            on=["SUBST_ID", "POSICAO_SUBST"],
+            how="inner",
+            suffixes=("_NOVO", "_ANTIGO"),
+        )
+        if df_pares.empty:
+            return pd.DataFrame()
+
+        df_subst = df_pares.merge(
+            df_subst_movs,
+            on=["SUBST_ID", "MOV_NOVO_ID"],
+            how="inner",
+        )
+        return df_subst[[
+            "MOV_NOVO_ID", "TOMBO_NOVO", "NOME_NOVO", "DATA_SUBST",
+            "USR_SUBST", "DEL_SUBST", "MOV_DEV_ID", "TOMBO_ANTIGO",
+            "NOME_ANTIGO", "CLIENTE_ID"
+        ]]
+
+    def _extrair_dados_substituicao(self, lista_mov_ids, tombos_novos=None):
         if not lista_mov_ids: return pd.DataFrame()
+        if tombos_novos is not None and not tombos_novos: return pd.DataFrame()
 
         print("   📖 Extraindo o núcleo das Substituições no legado...")
         lista_sql = "(" + ", ".join(map(str, lista_mov_ids)) + ")"
+        filtro_tombos = ""
+        if tombos_novos is not None:
+            tombos_novos_sql = "(" + ", ".join(map(str, sorted(set(tombos_novos)))) + ")"
+            filtro_tombos = f" AND eq_novo.numero IN {tombos_novos_sql}"
+
+        # 🎯 ADICIONE ESTES 3 PRINTS AQUI:
+        print(f"   🔍 DEBUG 1: Amostra dos Mov IDs enviados: {lista_mov_ids[:5]}")
+        if tombos_novos:
+            print(f"   🔍 DEBUG 2: Amostra dos Tombos (Parquet) enviados no filtro: {list(tombos_novos)[:5]}")
+            print(f"   🔍 DEBUG 3: Filtro SQL montado: {filtro_tombos[:150]}...")
 
         # 1. Puxa os dados da tabela aluguel_substituicao amarrando os dois equipamentos
         query_subst = f"""
@@ -224,11 +333,20 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             INNER JOIN aluguel_equipamentos eq_antigo ON eq_antigo.id = ami_dev.equipamento_id
             
             LEFT JOIN aluguel_clientes ac ON ac.id = mov_novo.cliente_id
-            WHERE mov_novo.id IN {lista_sql}
+            WHERE eq_novo.deleted_at IS NULL
+              AND mov_novo.id IN {lista_sql}
+              {filtro_tombos}
         """
         
         with self.engine_legado.connect() as conn:
             df_subst = pd.read_sql(text(query_subst), conn)
+
+        print(f"   📊 DEBUG 4: A query retornou {len(df_subst)} registros de substituições.")
+
+        if df_subst.empty:
+            print("   🔁 Query por IDs de item não retornou dados. Tentando formato por IDs de movimento...")
+            df_subst = self._extrair_dados_substituicao_por_movimentos(lista_mov_ids, tombos_novos)
+            print(f"   📊 Fallback por movimentos retornou {len(df_subst)} registros de substituições.")
 
         if df_subst.empty: return df_subst
 
@@ -260,7 +378,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         df_merged = df_merged[df_merged['ORIG_MOV_ID'] < df_merged['MOV_DEV_ID']]
         
         # Pega a primeira linha de cada substituição (A origem válida mais recente)
-        df_final = df_merged.groupby('MOV_NOVO_ID').first().reset_index()
+        df_final = df_merged.groupby(['MOV_NOVO_ID', 'TOMBO_NOVO'], as_index=False).first()
         return df_final
 
     def executar(self):
@@ -275,38 +393,41 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         tombos_parquet = df_parquet["TOMBO"].astype(int).unique().tolist()
         dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos_parquet)
         
-        # Filtra os Tombos da Planilha que O ÚLTIMO MOVIMENTO seja de Substituição (Tipo 6)
-        dict_row_parquet_by_mov = {}
+        # Usa o SQL pai para buscar o último movimento de cada tombo do Parquet
+        # e processa somente os que estão como Substituição Alugado (tipo_id = 5).
+        dict_row_parquet_by_tombo = {}
+        dict_mov_subst_by_tombo = {}
         
         for _, row_parquet in df_parquet.iterrows():
-            tombo = row_parquet["TOMBO"]
-            mov = dict_ultimo_mov.get(tombo)
-            if not mov or mov["movimento"]["tipo_id"] != 6:
+            tombo = str(row_parquet["TOMBO"]).strip()
+            mov_info = dict_ultimo_mov.get(tombo)
+
+            if not mov_info or int(mov_info["movimento"]["tipo_id"]) != 5:
                 continue
 
-            cliente_parquet = row_parquet["CLIENTE_ID_NORMALIZADO"]
-            cliente_movimento = int(mov["movimento"]["cliente_id"])
-            if pd.notna(cliente_parquet) and int(cliente_parquet) != cliente_movimento:
-                continue
+            row_atual = dict_row_parquet_by_tombo.get(tombo)
 
-            mov_id = int(mov["movimento"]["id"])
-            row_atual = dict_row_parquet_by_mov.get(mov_id)
             if (
                 row_atual is None
                 or row_parquet["COMPLETUDE_CONTRATO"] > row_atual["COMPLETUDE_CONTRATO"]
             ):
-                dict_row_parquet_by_mov[mov_id] = row_parquet
+                dict_row_parquet_by_tombo[tombo] = row_parquet
+                dict_mov_subst_by_tombo[tombo] = mov_info["movimento"]
 
-        lista_movs_subst = sorted(dict_row_parquet_by_mov)
+        lista_tombos_subst = sorted(int(tombo) for tombo in dict_row_parquet_by_tombo)
+        lista_movs_subst = sorted({
+            int(dict_mov_subst_by_tombo[str(tombo)]["id"])
+            for tombo in lista_tombos_subst
+        })
 
         if not lista_movs_subst:
-            print("⚠️ Nenhum equipamento dos Parquets possui Substituição como último movimento.")
+            print("⚠️ Nenhum tombo dos Parquets apareceu na listagem SQL de substituições ativas.")
             return
 
-        print(f"   🎯 {len(lista_movs_subst)} registros de Substituição identificados para processamento.")
+        print(f"   🎯 {len(lista_tombos_subst)} tombos em Substituição identificados para processamento ({len(lista_movs_subst)} movimentos).")
         
         # Manda os IDs de substituição pro banco trazer os detalhes
-        df_subst = self._extrair_dados_substituicao(lista_movs_subst)
+        df_subst = self._extrair_dados_substituicao(lista_movs_subst, lista_tombos_subst)
         if df_subst.empty:
             return
 
@@ -322,14 +443,14 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         for _, row in tqdm(df_subst.iterrows(), total=df_subst.shape[0], desc="Processando Ciclos"):
             
             mov_novo_id = int(row['MOV_NOVO_ID'])
-            row_parquet = dict_row_parquet_by_mov[mov_novo_id]
             
             tombo_novo = limpar_codigo(row['TOMBO_NOVO'])
             tombo_antigo = limpar_codigo(row['TOMBO_ANTIGO'])
             eq_id_novo = dict_equip_novo.get(tombo_novo)
             eq_id_antigo = dict_equip_novo.get(tombo_antigo)
+            row_parquet = dict_row_parquet_by_tombo.get(tombo_novo)
             
-            if not eq_id_novo or not eq_id_antigo:
+            if row_parquet is None or not eq_id_novo or not eq_id_antigo:
                 rejeitados += 1
                 continue
 
@@ -348,7 +469,13 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 rejeitados_tipo += 1
                 continue
 
-            cli_legado_id = int(row['CLIENTE_ID']) if pd.notna(row['CLIENTE_ID']) else 0
+            # 🎯 Pega o cliente_id de destino (prioriza a planilha Parquet)
+            cli_leg_parquet = row_parquet.get("CLIENTE_ID")
+            if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).strip() != '':
+                cli_legado_id = int(float(cli_leg_parquet))
+            else:
+                cli_legado_id = int(row['CLIENTE_ID']) if pd.notna(row['CLIENTE_ID']) else 0
+
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
             cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id)
             
@@ -357,45 +484,43 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 continue
 
             org_id_destino = descobrir_id_organizacao_destino(cli_legado_id)
-            endereco_base_id = self.dict_enderecos_base_org.get(org_id_destino, 1)
+            if org_id_destino not in self.dict_enderecos_base_org:
+                org_id_destino = 1115
+            endereco_base_id = self.dict_enderecos_base_org.get(
+                org_id_destino,
+                self.dict_enderecos_base_org.get(1115, 1),
+            )
 
             # =========================================================
-            # MATCH DO CONTRATO (Baseado no Planilha do Novo Equipamento)
+            # MATCH DO CONTRATO (A Chave de Ouro é o Parquet)
             # =========================================================
             try:
                 parquet_contract_id = int(float(row_parquet.get('CONTRACT_ID')))
             except (TypeError, ValueError):
                 parquet_contract_id = None
 
-            descricao_parquet = row_parquet.get('DESCRICAO_ITEM')
-            item_parquet = row_parquet.get('ITEM_DO_CONTRATO')
-            desc_i = (
-                normalizar_para_match(descricao_parquet)
-                if pd.notna(descricao_parquet)
-                else ""
-            )
-            item_c = (
-                normalizar_para_match(item_parquet)
-                if pd.notna(item_parquet)
-                else ""
-            )
-            
-            contrato_id_res = None
+            try:
+                parquet_contract_item_id = int(float(row_parquet.get('CONTRACT_ITEM_ID')))
+            except (TypeError, ValueError):
+                parquet_contract_item_id = None
+
+            contrato_id_res = parquet_contract_id
             item_id_res = None
             is_avulso = False
 
-            contratos_validos = self.dados["dict_contratos_vinculados"].get(recipient_id, [])
-            if parquet_contract_id in contratos_validos: contrato_id_res = parquet_contract_id
-            elif contratos_validos: contrato_id_res = contratos_validos[0]
-            else: is_avulso = True
+            if contrato_id_res is not None:
+                if parquet_contract_item_id is not None:
+                    # Match exato do Parquet
+                    item_id_res = parquet_contract_item_id
+                else:
+                    # Fallback
+                    item_id_res = next(
+                        (info['id'] for chave, info in self.dados["dict_contrato_item_por_chave"].items() if chave[1] == contrato_id_res),
+                        None
+                    )
+            else:
+                is_avulso = True
 
-            if contrato_id_res and not is_avulso:
-                chave_rigida = (int(recipient_id), contrato_id_res, item_c, desc_i)
-                match_info = self.dados["dict_contrato_item_por_chave"].get(chave_rigida)
-                if not match_info: match_info = self.dados["dict_contrato_item_aluguel_por_chave"].get((cli_legado_id, contrato_id_res, item_c, desc_i))
-
-                if match_info: item_id_res = match_info['id']
-                else: item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
 
             # O MESMO contrato rege o antigo e o novo!
             # =========================================================
@@ -414,8 +539,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     equipment_id_ref=eq_id_antigo,
                     
                     status_shipment=2,
-                    tipo_movimento_id=1,
-                    operation_type='ALUGUEL',
+                    tipo_movimento_id=7 if is_avulso else 1,
+                    operation_type='AVULSO' if is_avulso else 'ALUGUEL',
 
                     status_equipment_id=2, 
                     history_reason='SHIPPING_CONFIRMED_SEPARATE',
@@ -495,6 +620,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
 
         print(f"\n⚠️ Registros rejeitados (Sem equipamento encontrado): {rejeitados}")
         print(f"⚠️ Registros rejeitados (Tipo não identificado pelo nome): {rejeitados_tipo}")
+
+
         self.salvar_movimentos_banco()
 
         # Antigo segue o mesmo status da devolução; novo permanece alugado no cliente.

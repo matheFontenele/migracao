@@ -1,4 +1,5 @@
 import sys
+import re
 import sqlalchemy as sa
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -37,8 +38,10 @@ ABBREVIATIONS = {
     'EAMCE': 'ESCOLA DE APRENDIZES-MARINHEIROS DO CEARÁ',
     'UFC': 'UNIVERSIDADE FEDERAL DO CEARÁ',
     'IFCE': 'INSTITUTO FEDERAL DE EDUCAÇÃO E TECNOLOGIA - IFCE',
-    '10A REGIAO MILITAR': '10ª REGIÃO MILITAR',
-    '10ª REGIAO MILITAR': '10ª REGIÃO MILITAR',
+    '10A REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
+    '10ª REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
+    'COMANDO DA 10A REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
+    'COMANDO DA 10ª REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
     'ANA KALINCA': 'ANA KALINCA',
     'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM': 'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM',
     'H F DA ROCHA COMERCIO SERVIÇOS': 'HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA',
@@ -51,7 +54,7 @@ ABBREVIATIONS = {
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE SAÚDE': 'SEC. MUNICIPAL DA SAÚDE - URUOCA',
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE EDUCAÇÃO': 'SEC. MUNICIPAL DA EDUCAÇÃO - FUNDEB - URUOCA',
     'GOVERNO MUNICIPAL DE URUOCA - FUNDO MUNICIPAL DE ASSISTENCIA SOCIAL E CIDADANIA': 'SEC. DESENVOLVIMENTO SOCIAL, TRABALHO, EMPREENDORISMO E RENDA - URUOCA',
-    'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP'
+    'ESCRITORIO DE REPRESENTAÇÃO DO MINISTÉRIO DAS RELAÇÕES EXTERIORES': 'MINISTÉRIO DE RELAÇÕES EXTERIORES - SP',
 }
 MAP_EVENT_TYPES = {
     'CADASTRO': 1,
@@ -186,6 +189,13 @@ class MigracaoContratos:
     # ==============================================================================
     # MOTORES DE MATCH E BUSCA (HELPER METHODS)
     # ==============================================================================
+    @staticmethod
+    def _normalizar_token_ordinal(token):
+        match = re.fullmatch(r'(\d+)[AO]', token)
+        if match:
+            return match.group(1)
+        return token
+
     def _validar_conflito_estrito(self, tokens_alvo, tokens_banco):
         num_alvo = {t for t in tokens_alvo if t.isdigit()}
         num_banco = {t for t in tokens_banco if t.isdigit()}
@@ -199,13 +209,13 @@ class MigracaoContratos:
 
     def _match_por_tokens(self, nome_planilha_norm):
         stopwords = {'DE', 'DA', 'DO', 'DOS', 'DAS', 'E', 'EM', 'NA', 'NO', 'PARA', 'COM', 'POR', 'O', 'A', 'MUNICIPAL', 'ESTADO', 'MUNICIPIO'}
-        tokens_alvo = set(nome_planilha_norm.split())
+        tokens_alvo = {self._normalizar_token_ordinal(t) for t in nome_planilha_norm.split()}
         tokens_alvo_limpos = tokens_alvo - stopwords
         if not tokens_alvo_limpos: return None
 
         melhores_candidatos = []
         for chave_banco, dados in self.customer_cache.items():
-            tokens_banco = set(chave_banco.split())
+            tokens_banco = {self._normalizar_token_ordinal(t) for t in chave_banco.split()}
             tokens_banco_limpos = tokens_banco - stopwords
             
             if not self._validar_conflito_estrito(tokens_alvo, tokens_banco):
