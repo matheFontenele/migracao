@@ -12,7 +12,7 @@ from movimentos.migracao_reserva import MigracaoReserva
 from movimentos.migracao_devolucao import MigracaoDevolucao
 from movimentos.migracao_substituicao import MigracaoSubstituicao
 from movimentos.migracao_manutencao import MigracaoManutencao
-from atualizacao_contratos_data import AtualizacaoContratosData
+from movimentos.atualizacao_contratos_data import AtualizacaoContratosData
 
 TABELAS = []
 # ==============================================================================
