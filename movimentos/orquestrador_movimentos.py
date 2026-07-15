@@ -58,7 +58,7 @@ class OrquestradorMovimentos:
             substituicao.executar()
 
             print("\n▶️ Iniciando Módulo: MANUTENÇÃO")
-            manutencao = MigracaoManutencao(self.engine_new, self.engine_legado) # 🎯 NOVO
+            manutencao = MigracaoManutencao(self.engine_new, self.engine_legado, dados_compartilhados)
             manutencao.executar()
 
             print("\n▶️ Iniciando Atualização de datas contratos")
