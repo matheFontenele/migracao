@@ -11,6 +11,8 @@ from movimentos.migracao_aluguel import MigracaoAluguel
 from movimentos.migracao_reserva import MigracaoReserva
 from movimentos.migracao_devolucao import MigracaoDevolucao
 from movimentos.migracao_substituicao import MigracaoSubstituicao
+from movimentos.migracao_manutencao import MigracaoManutencao
+from atualizacao_contratos_data import AtualizacaoContratosData
 
 TABELAS = []
 # ==============================================================================
@@ -54,6 +56,14 @@ class OrquestradorMovimentos:
             print("\n▶️ Iniciando Módulo: SUBSTITUIÇÃO")
             substituicao = MigracaoSubstituicao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1500000)
             substituicao.executar()
+
+            print("\n▶️ Iniciando Módulo: MANUTENÇÃO")
+            manutencao = MigracaoManutencao(self.engine_new, self.engine_legado) # 🎯 NOVO
+            manutencao.executar()
+
+            print("\n▶️ Iniciando Atualização de datas contratos")
+            atualizacao = AtualizacaoContratosData(self.engine_new)
+            atualizacao.executar()
 
             print("\n" + "=" * 80)
             print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")

@@ -92,13 +92,19 @@ def iniciar_substituicao(eng_novo, eng_legado):
     from movimentos import migracao_substituicao
     migracao_substituicao.executar(eng_novo, eng_legado)
 
+def iniciar_manutencao(eng_novo, eng_legado):
+    from movimentos import migracao_manutencao
+    migracao_manutencao.executar(eng_novo, eng_legado)
+
 def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
     orquestrador_movimentos.executar(eng_novo, eng_legado)
 
 def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
-    from movimentos import atualizacao_contratos_data
-    atualizacao_contratos_data.executar(eng_novo, eng_legado)
+    from movimentos.atualizacao_contratos_data import AtualizacaoContratosData
+    # Se a classe exigir apenas engine_new, passe apenas ela.
+    migrador = AtualizacaoContratosData(eng_novo)
+    migrador.executar()
 
 # ==============================================================================
 # 2. MAPEAMENTO DE TAREFAS E GRUPOS
@@ -125,7 +131,9 @@ TABELAS = [
     'addresses',
     'customers',
     'suppliers',
-    'equipment_history'
+    'equipment_history',
+    'maintenance_items',
+    'maintenances'
 ]
 
 TABELAS_MOVIMENTOS = [
@@ -137,7 +145,9 @@ TABELAS_MOVIMENTOS = [
     'movements',
     'service_order_items',
     'service_orders',
-    'equipment_history' # 🎯 Adicionado aqui para limpar nos resets parciais
+    'equipment_history',
+    'maintenance_items',
+    'maintenances'
 ]
 
 TAREFAS = {
@@ -150,6 +160,7 @@ TAREFAS = {
     "movimentos_reserva": iniciar_reserva,
     "movimentos_devolucao": iniciar_devolucao,
     "movimentos_substituicao": iniciar_substituicao,
+    "movimentos_manutencao": iniciar_manutencao,
     "movimentos": iniciar_movimentos,
     "reset_movimentos": iniciar_reset_movimentos,
     "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato
@@ -157,7 +168,7 @@ TAREFAS = {
 
 GRUPOS = {
     "cadastros": ["clientes", "contratos", "contratantes", "equipamentos"],
-    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "movimentos", "atualizar_datas_contrato"]
+    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato"]
 }
 
 def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
