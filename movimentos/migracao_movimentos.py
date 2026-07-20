@@ -584,7 +584,9 @@ class BaseMigracaoMovimento:
             "movement_item_id": item_mov_id_atual,
             "volume_id": None,
             "details": f"Guia de transporte (Operação: {operation_type})",
-            "address_id": cliente_final_address_id # O destino da máquina
+            "address_id": cliente_final_address_id,
+            'created_at': mov_date,
+            'updated_at': mov_date
         })
         self.shipment_item_id_counter += 1
 
@@ -617,22 +619,6 @@ class BaseMigracaoMovimento:
     # 1. PERSISTÊNCIA DE NOVOS REGISTROS (INSERT EM MASSA)
     # ==========================================================================
     def salvar_movimentos_banco(self):
-
-        # =========================================================
-        # 🎯 BLOCO DE DEBUG ADICIONADO AQUI
-        # =========================================================
-        if self.movimento_itens_mestre:
-            # Pega todos os tipos de movimento únicos que estão na lista
-            tipos_enviados = set(item.get('movement_type_id') for item in self.movimento_itens_mestre)
-            print(f"   🔍 DEBUG: movement_type_ids que serão inseridos: {tipos_enviados}")
-            
-            # Mostra o dicionário completo do primeiro item para você conferir as chaves
-            print(f"   🔍 DEBUG: Exemplo do primeiro movement_item:\n{self.movimento_itens_mestre[0]}")
-            print("-" * 60)
-
-
-
-        """Salva apenas a estrutura de tabelas de movimentação e serviços."""
         print(f"\n🚀 Persistindo capas e itens de movimento no MySQL...")
         with self.engine_new.begin() as conn:
             if self.servicos_mestre: pd.DataFrame(self.servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
