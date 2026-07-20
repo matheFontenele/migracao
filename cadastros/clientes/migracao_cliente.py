@@ -122,6 +122,14 @@ DETRAN_CONFIG = {
         },
     },
 }
+HOSPITAIS_PB_CONFIG = {
+    10688: {"id_pai": 920001, "nome": "HULW - HOSPITAL UNIVERSITÁRIO LAURO WANDERLEY-JOÃO PESSOA-PB"},
+    10822: {"id_pai": 920001, "nome": "HULW - HOSPITAL UNIVERSITÁRIO LAURO WANDERLEY-JOÃO PESSOA-PB"},
+    10687: {"id_pai": 920002, "nome": "HUJB-HOSPITAL UNIVERSITÁRIO JULIO BANDEIRA-CAJAZEIRAS-PB"},
+    10752: {"id_pai": 920002, "nome": "HUJB-HOSPITAL UNIVERSITÁRIO JULIO BANDEIRA-CAJAZEIRAS-PB"},
+    10686: {"id_pai": 920003, "nome": "HUAC - HOSPITAL UNIVERSITÁRIO ALCIDES CARNEIRO-CAMPINA GRANDE-PB"}
+}
+
 
 class MigracaoClientes:
 
@@ -297,6 +305,25 @@ class MigracaoClientes:
             ]
 
         return df_modificado
+    def _padronizar_hospitais_pb(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+        
+        for id_legado, info in HOSPITAIS_PB_CONFIG.items():
+            mask_hosp = df_modificado['id_clean'] == id_legado
+            
+            if mask_hosp.any():
+                # 1. Promove ao status de Pai (Prefeitura Sintética)
+                df_modificado.loc[mask_hosp, 'ID_PREFEITURA'] = info['id_pai']
+                df_modificado.loc[mask_hosp, 'PREFEITURA'] = info['nome']
+                
+                # 2. Achata hierarquia (Remove secretaria antiga)
+                df_modificado.loc[mask_hosp, 'ID_SECRETARIA'] = None
+                df_modificado.loc[mask_hosp, 'SECRETARIA'] = None
+                
+                # 3. Renomeia o cliente final (Isso remove a palavra RESERVA, escapando do merge de reservas)
+                df_modificado.loc[mask_hosp, 'CLIENTE'] = info['nome']
+                
+        return df_modificado
     # ==============================================================================
     # FUNÇÕES AUXILIARES DE SANETIZAÇÃO
     # ==============================================================================
@@ -325,8 +352,9 @@ class MigracaoClientes:
         df_clean['id_clean'] = pd.to_numeric(df_clean['ID_CLIENTE'], errors='coerce').fillna(0).astype(int)
         df_clean = df_clean[~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)]
 
-        # --- APLICA EXCEÇÕES (São Luís e PCPB) ---
+        # --- APLICA EXCEÇÕES (PCPB, Hospitais PB, São Luís e Ministérios) ---
         df_clean = self._regionalizar_pcpb(df_clean)
+        df_clean = self._padronizar_hospitais_pb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
         df_clean = self._unificar_ministerio_transportes(df_clean)
