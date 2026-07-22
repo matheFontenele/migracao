@@ -13,6 +13,7 @@ from movimentos.migracao_devolucao import MigracaoDevolucao
 from movimentos.migracao_substituicao import MigracaoSubstituicao
 from movimentos.migracao_manutencao import MigracaoManutencao
 from movimentos.atualizacao_contratos_data import AtualizacaoContratosData
+from movimentos.revisao_status import RevisaoStatusEquipamentos
 
 TABELAS = []
 # ==============================================================================
@@ -64,6 +65,10 @@ class OrquestradorMovimentos:
             print("\n▶️ Iniciando Atualização de datas contratos")
             atualizacao = AtualizacaoContratosData(self.engine_new)
             atualizacao.executar()
+
+            print("\n▶️ Iniciando Módulo: REVISÃO DE STATUS (SANITY CHECK)")
+            revisao = RevisaoStatusEquipamentos(self.engine_new, self.engine_legado)
+            revisao.executar()
 
             print("\n" + "=" * 80)
             print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")

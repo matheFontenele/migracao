@@ -27,7 +27,7 @@ dist/
 
 # Logs and local run outputs
 *.log
-/log_*.csv
+log_*.csv
 
 # Generated data artifacts
 *.parquet

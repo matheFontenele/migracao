@@ -300,18 +300,12 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         if not lista_mov_ids: return pd.DataFrame()
         if tombos_novos is not None and not tombos_novos: return pd.DataFrame()
 
-        print("   📖 Extraindo o núcleo das Substituições no legado...")
+        print("   📖 Extraindo Substituições no legado...")
         lista_sql = "(" + ", ".join(map(str, lista_mov_ids)) + ")"
         filtro_tombos = ""
         if tombos_novos is not None:
             tombos_novos_sql = "(" + ", ".join(map(str, sorted(set(tombos_novos)))) + ")"
             filtro_tombos = f" AND eq_novo.numero IN {tombos_novos_sql}"
-
-        # 🎯 ADICIONE ESTES 3 PRINTS AQUI:
-        print(f"   🔍 DEBUG 1: Amostra dos Mov IDs enviados: {lista_mov_ids[:5]}")
-        if tombos_novos:
-            print(f"   🔍 DEBUG 2: Amostra dos Tombos (Parquet) enviados no filtro: {list(tombos_novos)[:5]}")
-            print(f"   🔍 DEBUG 3: Filtro SQL montado: {filtro_tombos[:150]}...")
 
         # 1. Puxa os dados da tabela aluguel_substituicao amarrando os dois equipamentos
         query_subst = f"""
@@ -340,8 +334,6 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         
         with self.engine_legado.connect() as conn:
             df_subst = pd.read_sql(text(query_subst), conn)
-
-        print(f"   📊 DEBUG 4: A query retornou {len(df_subst)} registros de substituições.")
 
         if df_subst.empty:
             print("   🔁 Query por IDs de item não retornou dados. Tentando formato por IDs de movimento...")
@@ -393,10 +385,18 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         tombos_parquet = df_parquet["TOMBO"].astype(int).unique().tolist()
         dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos_parquet)
         
-        # Usa o SQL pai para buscar o último movimento de cada tombo do Parquet
-        # e processa somente os que estão como Substituição Alugado (tipo_id = 5).
-        dict_row_parquet_by_tombo = {}
-        dict_mov_subst_by_tombo = {}
+        with self.engine_new.connect() as conn:
+            df_contracts = pd.read_sql("SELECT id, organization_id FROM contracts", conn)
+            dict_contract_org = dict(zip(df_contracts['id'], df_contracts['organization_id']))
+            
+            df_customers = pd.read_sql("SELECT id, organization_id FROM customers", conn)
+            dict_customer_org = dict(zip(df_customers['id'], df_customers['organization_id']))
+            
+            df_equip_orgs = pd.read_sql("SELECT id, current_organization_id FROM equipments", conn)
+            dict_equip_org = dict(zip(df_equip_orgs['id'], df_equip_orgs['current_organization_id']))
+
+            dict_row_parquet_by_tombo = {}
+            dict_mov_subst_by_tombo = {}
         
         for _, row_parquet in df_parquet.iterrows():
             tombo = str(row_parquet["TOMBO"]).strip()
@@ -521,6 +521,17 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             else:
                 is_avulso = True
 
+            
+            org_id_cascata = None
+            if contrato_id_res and pd.notna(dict_contract_org.get(contrato_id_res)):
+                org_id_cascata = dict_contract_org.get(contrato_id_res)
+            if (not org_id_cascata or pd.isna(org_id_cascata)) and pd.notna(dict_customer_org.get(recipient_id)):
+                org_id_cascata = dict_customer_org.get(recipient_id)
+            if (not org_id_cascata or pd.isna(org_id_cascata)) and pd.notna(dict_equip_org.get(eq_id_novo)):
+                org_id_cascata = dict_equip_org.get(eq_id_novo)
+                
+            org_id_cascata = int(org_id_cascata) if org_id_cascata and pd.notna(org_id_cascata) else 1115
+
 
             # O MESMO contrato rege o antigo e o novo!
             # =========================================================
@@ -530,7 +541,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 self.registrar_movimento(
                     id_final=int(row['ORIG_MOV_ID']),
                     recipient_id=recipient_id, cliente_final_address_id=cliente_final_address,
-                    usuario_id=int(row['ORIG_USR_ID']), organization_id=org_id_destino,
+                    usuario_id=int(row['ORIG_USR_ID']), organization_id=org_id_cascata,
                     mov_date=row['ORIG_DATA'],
                     deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
 
@@ -563,16 +574,17 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 recipient_id=recipient_id, 
                 cliente_final_address_id=endereco_base_id,
                 usuario_id=usr_subst, 
-                organization_id=org_id_destino,
+                organization_id=org_id_cascata,
                 mov_date=dt_subst, 
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 
                 contrato_id=contrato_id_res, 
                 contrato_item_id=item_id_res, 
-                equipment_id_ref=eq_id_antigo, status_shipment=1,
+                equipment_id_ref=eq_id_antigo, 
+                status_shipment=2,
                 
-                tipo_movimento_id=2, # 🎯 CORRIGIDO: 2 = SUBSTITUIÇÃO
-                operation_type='SUBSTITUICAO', # 🎯 CORRIGIDO
+                tipo_movimento_id=2,
+                operation_type='SUBSTITUICAO',
                 
                 status_equipment_id=8, 
                 history_reason='SHIPPING_CONFIRMED_DEVOLUTION',
@@ -594,13 +606,14 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 recipient_id=recipient_id, 
                 cliente_final_address_id=cliente_final_address,
                 usuario_id=usr_subst, 
-                organization_id=org_id_destino,
+                organization_id=org_id_cascata,
                 mov_date=dt_subst, 
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 
                 contrato_id=contrato_id_res, 
                 contrato_item_id=item_id_res, 
-                equipment_id_ref=eq_id_novo, status_shipment=1,
+                equipment_id_ref=eq_id_novo, 
+                status_shipment=2,
                 
                 tipo_movimento_id=2,
                 operation_type='SUBSTITUICAO',

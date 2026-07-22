@@ -34,7 +34,7 @@ class MigracaoReserva(BaseMigracaoMovimento):
         query = f"""
             SELECT
                 eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-                ac.id AS ID_CLIENTE, mov.id as MOVIMENTO_ID, 
+                ac.id AS ID_CLIENTE, ac.orgao_id, mov.id as MOVIMENTO_ID, 
                 mov.usuario_id, mov.updated_at, mov.deleted_at
             FROM aluguel_equipamentos eq
             INNER JOIN (
@@ -90,6 +90,7 @@ class MigracaoReserva(BaseMigracaoMovimento):
             id_final = int(row['MOVIMENTO_ID'])
             tombo = str(row['TOMBO']).strip()
             cliente_id_legado = int(row['ID_CLIENTE'])
+            orgao_id_legado = row['orgao_id']
             
             equipment_id_ref = self.dados["dict_equip_ref_por_number"].get(tombo)
             if not equipment_id_ref:
@@ -108,7 +109,8 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 rejeitados += 1
                 return
             
-            org_id_destino = descobrir_id_organizacao_destino(cliente_id_legado)
+            
+            org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
 
             if org_id_destino not in [1115, 1311, 1122, 1378]:
                 org_id_destino = 1115

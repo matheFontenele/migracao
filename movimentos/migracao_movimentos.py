@@ -5,10 +5,6 @@ from sqlalchemy import text
 from datetime import datetime
 
 from config.config import CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS
-from sqlalchemy import text
-from datetime import datetime
-
-# Importa a função oficial de higienização do projeto
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, normalizar_para_match
 
 # ==============================================================================
@@ -94,11 +90,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
             ORDER BY ci.created_at DESC;
         """)
         df_contratos_itens = pd.read_sql(query_contratos_itens, conn)
-        df_saldos_contract_items = pd.read_sql(
-            "SELECT id AS contract_item_id, available_quantity FROM contract_items",
-            conn
-        )
-
+        
         query_saldos = text("""
             SELECT
                 coi.id AS contract_item_id,
@@ -117,9 +109,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_equipamentos_refatorado = pd.read_sql(
             "SELECT id, number, name, current_organization_id, deleted_at FROM equipments", conn
         )
-        df_contratos_refatorado = pd.read_sql(
-            "SELECT id, name, organization_id, customer_id FROM contracts", conn
-        )
+        
         df_enderecos_valido = pd.read_sql(
             "SELECT id, addressable_id, legacy_customer_id FROM addresses WHERE legacy_customer_id IS NOT NULL", conn
         )
@@ -146,15 +136,24 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_primeiro_item_por_contrato = pd.read_sql(query_primeiro_item_por_contrato, conn)
         df_primeiro_item_por_contrato = df_primeiro_item_por_contrato.drop_duplicates(subset=['contract_id'], keep='first')
 
-        query_tipo_equipamentos = text("""
-            SELECT e.id AS equipment_id, p.type_id 
-            FROM equipments e
-            JOIN product_items pi ON e.product_item_id = pi.id
-            JOIN products p ON pi.product_id = p.id
-            WHERE p.type_id IS NOT NULL
+        query_refs_equipamentos = text("""
+            SELECT
+                eqp.id AS equipment_id,
+                prod.id AS product_id,
+                types.id AS type_id
+            FROM equipments eqp
+            INNER JOIN product_items proditem ON eqp.product_item_id = proditem.id
+            INNER JOIN products prod ON proditem.product_id = prod.id
+            INNER JOIN types ON prod.type_id = types.id
         """)
-        result_tipos = conn.execute(query_tipo_equipamentos).fetchall()
-        dict_tipo_por_equipamento = {row.equipment_id: row.type_id for row in result_tipos}
+        result_refs = conn.execute(query_refs_equipamentos).fetchall()
+        dict_refs_por_equipamento = {
+            int(row.equipment_id): {
+                'type_id': int(row.type_id), 
+                'product_id': int(row.product_id)
+            }
+            for row in result_refs
+        }
 
     # ----------------------------------------------------------------------
     # Construção dos dicionários de lookup O(1)
@@ -167,12 +166,15 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
     df_equipamentos_ativos = df_equipamentos_refatorado[
         df_equipamentos_refatorado['deleted_at'].isna()
     ].sort_values('id')
+    
     dict_equip_ref_por_number = {
         limpar_codigo(row['number']): int(row['id'])
         for _, row in df_equipamentos_ativos.iterrows()
     }
+    
     ids_equipamentos_ref = set(df_equipamentos_refatorado['id'].astype(int))
     dict_movimentos_legado = {row['id']: row for _, row in df_movimentos_legado.iterrows()}
+    
     dict_cliente_adress = dict(zip(
         df_enderecos_valido['legacy_customer_id'].astype(int),
         df_enderecos_valido['addressable_id'].astype(int)
@@ -181,6 +183,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_enderecos_valido['legacy_customer_id'].astype(int),
         df_enderecos_valido['id'].astype(int)
     ))
+    
     dict_primeiro_item_por_cliente = dict(zip(
         df_primeiro_item['customer_id'].astype(int),
         df_primeiro_item['contract_item_id'].astype(int)
@@ -194,7 +197,6 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_primeiro_item_por_contrato['contract_item_id'].astype(int)
     ))
 
-    # Dicionário de contrato_item com chave composta (cliente, contrato, item, descrição)
     dict_contratos_vinculados = df_vinculos.groupby('customer_id')['contract_id'].apply(list).to_dict()
 
     dict_contrato_item_por_chave = {
@@ -253,8 +255,13 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         if pd.notna(row['contract_item_id'])
     }
 
+    # Mantém o dicionário legacy apenas para a lógica de 'is_kit_override' do Aluguel
+    dict_tipo_por_equipamento = {
+        k: v['type_id'] for k, v in dict_refs_por_equipamento.items()
+    }
+
     print(f"   ✅ {len(dict_contrato_item_por_chave)} combinações (cliente, contrato, item, descrição) indexadas.")
-    print(f"   ✅ {len(dict_contrato_item_aluguel_por_chave)} combinações de aluguel por legacy_customer_id indexadas.")
+    print(f"   ✅ {len(dict_refs_por_equipamento)} mapeamentos de type/product indexados para os equipamentos.")
 
     return {
         "dict_tombo_por_equip_id": dict_tombo_por_equip_id,
@@ -271,6 +278,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_contrato_item_aluguel_por_chave": dict_contrato_item_aluguel_por_chave,
         "dict_contrato_aluguel_por_chave": dict_contrato_aluguel_por_chave,
         "dict_tipo_por_equipamento": dict_tipo_por_equipamento,
+        "dict_refs_por_equipamento": dict_refs_por_equipamento, # 🎯 NOVO DICIONÁRIO SALVO AQUI
         "saldos_por_id": saldos_por_id,
         "df_movimento_item_legado": df_movimento_item_legado,
     }
@@ -378,7 +386,6 @@ class BaseMigracaoMovimento:
         tombos_formatados = [f"'{str(t).strip()}'" for t in lista_tombos]
         lista_tombos_sql = "(" + ", ".join(tombos_formatados) + ")"
         
-        # O SEU SQL APLICADO AQUI
         query = f"""
             SELECT 
                 eq.id, 
@@ -390,10 +397,8 @@ class BaseMigracaoMovimento:
             WHERE eq.number IN {lista_tombos_sql} AND eq.deleted_at IS NULL
         """
         
-        # Executa a query diretamente no banco NOVO
         df_resultado = pd.read_sql(text(query), self.engine_new)
 
-        # Monta o dicionário de tradução ultra-rápida (O(1))
         dict_res = {}
         for _, row in df_resultado.iterrows():
             tombo_chave = limpar_codigo(row['number'])
@@ -424,6 +429,8 @@ class BaseMigracaoMovimento:
         operation_type: str,
         status_equipment_id: int,
         history_reason: str,
+        type_id_ref: int = None,
+        product_id_ref: int = None,
         alias_item: str = None,
         alias_movimento: str = None,
         details_capa: str = "Migração Automática",
@@ -436,7 +443,7 @@ class BaseMigracaoMovimento:
         type_id_override: int = None
     ):
         
-        #Blindagem para usuarios inexistentes
+        # Blindagem para usuarios inexistentes
         if hasattr(self, 'usuarios_validos') and usuario_id in self.usuarios_validos:
             usuario_seguro = usuario_id
         else:
@@ -500,7 +507,6 @@ class BaseMigracaoMovimento:
                 else None
             )
         else:
-            # Só calcula o saldo se NÃO for avulso
             if is_kit_override is None and type_id_override is None:
                 is_extra_flag, extra_id_atual, contrato_item_id_resolvido = self.calcular_saldo(
                     contrato_item_id, recipient_id, equipment_id_ref, mov_date,
@@ -514,6 +520,11 @@ class BaseMigracaoMovimento:
                     type_id_override=type_id_override
                 )
 
+        refs_equip = self.dados.get("dict_refs_por_equipamento", {}).get(int(equipment_id_ref), {})
+        type_id_resolvido = type_id_ref if type_id_ref is not None else refs_equip.get('type_id')
+        product_id_resolvido = product_id_ref if product_id_ref is not None else refs_equip.get('product_id')
+
+
         # 3️⃣ SERVICE ORDER ITEM
         txt_detalhe_final = details_item if details_item else ("Item Extra (Saldo do Item de Contrato Esgotado)" if is_extra_flag else None)
 
@@ -526,8 +537,8 @@ class BaseMigracaoMovimento:
             "contract_item_id": contrato_item_id_resolvido,
             "alias": alias_item,
             "equipment_id": equipment_id_ref,
-            "type_id": None,
-            "product_id": None,
+            "type_id": type_id_resolvido,
+            "product_id": product_id_resolvido,
             "is_exchange": is_exchange,
             "is_extra": is_extra_flag,
             "quantity_product": None,
@@ -595,7 +606,16 @@ class BaseMigracaoMovimento:
             "movement_id": id_capa_atual
         })
 
-        self.equipamentos_alterados.append({int(equipment_id_ref): item_mov_id_atual})
+        # ==============================================================================
+        # 🛡️ ESCUDO CRONOLÓGICO (Proteção do Parque Físico)
+        # ==============================================================================
+        ultimo_mov_conhecido = self.dados.get("dict_ultimo_mov_equip", {}).get(int(equipment_id_ref))
+        
+        if ultimo_mov_conhecido is None or int(id_final) >= int(ultimo_mov_conhecido):
+            cliente_alvo = int(recipient_id) if recipient_id else None
+            self.equipamentos_alterados.append({int(equipment_id_ref): cliente_alvo})
+        else:
+            pass
 
         # ==============================================================================
         # 6️⃣ HISTÓRICO DO EQUIPAMENTO
@@ -615,28 +635,20 @@ class BaseMigracaoMovimento:
 
         return id_capa_atual, item_servico_id_atual, item_mov_id_atual
 
-   # ==========================================================================
+    # ==========================================================================
     # 1. PERSISTÊNCIA DE NOVOS REGISTROS (INSERT EM MASSA)
     # ==========================================================================
     def salvar_movimentos_banco(self):
         print(f"\n🚀 Persistindo capas e itens de movimento no MySQL...")
         with self.engine_new.begin() as conn:
             if self.servicos_mestre: pd.DataFrame(self.servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
-
             if self.service_itens_mestre: pd.DataFrame(self.service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
-
             if self.movimentos_mestre: pd.DataFrame(self.movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)
-
             if self.movimento_itens_mestre: pd.DataFrame(self.movimento_itens_mestre).to_sql("movement_items", con=conn, if_exists="append", index=False)
-
             if self.itens_extras_mestre: pd.DataFrame(self.itens_extras_mestre).to_sql("service_order_item_extra_equipments", con=conn, if_exists="append", index=False)
-
             if self.shipments_mestre: pd.DataFrame(self.shipments_mestre).to_sql("shipments", con=conn, if_exists="append", index=False)
-
             if self.shipment_movements_mestre: pd.DataFrame(self.shipment_movements_mestre).to_sql("shipment_movements", con=conn, if_exists="append", index=False)
-
             if self.shipment_items_mestre: pd.DataFrame(self.shipment_items_mestre).to_sql("shipment_items", con=conn, if_exists="append", index=False)
-
             if self.equipment_histories_mestre: pd.DataFrame(self.equipment_histories_mestre).to_sql("equipment_history", con=conn, if_exists="append", index=False)
 
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
@@ -663,7 +675,7 @@ class BaseMigracaoMovimento:
                     updates.append({
                         "e_id": int(e_id), 
                         "s_id": int(id_status_equipamento), 
-                        "c_id": int(c_id)
+                        "c_id": int(c_id) if pd.notna(c_id) else None
                     })
 
             conn.execute(
