@@ -123,6 +123,18 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
         print(f"   ✅ {len(dict_equipamentos_novo)} equipamentos correspondentes encontrados no banco novo.")
 
+        with self.engine_new.connect() as conn:
+            # 1. Organização dos Contratos
+            df_contracts = pd.read_sql("SELECT id, organization_id FROM contracts", conn)
+            dict_contract_org = dict(zip(df_contracts['id'], df_contracts['organization_id']))
+            
+            # 2. Organização dos Clientes
+            df_customers = pd.read_sql("SELECT id, organization_id FROM customers", conn)
+            dict_customer_org = dict(zip(df_customers['id'], df_customers['organization_id']))
+            
+            # 3. Organização dos Equipamentos
+            df_equip_orgs = pd.read_sql("SELECT id, current_organization_id FROM equipments", conn)
+            dict_equip_org = dict(zip(df_equip_orgs['id'], df_equip_orgs['current_organization_id']))
 
 
         log_nao_match = []
@@ -151,7 +163,6 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
             
             if not recipient_id: 
-                print(f"\n⚠️ Ignorado: Mov. {row_mov['id']} (Tombo {tombo}). Cliente {cli_legado_id} não mapeado na tabela 'addresses'.")
                 rejeitados += 1
                 continue
 
@@ -160,7 +171,6 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             # ==================================================================
             equipment_id_ref = dict_equipamentos_novo.get(tombo)
             if not equipment_id_ref:
-                print(f"\n⚠️ Ignorado: Tombo {tombo} não encontrado na tabela equipments do banco novo.")
                 rejeitados += 1
                 continue
 
@@ -282,12 +292,29 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             elif not teve_match_perfeito:
                 detalhes_item = "Item Extra Oficial (Fallback de Contrato/Item)"
 
+            org_id_resolvida = None
+
+            # 1. Tenta pegar a Org através do Contrato
+            if contrato_id_res and pd.notna(dict_contract_org.get(contrato_id_res)):
+                org_id_resolvida = dict_contract_org.get(contrato_id_res)
+
+            # 2. Se falhou, tenta pegar a Org através do Cliente (recipient_id)
+            if (not org_id_resolvida or pd.isna(org_id_resolvida)) and pd.notna(dict_customer_org.get(recipient_id)):
+                org_id_resolvida = dict_customer_org.get(recipient_id)
+
+            # 3. Se falhou, tenta pegar a Org através do Equipamento (equipment_id_ref)
+            if (not org_id_resolvida or pd.isna(org_id_resolvida)) and pd.notna(dict_equip_org.get(equipment_id_ref)):
+                org_id_resolvida = dict_equip_org.get(equipment_id_ref)
+
+            # 4. Se absolutamente tudo falhou, cai no Fallback seguro 1115
+            org_id_resolvida = int(org_id_resolvida) if org_id_resolvida and pd.notna(org_id_resolvida) else 1115
+
             self.registrar_movimento(
                 id_final=int(row_mov['id']),
                 recipient_id=recipient_id,
                 cliente_final_address_id=self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id),
                 usuario_id=usr_id,
-                organization_id=1378,
+                organization_id=org_id_resolvida,
                 mov_date=dt_mov,
                 deleted_at_mov=row_mov['deleted_at'] if pd.notna(row_mov['deleted_at']) else None,
                 
@@ -312,9 +339,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         # ==================================================================
         # FINALIZAÇÃO E LOGS
-        # ==================================================================
-        print(f"\n⚠️ Registros rejeitados (Sem movimento ou sem endereço no novo banco): {rejeitados}")
-        
+        # ==================================================================        
         if log_nao_match:
             print(f"📝 {len(log_nao_match)} divergências registradas. Salvando log...")
             df_erros = pd.DataFrame(log_nao_match)

@@ -246,12 +246,10 @@ class MigracaoContratos:
 
         if nome_alvo in self.customer_cache:
             d = self.customer_cache[nome_alvo]
-            print(f"   ✅ Match (Nome Exato): '{nome_planilha}' -> '{d['debug']}'")
             return d
         
         match_tokens = self._match_por_tokens(nome_alvo)
         if match_tokens:
-            print(f"   ✅ Match (Fuzzy Seguro): '{nome_planilha}' -> '{match_tokens['debug']}'")
             return match_tokens
 
         return None
@@ -291,7 +289,6 @@ class MigracaoContratos:
 
             id_contrato_excel = limpar_valor_inteiro(row.get('ID'))
             if id_contrato_excel == 0:
-                print(f"   ⚠️ Contrato ignorado: A linha não possui um 'ID' válido.")
                 self.stats['contratos_ignorados'] += 1
                 continue
 
@@ -303,7 +300,6 @@ class MigracaoContratos:
                     legacy_id = limpar_valor_inteiro(row[col_id])
                     if legacy_id in self.dict_legacy_to_customer:
                         cust_info = self.dict_legacy_to_customer[legacy_id]
-                        print(f"   🎯 Match (ID Ouro): [{legacy_id}] -> '{cust_info['debug']}'")
                         break
             
             # 2. Se não tinha ID na planilha, tenta pelos nomes gerados pelo SQL
@@ -312,7 +308,6 @@ class MigracaoContratos:
 
             # 3. Falhou em todos os testes
             if not cust_info:
-                print(f"   ❌ Cliente não localizado no banco: {row['CONTRATANTE']}")
                 self.stats['contratos_ignorados'] += 1
                 continue
 
@@ -403,7 +398,6 @@ class MigracaoContratos:
             
             # 3. Se ainda assim não achou, é porque o contrato não existe (falhou na aba 1)
             if not contract_id:
-                print(f"   ⚠️ Evento ignorado. Contrato '{nome_contrato}' não encontrado no banco/cache.")
                 self.stats['eventos_ignorados'] += 1
                 continue
 
@@ -443,7 +437,6 @@ class MigracaoContratos:
                     
                     antigo_additive_id = self.ultimo_aditivo_por_contrato.get(contract_id)
                     if antigo_additive_id:
-                        print(f"      📋 Clonando dados do aditivo ({antigo_additive_id}) para o novo ({additive_id})...")
                         conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) SELECT :novo_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, :now, :now FROM contract_infos WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
                         conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now FROM contract_items WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
                         conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
