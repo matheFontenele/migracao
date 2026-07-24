@@ -596,6 +596,10 @@ class BaseMigracaoMovimento:
         # 3️⃣ SERVICE ORDER ITEM
         txt_detalhe_final = details_item if details_item else ("Item Extra (Saldo do Item de Contrato Esgotado)" if is_extra_flag else None)
 
+        equip_id_mov_item = None if operation_type == 'ALUGUEL' else equipment_id_ref
+        type_mov_item = None if operation_type == 'ALUGUEL' else type_id_resolvido
+        prod_id_item = None if operation_type == 'ALUGUEL' else product_id_resolvido
+
         self.service_itens_mestre.append({
             "id": item_servico_id_atual,
             "status_id": 3,
@@ -604,9 +608,9 @@ class BaseMigracaoMovimento:
             "movement_type_id": tipo_movimento_id,
             "contract_item_id": contrato_item_id_resolvido,
             "alias": alias_item,
-            "equipment_id": equipment_id_ref,
-            "type_id": type_id_resolvido,
-            "product_id": product_id_resolvido,
+            "equipment_id": equip_id_mov_item,
+            "type_id": type_mov_item,
+            "product_id": prod_id_item,
             "is_exchange": is_exchange,
             "is_extra": is_extra_flag,
             "quantity_product": None,
