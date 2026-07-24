@@ -37,6 +37,7 @@ ABBREVIATIONS = {
     'CMFOR': 'COMANDO DA MARINHA EM FORTALEZA',
     'EAMCE': 'ESCOLA DE APRENDIZES-MARINHEIROS DO CEARÁ',
     'UFC': 'UNIVERSIDADE FEDERAL DO CEARÁ',
+    'UFSC': 'UNIVERSIDADE FEDERAL DE SANTA CATARINA - UFSC',
     'IFCE': 'INSTITUTO FEDERAL DE EDUCAÇÃO E TECNOLOGIA - IFCE',
     '10A REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
     '10ª REGIAO MILITAR': 'COMANDO DA 10ª REGIÃO MILITAR - FORTALEZA',
@@ -105,7 +106,7 @@ class MigracaoContratos:
         self.contract_event_counters = {}
         self.ultimo_aditivo_por_contrato = {}
 
-        # ==============================================================================
+    # ==============================================================================
     # CARREGAMENTO DE CACHES DO BANCO DE DADOS
     # ==============================================================================
     def _construir_caches(self, conn):
@@ -115,16 +116,12 @@ class MigracaoContratos:
         res_contracts = conn.execute(text("SELECT id, name, number, organization_id, customer_id FROM contracts")).fetchall()
         for r in res_contracts:
             nome_contrato_banco = str(r[1]).strip().upper()
-            
-            # NOME/APELIDO do Contrato
-            # (Adicionamos o customer_id como fallback para evitar nomes duplicados em clientes diferentes)
             chave = f"{nome_contrato_banco}|{r[4]}" 
             chave_simples = f"{nome_contrato_banco}"
             
             dados_cache = {"id": r[0], "customer_id": r[4]}
-            
             self.contracts_cache[chave] = dados_cache
-            self.contracts_cache[chave_simples] = dados_cache # Permite a busca só pelo nome
+            self.contracts_cache[chave_simples] = dados_cache
             
         print(f"   📋 {len(self.contracts_cache)} contratos em cache")
 
@@ -146,13 +143,9 @@ class MigracaoContratos:
         print("   🔍 Mapeando Hierarquia de Clientes e IDs Legados...")
         query_clientes = text("""
             SELECT 
-                cup.id AS id_pai,
-                cu.id AS id_cliente,
-                cu.alias AS cliente_nome,
-                cu.name AS razao_social,
-                ad.legacy_customer_id AS id_legado,
-                ad.alias AS endereco_nome,
-                ad.city AS cidade
+                cup.id AS id_pai, cu.id AS id_cliente, cu.alias AS cliente_nome,
+                cu.name AS razao_social, ad.legacy_customer_id AS id_legado,
+                ad.alias AS endereco_nome, ad.city AS cidade
             FROM customers cu
             LEFT JOIN customers cup ON cu.parent_id = cup.id
             LEFT JOIN addresses ad ON ad.addressable_id = cu.id AND ad.addressable_type = 'customer'
@@ -161,31 +154,22 @@ class MigracaoContratos:
         
         for r in res_cust:
             id_pai, id_cliente, cliente_nome, razao_social, id_legado, endereco_nome, cidade = r
-            
             info = {'id': id_cliente, 'parent_id': id_pai, 'debug': cliente_nome}
             
-            # A. Âncora Absoluta: ID Legado (Se a planilha enviar, não tem como errar!)
             if id_legado:
                 self.dict_legacy_to_customer[int(id_legado)] = info
 
-            # B. Âncoras de Texto Exato (Múltiplas combinações seguras baseadas no banco)
             combos = [cliente_nome, razao_social, endereco_nome]
             if cliente_nome and cidade: combos.append(f"{cliente_nome} {cidade}")
             if endereco_nome and cidade: combos.append(f"{endereco_nome} {cidade}")
             
             for txt in combos:
-                if txt:  # Evita tentar normalizar textos nulos
+                if txt:
                     norm = ultra_normalizar(txt)
                     if norm: self.customer_cache[norm] = info
                     
         print(f"   👥 {len(self.dict_legacy_to_customer)} IDs legados atrelados e {len(self.customer_cache)} variações de nomes em cache")
 
-        print("   🔄 Expandindo cache com abreviações conhecidas...")
-        for abbr, full_name in ABBREVIATIONS.items():
-            norm_abbr = ultra_normalizar(abbr)
-            norm_full = ultra_normalizar(full_name)
-            if norm_full in self.customer_cache:
-                self.customer_cache[norm_abbr] = self.customer_cache[norm_full]   
     # ==============================================================================
     # MOTORES DE MATCH E BUSCA (HELPER METHODS)
     # ==============================================================================
@@ -197,14 +181,31 @@ class MigracaoContratos:
         return token
 
     def _validar_conflito_estrito(self, tokens_alvo, tokens_banco):
+        # 1. Validação de Números (Ex: 10ª Região vs 11ª Região)
         num_alvo = {t for t in tokens_alvo if t.isdigit()}
         num_banco = {t for t in tokens_banco if t.isdigit()}
         if num_alvo and num_banco and num_alvo != num_banco:
             return False
+            
+        # 2. 🎯 TRAVA DE NATUREZA: Impede cross-match entre tipos diferentes de entidades
+        # Uma Universidade NUNCA pode dar match com uma Superintendência (ex: UFSC x Receita Federal)
+        naturezas = {'UNIVERSIDADE', 'SUPERINTENDENCIA', 'CONSELHO', 'TRIBUNAL', 'COMANDO', 'PREFEITURA'}
+        nat_alvo = naturezas.intersection(tokens_alvo)
+        nat_banco = naturezas.intersection(tokens_banco)
+        
+        # Se os dois possuem alguma palavra de natureza, eles PRECISAM concordar na natureza
+        if nat_alvo and nat_banco and not nat_alvo.intersection(nat_banco):
+            return False
+
+        # 3. Validação de Siglas (Permite flexibilidade se um dos lados não tiver a sigla)
         siglas = {'IFCE', 'IFRN', 'IFPB', 'UFC', 'UFSC', 'TRE', 'TRT'}
-        for s in siglas:
-            if s in tokens_alvo and s not in tokens_banco: return False
-            if s in tokens_banco and s not in tokens_alvo: return False
+        siglas_alvo = siglas.intersection(tokens_alvo)
+        siglas_banco = siglas.intersection(tokens_banco)
+        
+        # Só proíbe se os dois lados tem uma sigla, e elas são conflitantes (Ex: UFC x UFSC)
+        if siglas_alvo and siglas_banco and not siglas_alvo.intersection(siglas_banco): 
+            return False
+            
         return True
 
     def _match_por_tokens(self, nome_planilha_norm):
@@ -241,20 +242,18 @@ class MigracaoContratos:
         return None
 
     def _get_hierarchical_customer(self, nome_planilha):
-        nome_alvo = ultra_normalizar(nome_planilha)
+        nome_bruto = str(nome_planilha).strip().upper()
+        
+        if nome_bruto in ABBREVIATIONS:
+            nome_bruto = ABBREVIATIONS[nome_bruto]
+            
+        nome_alvo = ultra_normalizar(nome_bruto)
         if not nome_alvo: return None
 
         if nome_alvo in self.customer_cache:
-            d = self.customer_cache[nome_alvo]
-            return d
+            return self.customer_cache[nome_alvo]
         
-        match_tokens = self._match_por_tokens(nome_alvo)
-        if match_tokens:
-            return match_tokens
-
-        return None
-
-
+        return self._match_por_tokens(nome_alvo)
 
     # ==============================================================================
     # PROCESSAMENTO DE ENTIDADES (UPSERT)
@@ -262,20 +261,11 @@ class MigracaoContratos:
     def _resolver_tipos_evento(self, tipo_planilha):
         tipo_normalizado = ultra_normalizar(tipo_planilha)
 
-        if not tipo_normalizado:
-            return [MAP_EVENT_TYPES['CADASTRO']]
+        if not tipo_normalizado: return [MAP_EVENT_TYPES['CADASTRO']]
+        if tipo_normalizado in MAP_EVENT_TYPES: return [MAP_EVENT_TYPES[tipo_normalizado]]
 
-        if tipo_normalizado in MAP_EVENT_TYPES:
-            return [MAP_EVENT_TYPES[tipo_normalizado]]
-
-        tipos = [
-            event_type_id
-            for termo, event_type_id in TERMOS_EVENT_TYPES
-            if termo in tipo_normalizado
-        ]
-
-        if tipos:
-            return tipos
+        tipos = [event_type_id for termo, event_type_id in TERMOS_EVENT_TYPES if termo in tipo_normalizado]
+        if tipos: return tipos
 
         print(f"   ⚠️ Tipo de evento não mapeado: '{tipo_planilha}'. Usando CADASTRO.")
         return [MAP_EVENT_TYPES['CADASTRO']]
@@ -294,7 +284,7 @@ class MigracaoContratos:
 
             cust_info = None
 
-            # 1. Tenta pelo ID Legado (Se a coluna existir na planilha é sucesso instantâneo)
+            # 1. Tenta pelo ID Legado
             for col_id in ['CLIENTE_ID', 'ID_CLIENTE', 'LEGACY_CUSTOMER_ID', 'ID_LEGADO']:
                 if col_id in row and pd.notna(row[col_id]):
                     legacy_id = limpar_valor_inteiro(row[col_id])
@@ -302,16 +292,15 @@ class MigracaoContratos:
                         cust_info = self.dict_legacy_to_customer[legacy_id]
                         break
             
-            # 2. Se não tinha ID na planilha, tenta pelos nomes gerados pelo SQL
+            # 2. Tenta pelos nomes
             if not cust_info:
                 cust_info = self._get_hierarchical_customer(row['CONTRATANTE'])
 
-            # 3. Falhou em todos os testes
             if not cust_info:
                 self.stats['contratos_ignorados'] += 1
                 continue
 
-            # Resolve se fica na Secretaria ou joga pro Pai/Prefeitura
+            # Resolve hierarquia
             cust_id = cust_info['parent_id'] if cust_info['parent_id'] else cust_info['id']
             
             # ==================================================================
@@ -319,19 +308,13 @@ class MigracaoContratos:
             # ==================================================================
             nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
             numero_original = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
-            if numero_original != "SEM_NUMERO":
-                # Limita a 255 caracteres caso o nome seja muito grande
-                numero_contrato = numero_original
-            else:
-                numero_contrato = f"SEM_NUMERO ({nome_contrato})"[:255]
+            numero_contrato = numero_original if numero_original != "SEM_NUMERO" else f"SEM_NUMERO ({nome_contrato})"[:255]
 
             org_id = MAP_ORGANIZACAO.get(row['CONTRATADO'], 1115)
             
-            # Chaves rigorosas
             chave_contrato = f"{nome_contrato}|{cust_id}"
             chave_simples = f"{nome_contrato}"
 
-            # Busca no cache (Tenta a chave forte, se não achar, tenta só pelo nome)
             contract_info = self.contracts_cache.get(chave_contrato) or self.contracts_cache.get(chave_simples)
 
             dados_contrato = {
@@ -364,7 +347,6 @@ class MigracaoContratos:
                 
                 contract_id = id_contrato_excel
                 
-                # Salva no cache com as duas chaves para o próximo laço conseguir achar
                 novo_cache = {'id': contract_id, 'customer_id': cust_id}
                 self.contracts_cache[chave_contrato] = novo_cache
                 self.contracts_cache[chave_simples] = novo_cache
@@ -373,7 +355,6 @@ class MigracaoContratos:
             conn.execute(text("INSERT IGNORE INTO contract_recipient_customers (contract_id, customer_id) VALUES (:c_id, :cust_id)"), 
                          {'c_id': int(contract_id), 'cust_id': int(cust_id)})
 
-            # O mapa para a aba de Eventos usar:
             self.contract_id_map[nome_contrato] = contract_id
 
     def _processar_eventos(self, conn, df_ex_events):
@@ -384,28 +365,21 @@ class MigracaoContratos:
                 continue
             
             nome_contrato = str(row['CONTRATO']).strip().upper()
-            
-            # 1. Tenta pegar o ID no mapa da aba 1 (Criados/Atualizados nesta execução)
             contract_id = self.contract_id_map.get(nome_contrato)
             
-            # 2. Se não achou no mapa atual, tenta achar no Cache do Banco de Dados
             if not contract_id:
                 cache_info = self.contracts_cache.get(nome_contrato)
                 if cache_info:
                     contract_id = cache_info['id']
-                    # Adiciona no mapa local para as próximas linhas acharem mais rápido
                     self.contract_id_map[nome_contrato] = contract_id
             
-            # 3. Se ainda assim não achou, é porque o contrato não existe (falhou na aba 1)
             if not contract_id:
                 self.stats['eventos_ignorados'] += 1
                 continue
 
             id_evento_planilha = row['ID']
 
-            if contract_id not in self.contract_event_counters:
-                self.contract_event_counters[contract_id] = 0
-            
+            if contract_id not in self.contract_event_counters: self.contract_event_counters[contract_id] = 0
             idx_evento_atual = self.contract_event_counters[contract_id]
 
             if contract_id in self.events_cache and idx_evento_atual < len(self.events_cache[contract_id]):
@@ -414,13 +388,11 @@ class MigracaoContratos:
                 res = conn.execute(text("INSERT INTO contract_events (contract_id, created_at, updated_at) VALUES (:c_id, :now, :now)"), 
                                    {"c_id": contract_id, "now": self.now})
                 event_id = res.lastrowid
-                if contract_id not in self.events_cache:
-                    self.events_cache[contract_id] = []
+                if contract_id not in self.events_cache: self.events_cache[contract_id] = []
                 self.events_cache[contract_id].append(event_id)
                 self.stats['eventos_criados'] += 1
 
             self.contract_event_counters[contract_id] += 1
-
             tipos_aditivos = self._resolver_tipos_evento(row['TIPO'])
 
             for t_id in tipos_aditivos:
@@ -536,7 +508,6 @@ class MigracaoContratos:
         print("=" * 80)
         
         try:
-            # 🧹 O Truncate voltou para cá, garantindo a limpeza autossuficiente do módulo!
             executar_truncate_tabelas(self.engine_new, TABELAS_CONTRATOS)
 
             print(f"\n📖 Lendo abas da planilha {self.caminho_planilha}...")
@@ -546,7 +517,6 @@ class MigracaoContratos:
             df_ex_jobs = pd.read_excel(self.caminho_planilha, sheet_name='SERVICOS')
             df_ex_infos = pd.read_excel(self.caminho_planilha, sheet_name='INFORMAÇÕES')
 
-            # TUDO AQUI RODA DENTRO DE UMA ÚNICA TRANSAÇÃO SEGURA!
             with self.engine_new.begin() as conn:
                 self._construir_caches(conn)
                 self._processar_contratos(conn, df_ex_contract)
@@ -556,7 +526,7 @@ class MigracaoContratos:
                 self._processar_infos(conn, df_ex_infos)
 
             print("\n" + "=" * 80)
-            print("📊 RELATÓRIO DE MIGRAÇÃO (MODO UPSERT + SNAPSHOTS)")
+            print("📊 RELATÓRIO DE MIGRAÇÃO")
             print("=" * 80)
             print(f"{'CONTRATOS:':<20} ✅ Criados: {self.stats['contratos_criados']:<5} 🔄 Atualizados: {self.stats['contratos_atualizados']:<5} ⚠️ Ignorados: {self.stats['contratos_ignorados']}")
             print(f"{'EVENTOS:':<20} ✅ Criados: {self.stats['eventos_criados']:<5} ⚠️ Ignorados: {self.stats['eventos_ignorados']}")
@@ -574,7 +544,7 @@ class MigracaoContratos:
             sys.exit(1)
 
 # ==============================================================================
-# WRAPPER (Ponte para o main.py)
+# WRAPPER
 # ==============================================================================
 def executar(eng_novo, eng_legado):
     migrador = MigracaoContratos(eng_novo, eng_legado)
