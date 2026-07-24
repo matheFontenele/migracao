@@ -678,12 +678,20 @@ class BaseMigracaoMovimento:
         # 🛡️ ESCUDO CRONOLÓGICO (Proteção do Parque Físico)
         # ==============================================================================
         ultimo_mov_conhecido = self.dados.get("dict_ultimo_mov_equip", {}).get(int(equipment_id_ref))
-        
         if ultimo_mov_conhecido is None or int(id_final) >= int(ultimo_mov_conhecido):
-            cliente_alvo = int(recipient_id) if recipient_id else None
-            self.equipamentos_alterados.append({int(equipment_id_ref): cliente_alvo})
-        else:
-            pass
+            self.equipamentos_alterados.append({
+                "e_id": int(equipment_id_ref),
+                "mov_item_id": int(item_mov_id_atual),
+                "addr_id": int(cliente_final_address_id) if cliente_final_address_id else None
+            })
+
+        self.equipment_histories_mestre.append({
+            "equipment_id": equipment_id_ref, "status_id": status_equipment_id, "occurred_at": mov_date, "movement_item_id": item_mov_id_atual,
+            "service_order_item_id": item_servico_id_atual, "contract_item_id": contrato_item_id_resolvido, "shipment_item_id": shipment_item_id_atual,
+            "is_conversion": 0, "reason": history_reason, "user_id": usuario_seguro
+        })
+
+        return id_capa_atual, item_servico_id_atual, item_mov_id_atual
 
         # ==============================================================================
         # 6️⃣ HISTÓRICO DO EQUIPAMENTO
@@ -729,25 +737,37 @@ class BaseMigracaoMovimento:
     # 2. ATUALIZAÇÃO DO PARQUE FÍSICO (UPDATE EM MASSA)
     # ==========================================================================
     def atualizar_equipamentos_banco(self, id_status_equipamento: int, lista_dicionarios: list):
-
-        if not lista_dicionarios:
-            print("   ⚠️ Nenhum equipamento para atualizar. Pulando etapa de atualização.")
-            return
-
-        print(f"\n🚀 Atualizando status e cliente em {len(lista_dicionarios)} equipamentos...")
-        with self.engine_new.begin() as conn:
-            
-            updates = []
-            for dicionario in lista_dicionarios:
-                for e_id, c_id in dicionario.items():
-                    updates.append({
-                        "e_id": int(e_id), 
-                        "s_id": int(id_status_equipamento), 
-                        "c_id": int(c_id) if pd.notna(c_id) else None
-                    })
-
-            conn.execute(
-                text("UPDATE equipments SET status_id = :s_id, last_movement_item_customer_id = :c_id WHERE id = :e_id"),
-                updates
-            )
-        print("   ✅ Atualização de equipamentos concluída.")
+            if not lista_dicionarios:
+                return
+    
+            print(f"\n🚀 Atualizando status, LAST_MOVEMENT_ITEM e ENDEREÇO em {len(lista_dicionarios)} equipamentos...")
+            with self.engine_new.begin() as conn:
+                updates = []
+                for item in lista_dicionarios:
+                    if isinstance(item, dict) and "e_id" in item:
+                        updates.append({
+                            "e_id": item["e_id"], 
+                            "s_id": int(id_status_equipamento), 
+                            "mov_item_id": item.get("mov_item_id"),
+                            "addr_id": item.get("addr_id")
+                        })
+                    else:
+                        for e_id, mov_item_id in item.items():
+                            updates.append({
+                                "e_id": int(e_id), 
+                                "s_id": int(id_status_equipamento), 
+                                "mov_item_id": int(mov_item_id) if pd.notna(mov_item_id) else None,
+                                "addr_id": None
+                            })
+    
+                conn.execute(
+                    text("""
+                        UPDATE equipments 
+                        SET status_id = :s_id, 
+                            last_movement_item_customer_id = :mov_item_id, 
+                            address_id = COALESCE(:addr_id, address_id) 
+                        WHERE id = :e_id
+                    """),
+                    updates
+                )
+            print("   ✅ Atualização de equipamentos concluída.")

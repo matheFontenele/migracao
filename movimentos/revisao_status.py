@@ -5,18 +5,18 @@ from sqlalchemy import text
 from tqdm import tqdm
 
 # ==============================================================================
-# DICIONÁRIO DE AGRUPAMENTO (LEGADO -> NOVO)
+# DICIONÁRIO DE AGRUPAMENTO (Foco Exclusivo em Reserva e Devolução)
 # ==============================================================================
 AGRUPAMENTO_STATUS = {
-    1: [7, 8, 11],       # DISPONÍVEL PARA LOCAÇÃO
-    2: [1],              # ALUGADO
-    3: [15],             # RESERVADO
-    4: [2],              # EMPRESTADO
-    5: [5, 16],          # USO INTERNO
-    6: [3, 9, 12, 13],   # EM MANUTENÇÃO
-    7: [6],              # NA GARANTIA
-    8: [14],             # EM DEVOLUÇÃO
-    9: [4, 10]           # BAIXADO
+    # 1: [7, 8, 11],       # DISPONÍVEL PARA LOCAÇÃO (Ignorado)
+    # 2: [1],              # ALUGADO (Ignorado para não alugar nada)
+    3: [15],               # 🎯 RESERVADO
+    # 4: [2],              # EMPRESTADO (Ignorado)
+    # 5: [5, 16],          # USO INTERNO (Ignorado)
+    # 6: [3, 9, 12, 13],   # EM MANUTENÇÃO (Ignorado)
+    # 7: [6],              # NA GARANTIA (Ignorado)
+    8: [14],               # 🎯 EM DEVOLUÇÃO
+    # 9: [4, 10]           # BAIXADO (Ignorado)
 }
 
 MAPA_STATUS_LEGADO_PARA_NOVO = {
@@ -64,7 +64,7 @@ class RevisaoStatusEquipamentos:
 
     def executar(self):
         print("\n" + "=" * 70)
-        print("🔍 MÓDULO: CONCILIAÇÃO FINAL DE STATUS")
+        print("🔍 MÓDULO: CONCILIAÇÃO FINAL DE STATUS (RESERVAS E DEVOLUÇÕES)")
         print("=" * 70)
 
         tombos_intocaveis = self._carregar_tombos_parquet()
@@ -136,7 +136,6 @@ class RevisaoStatusEquipamentos:
         # 4. Aplicação do De/Para e Filtro das Divergências
         divergencias = []
         ignorados_parquet = 0
-        ignorados_falso_aluguel = 0
 
         for _, row in tqdm(df_merge.iterrows(), total=df_merge.shape[0], desc="Analisando Equipamentos"):
             tombo = row['tombo_clean']
@@ -152,12 +151,9 @@ class RevisaoStatusEquipamentos:
                 
             sit_legado = int(sit_legado)
 
-            # 🛡️ REGRA 2: Se o legado diz que é Alugado (1), mas não estava no Parquet, IGNORA!
-            if sit_legado == 1:
-                ignorados_falso_aluguel += 1
-                continue
-
             status_atual = int(row['status_atual']) if pd.notna(row['status_atual']) else None
+            
+            # 🛡️ REGRA 2: Só retorna valor se a situação estiver mapeada em AGRUPAMENTO_STATUS
             status_esperado = MAPA_STATUS_LEGADO_PARA_NOVO.get(sit_legado)
 
             if status_esperado is not None and status_esperado != status_atual:
@@ -181,16 +177,15 @@ class RevisaoStatusEquipamentos:
         total_divergencias = len(divergencias)
         
         print("\n" + "=" * 50)
-        print("📊 RELATÓRIO DA VARREDURA (SANITY CHECK)")
+        print("📊 RELATÓRIO DA VARREDURA (RESERVAS E DEVOLUÇÕES)")
         print("=" * 50)
         print(f"📦 Total Verificado no Cruzamento Exato: {df_merge.shape[0]}")
         print(f"🛡️  Ignorados (Protegidos pelo Parquet): {ignorados_parquet}")
-        print(f"🛑 Ignorados (Falso Aluguel no Legado): {ignorados_falso_aluguel}")
         print(f"🛠️  Total de Correções Aplicadas:        {total_divergencias}")
         print("=" * 50)
         
         if total_divergencias == 0:
-            print("\n✅ Todos os equipamentos do banco novo estão com o status perfeitamente sincronizado com as regras de negócio.")
+            print("\n✅ As Reservas e Devoluções do banco novo estão perfeitamente sincronizadas com o legado.")
             return
 
         print(f"\n⚠️ Executando correção de {total_divergencias} divergências no MySQL...")
@@ -205,7 +200,7 @@ class RevisaoStatusEquipamentos:
 
         df_log = pd.DataFrame(divergencias)
         df_log.to_csv("docs/log_status_corrigidos.csv", index=False)
-        print("📄 Log detalhado dinâmico salvo em 'docs/log_status_corrigidos.csv'")
+        print("📄 Log detalhado salvo em 'docs/log_status_corrigidos.csv'")
 
 
 # ==============================================================================
