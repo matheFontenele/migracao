@@ -10,7 +10,8 @@ from movimentos.migracao_movimentos import BaseMigracaoMovimento, carregar_dados
 class MigracaoDevolucao(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=800000):
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
-        
+        self.consumir_saldos = False # 🛡️ Proteção Absoluta: Devolução não consome saldos
+
         # 1. Contadores Inteligentes para Shipments
         with self.engine_new.connect() as conn:
 
@@ -31,6 +32,11 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # Dicionário em memória: {ID_DA_ORG: ID_DO_ENDERECO}
             self.dict_enderecos_base_org = {row.addressable_id: row.address_id for row in result_ends}
             
+    def calcular_saldo(self, *args, **kwargs):
+        """
+        POLIMORFISMO: Devolução ignora totalmente as regras comerciais de saldo ou excedente
+        """
+        return 0, None, int(args[0]) if pd.notna(args[0]) else None
 
     def salvar_shipments_banco(self):
         if not self.shipments_mestre:
@@ -178,7 +184,9 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 endereco_base_id = self.dict_enderecos_base_org.get(1115, 1) 
                 org_id_destino = 1115
 
-            # Carrega contratos de Fallback para a Fase 1 e Fase 2
+            # ==================================================================
+            # 🎯 REGRA DE DEVOLUÇÃO (Sem Parquets, usa o que tá ativo pro cliente)
+            # ==================================================================
             contrato_id_ativo = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
             item_id_ativo = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
 
@@ -218,6 +226,9 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 status_equipment_id=2, 
                 history_reason='SHIPPING_CONFIRMED_SEPARATE',
                 
+                is_exchange=False, # 🎯 Devolução não mexe com is_exchange
+                forcar_extra=False,
+                
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa=f"Migração (Reconstrução): {op_type} Histórico",
@@ -252,6 +263,9 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 tipo_movimento_id=3,
                 operation_type='DEVOLUCAO',
                 
+                is_exchange=False, # 🎯 Devolução não mexe com is_exchange
+                forcar_extra=False,
+                
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
@@ -276,8 +290,6 @@ def executar(eng_novo, eng_legado):
     print("\n" + "="*70)
     print("🚀 MODO DEBUG: Disparando teste isolado de DEVOLUÇÃO")
     print("="*70)
-
-    print("\n🧹 Executando faxina e reset de saldos...")
 
     print("\n🧠 Carregando dados compartilhados na RAM (Caches)...")
     dados_ram = carregar_dados_compartilhados(eng_legado, eng_novo)
