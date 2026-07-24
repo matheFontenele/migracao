@@ -3,24 +3,20 @@ from sqlalchemy import text
 from tqdm import tqdm
 
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino
-
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
 
 class MigracaoReserva(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=500000):
 
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
-        self.consumir_saldos = False  # 🛡️ Proteção: Reserva não subtrai saldo de contrato
+        self.consumir_saldos = False
 
-    def calcular_saldo(
-        self, contrato_item_id, recipient_id, equipment_id_ref, mov_date,
-        item_servico_id_atual, fallback_contract_item_id=None, forcar_extra=False
-    ):
+    def calcular_saldo(self, *args, **kwargs):
         """
-        POLIMORFISMO: Substitui a regra do Aluguel. 
-        Reservas não consomem saldo e não geram itens extras na tabela.
+        POLIMORFISMO: Substitui a regra matemática. 
+        Reservas não consomem saldo e não geram itens extras.
         """
-        return 0, None, int(contrato_item_id) if pd.notna(contrato_item_id) else None
+        return 0, None, int(args[0]) if pd.notna(args[0]) else None
 
     def _extrair_dados_reserva(self, frente):
         print(f"   📖 Extraindo Frente {frente} de Reservas...")
@@ -74,6 +70,10 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 dict_recipient_por_reserved[res_id] = int(r['addressable_id'])
                 dict_endereco_por_reserved[res_id] = int(r['id'])
 
+            dict_contract_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM contracts", conn).values.T))
+            dict_customer_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM customers", conn).values.T))
+            dict_equip_org = dict(zip(*pd.read_sql("SELECT id, current_organization_id FROM equipments", conn).values.T))
+
         # 2. Executa as Extrações (Frente 1 e Frente 2)
         df_frente1 = self._extrair_dados_reserva(frente=1)
         df_frente2 = self._extrair_dados_reserva(frente=2)
@@ -109,18 +109,16 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 rejeitados += 1
                 return
             
-            
-            org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
-
-            if org_id_destino not in [1115, 1311, 1122, 1378]:
-                org_id_destino = 1115
-
             usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
             mov_date = row['updated_at'] if pd.notna(row['updated_at']) else self.now
-
-            # Fallback Padrão da Reserva: Puxa o primeiro contrato/item disponível do cliente
+            
+            # Fallback Padrão: Puxa o primeiro contrato/item disponível do cliente
             contrato_id_res = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
             item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+
+            # Roteamento Cascata de Organização
+            org_id_cascata = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(equipment_id_ref)
+            org_id_destino = int(org_id_cascata) if org_id_cascata and pd.notna(org_id_cascata) else descobrir_id_organizacao_destino(orgao_id_legado)
 
             # Envia para a fábrica da Classe Pai criar os registros nas 4 tabelas mestre
             self.registrar_movimento(
@@ -143,6 +141,10 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 
                 organization_id=org_id_destino,
                 operation_type='RESERVA',
+                
+                forcar_extra=False, 
+                is_exchange=False,
+                
                 alias_item=None,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa=f"Migração - Reserva (Frente {frente})",
@@ -156,7 +158,7 @@ class MigracaoReserva(BaseMigracaoMovimento):
         for _, row in tqdm(df_frente2.iterrows(), total=df_frente2.shape[0], desc="Processando FRENTE 2"):
             processar_linha(row, frente=2)
 
-        print(f"\n⚠️ Registros rejeitados (Sem equipamento ou sem endereço): {rejeitados}")
+        print(f"\n⚠️ Registros rejeitados (Sem equipamento ou sem endereço válido): {rejeitados}")
 
         # 5. Salva em lote no banco (Status 3 = Reservado)
         self.salvar_movimentos_banco()

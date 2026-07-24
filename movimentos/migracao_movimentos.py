@@ -278,7 +278,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_contrato_item_aluguel_por_chave": dict_contrato_item_aluguel_por_chave,
         "dict_contrato_aluguel_por_chave": dict_contrato_aluguel_por_chave,
         "dict_tipo_por_equipamento": dict_tipo_por_equipamento,
-        "dict_refs_por_equipamento": dict_refs_por_equipamento, # 🎯 NOVO DICIONÁRIO SALVO AQUI
+        "dict_refs_por_equipamento": dict_refs_por_equipamento,
         "saldos_por_id": saldos_por_id,
         "df_movimento_item_legado": df_movimento_item_legado,
     }
@@ -302,7 +302,6 @@ class BaseMigracaoMovimento:
             max_mov_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM movement_items")).scalar()
             max_extra = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM service_order_item_extra_equipments")).scalar()
 
-            # Pegando os MAX IDs das tabelas de SHIPMENT (Transporte) 🎯
             max_ship = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipments")).scalar()
             max_ship_item = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM shipment_items")).scalar()
 
@@ -413,6 +412,73 @@ class BaseMigracaoMovimento:
     ):
         return 0, None, contrato_item_id
 
+    def regras_item_contratos(
+            self, csv_contract_id, csv_item_id, equipment_id_ref, recipient_id, dict_is_kit, abater_saldo=True
+        ):
+            """
+            Avalia Avulso, Kit e Excedente, e abate o saldo se necessário.
+            Usado pelos scripts filhos (Aluguel, Substituição) para evitar duplicação de regras lógicas.
+            """
+            contrato_id_res = None
+            item_id_res = None
+            is_avulso = False
+            is_excedente = False
+            is_kit = False
+            teve_match_perfeito = False
+            motivo_divergencia = None
+    
+            # 1. REGRA DO AVULSO
+            if csv_contract_id is None:
+                is_avulso = True
+                motivo_divergencia = "Equipamento sem contrato no Parquet. Mantido como AVULSO."
+            else:
+                contrato_id_res = csv_contract_id
+                
+                type_id_atual = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
+                eh_tipo_kit = dict_is_kit.get(type_id_atual, 0) == 1
+                
+                # 2. REGRA DO KIT
+                if eh_tipo_kit and csv_item_id is None:
+                    is_kit = True
+                    motivo_divergencia = "Equipamento é KIT e não foi atrelado a um item no Parquet. Regra de KIT aplicada (Imune)."
+                
+                # 3. REGRA NORMAL OU EXCEDENTE
+                else:
+                    item_id_res = csv_item_id
+                    if item_id_res is not None:
+                        teve_match_perfeito = True
+                    else:
+                        # Fallback em Cascata
+                        item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_por_chave"].items() if chave[1] == contrato_id_res), None)
+                        if not item_id_res:
+                            item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_aluguel_por_chave"].items() if chave[1] == contrato_id_res), None)
+                        if not item_id_res:
+                            item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+                            
+                        if not motivo_divergencia:
+                            motivo_divergencia = "ID do Item ausente no Parquet. Fallback aplicado para o primeiro item disponível."
+    
+                    if item_id_res is not None:
+                        item_id_res_int = int(item_id_res)
+                        saldo_atual = self.dados["saldos_por_id"].get(item_id_res_int, 0)
+                        
+                        # Ativador da Regra do Excedente
+                        if saldo_atual <= 0:
+                            is_excedente = True
+                            if not motivo_divergencia:
+                                motivo_divergencia = "Item de contrato atrelado está com saldo zerado/negativo. Regra do EXCEDENTE aplicada."
+                        else:
+                            # Abate o Saldo Globalmente
+                            if abater_saldo:
+                                self.dados["saldos_por_id"][item_id_res_int] = saldo_atual - 1
+                                if hasattr(self, 'saldos_modificados'):
+                                    self.saldos_modificados.add(item_id_res_int)
+                    else:
+                        is_excedente = True
+                        motivo_divergencia = "Contrato sem itens vinculáveis no banco. Forçado para EXCEDENTE."
+    
+            return contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia
+
     def registrar_movimento(
         self, id_final: int,
         recipient_id: int,
@@ -433,7 +499,7 @@ class BaseMigracaoMovimento:
         product_id_ref: int = None,
         alias_item: str = None,
         alias_movimento: str = None,
-        details_capa: str = "Migração Automática",
+        details_capa: str = "Processo de Migração",
         details_item: str = None,
         fallback_contract_item_id: int = None,
         forcar_extra: bool = False,
@@ -467,6 +533,8 @@ class BaseMigracaoMovimento:
                 "recipient_customer_id": recipient_id,
                 "deadline": mov_date,
                 "details": details_capa,
+                "situation": "APPROVED",
+                "changed_by": usuario_seguro,
                 "created_at": mov_date,
                 "updated_at": mov_date,
                 "deleted_at": deleted_at_mov
