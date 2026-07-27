@@ -85,8 +85,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
             tombo = str(row_csv['TOMBO']).strip()
             ultimo_mov = dict_ultimo_mov.get(tombo)
-            
-            if not ultimo_mov or ultimo_mov['movimento']['tipo_id'] not in {1, 5}: 
+
+            if not ultimo_mov or ultimo_mov['movimento']['tipo_id'] != 1: 
                 rejeitados += 1
                 continue
 
@@ -100,7 +100,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 continue
 
             # ==================================================================
-            # 1. MÁGICA: APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
+            # 1.APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
             # ==================================================================      
             raw_contract_id = row_csv.get('CONTRACT_ID')
             csv_contract_id = int(float(raw_contract_id)) if pd.notna(raw_contract_id) and str(raw_contract_id).strip() not in ['None', 'nan', ''] else None

@@ -346,7 +346,7 @@ class BaseMigracaoMovimento:
         lista_tombos_sql = "(" + ", ".join(map(str, lista_tombos)) + ")"
         query = f"""
             SELECT am.id, am.data, am.tipo_id, amt.nome AS tipo_nome,
-                   am.cliente_id, am.usuario_id, am.updated_at, am.deleted_at,
+                   am.cliente_id, am.usuario_id, am.deleted_at, am.updated_at,
                    ae.id AS equipment_id, ae.numero AS tombo
             FROM aluguel_movimento am
             INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
@@ -359,9 +359,9 @@ class BaseMigracaoMovimento:
                   SELECT am2.id FROM aluguel_movimento am2
                   INNER JOIN aluguel_movimento_itens ami2 ON ami2.movimento_id = am2.id
                   WHERE ami2.equipamento_id = ae.id AND am2.deleted_at IS NULL
-                  ORDER BY am2.updated_at DESC, am2.data DESC LIMIT 1
+                  ORDER BY am2.data DESC, am2.id DESC LIMIT 1
               )
-            ORDER BY ae.numero, am.updated_at DESC, am.data DESC, am.id DESC;
+            ORDER BY ae.numero, am.data DESC, am.id DESC;
         """
         df_resultado = pd.read_sql(query, self.engine_legado)
 
@@ -372,7 +372,7 @@ class BaseMigracaoMovimento:
                 dict_res.setdefault(tombo_chave, {
                     'movimento': row.to_dict(),
                     'equipment_id': int(row['equipment_id']),
-                    'data_dt': pd.to_datetime(row['updated_at'] if pd.notna(row['updated_at']) else row['data'])
+                    'data_dt': pd.to_datetime(row['data'])
                 })
         
         return dict_res
