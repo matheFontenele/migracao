@@ -3,6 +3,7 @@ import sqlalchemy as sa
 import os
 import time
 import sys
+import difflib
 from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
@@ -42,7 +43,7 @@ class MigracaoEquipamentos:
         # Estatísticas
         self.stats = {
             "grupos": 0, "brands": 0, "types": 0, "products": 0,
-            "suppliers": 0, "transactions": 0, "transaction_items": 0, "equipments": 0, "history": 0
+            "suppliers": 0, "transactions": 0, "transaction_items": 0, "equipments": 0, "history": 0, "tipos_inferidos": 0
         }
 
     # ==============================================================================
@@ -55,12 +56,31 @@ class MigracaoEquipamentos:
         if pd.isna(id_legado): return 1115
         id_legado_int = int(id_legado)
         if id_legado_int in MAPPING_ALUCOM: return 1115
-        if id_legado_int in MAPPING_IP: return 1115
-        if id_legado_int in MAPPING_MOREIA: return 1115
-        if id_legado_int in MAPPING_AS: return 1115
-        if id_legado_int in MAPPING_SC: return 1115
+        if id_legado_int in MAPPING_IP: return 1311 
+        if id_legado_int in MAPPING_MOREIA: return 1122
+        if id_legado_int in MAPPING_AS: return 1378 
+        if id_legado_int in MAPPING_SC: return 1115  
         return id_legado_int
-    
+
+    def _inferir_tipo_por_similaridade(self, nome_equipamento, tipos_validos):
+            """Tenta adivinhar o tipo com base no nome do equipamento"""
+            if pd.isna(nome_equipamento) or not str(nome_equipamento).strip():
+                return None
+                
+            nome_str = str(nome_equipamento).strip().upper()
+            
+            # 1. Busca por Substring (ex: Acha "MONITOR" dentro de "MONITOR 19 AOC")
+            for tipo in tipos_validos:
+                if tipo in nome_str:
+                    return tipo
+                    
+            # 2. Busca por Similaridade Aproximada (Corrigir erros de digitação, cutoff 0.6 = 60% de similaridade)
+            matches = difflib.get_close_matches(nome_str, tipos_validos, n=1, cutoff=0.6)
+            if matches:
+                return matches[0]
+                
+            return None
+            
     # ==============================================================================
     # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS)
     # ==============================================================================
@@ -69,6 +89,7 @@ class MigracaoEquipamentos:
         df_equipamentos = pd.read_csv(self.ARQUIVO_IMPORTACAO, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
 
         with self.engine_legado.connect() as conn:
+            # O orgao_id já é extraído perfeitamente aqui para alimentar o pipeline
             df_equipamentos_legado = pd.read_sql("SELECT id, numero, orgao_id, situacao_id, created_at, updated_at, deleted_at FROM aluguel_equipamentos", conn)
 
        # ==============================================================================
@@ -85,12 +106,11 @@ class MigracaoEquipamentos:
             8: "Uso Interno"
         }
 
-
         df_validos = df_equipamentos_legado[
             (df_equipamentos_legado['numero'].notna()) & 
             (df_equipamentos_legado['deleted_at'].isna()) &
             (df_equipamentos_legado['orgao_id'].isin(TODOS_ORGAOS_MAPEADOS)) &
-            (~df_equipamentos_legado['numero'].astype(str).str.strip().isin(['0', '0.0', '0.00'])) # 👈 O novo filtro entra aqui!
+            (~df_equipamentos_legado['numero'].astype(str).str.strip().isin(['0', '0.0', '0.00']))
         ].copy()
         
         duplicatas = df_validos[df_validos.duplicated(subset=['numero'], keep=False)]
@@ -101,12 +121,13 @@ class MigracaoEquipamentos:
             # 1. Pega apenas os IDs que estão dando conflito
             ids_conflitantes = tuple(duplicatas['id'].tolist())
             
-            # 2. Query para buscar o "contexto" de cada equipamento clonado
+            # 2. Query para buscar o contexto de cada equipamento clonado (🎯 SQL ATUALIZADO COM aq.orgao_id)
             query_relatorio = text("""
                 SELECT
                     aq.id AS ID,
                     aq.numero AS TOMBO,
                     aq.nome AS EQUIPAMENTO,
+                    aq.orgao_id AS ORG_ID,
                     al.id AS ID_CLIENTE,
                     al.nome_razao_social AS CLIENTE,
                     alm.nome AS TIPO_MOV,
@@ -132,9 +153,10 @@ class MigracaoEquipamentos:
                 df_relatorio = pd.read_sql(query_relatorio, conn, params={"ids": ids_conflitantes})
 
             df_relatorio['MOVIMENTO_TIPO'] = df_relatorio['MOV_TIPO_ID'].map(de_para_mov).fillna("Sem Movimento")
-            colunas_inteiras = ['ID_CLIENTE', 'ID_ULTI_MOVI', 'MOV_TIPO_ID']
+            colunas_inteiras = ['ID_CLIENTE', 'ID_ULTI_MOVI', 'MOV_TIPO_ID', 'ORG_ID']
             for col in colunas_inteiras:
-                df_relatorio[col] = df_relatorio[col].astype("Int64")
+                if col in df_relatorio.columns:
+                    df_relatorio[col] = df_relatorio[col].astype("Int64")
             
             # 3. Exporta o DataFrame para CSV
             os.makedirs("docs", exist_ok=True)
@@ -163,6 +185,9 @@ class MigracaoEquipamentos:
 
         self.lista_fornecedores_legado = df_equipamentos['MARCA_AJUSTADA'].dropna().unique()
 
+        tipos_existentes = [str(t).strip().upper() for t in df_equipamentos['TIPO_AJUSTADO'].dropna().unique() if str(t).strip()]
+        tipos_existentes.sort(key=len, reverse=True)
+
         lista_mestre = []
         for index, row in tqdm(df_equipamentos.iterrows(), total=df_equipamentos.shape[0], desc="Refatorando dados"):
 
@@ -177,8 +202,6 @@ class MigracaoEquipamentos:
             id_situacao_legado = mapa_equipamento_situacao.get(id_equipamento_legado, None)
             org_destino = self._descobrir_id_organizacao_destino(id_orgao_legado)
 
-            if org_destino not in {1115, 1122, 1311, 1378}: org_destino = 1115
-
             datas_legado = mapa_datas_legado.get(id_equipamento_legado, {}) 
             created_at_destino = datas_legado.get('created_at') if datas_legado.get('created_at') else self.now
             updated_at_destino = datas_legado.get('updated_at') if datas_legado.get('updated_at') else self.now
@@ -188,7 +211,14 @@ class MigracaoEquipamentos:
             else:
                 deleted_at_destino = None    
 
-            status_id_destino = 9 if id_situacao_legado == 10 else 1  
+            status_id_destino = 9 if id_situacao_legado == 10 else 1 
+
+            tipo_original = row.get("TIPO_AJUSTADO")
+            if pd.isna(tipo_original) or str(tipo_original).strip() == "":
+                tipo_final = self._inferir_tipo_por_similaridade(row.get("NOME_AJUSTADO"), tipos_existentes)
+                self.stats["tipos_inferidos"] += 1
+            else:
+                tipo_final = str(tipo_original).strip().upper() 
 
             lista_mestre.append({
                 "id_legado":     id_equipamento_legado,
@@ -201,7 +231,7 @@ class MigracaoEquipamentos:
                 "group_id":      None,
                 "marca":         row.get("MARCA_AJUSTADA") if pd.notna(row.get("MARCA_AJUSTADA")) else None,
                 "brand_id":      None,
-                "tipo":          row.get("TIPO_AJUSTADO")  if pd.notna(row.get("TIPO_AJUSTADO"))  else None,
+                "tipo":          tipo_final,
                 "type_id":       None,
                 "status_id":     status_id_destino,
                 "org_destino":   org_destino,
@@ -480,6 +510,7 @@ class MigracaoEquipamentos:
             print(f"📦 Grupos criados:       {self.stats['grupos']}")
             print(f"🏷️  Marcas criadas:       {self.stats['brands']}")
             print(f"📁 Tipos criados:        {self.stats['types']}")
+            print(f"🤖 Tipos Inferidos Sozinhos: {self.stats['tipos_inferidos']}")
             print(f"🛒 Produtos cadastrados: {self.stats['products']}")
             print(f"🏭 Novos fornecedores:   {self.stats['suppliers']}")
             print(f"📑 Transações-Mãe:       {self.stats['transactions']}")
