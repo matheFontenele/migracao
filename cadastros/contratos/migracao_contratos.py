@@ -105,6 +105,8 @@ class MigracaoContratos:
         self.additive_lookup = {}
         self.contract_event_counters = {}
         self.ultimo_aditivo_por_contrato = {}
+        self.additive_to_contract = {}
+        self.item_roots_cache = {}
 
     # ==============================================================================
     # CARREGAMENTO DE CACHES DO BANCO DE DADOS
@@ -133,10 +135,14 @@ class MigracaoContratos:
             self.events_cache[r[1]].append(r[0])
         print(f"   📅 {len(res_events)} eventos em cache")
 
-        # 3. Cache de Aditivos
-        res_additives = conn.execute(text("SELECT id, event_id, contract_event_type_id FROM event_additives")).fetchall()
+        res_additives = conn.execute(text("""
+            SELECT ea.id, ea.event_id, ea.contract_event_type_id, ce.contract_id 
+            FROM event_additives ea
+            JOIN contract_events ce ON ea.event_id = ce.id
+        """)).fetchall()
         for r in res_additives:
             self.additives_cache[f"{r[1]}|{r[2]}"] = r[0]
+            self.additive_to_contract[r[0]] = r[3]
         print(f"   📝 {len(self.additives_cache)} aditivos em cache")
 
         # 4. Cache de Clientes (Matches Complexos)
@@ -181,28 +187,22 @@ class MigracaoContratos:
         return token
 
     def _validar_conflito_estrito(self, tokens_alvo, tokens_banco):
-        # 1. Validação de Números (Ex: 10ª Região vs 11ª Região)
         num_alvo = {t for t in tokens_alvo if t.isdigit()}
         num_banco = {t for t in tokens_banco if t.isdigit()}
         if num_alvo and num_banco and num_alvo != num_banco:
             return False
             
-        # 2. 🎯 TRAVA DE NATUREZA: Impede cross-match entre tipos diferentes de entidades
-        # Uma Universidade NUNCA pode dar match com uma Superintendência (ex: UFSC x Receita Federal)
         naturezas = {'UNIVERSIDADE', 'SUPERINTENDENCIA', 'CONSELHO', 'TRIBUNAL', 'COMANDO', 'PREFEITURA'}
         nat_alvo = naturezas.intersection(tokens_alvo)
         nat_banco = naturezas.intersection(tokens_banco)
         
-        # Se os dois possuem alguma palavra de natureza, eles PRECISAM concordar na natureza
         if nat_alvo and nat_banco and not nat_alvo.intersection(nat_banco):
             return False
 
-        # 3. Validação de Siglas (Permite flexibilidade se um dos lados não tiver a sigla)
         siglas = {'IFCE', 'IFRN', 'IFPB', 'UFC', 'UFSC', 'TRE', 'TRT'}
         siglas_alvo = siglas.intersection(tokens_alvo)
         siglas_banco = siglas.intersection(tokens_banco)
         
-        # Só proíbe se os dois lados tem uma sigla, e elas são conflitantes (Ex: UFC x UFSC)
         if siglas_alvo and siglas_banco and not siglas_alvo.intersection(siglas_banco): 
             return False
             
@@ -284,7 +284,6 @@ class MigracaoContratos:
 
             cust_info = None
 
-            # 1. Tenta pelo ID Legado
             for col_id in ['CLIENTE_ID', 'ID_CLIENTE', 'LEGACY_CUSTOMER_ID', 'ID_LEGADO']:
                 if col_id in row and pd.notna(row[col_id]):
                     legacy_id = limpar_valor_inteiro(row[col_id])
@@ -292,7 +291,6 @@ class MigracaoContratos:
                         cust_info = self.dict_legacy_to_customer[legacy_id]
                         break
             
-            # 2. Tenta pelos nomes
             if not cust_info:
                 cust_info = self._get_hierarchical_customer(row['CONTRATANTE'])
 
@@ -300,12 +298,8 @@ class MigracaoContratos:
                 self.stats['contratos_ignorados'] += 1
                 continue
 
-            # Resolve hierarquia
             cust_id = cust_info['parent_id'] if cust_info['parent_id'] else cust_info['id']
             
-            # ==================================================================
-            # GRAVAÇÃO DO CONTRATO
-            # ==================================================================
             nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
             numero_original = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
             numero_contrato = numero_original if numero_original != "SEM_NUMERO" else f"SEM_NUMERO ({nome_contrato})"[:255]
@@ -405,12 +399,24 @@ class MigracaoContratos:
                                        {"e_id": event_id, "t_id": t_id, "now": self.now})
                     additive_id = res.lastrowid
                     self.additives_cache[chave_aditivo] = additive_id
+                    
+                    # 🎯 Popula em tempo real o dicionario para o processador de itens saber onde achar o root
+                    self.additive_to_contract[additive_id] = contract_id
+                    
                     self.stats['aditivos_criados'] += 1
                     
                     antigo_additive_id = self.ultimo_aditivo_por_contrato.get(contract_id)
                     if antigo_additive_id:
                         conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) SELECT :novo_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, :now, :now FROM contract_infos WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
-                        conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now FROM contract_items WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
+                        
+                        # 🎯 LINHAGEM DO ITEM CLONADO: Usa COALESCE(root_item_id, id) para passar o gene adiante
+                        conn.execute(text("""
+                            INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at, root_item_id) 
+                            SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now, COALESCE(root_item_id, id) 
+                            FROM contract_items 
+                            WHERE event_additive_id = :antigo_id
+                        """), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
+                        
                         conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
 
                 self.ultimo_aditivo_por_contrato[contract_id] = additive_id
@@ -418,17 +424,24 @@ class MigracaoContratos:
                     self.additive_lookup[id_evento_planilha] = additive_id
 
     def _processar_itens(self, conn, df_ex_itens):
-        print("\n📦 Processando Itens (UPSERT)...")
+        print("\n📦 Processando Itens (UPSERT) e Rastrando a Linhagem (Root Item)...")
         for _, row in df_ex_itens.iterrows():
             if pd.isna(row['EVENTO']): continue
             aid = self.additive_lookup.get(row['EVENTO'])
             if not aid: continue
 
+            # 🎯 FIX ROOT ITEM: Descobre a qual contrato esse aditivo pertence
+            contract_id = self.additive_to_contract.get(aid)
+            if not contract_id: continue
+
+            alias_str = str(row['APELIDO'])[:100]
+            chave_root = f"{contract_id}|{alias_str.upper()}"
+
             exists = conn.execute(text("SELECT id FROM contract_items WHERE event_additive_id = :aid AND alias = :alias"), 
-                                  {"aid": aid, "alias": str(row['APELIDO'])[:100]}).fetchone()
+                                  {"aid": aid, "alias": alias_str}).fetchone()
 
             dados_item = {
-                'alias': str(row['APELIDO'])[:100],
+                'alias': alias_str,
                 'description': str(row['DESCRICAO'])[:500] if pd.notna(row['DESCRICAO']) else '',
                 'quantity': limpar_valor_numerico(row['QUANTIDADE']),
                 'available_quantity': limpar_valor_numerico(row['QUANTIDADE']),
@@ -438,12 +451,57 @@ class MigracaoContratos:
 
             if exists:
                 conn.execute(text("UPDATE contract_items SET description = :description, quantity = :quantity, available_quantity = :available_quantity, price = :price, updated_at = :updated_at WHERE id = :id"), {**dados_item, 'id': exists[0]})
+                
+                # UPDATE the cache just in case we didn't have it (fallback de segurança)
+                if chave_root not in self.item_roots_cache:
+                    self.item_roots_cache[chave_root] = exists[0]
+                    
                 self.stats['itens_atualizados'] += 1
             else:
                 dados_item['event_additive_id'] = aid
                 dados_item['created_at'] = self.now
-                conn.execute(text("INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) VALUES (:event_additive_id, :alias, :description, :quantity, :available_quantity, :price, :created_at, :updated_at)"), dados_item)
-                self.stats['itens_criados'] += 1
+                
+                # Check se já processamos um "Pai" para esse contrato+item
+                root_id = self.item_roots_cache.get(chave_root)
+                
+                # Se não está no cache, tenta buscar no banco (caso o Cadastro já exista de execuções anteriores)
+                if not root_id:
+                    root_db = conn.execute(text("""
+                        SELECT ci.root_item_id
+                        FROM contract_items ci
+                        JOIN event_additives ea ON ci.event_additive_id = ea.id
+                        JOIN contract_events ce ON ea.event_id = ce.id
+                        WHERE ce.contract_id = :cid AND ci.alias = :alias
+                        ORDER BY ci.id ASC LIMIT 1
+                    """), {"cid": contract_id, "alias": alias_str}).fetchone()
+                    
+                    if root_db and root_db[0]:
+                        root_id = root_db[0]
+                        self.item_roots_cache[chave_root] = root_id
+
+                if root_id is not None:
+                    # 🎯 É UM FILHO (Aditivo) -> Aponta o Root pro Pai
+                    dados_item['root_item_id'] = root_id
+                    conn.execute(text("""
+                        INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at, root_item_id) 
+                        VALUES (:event_additive_id, :alias, :description, :quantity, :available_quantity, :price, :created_at, :updated_at, :root_item_id)
+                    """), dados_item)
+                    self.stats['itens_criados'] += 1
+                else:
+                    # 🎯 É O PAI DE TODOS (Cadastro) -> Cria e se assume como Root
+                    res = conn.execute(text("""
+                        INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at) 
+                        VALUES (:event_additive_id, :alias, :description, :quantity, :available_quantity, :price, :created_at, :updated_at)
+                    """), dados_item)
+                    novo_item_id = res.lastrowid
+                    
+                    # Atualiza ele mesmo para apontar o Root para o próprio ID
+                    conn.execute(text("UPDATE contract_items SET root_item_id = :root_id WHERE id = :id"), {"root_id": novo_item_id, "id": novo_item_id})
+                    
+                    # Salva no cache da memória para que os próximos aditivos apontem para ele!
+                    self.item_roots_cache[chave_root] = novo_item_id
+                    
+                    self.stats['itens_criados'] += 1
 
     def _processar_servicos(self, conn, df_ex_jobs):
         print("\n🛠️ Processando Serviços (UPSERT)...")
