@@ -614,14 +614,22 @@ class BaseMigracaoMovimento:
         txt_detalhe_final = details_item if details_item else ("Item Extra (Saldo do Item de Contrato Esgotado)" if is_extra_flag else None)
 
         # ROTEAMENTO DE MODELO VS. FÍSICO (Service Order Item)
-        if operation_type in ['ALUGUEL', 'RESERVA', 'AVULSO']:
-            equip_id_mov_item = None                 # Esconde a máquina física no pedido
-            type_mov_item = type_id_resolvido        # Define o modelo (Type)
-            prod_id_item = product_id_resolvido      # Define o modelo (Product)
+        if operation_type == 'ALUGUEL':
+            # Aluguel é guiado APENAS pelo contract_item_id. O resto fica nulo.
+            equip_id_mov_item = None
+            type_mov_item = None
+            prod_id_item = None
+            
+        elif operation_type == 'RESERVA':
+            # Reserva segura a categoria da máquina (Type). O resto fica nulo.
+            equip_id_mov_item = None
+            type_mov_item = type_id_resolvido
+            prod_id_item = None
+            
         else:
-            # Em Devoluções e Substituições, o pedido exige devolver a máquina exata
-            equip_id_mov_item = equipment_id_ref     # Trava a máquina física
-            type_mov_item = None                     
+            # Devolução, Substituição (e Avulso): exigem a máquina física exata (Equipment)
+            equip_id_mov_item = equipment_id_ref
+            type_mov_item = None
             prod_id_item = None
 
         self.service_itens_mestre.append({
