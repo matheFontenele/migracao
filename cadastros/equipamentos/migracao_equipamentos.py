@@ -121,7 +121,6 @@ class MigracaoEquipamentos:
             # 1. Pega apenas os IDs que estão dando conflito
             ids_conflitantes = tuple(duplicatas['id'].tolist())
             
-            # 2. Query para buscar o contexto de cada equipamento clonado (🎯 SQL ATUALIZADO COM aq.orgao_id)
             query_relatorio = text("""
                 SELECT
                     aq.id AS ID,
