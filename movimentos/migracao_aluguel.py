@@ -70,7 +70,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
         
         tombos = df_csv['TOMBO'].unique().tolist()
-        dict_ultimo_mov = self.buscar_ultimo_movimento_por_tombo(tombos)
+        
+        dict_ultimo_mov = self.buscar_ultimo_movimento_cte(tombos, tipos_permitidos=(1,), situacoes_permitidas=(1,))
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
 
         with self.engine_new.connect() as conn:
@@ -91,7 +92,13 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 continue
 
             row_mov = ultimo_mov['movimento']
-            cli_legado_id = int(row_mov['cliente_id'])
+            
+            cli_leg_parquet = row_csv.get('CLIENTE_ID')
+            if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).lower() not in ['', 'nan', 'none']:
+                cli_legado_id = int(float(cli_leg_parquet))
+            else:
+                cli_legado_id = int(row_mov['cliente_id'])
+            
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
             equipment_id_ref = dict_equipamentos_novo.get(tombo)
             
@@ -100,7 +107,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 continue
 
             # ==================================================================
-            # 1.APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
+            # 1. APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
             # ==================================================================      
             raw_contract_id = row_csv.get('CONTRACT_ID')
             csv_contract_id = int(float(raw_contract_id)) if pd.notna(raw_contract_id) and str(raw_contract_id).strip() not in ['None', 'nan', ''] else None
@@ -129,9 +136,10 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)" if is_avulso else "Equipamento Kit (Imune a saldo, sem item vinculado)" if is_kit else "Equipamento Excedente (Contrato sem saldo)" if is_excedente else "Item Extra Oficial (Fallback de Contrato/Item)" if not teve_match_perfeito else None
 
             org_id_resolvida = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(equipment_id_ref) or 1115
+            id_legado_origem = int(row_mov['id'])
 
             self.registrar_movimento(
-                id_final=int(row_mov['id']),
+                id_final=id_legado_origem,
                 recipient_id=recipient_id,
                 cliente_final_address_id=self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id),
                 usuario_id=usr_id,
@@ -150,14 +158,17 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 is_exchange=is_excedente,
                 alias_item=str(row_csv.get('ITEM_DO_CONTRATO')).strip() if pd.notna(row_csv.get('ITEM_DO_CONTRATO')) else None,
                 alias_movimento=row_csv.get('EQUIPAMENTO_NOME'),
-                details_capa="Migração",
-                details_item=detalhes_item
+                details_capa=f"Gerado por migração: registro legado {id_legado_origem}",
+                details_item=detalhes_item,
+                forcar_atualizacao_parque=True # 👈 Garante a atualização física da máquina pelo Parquet
             )
 
         if log_nao_match:
             print(f"📝 {len(log_nao_match)} regras comerciais processadas. Salvando log...")
             pd.DataFrame(log_nao_match).to_csv("log_divergencias_aluguel.csv", index=False, encoding="utf-8")
             print("   📄 Log salvo em 'log_divergencias_aluguel.csv'")
+            
+        print(f"   ⏩ Ignorados (Sua última ação real foi Substituição, não Aluguel original): {rejeitados}")
 
         self.salvar_movimentos_banco()
         self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=self.equipamentos_alterados)
