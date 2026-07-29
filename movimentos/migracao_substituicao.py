@@ -59,24 +59,66 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         return df_itens
 
     def _extrair_dados_substituicao(self):
-        print("   📖 Extraindo O PRESENTE (Substituições consolidadas)...")
-        
+        print("   📖 Extraindo O PRESENTE (Pareamento exato por TIPO de Equipamento)...")
+
         query_presente = """
+            WITH devolucoes AS (
+                SELECT
+                    sub.id AS substituicao_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_mov,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    mov.deleted_at,
+                    eq.numero AS tombo,
+                    eq.nome,
+                    eq.tipo_id,
+                    ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
+                FROM aluguel_substituicao sub
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_devolucao_id = mov.id
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
+                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
+            ),
+            alugueis AS (
+                SELECT
+                    sub.id AS substituicao_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_mov,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    mov.deleted_at,
+                    eq.numero AS tombo,
+                    eq.nome,
+                    eq.tipo_id,
+                    ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
+                FROM aluguel_substituicao sub
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_aluguel_id = mov.id
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
+                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
+            )
             SELECT
-                eq_antigo.numero AS TOMBO_ANTIGO, eq_antigo.nome AS NOME_ANTIGO, mov_dev.id AS MOV_DEV_ID,
-                eq_novo.numero AS TOMBO_NOVO, eq_novo.nome AS NOME_NOVO, mov_novo.id AS MOV_NOVO_ID,
-                ac.id AS CLIENTE_ID, ac.orgao_id AS ORGAO_ID,
-                COALESCE(NULLIF(mov_novo.usuario_id, 0), 1) AS USR_SUBST, COALESCE(mov_novo.updated_at, mov_novo.data) AS DATA_SUBST, mov_novo.deleted_at AS DEL_SUBST
-            FROM aluguel_equipamentos eq_antigo
-            INNER JOIN (SELECT mi.equipamento_id, MAX(m.id) as ultimo_mov_id FROM aluguel_movimento_itens mi INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id WHERE m.deleted_at IS NULL GROUP BY mi.equipamento_id) ult_mov_antigo ON ult_mov_antigo.equipamento_id = eq_antigo.id
-            INNER JOIN aluguel_movimento mov_dev ON mov_dev.id = ult_mov_antigo.ultimo_mov_id
-            INNER JOIN aluguel_movimento_itens ami_dev ON ami_dev.movimento_id = mov_dev.id AND ami_dev.equipamento_id = eq_antigo.id
-            INNER JOIN aluguel_substituicao als ON als.substituicao_devolucao_id = ami_dev.id
-            INNER JOIN aluguel_movimento_itens ami_novo ON ami_novo.id = als.substituicao_aluguel_id
-            INNER JOIN aluguel_movimento mov_novo ON mov_novo.id = ami_novo.movimento_id
-            INNER JOIN aluguel_equipamentos eq_novo ON eq_novo.id = ami_novo.equipamento_id
-            LEFT JOIN aluguel_clientes ac ON ac.id = mov_novo.cliente_id
-            WHERE eq_antigo.deleted_at IS NULL AND eq_novo.deleted_at IS NULL AND eq_antigo.situacao_id = 14 AND mov_dev.tipo_id = 3
+                d.substituicao_id,
+                d.cliente_id AS CLIENTE_ID,
+                COALESCE(NULLIF(d.usuario_id, 0), 1) AS USR_SUBST,
+                COALESCE(a.data_mov, d.data_mov) AS DATA_SUBST,
+                d.deleted_at AS DEL_SUBST,
+
+                d.movimento_id AS MOV_DEV_ID,
+                d.tombo AS TOMBO_ANTIGO,
+                d.nome AS NOME_ANTIGO,
+                d.tipo_id AS TIPO_ANTIGO,
+
+                a.movimento_id AS MOV_NOVO_ID,
+                a.tombo AS TOMBO_NOVO,
+                a.nome AS NOME_NOVO,
+                a.tipo_id AS TIPO_NOVO
+            FROM devolucoes d
+            INNER JOIN alugueis a 
+                ON d.substituicao_id = a.substituicao_id 
+                AND d.tipo_id = a.tipo_id 
+                AND d.par_index = a.par_index
         """
         with self.engine_legado.connect() as conn:
             df_presente = pd.read_sql(text(query_presente), conn)
@@ -117,6 +159,9 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         df_parquet = self._carregar_itens_parquet()
         dict_row_parquet_by_tombo = {str(row["TOMBO"]): row for _, row in df_parquet.iterrows()} if not df_parquet.empty else {}
         
+        tombos_parquet = list(dict_row_parquet_by_tombo.keys())
+        dict_ultimo_mov_subst = self.buscar_ultimo_movimento_cte(tombos_parquet, tipos_permitidos=(5,), situacoes_permitidas=(1, 15))
+
         with self.engine_new.connect() as conn:
             dict_contract_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM contracts", conn).values.T))
             dict_customer_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM customers", conn).values.T))
@@ -137,9 +182,14 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
 
         for _, row in tqdm(df_subst.iterrows(), total=df_subst.shape[0], desc="Processando Ciclos"):
             
-            mov_novo_id = int(row['MOV_NOVO_ID'])
             tombo_novo = limpar_codigo(row['TOMBO_NOVO'])
             tombo_antigo = limpar_codigo(row['TOMBO_ANTIGO'])
+            
+            if tombo_novo not in dict_ultimo_mov_subst:
+                rejeitados += 1
+                continue
+                
+            mov_novo_id = int(row['MOV_NOVO_ID'])
             eq_id_novo = dict_equip_novo.get(tombo_novo)
             eq_id_antigo = dict_equip_novo.get(tombo_antigo)
             
@@ -147,7 +197,6 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 rejeitados += 1
                 continue
 
-            # 🎯 Integração Parquet: A máquina NOVA guia as regras
             row_parquet = dict_row_parquet_by_tombo.get(tombo_novo)
             cli_leg_parquet = row_parquet.get("CLIENTE_ID") if row_parquet is not None else None
             
@@ -186,11 +235,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     "ITEM_RESOLVIDO_ID": item_id_res, "STATUS_FINAL": status_final_log, "MOTIVO_EXATO": motivo_divergencia
                 })
 
-            # Roteamento Cascata de Organização
             org_id_cascata = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(eq_id_novo) or 1115
-            det_text = "Avulso" if is_avulso else "Kit (Imune)" if is_kit else "Excedente" if is_excedente else "Normal"
 
-            # O MESMO contrato rege o antigo e o novo!
             # =========================================================
             # 🕰️ FASE 1: O PASSADO (ALUGAMOS A MÁQUINA ANTIGA)
             # =========================================================
@@ -209,13 +255,14 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     equipment_id_ref=eq_id_antigo,
                     status_shipment=2, 
                     tipo_movimento_id=7 if is_avulso else 1,
-                    operation_type='AVULSO' if is_avulso else 'ALUGUEL',
+                    operation_type='ALUGUEL',
                     status_equipment_id=2,
                     history_reason='SHIPPING_CONFIRMED_SEPARATE',
                     is_exchange=False,
+                    consumir_saldo=False, 
                     alias_movimento=row['NOME_ANTIGO'],
-                    details_capa=f"Gerado por migração: registro legado {id_legado_origem}",
-                    details_item=f"Gerado por migração: registro legado {id_legado_origem}"
+                    details_capa=f"Aluguel Passado - Origem da Substituição: {id_legado_origem}",
+                    details_item=f"Aluguel Passado - Origem da Substituição: {id_legado_origem}"
                 )
 
             # =========================================================
@@ -234,14 +281,15 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 contrato_item_id=item_id_res,
                 equipment_id_ref=eq_id_antigo,
                 status_shipment=2, 
-                tipo_movimento_id=2,
-                operation_type='SUBSTITUICAO',
+                tipo_movimento_id=2, 
+                operation_type='DEVOLUCAO',
                 status_equipment_id=8,
                 history_reason='SHIPPING_CONFIRMED_DEVOLUTION',
                 is_exchange=False,
+                consumir_saldo=False,
                 alias_movimento=row['NOME_ANTIGO'],
-                details_capa=f"Gerado por migração: registro legado {id_mov_dev}",
-                details_item=f"Gerado por migração: registro legado {id_mov_dev}"
+                details_capa=f"Devolução da Substituição Legado: {row['substituicao_id']}",
+                details_item=f"Devolução da Substituição Legado: {row['substituicao_id']}"
             )
             eqs_antigos_alterar.append({int(eq_id_antigo): int(id_mov_item_dev)})
 
@@ -258,20 +306,23 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
-                equipment_id_ref=eq_id_novo, status_shipment=2, 
-                tipo_movimento_id=2,
-                operation_type='SUBSTITUICAO',
+                equipment_id_ref=eq_id_novo, 
+                status_shipment=2, 
+                tipo_movimento_id=1, 
+                operation_type='ALUGUEL',
                 status_equipment_id=2,
-                history_reason='SHIPPING_CONFIRMED_SEPARATE' if is_avulso else 'SHIPPING_CONFIRMED_RENT',
+                history_reason='SHIPPING_CONFIRMED_RENT',
                 is_exchange=is_excedente,
+                consumir_saldo=False, 
                 alias_movimento=row['NOME_NOVO'],
-                details_capa=f"Gerado por migração: registro legado {mov_novo_id}",
-                details_item=f"Gerado por migração: registro legado {mov_novo_id}"
+                details_capa=f"Envio da Substituição Legado: {row['substituicao_id']}",
+                details_item=f"Envio da Substituição Legado: {row['substituicao_id']}",
+                forcar_atualizacao_parque=True 
             )
             eqs_novos_alterar.append({int(eq_id_novo): int(id_mov_item_novo)})
 
         if rejeitados > 0:
-            print(f"\n⚠️ Registros rejeitados (Sem equipamento encontrado ou faltante no Parquet): {rejeitados}")
+            print(f"\n⚠️ Registros rejeitados (Sem equipamento, rejeitado pela CTE ou faltante no Parquet): {rejeitados}")
 
         if log_nao_match:
             pd.DataFrame(log_nao_match).to_csv("log_divergencias_substituicao.csv", index=False)

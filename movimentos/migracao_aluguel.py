@@ -160,7 +160,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 alias_movimento=row_csv.get('EQUIPAMENTO_NOME'),
                 details_capa=f"Gerado por migração: registro legado {id_legado_origem}",
                 details_item=detalhes_item,
-                forcar_atualizacao_parque=True # 👈 Garante a atualização física da máquina pelo Parquet
+                forcar_atualizacao_parque=True
             )
 
         if log_nao_match:
