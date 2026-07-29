@@ -339,42 +339,62 @@ class BaseMigracaoMovimento:
     def limpar_tabelas_movimento(self):
         pass
 
-    def buscar_ultimo_movimento_por_tombo(self, lista_tombos: list) -> dict:
-        if not lista_tombos:
+
+    def buscar_ultimo_movimento_cte(self, lista_tombos: list, tipos_permitidos: tuple = (1,), situacoes_permitidas: tuple = (1, 15)) -> dict:
+        """
+        Busca o último movimento de um equipamento, filtrando por tipos específicos (ex: 1 para Aluguel, 5 para Substituição)
+        e restrito apenas aos tombos que vieram do Parquet. Usa CTE (WITH) com ROW_NUMBER() para máxima performance.
+        """
+        if not lista_tombos: 
             return {}
 
-        lista_tombos_sql = "(" + ", ".join(map(str, lista_tombos)) + ")"
+        # Formatação segura para o SQL (Injeta as aspas e separa por vírgula)
+        lista_tombos_sql = "(" + ", ".join([f"'{str(t).strip()}'" for t in lista_tombos]) + ")"
+        tipos_sql = "(" + ", ".join(map(str, tipos_permitidos)) + ")"
+        situacoes_sql = "(" + ", ".join(map(str, situacoes_permitidas)) + ")"
+
         query = f"""
-            SELECT am.id, am.data, am.tipo_id, amt.nome AS tipo_nome,
-                   am.cliente_id, am.usuario_id, am.deleted_at, am.updated_at,
-                   ae.id AS equipment_id, ae.numero AS tombo
-            FROM aluguel_movimento am
-            INNER JOIN aluguel_movimento_itens ami ON ami.movimento_id = am.id
-            INNER JOIN aluguel_equipamentos ae ON ae.id = ami.equipamento_id
-            INNER JOIN aluguel_tipos_movimento amt ON amt.id = am.tipo_id
-            WHERE am.deleted_at IS NULL
-              AND ae.deleted_at IS NULL
-              AND ae.numero IN {lista_tombos_sql}
-              AND am.id = (
-                  SELECT am2.id FROM aluguel_movimento am2
-                  INNER JOIN aluguel_movimento_itens ami2 ON ami2.movimento_id = am2.id
-                  WHERE ami2.equipamento_id = ae.id AND am2.deleted_at IS NULL
-                  ORDER BY am2.data DESC, am2.id DESC LIMIT 1
-              )
-            ORDER BY ae.numero, am.data DESC, am.id DESC;
+            WITH MovimentosOrdenados AS (
+                SELECT
+                    alq.id AS equipment_id,
+                    alq.numero AS tombo,
+                    tipo.nome AS tipo_nome,
+                    alq.situacao_id,
+                    mov.id,
+                    mov.data,
+                    mov.updated_at,
+                    mov.deleted_at,
+                    mov.tipo_id,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    ROW_NUMBER() OVER(PARTITION BY alq.id ORDER BY mov.data DESC, mov.id DESC) AS ordem
+                FROM aluguel_equipamentos alq
+                INNER JOIN aluguel_movimento_itens movi ON alq.id = movi.equipamento_id
+                INNER JOIN aluguel_movimento mov ON movi.movimento_id = mov.id
+                INNER JOIN aluguel_clientes cli ON mov.cliente_id = cli.id
+                INNER JOIN aluguel_tipos tipo ON alq.tipo_id = tipo.id
+                WHERE mov.deleted_at IS NULL 
+                  AND alq.deleted_at IS NULL 
+                  AND alq.situacao_id IN {situacoes_sql}
+                  AND mov.tipo_id IN {tipos_sql}
+                  AND alq.numero IN {lista_tombos_sql}
+            )
+            SELECT * FROM MovimentosOrdenados WHERE ordem = 1;
         """
-        df_resultado = pd.read_sql(query, self.engine_legado)
+        
+        # Executa no banco legado
+        df_resultado = pd.read_sql(text(query), self.engine_legado)
+        df_resultado['tombo_clean'] = df_resultado['tombo'].apply(limpar_codigo)
 
         dict_res = {}
         for _, row in df_resultado.iterrows():
-            tombo_chave = limpar_codigo(row['tombo'])
-            if tombo_chave and tombo_chave != 'nan':
-                dict_res.setdefault(tombo_chave, {
+            tombo_chave = row['tombo_clean']
+            if tombo_chave:
+                dict_res[tombo_chave] = {
                     'movimento': row.to_dict(),
                     'equipment_id': int(row['equipment_id']),
-                    'data_dt': pd.to_datetime(row['data'])
-                })
-        
+                    'data_dt': pd.to_datetime(row['data']) # A data real dita a regra
+                }
         return dict_res
 
     def buscar_equipamentos_novo_por_tombo(self, lista_tombos: list) -> dict:
@@ -506,7 +526,8 @@ class BaseMigracaoMovimento:
         is_exchange: bool = False,
         consumir_saldo: bool = True,
         is_kit_override: bool = None,
-        type_id_override: int = None
+        type_id_override: int = None,
+        forcar_atualizacao_parque: bool = False
     ):
         
         # Blindagem para usuarios inexistentes
@@ -562,11 +583,7 @@ class BaseMigracaoMovimento:
         item_servico_id_atual = self.so_item_id_counter
         self.so_item_id_counter += 1
         
-        if tipo_movimento_id == 7:
-            is_extra_flag = False
-            extra_id_atual = None
-            contrato_item_id_resolvido = None
-        elif not consumir_saldo:
+        if tipo_movimento_id == 7 or not consumir_saldo:
             is_extra_flag = False
             extra_id_atual = None
             contrato_item_id_resolvido = (
@@ -682,34 +699,26 @@ class BaseMigracaoMovimento:
         # 🛡️ ESCUDO CRONOLÓGICO (Proteção do Parque Físico)
         # ==============================================================================
         ultimo_mov_conhecido = self.dados.get("dict_ultimo_mov_equip", {}).get(int(equipment_id_ref))
-        if ultimo_mov_conhecido is None or int(id_final) >= int(ultimo_mov_conhecido):
+        if forcar_atualizacao_parque or ultimo_mov_conhecido is None or int(id_final) >= int(ultimo_mov_conhecido):
             self.equipamentos_alterados.append({
                 "e_id": int(equipment_id_ref),
                 "mov_item_id": int(item_mov_id_atual),
                 "addr_id": int(cliente_final_address_id) if cliente_final_address_id else None
             })
 
-        self.equipment_histories_mestre.append({
-            "equipment_id": equipment_id_ref, "status_id": status_equipment_id, "occurred_at": mov_date, "movement_item_id": item_mov_id_atual,
-            "service_order_item_id": item_servico_id_atual, "contract_item_id": contrato_item_id_resolvido, "shipment_item_id": shipment_item_id_atual,
-            "is_conversion": 0, "reason": history_reason, "user_id": usuario_seguro
-        })
-
-        return id_capa_atual, item_servico_id_atual, item_mov_id_atual
-
         # ==============================================================================
         # 6️⃣ HISTÓRICO DO EQUIPAMENTO
         # ==============================================================================
         self.equipment_histories_mestre.append({
-            "equipment_id": equipment_id_ref,
-            "status_id": status_equipment_id,
-            "occurred_at": mov_date,
+            "equipment_id": equipment_id_ref, 
+            "status_id": status_equipment_id, 
+            "occurred_at": mov_date, 
             "movement_item_id": item_mov_id_atual,
-            "service_order_item_id": item_servico_id_atual,
-            "contract_item_id": contrato_item_id_resolvido,
+            "service_order_item_id": item_servico_id_atual, 
+            "contract_item_id": contrato_item_id_resolvido, 
             "shipment_item_id": shipment_item_id_atual,
-            "is_conversion": 0,
-            "reason": history_reason,
+            "is_conversion": 0, 
+            "reason": history_reason, 
             "user_id": usuario_seguro
         })
 
