@@ -43,7 +43,7 @@ class MigracaoEquipamentos:
         # Estatísticas
         self.stats = {
             "grupos": 0, "brands": 0, "types": 0, "products": 0,
-            "suppliers": 0, "transactions": 0, "transaction_items": 0, "equipments": 0, "history": 0, "tipos_inferidos": 0
+            "suppliers": 0, "transactions": 0, "transaction_items": 0, "product_items_criados": 0, "equipments": 0, "history": 0, "tipos_inferidos": 0
         }
 
     # ==============================================================================
@@ -63,174 +63,146 @@ class MigracaoEquipamentos:
         return id_legado_int
 
     def _inferir_tipo_por_similaridade(self, nome_equipamento, tipos_validos):
-            """Tenta adivinhar o tipo com base no nome do equipamento"""
             if pd.isna(nome_equipamento) or not str(nome_equipamento).strip():
                 return None
-                
             nome_str = str(nome_equipamento).strip().upper()
-            
-            # 1. Busca por Substring (ex: Acha "MONITOR" dentro de "MONITOR 19 AOC")
             for tipo in tipos_validos:
                 if tipo in nome_str:
                     return tipo
-                    
-            # 2. Busca por Similaridade Aproximada (Corrigir erros de digitação, cutoff 0.6 = 60% de similaridade)
             matches = difflib.get_close_matches(nome_str, tipos_validos, n=1, cutoff=0.6)
             if matches:
                 return matches[0]
-                
             return None
             
     # ==============================================================================
-    # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS)
+    # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS + NOVA CTE)
     # ==============================================================================
     def _extrair_e_transformar(self):
-        print("\n📖 Carregando dados da planilha e do banco legado...")
-        df_equipamentos = pd.read_csv(self.ARQUIVO_IMPORTACAO, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
+        print("\n📖 Carregando dados da planilha e do banco legado (via CTE Otimizada)...")
+        df_planilha = pd.read_csv(self.ARQUIVO_IMPORTACAO, sep=",", encoding="utf-8", on_bad_lines="skip", low_memory=False)
 
+        df_planilha['ID_LEGADO'] = pd.to_numeric(df_planilha['ID_LEGADO'], errors='coerce')
+        mapa_planilha = {
+            int(row['ID_LEGADO']): row 
+            for _, row in df_planilha.dropna(subset=['ID_LEGADO']).iterrows()
+        }
+
+        query_legado = """
+            WITH UltimoMovimento AS (
+                SELECT 
+                    equipamento_id,
+                    novo_orgao_id,
+                    ROW_NUMBER() OVER(PARTITION BY equipamento_id ORDER BY id DESC) AS ordem
+                FROM aluguel_movimento_itens
+                WHERE deleted_at IS NULL
+            )
+            SELECT 
+                alq.id AS id_legado,
+                alq.numero AS tombo_legado,
+                alq.nome AS nome_legado,
+                tipe.nome AS tipo_legado,
+                og.ORG_ID AS orgao_original,
+                org.ORG_ID AS orgao_atual,
+                alq.situacao_id,
+                alq.created_at,
+                alq.updated_at,
+                alq.deleted_at
+            FROM aluguel_equipamentos alq
+            LEFT JOIN aluguel_tipos tipe ON alq.tipo_id = tipe.id
+            INNER JOIN ORGAOS og ON alq.orgao_id = og.ORG_ID
+            LEFT JOIN UltimoMovimento ult_movi ON alq.id = ult_movi.equipamento_id AND ult_movi.ordem = 1
+            LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
+            WHERE alq.deleted_at IS NULL;
+        """
+        
         with self.engine_legado.connect() as conn:
-            # O orgao_id já é extraído perfeitamente aqui para alimentar o pipeline
-            df_equipamentos_legado = pd.read_sql("SELECT id, numero, orgao_id, situacao_id, created_at, updated_at, deleted_at FROM aluguel_equipamentos", conn)
+            df_equipamentos_legado = pd.read_sql(text(query_legado), conn)
 
-       # ==============================================================================
-        # 🕵️ AUDITORIA DE DUPLICATAS DE TOMBO NO LEGADO (IGNORANDO LIXEIRA)
-        # ==============================================================================
-        de_para_mov = {
-            1: "Alugado",
-            2: "Devolução",
-            3: "Substituição Devolução",
-            4: "Baixado",
-            5: "Substituição Alugado",
-            6: "Transferência",
-            7: "Reserva",
-            8: "Uso Interno"
-        }
+        print(f"\n🔍 Total retornado pelo SQL: {len(df_equipamentos_legado)}")
 
-        df_validos = df_equipamentos_legado[
-            (df_equipamentos_legado['numero'].notna()) & 
-            (df_equipamentos_legado['deleted_at'].isna()) &
-            (df_equipamentos_legado['orgao_id'].isin(TODOS_ORGAOS_MAPEADOS)) &
-            (~df_equipamentos_legado['numero'].astype(str).str.strip().isin(['0', '0.0', '0.00']))
-        ].copy()
-        
-        duplicatas = df_validos[df_validos.duplicated(subset=['numero'], keep=False)]
 
-        if not duplicatas.empty:
-            print("🚨 ATENÇÃO: DUPLICATAS DE TOMBO ATIVOS ENCONTRADAS NO BANCO LEGADO!")
-            
-            # 1. Pega apenas os IDs que estão dando conflito
-            ids_conflitantes = tuple(duplicatas['id'].tolist())
-            
-            query_relatorio = text("""
-                SELECT
-                    aq.id AS ID,
-                    aq.numero AS TOMBO,
-                    aq.nome AS EQUIPAMENTO,
-                    aq.orgao_id AS ORG_ID,
-                    al.id AS ID_CLIENTE,
-                    al.nome_razao_social AS CLIENTE,
-                    alm.nome AS TIPO_MOV,
-                    mov.id AS ID_ULTI_MOVI,
-                    mov.tipo_id AS MOV_TIPO_ID,
-                    mov.data AS DATA_ULTI_MOVI
-                FROM aluguel_equipamentos aq
-                LEFT JOIN (
-                    SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-                    FROM aluguel_movimento_itens mi
-                    INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-                    WHERE m.deleted_at IS NULL
-                    GROUP BY mi.equipamento_id
-                ) ult_mov ON ult_mov.equipamento_id = aq.id
-                LEFT JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
-                LEFT JOIN aluguel_tipos_movimento alm ON mov.tipo_id = alm.id
-                LEFT JOIN aluguel_clientes al ON al.id = mov.cliente_id
-                WHERE aq.id IN :ids
-                ORDER BY aq.numero, aq.id
-            """)
-            
-            with self.engine_legado.connect() as conn:
-                df_relatorio = pd.read_sql(query_relatorio, conn, params={"ids": ids_conflitantes})
-
-            df_relatorio['MOVIMENTO_TIPO'] = df_relatorio['MOV_TIPO_ID'].map(de_para_mov).fillna("Sem Movimento")
-            colunas_inteiras = ['ID_CLIENTE', 'ID_ULTI_MOVI', 'MOV_TIPO_ID', 'ORG_ID']
-            for col in colunas_inteiras:
-                if col in df_relatorio.columns:
-                    df_relatorio[col] = df_relatorio[col].astype("Int64")
-            
-            # 3. Exporta o DataFrame para CSV
-            os.makedirs("docs", exist_ok=True)
-            caminho_csv = os.path.join("docs", "relatorio_duplicatas_tombos.csv")
-            df_relatorio.to_csv(caminho_csv, index=False, encoding="utf-8")
-            
-            # 4. Exibe o resumo final
-            grupo_duplicatas = duplicatas.groupby('numero')['id'].apply(list).reset_index()
-            
-            print(f"   📄 Relatório detalhado gerado com sucesso em: '{caminho_csv}'")
-            print("-" * 70)
-            print("📊 RESUMO DA AUDITORIA:")
-            print(f"   Total de Tombos repetidos: {len(grupo_duplicatas)}")
-        else:
-            print("   ✅ Auditoria concluída: Nenhuma duplicata de TOMBO (ativo) encontrada no banco legado.")
-        # ==============================================================================
-
-        mapa_equipamento_orgao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['orgao_id']))
-        mapa_equipamento_situacao = dict(zip(df_equipamentos_legado['id'], df_equipamentos_legado['situacao_id']))
-        
-        mapa_datas_legado = {
-            row['id']: {
-                'created_at': row['created_at'], 'updated_at': row['updated_at'], 'deleted_at': row['deleted_at']
-            } for _, row in df_equipamentos_legado.iterrows()
-        }
-
-        self.lista_fornecedores_legado = df_equipamentos['MARCA_AJUSTADA'].dropna().unique()
-
-        tipos_existentes = [str(t).strip().upper() for t in df_equipamentos['TIPO_AJUSTADO'].dropna().unique() if str(t).strip()]
+        self.lista_fornecedores_legado = df_planilha['MARCA_AJUSTADA'].dropna().unique()
+        tipos_existentes = [str(t).strip().upper() for t in df_planilha['TIPO_AJUSTADO'].dropna().unique() if str(t).strip()]
         tipos_existentes.sort(key=len, reverse=True)
 
         lista_mestre = []
-        for index, row in tqdm(df_equipamentos.iterrows(), total=df_equipamentos.shape[0], desc="Refatorando dados"):
 
-            tombo_atual = row.get("TOMBO")
+        # ← CONTADORES DE DESCARTE
+        descartados_tombo_zero = 0
+        descartados_org_nao_mapeada = 0
+        orgaos_nao_mapeados_amostra = set()
+        
+        # 🎯 3. NOVO LAÇO: Agora percorremos o BANCO DE DADOS (Todos os 110.655 registros!)
+        for index, dados_db in tqdm(df_equipamentos_legado.iterrows(), total=df_equipamentos_legado.shape[0], desc="Refatorando dados"):
+
+            tombo_atual = dados_db['tombo_legado']
+            
+            # Pula tombos 0, 0.0 etc.
             if pd.notna(tombo_atual) and str(tombo_atual).strip() in ['0', '0.0', '0.00']:
+                descartados_tombo_zero += 1
                 continue
 
-            id_equipamento_legado = row.get("ID_LEGADO")
-            id_orgao_legado = mapa_equipamento_orgao.get(id_equipamento_legado, None)
-            if id_orgao_legado not in TODOS_ORGAOS_MAPEADOS:
+            id_equipamento_legado = dados_db['id_legado']
+            
+            # Regra de Órgão: Usa o Órgão Atual. Se for Nulo, usa o Original.
+            orgao_bruto = dados_db['orgao_atual'] if pd.notna(dados_db['orgao_atual']) else dados_db['orgao_original']
+            
+            # Se a máquina pertence a um órgão que não estamos migrando, pula
+            if orgao_bruto not in TODOS_ORGAOS_MAPEADOS:
+                descartados_org_nao_mapeada += 1
+                if len(orgaos_nao_mapeados_amostra) < 20:
+                    orgaos_nao_mapeados_amostra.add(orgao_bruto)
                 continue
-            id_situacao_legado = mapa_equipamento_situacao.get(id_equipamento_legado, None)
-            org_destino = self._descobrir_id_organizacao_destino(id_orgao_legado)
+                
+            org_destino = self._descobrir_id_organizacao_destino(orgao_bruto)
+            id_situacao_legado = dados_db['situacao_id']
 
-            datas_legado = mapa_datas_legado.get(id_equipamento_legado, {}) 
-            created_at_destino = datas_legado.get('created_at') if datas_legado.get('created_at') else self.now
-            updated_at_destino = datas_legado.get('updated_at') if datas_legado.get('updated_at') else self.now
-
-            if id_situacao_legado == 10 or pd.notna(datas_legado.get('deleted_at')):
-                deleted_at_destino = datas_legado.get('deleted_at') if pd.notna(datas_legado.get('deleted_at')) else self.now
-            else:
-                deleted_at_destino = None    
-
+            created_at_destino = dados_db['created_at'] if pd.notna(dados_db['created_at']) else self.now
+            updated_at_destino = dados_db['updated_at'] if pd.notna(dados_db['updated_at']) else self.now
+            deleted_at_destino = dados_db['deleted_at'] if pd.notna(dados_db['deleted_at']) else (self.now if id_situacao_legado == 10 else None)
+            
             status_id_destino = 9 if id_situacao_legado == 10 else 1 
 
-            tipo_original = row.get("TIPO_AJUSTADO")
+            # 🎯 4. ENRIQUECIMENTO: Busca na planilha para ver se essa máquina foi higienizada
+            row_plan = mapa_planilha.get(id_equipamento_legado, {})
+            
+            # TRATAMENTO DO TIPO
+            tipo_original = row_plan.get("TIPO_AJUSTADO")
             if pd.isna(tipo_original) or str(tipo_original).strip() == "":
-                tipo_final = self._inferir_tipo_por_similaridade(row.get("NOME_AJUSTADO"), tipos_existentes)
-                self.stats["tipos_inferidos"] += 1
+                # Se não tem na planilha, tenta pegar do banco legado
+                tipo_bd = dados_db['tipo_legado']
+                if pd.notna(tipo_bd) and str(tipo_bd).strip() != "":
+                    tipo_final = str(tipo_bd).strip().upper()
+                else:
+                    nome_base = row_plan.get("NOME_AJUSTADO") if pd.notna(row_plan.get("NOME_AJUSTADO")) else dados_db['nome_legado']
+                    tipo_final = self._inferir_tipo_por_similaridade(nome_base, tipos_existentes)
+                    self.stats["tipos_inferidos"] += 1
             else:
                 tipo_final = str(tipo_original).strip().upper() 
+
+            # TRATAMENTO DOS DEMAIS DADOS (Com Fallback para as 36 mil que não estão na planilha)
+            nome_final = row_plan.get("NOME_AJUSTADO")
+            if pd.isna(nome_final): nome_final = dados_db['nome_legado']
+            if pd.isna(nome_final): nome_final = "SEM NOME REGISTRADO"
+            
+            marca_final = row_plan.get("MARCA_AJUSTADA")
+            if pd.isna(marca_final): marca_final = "FORNECEDOR NÃO IDENTIFICADO"
+            
+            grupo_final = row_plan.get("GRUPOS")
+            if pd.isna(grupo_final): grupo_final = "GERAL"
 
             lista_mestre.append({
                 "id_legado":     id_equipamento_legado,
                 "TOMBO":         tombo_atual,
-                "NOME_AJUSTADO": row.get("NOME_AJUSTADO"),
-                "NUMERO_SERIE":  row.get("NUMERO_SERIE"),
-                "codigo_item":   row.get("codigo_item"),
-                "valor":         float(row["valor"]) if pd.notna(row.get("valor")) else 0.0,
-                "grupo":         row.get("GRUPOS") if pd.notna(row.get("GRUPOS")) else None,
+                "NOME_AJUSTADO": nome_final,
+                "NUMERO_SERIE":  row_plan.get("NUMERO_SERIE") if pd.notna(row_plan.get("NUMERO_SERIE")) else None,
+                "codigo_item":   row_plan.get("codigo_item") if pd.notna(row_plan.get("codigo_item")) else None,
+                "valor":         float(row_plan.get("valor")) if pd.notna(row_plan.get("valor")) else 0.0,
+                "grupo":         grupo_final,
                 "group_id":      None,
-                "marca":         row.get("MARCA_AJUSTADA") if pd.notna(row.get("MARCA_AJUSTADA")) else None,
+                "marca":         marca_final,
                 "brand_id":      None,
-                "tipo":          tipo_final,
+                "tipo":          tipo_final if tipo_final else "OUTROS",
                 "type_id":       None,
                 "status_id":     status_id_destino,
                 "org_destino":   org_destino,
@@ -239,6 +211,14 @@ class MigracaoEquipamentos:
                 "deleted_at":    deleted_at_destino,
                 "transaction_id": None
             })
+
+        # ← RESUMO FINAL DOS DESCARTES
+        print(f"\n📊 RESUMO DE DESCARTES NO LOOP:")
+        print(f"   Total original (SQL):              {len(df_equipamentos_legado)}")
+        print(f"   ❌ Descartados (tombo 0/0.0/0.00):  {descartados_tombo_zero}")
+        print(f"   ❌ Descartados (órgão não mapeado): {descartados_org_nao_mapeada}")
+        print(f"   ✅ Sobreviventes (foram para lista_mestre): {len(lista_mestre)}")
+        print(f"   🔍 Amostra de órgãos não mapeados: {orgaos_nao_mapeados_amostra}")
 
         return pd.DataFrame(lista_mestre).reset_index(drop=True)
 
@@ -281,7 +261,7 @@ class MigracaoEquipamentos:
         df_master['type_id'] = df_master['tipo'].map(dict(zip(db_types['name'], db_types['type_id']))).astype("Int64")
         self.stats["types"] = len(tipos_unicos)
 
-        # 4. PRODUCTS
+        # 4. PRODUCTS (Agrupamento único)
         print("💾 Inserindo products...")
         df_produtos_unicos = df_master[['marca', 'tipo', 'grupo', 'brand_id', 'type_id', 'group_id']].drop_duplicates()
 
@@ -379,91 +359,106 @@ class MigracaoEquipamentos:
         return df_master
 
     # ==============================================================================
-    # ETL: INVENTÁRIO (TRANSACTIONS E EQUIPMENTS)
+    # ETL: INVENTÁRIO (AGRUPADO POR MATCH PARA PRODUCT_ITEMS)
     # ==============================================================================
     def _gerar_inventario(self, df_master):
-        print("📊 Gerando agrupamento de Inventário (Fornecedor + Órgão de Destino)...")
+        print("📊 Gerando agrupamento de Inventário (Fornecedor + Órgão + Produto)...")
+        
         df_validos = df_master[df_master['supplier_id'].notna() & df_master['org_destino'].notna()]
-        contagem_grupos = df_validos.groupby(['supplier_id', 'org_destino']).size().to_dict()
+        
+        # Agrupamento Mestre (Abre 1 Transação por combinação Fornecedor + Destino)
+        grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino'])
 
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
 
         with self.engine_new.begin() as conn:
-            for (s_id, org_id), qtd in contagem_grupos.items():
+            for (s_id, org_id), df_transacao in grupos_transacao:
                 supplier_id_int = int(s_id)
                 buyer_id_int = int(org_id)
-                df_grupo = df_validos[(df_validos['supplier_id'] == s_id) & (df_validos['org_destino'] == org_id)]
 
-                # A. Transação Mãe
+                # A. Transação Mãe (O "Caminhão" que chegou no órgão)
                 result_tx = conn.execute(text("""
                     INSERT INTO transactions (transaction_date, transaction_type_id, supplier_id, buyer_id, 
                     doc_type_id, doc_date, purchase_date, created_by, details, amount_total, amount_discount, created_at, updated_at) 
-                    VALUES (:now, 1, :sid, :bid, 3, :now, :now, 1, 'Migração', 1, 0, :now, :now)
+                    VALUES (:now, 1, :sid, :bid, 3, :now, :now, 1, 'Migração Inicial (Lote)', 1, 0, :now, :now)
                 """), {"now": self.now, "sid": supplier_id_int, "bid": buyer_id_int})
                 tx_id_gerado = result_tx.lastrowid
                 self.stats["transactions"] += 1
 
-                for _, linha_equip in df_grupo.iterrows():
-                    codigo_item_val = f"MIG-{int(time.time() * 1000)}" if pd.isna(linha_equip['codigo_item']) else linha_equip['codigo_item']
+                # 🎯 B. O DICIONÁRIO DE MATCHES: Agrupa máquinas idênticas
+                # Isso impede de criar 50 registros de estoque iguais. Cria 1 registro com quantity = 50.
+                grupos_produtos = df_transacao.groupby('product_id', dropna=False)
+
+                for p_id, df_equipamentos_identicos in grupos_produtos:
+                    
+                    p_id_val = int(p_id) if pd.notna(p_id) else None
+                    qtd_repeticoes = len(df_equipamentos_identicos)
                     addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
 
-                    # B. Product Item
+                    # C. Product Item (Estoque consolidado, ex: "50 Monitores AOC")
                     result_pi = conn.execute(text("""
                         INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
-                        VALUES (:pid, :code, 1, 1, :addr, :org, 1, 1, :now, :now)
-                    """), {"pid": self._nula(linha_equip['product_id']), "code": contador_codigo_unico, "addr": addr_id, "org": buyer_id_int, "now": self.now})
+                        VALUES (:pid, :code, 1, 1, :addr, :org, 1, :qty, :now, :now)
+                    """), {
+                        "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, 
+                        "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
+                    })
+                    pi_id_gerado = result_pi.lastrowid
                     contador_codigo_unico += 1
+                    self.stats["product_items_criados"] += 1
 
-                    # C. Transaction Item
+                    # D. Transaction Item (Item da Nota Fiscal consolidado)
                     result_item = conn.execute(text("""
                         INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, 1, :now, :addr, 0, 1, :now, :now, :del)
-                    """), {"tid": tx_id_gerado, "pid": self._nula(linha_equip['product_id']), "now": self.now, "addr": addr_id, "del": self._nula(linha_equip['deleted_at'])})
-                    
+                        VALUES (:tid, :pid, 1, 1, :now, :addr, 0, :qty, :now, :now, NULL)
+                    """), {
+                        "tid": tx_id_gerado, "pid": p_id_val, "now": self.now, 
+                        "addr": addr_id, "qty": qtd_repeticoes
+                    })
+                    ti_id_gerado = result_item.lastrowid
                     self.stats["transaction_items"] += 1
 
-                    # Variáveis compartilhadas
-                    eq_id = int(linha_equip['id_legado'])
-                    eq_created_at = linha_equip['created_at']
+                    # E. MÁQUINAS FÍSICAS (Registra cada tombo apontando para o bloco agrupado acima)
+                    for _, linha_equip in df_equipamentos_identicos.iterrows():
+                        eq_id = int(linha_equip['id_legado'])
+                        eq_created_at = linha_equip['created_at']
 
-                    # D. Equipamento
-                    lista_equipamentos_global.append({
-                        "id": int(linha_equip['id_legado']),
-                        "product_item_id": result_pi.lastrowid,
-                        "transaction_item_id": result_item.lastrowid,
-                        "number": linha_equip['TOMBO'],
-                        "name": linha_equip['product_name'],
-                        "serial_number": self._nula(linha_equip['NUMERO_SERIE']),
-                        "serial_required": 0,
-                        "current_organization_id": buyer_id_int,
-                        "status_id": linha_equip['status_id'],
-                        "address_id": addr_id,
-                        "location_id": None,
-                        "is_completed": 1,
-                        "created_at": linha_equip['created_at'],
-                        "updated_at": linha_equip['updated_at'],
-                        "deleted_at": self._nula(linha_equip['deleted_at'])
-                    })
+                        lista_equipamentos_global.append({
+                            "id": eq_id,
+                            "product_item_id": pi_id_gerado,
+                            "transaction_item_id": ti_id_gerado,
+                            "number": linha_equip['TOMBO'],
+                            "name": linha_equip['product_name'],
+                            "serial_number": self._nula(linha_equip['NUMERO_SERIE']),
+                            "serial_required": 0,
+                            "current_organization_id": buyer_id_int,
+                            "status_id": linha_equip['status_id'],
+                            "address_id": addr_id,
+                            "location_id": None,
+                            "is_completed": 1,
+                            "created_at": linha_equip['created_at'],
+                            "updated_at": linha_equip['updated_at'],
+                            "deleted_at": self._nula(linha_equip['deleted_at'])
+                        })
 
-                    # E. Histórico
-                    lista_historico_global.append({
-                        "equipment_id": eq_id,
-                        "status_id": 1,
-                        "occurred_at": eq_created_at,
-                        "movement_item_id": None,
-                        "service_order_item_id": None,
-                        "contract_item_id": None,
-                        "shipment_item_id": None,
-                        "is_conversion": 0,
-                        "reason": "TRANSACTION_ENTRANCE_EQUIPMENT",
-                        "user_id": 1 
-                    })
+                        lista_historico_global.append({
+                            "equipment_id": eq_id,
+                            "status_id": 1,
+                            "occurred_at": eq_created_at,
+                            "movement_item_id": None,
+                            "service_order_item_id": None,
+                            "contract_item_id": None,
+                            "shipment_item_id": None,
+                            "is_conversion": 0,
+                            "reason": "TRANSACTION_ENTRANCE_EQUIPMENT",
+                            "user_id": 1 
+                        })
 
-            # E. BULK INSERT EQUIPAMENTOS
+            # F. BULK INSERT MÁQUINAS FÍSICAS
             if lista_equipamentos_global:
-                print("💾 Inserindo equipamentos no MySQL...")
+                print(f"💾 Inserindo {len(lista_equipamentos_global)} máquinas físicas no MySQL...")
                 conn.execute(text("""
                     INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at) 
                     VALUES (:id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, :serial_required, :current_organization_id, :status_id, :address_id, :location_id, :is_completed, :created_at, :updated_at, :deleted_at)
@@ -471,7 +466,7 @@ class MigracaoEquipamentos:
                 self.stats["equipments"] += len(lista_equipamentos_global)
 
             if lista_historico_global:
-                print("💾 Inserindo logs de histórico no MySQL...")
+                print(f"💾 Inserindo {len(lista_historico_global)} logs de histórico no MySQL...")
                 conn.execute(text("""
                     INSERT INTO equipment_history (
                         equipment_id, status_id, occurred_at, movement_item_id, 
@@ -490,14 +485,12 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def executar(self):
         print("\n" + "=" * 80)
-        print("🚀 INICIANDO MIGRAÇÃO: EQUIPAMENTOS E INVENTÁRIO")
+        print("🚀 INICIANDO MIGRAÇÃO: EQUIPAMENTOS E INVENTÁRIO (COM AGRUPAMENTO)")
         print("=" * 80)
         
         try:
-            # 🧹 Limpeza garantida caso o módulo seja rodado de forma isolada!
             executar_truncate_tabelas(self.engine_new, TABELAS)
 
-            # Pipeline
             df_master = self._extrair_e_transformar()
             df_master = self._carregar_tabelas_dimensionais(df_master)
             df_master = self._tratar_fornecedores(df_master)
@@ -506,16 +499,18 @@ class MigracaoEquipamentos:
             print("\n" + "=" * 50)
             print("📊 RELATÓRIO FINAL DE EQUIPAMENTOS")
             print("=" * 50)
-            print(f"📦 Grupos criados:       {self.stats['grupos']}")
-            print(f"🏷️  Marcas criadas:       {self.stats['brands']}")
-            print(f"📁 Tipos criados:        {self.stats['types']}")
-            print(f"🤖 Tipos Inferidos Sozinhos: {self.stats['tipos_inferidos']}")
-            print(f"🛒 Produtos cadastrados: {self.stats['products']}")
-            print(f"🏭 Novos fornecedores:   {self.stats['suppliers']}")
-            print(f"📑 Transações-Mãe:       {self.stats['transactions']}")
-            print(f"🧩 Itens de Transação:   {self.stats['transaction_items']}")
-            print(f"💻 Equipamentos salvos:  {self.stats['equipments']}")
-            print(f"📜 Logs de Entrada (TX): {self.stats['history']}")
+            print(f"📦 Grupos criados:         {self.stats['grupos']}")
+            print(f"🏷️  Marcas criadas:         {self.stats['brands']}")
+            print(f"📁 Tipos criados:          {self.stats['types']}")
+            print(f"🤖 Tipos Inferidos:        {self.stats['tipos_inferidos']}")
+            print(f"🛒 Produtos cadastrados:   {self.stats['products']}")
+            print(f"🏭 Novos fornecedores:     {self.stats['suppliers']}")
+            print("-" * 50)
+            print(f"📑 Transações-Mãe:         {self.stats['transactions']}")
+            print(f"📦 Blocos de Estoque (PI): {self.stats['product_items_criados']}")
+            print(f"🧩 Itens de Transação:     {self.stats['transaction_items']}")
+            print(f"💻 Equipamentos salvos:    {self.stats['equipments']}")
+            print(f"📜 Logs de Entrada (TX):   {self.stats['history']}")
             print("=" * 50)
 
         except Exception as e:
