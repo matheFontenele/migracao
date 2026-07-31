@@ -295,7 +295,7 @@ class MigracaoEquipamentos:
             "type_id": df_produtos_unicos['type_id'], "group_id": df_produtos_unicos['group_id'],
             "is_asset": 1, "length": 0, "width": 0, "height": 0, "weight": 0,
             "min_quantity": 1, 
-            "max_quantity": 1,
+            "max_quantity": 2,
             "created_at": self.now, "updated_at": self.now
         })
 
