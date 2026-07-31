@@ -76,6 +76,10 @@ def iniciar_equipamentos(eng_novo, eng_legado):
     from cadastros.equipamentos import migracao_equipamentos
     migracao_equipamentos.executar(eng_novo, eng_legado)
 
+def iniciar_insumos(eng_novo, eng_legado):
+    from cadastros.equipamentos import migracao_insumos
+    migracao_insumos.executar(eng_novo, eng_legado)
+
 def iniciar_aluguel(eng_novo, eng_legado):
     from movimentos import migracao_aluguel
     migracao_aluguel.executar(eng_novo, eng_legado)
@@ -156,6 +160,7 @@ TAREFAS = {
     "contratos": iniciar_contratos,
     "contratantes": iniciar_contratantes,
     "equipamentos": iniciar_equipamentos,
+    "insumos": iniciar_insumos,
     "movimentos_aluguel": iniciar_aluguel,
     "movimentos_reserva": iniciar_reserva,
     "movimentos_devolucao": iniciar_devolucao,
@@ -167,8 +172,8 @@ TAREFAS = {
 }
 
 GRUPOS = {
-    "cadastros": ["clientes", "contratos", "contratantes", "equipamentos"],
-    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato"]
+    "cadastros": ["clientes", "contratos", "contratantes", "equipamentos", "insumos"],
+    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "insumos", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato"]
 }
 
 def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
@@ -202,7 +207,7 @@ def main():
         print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.\n")
         print("Comandos válidos para Lote:")
         print("  python main.py todos        (Roda a esteira inteira)")
-        print("  python main.py cadastros    (Roda apenas clientes, contratos, contratantes, equipamentos)")
+        print("  python main.py cadastros    (Roda apenas clientes, contratos, contratantes, equipamentos, insumos)")
         print("\nComandos válidos para Debug Individual:")
         for t in TAREFAS.keys():
             print(f"  python main.py {t}")
