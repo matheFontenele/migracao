@@ -122,7 +122,6 @@ class MigracaoEquipamentos:
 
         print(f"\n🔍 Total retornado pelo SQL: {len(df_equipamentos_legado)}")
 
-
         self.lista_fornecedores_legado = df_planilha['MARCA_AJUSTADA'].dropna().unique()
         tipos_existentes = [str(t).strip().upper() for t in df_planilha['TIPO_AJUSTADO'].dropna().unique() if str(t).strip()]
         tipos_existentes.sort(key=len, reverse=True)
@@ -419,11 +418,18 @@ class MigracaoEquipamentos:
             for (s_id, org_id), df_transacao in grupos_transacao:
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
-
                 datas_lote = pd.to_datetime(df_transacao['created_at'], errors='coerce').dropna()
-                data_transacao = datas_lote.min().strftime('%Y-%m-%d %H:%M:%S') if not datas_lote.empty else self.now
+                
+                if not datas_lote.empty:
+                    data_minima_dt = datas_lote.min()
+                    data_transacao = data_minima_dt.strftime('%Y-%m-%d %H:%M:%S')
+                    # Adiciona 1 mês para a garantia
+                    data_garantia = (data_minima_dt + pd.DateOffset(months=1)).strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    data_transacao = self.now
+                    data_garantia = (pd.to_datetime(self.now) + pd.DateOffset(months=1)).strftime('%Y-%m-%d %H:%M:%S')
 
-                # A. Transação Mãe (O "Caminhão" que chegou no órgão com a data do equipamento mais antigo)
+                # A. Transação Mãe
                 result_tx = conn.execute(text("""
                     INSERT INTO transactions (transaction_date, transaction_type_id, supplier_id, buyer_id, 
                     doc_type_id, doc_date, purchase_date, created_by, details, amount_total, amount_discount, created_at, updated_at) 
@@ -458,10 +464,14 @@ class MigracaoEquipamentos:
 
                     result_item = conn.execute(text("""
                         INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, 1, :now, :addr, 0, :qty, :now, :now, NULL)
+                        VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, 0, :qty, :now, :now, NULL)
                     """), {
-                        "tid": tx_id_gerado, "pid": p_id_val, "now": self.now, 
-                        "addr": addr_id, "qty": qtd_repeticoes
+                        "tid": tx_id_gerado, 
+                        "pid": p_id_val, 
+                        "warranty_date": data_garantia, # <-- Aqui entra o +1 mês
+                        "now": self.now, 
+                        "addr": addr_id, 
+                        "qty": qtd_repeticoes
                     })
                     ti_id_gerado = result_item.lastrowid
                     self.stats["transaction_items"] += 1
