@@ -41,7 +41,32 @@ class MigracaoManutencao(BaseMigracaoMovimento):
             self.dict_product_items = dict(zip(df_equipments['id'], df_equipments['product_item_id']))
 
     # ==============================================================================
-    # 1. EXTRAÇÃO
+    # HELPER DE VALIDAÇÃO DA ORGANIZAÇÃO (Regra de Negócio)
+    # ==============================================================================
+    def _descobrir_id_organizacao_destino(self, orgao_cliente, orgao_equip):
+        # Define a prioridade: Org do Cliente > Org do Equipamento
+        id_escolhido = orgao_cliente if pd.notna(orgao_cliente) else orgao_equip
+        
+        if pd.isna(id_escolhido): 
+            return 1115
+            
+        try:
+            id_legado_int = int(id_escolhido)
+        except (ValueError, TypeError):
+            return 1115
+
+        from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC
+        
+        if id_legado_int in MAPPING_ALUCOM: return 1115
+        if id_legado_int in MAPPING_IP: return 1311 
+        if id_legado_int in MAPPING_MOREIA: return 1122
+        if id_legado_int in MAPPING_AS: return 1378 
+        if id_legado_int in MAPPING_SC: return 1115  
+        
+        return 1115 # Fallback geral caso não encontre nas regras mapeadas
+
+    # ==============================================================================
+    # 1. EXTRAÇÃO (Query Atualizada)
     # ==============================================================================
     def _extrair(self):
         print("📖 Extraindo dados de manutenção do legado...")
@@ -57,6 +82,8 @@ class MigracaoManutencao(BaseMigracaoMovimento):
                 asi.nome AS situacao,
                 alma.id AS manutencao_id,
                 alma.cliente_id AS cliente,
+                cli.orgao_id AS orgao_cliente_id,
+                alq.orgao_id AS orgao_id_equip,
                 alma.usuario_id AS usuario,
                 alma.situacao_anterior_id AS situacao_anterior_id,
                 alma.manutencao_situacao_id AS technician_status,
@@ -72,6 +99,7 @@ class MigracaoManutencao(BaseMigracaoMovimento):
             LEFT JOIN aluguel_manutencao_movimento_itens almai ON alma.id = almai.manutencao_movimento_id
             INNER JOIN aluguel_situacao asi ON alq.situacao_id = asi.id
             INNER JOIN aluguel_tipos alt ON alq.tipo_id = alt.id
+            LEFT JOIN aluguel_clientes cli ON alma.cliente_id = cli.id
             WHERE alma.deleted_at IS NULL AND asi.id = 3
         """
         with self.engine_legado.connect() as conn:
@@ -123,6 +151,13 @@ class MigracaoManutencao(BaseMigracaoMovimento):
                 details_text = "Migração Automática do Legado"
 
             # ------------------------------------------------------------------
+            # APLICAÇÃO DA REGRA DE NEGÓCIO: ORGANIZAÇÃO (ORGAO_ID)
+            # ------------------------------------------------------------------
+            org_cliente = row['orgao_cliente_id']
+            org_equip = row['orgao_id_equip']
+            organization_id = self._descobrir_id_organizacao_destino(org_cliente, org_equip)
+
+            # ------------------------------------------------------------------
             # MONTAGEM DA CAPA
             # ------------------------------------------------------------------
             if legacy_id not in manutencoes_processadas:
@@ -132,6 +167,7 @@ class MigracaoManutencao(BaseMigracaoMovimento):
                     "created_by": tech_id,
                     "equipment_id": equip_id,
                     "product_item_id": self.dict_product_items.get(equip_id),
+                    "organization_id": organization_id,
                     "product_quantity": 1,
                     "is_closed": 0,  
                     "details": details_text,
@@ -212,7 +248,6 @@ class MigracaoManutencao(BaseMigracaoMovimento):
 # ==============================================================================
 def executar(eng_novo, eng_legado):
     from movimentos.migracao_movimentos import carregar_dados_compartilhados
-    # Carrega a RAM estritamente necessária para herdar a classe pai no modo debug
     dados_ram = carregar_dados_compartilhados(eng_legado, eng_novo)
     app = MigracaoManutencao(eng_novo, eng_legado, dados_ram)
     app.executar()
