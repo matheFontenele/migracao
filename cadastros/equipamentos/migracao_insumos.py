@@ -8,7 +8,7 @@ from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC
+from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, EQUIPAMENTOS_TIPOS
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
 
@@ -22,7 +22,8 @@ class MigracaoInsumos:
         self.stats = {
             "grupos": 0, "types": 0, "products": 0,
             "transacoes_entrada": 0, "transacoes_saida": 0, 
-            "product_items_criados": 0, "transaction_items": 0
+            "product_items_criados": 0, "transaction_items": 0,
+            "itens_ignorados_equipamento": 0
         }
 
     # ==============================================================================
@@ -73,6 +74,7 @@ class MigracaoInsumos:
                  , SPA.SGA_NOME AS TIPO
                  , PA.PRO_QUANT_MIN AS QUANTI_MININA
                  , PA.PRO_QUANT_MAX AS QUANTI_MAX
+                 , IESA.IES_VALOR_UNITARIO AS PRECO
                  , ESA.ESA_ID AS LEGACY_TX_ID
                  , ESA.ESA_TIPO AS TIPO_MOVIMENTO
                  , IESA.IES_QUANTIDADE AS QUANTIDADE_MOVIMENTO
@@ -94,12 +96,17 @@ class MigracaoInsumos:
         with self.engine_legado.connect() as conn:
             df_movimentos = pd.read_sql(text(query_legado), conn)
 
-        print(f"🔍 Foram extraídos {len(df_movimentos)} movimentos detalhados válidos (> 0).")
+        print(f"🔍 Foram extraídos {len(df_movimentos)} movimentos válidos.")
 
         lista_mestre = []
         for index, row in tqdm(df_movimentos.iterrows(), total=df_movimentos.shape[0], desc="Mapeando Dicionários"):
             nome_produto = str(row['PRODUTO']).strip() if pd.notna(row['PRODUTO']) else "INSUMO SEM NOME"
             tipo = str(row['TIPO']).strip() if pd.notna(row['TIPO']) else "OUTROS"
+            tipo_upper = tipo.upper()
+
+            if tipo_upper in EQUIPAMENTOS_TIPOS:
+                self.stats["itens_ignorados_equipamento"] += 1
+                continue
             
             grupo = self._extrair_grupo_do_nome(nome_produto, tipo)
             condicao_id = self._mapear_condicao(row['CONDICAO'])
@@ -128,6 +135,7 @@ class MigracaoInsumos:
                 "tipo": tipo,
                 "min_quantity": min_q,
                 "max_quantity": max_q,
+                "preco_unitario": float(row['PRECO']) if pd.notna(row['PRECO']) else 0.0,
                 "condition_id": condicao_id,
                 "tipo_movimento": tipo_mov,
                 "quantidade": qtd,
@@ -253,15 +261,14 @@ class MigracaoInsumos:
         df_master['data_transacao'] = pd.to_datetime(df_master['data_transacao'])
         df_master = df_master.sort_values(by='data_transacao')
 
-        # Dicionário Livro Razão
-        # Chave: (product_id, org_destino, condition_id) -> Valor: quantidade atual
+        # Dicionários em Memória
         livro_razao = {}
+        ultimos_precos = {}
 
         print("   ⏳ Reconstruindo o histórico de transações...")
         
         # Agrupamento cronológico seguro
         grupos_transacoes = df_master.groupby(['legacy_tx_id', 'org_destino', 'tipo_movimento'], sort=False)
-        
         transaction_items_batch = []
 
         with self.engine_new.begin() as conn:
@@ -307,10 +314,12 @@ class MigracaoInsumos:
                     pid = int(row['product_id'])
                     cond = int(row['condition_id'])
                     qtd = float(row['quantidade'])
+                    preco_unit = float(row['preco_unitario'])
                     data_item = row['data_transacao'].strftime('%Y-%m-%d %H:%M:%S')
 
                     # 2. CÁLCULO INTERNO: ATUALIZA O ESTOQUE NESTE EXATO MOMENTO DA HISTÓRIA
                     chave_estoque = (pid, buyer_id_int, cond)
+                    ultimos_precos[chave_estoque] = preco_unit
                     
                     if chave_estoque not in livro_razao:
                         livro_razao[chave_estoque] = 0.0
@@ -322,6 +331,7 @@ class MigracaoInsumos:
 
                     transaction_items_batch.append({
                         "tid": tx_id, "pid": pid, "cond": cond, "addr": 1, 
+                        "unit_cost": preco_unit,
                         "qty": qtd, "now": data_item
                     })
                     
@@ -330,7 +340,7 @@ class MigracaoInsumos:
                 for i in range(0, len(transaction_items_batch), 5000):
                     conn.execute(text("""
                         INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, :cond, :now, :addr, 0, :qty, :now, :now, NULL)
+                        VALUES (:tid, :pid, 1, :cond, :now, :addr, :unit_cost, :qty, :now, :now, NULL)
                     """), transaction_items_batch[i:i+5000])
                     self.stats["transaction_items"] += len(transaction_items_batch[i:i+5000])
 
@@ -339,11 +349,15 @@ class MigracaoInsumos:
         product_items_batch = []
         contador_codigo_unico = 9000000 
         
-        for (pid, org_id, cond), saldo_final in livro_razao.items():
+        for chave_estoque, saldo_final in livro_razao.items():
             if saldo_final > 0:
+                pid, org_id, cond = chave_estoque
+                # 🎯 Pega o preço exato que ficou armazenado por último no dicionário
+                avg_cost_final = ultimos_precos.get(chave_estoque, 0.0)
+                
                 product_items_batch.append({
                     "pid": pid, "code": contador_codigo_unico, "cond": cond, 
-                    "addr": 1, "org": org_id, "qty": saldo_final, "now": self.now
+                    "addr": 1, "org": org_id, "qty": saldo_final, "avg_cost": avg_cost_final, "now": self.now
                 })
                 contador_codigo_unico += 1
                 
@@ -353,7 +367,7 @@ class MigracaoInsumos:
                 for i in range(0, len(product_items_batch), 5000):
                     conn.execute(text("""
                         INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
-                        VALUES (:pid, :code, 1, :cond, :addr, :org, 1, :qty, :now, :now)
+                        VALUES (:pid, :code, 1, :cond, :addr, :org, :avg_cost, :qty, :now, :now)
                     """), product_items_batch[i:i+5000])
                     self.stats["product_items_criados"] += len(product_items_batch[i:i+5000])
 
@@ -376,6 +390,7 @@ class MigracaoInsumos:
             print(f"📦 Novos Grupos:           {self.stats['grupos']}")
             print(f"📁 Novos Tipos:            {self.stats['types']}")
             print(f"🛒 Produtos (Insumos):     {self.stats['products']}")
+            print(f"🚫 Movimentos ignorados (Equipamentos): {self.stats['itens_ignorados_equipamento']}")
             print("-" * 50)
             print(f"📈 Transações de Entrada:  {self.stats['transacoes_entrada']}")
             print(f"📉 Transações de Saída:    {self.stats['transacoes_saida']}")

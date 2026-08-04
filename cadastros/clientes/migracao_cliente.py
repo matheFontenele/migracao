@@ -185,6 +185,54 @@ class MigracaoClientes:
     #==============================================================================
     # 2. APLICANDO REGRAS DE EXCEÇÃO E LIMPEZA DE DADOS
     # ==============================================================================
+    def _achatar_secretarias_iguais_prefeitura(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+        
+        # Cria uma máscara para identificar onde Prefeitura e Secretaria são iguais
+        mask_same_name = (
+            df_modificado['PREFEITURA'].notna() & 
+            df_modificado['SECRETARIA'].notna() & 
+            (df_modificado['PREFEITURA'].astype(str).str.strip().str.upper() == 
+             df_modificado['SECRETARIA'].astype(str).str.strip().str.upper())
+        )
+        
+        if mask_same_name.any():
+            # Achata a hierarquia definindo a Secretaria como nula
+            df_modificado.loc[mask_same_name, 'ID_SECRETARIA'] = None
+            df_modificado.loc[mask_same_name, 'SECRETARIA'] = None
+            
+        return df_modificado
+
+
+    def _unificar_receita_federal(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_modificado = df.copy()
+
+        id_pref_serie = pd.to_numeric(df_modificado['ID_PREFEITURA'], errors='coerce')
+        id_sec_serie = pd.to_numeric(df_modificado['ID_SECRETARIA'], errors='coerce')
+
+        # 1️⃣ Unir Prefeitura 420 -> 297
+        mask_pref_420 = id_pref_serie == 420
+        if mask_pref_420.any():
+            # Busca o nome original da Prefeitura 297 para padronizar
+            nomes_pref_297 = df_modificado.loc[id_pref_serie == 297, 'PREFEITURA']
+            nome_pref_padrao = nomes_pref_297.iloc[0] if not nomes_pref_297.empty else "SUPERINTENDENCIA REG DA RECEITA FEDERAL DO BRASIL SANTA CATARINA"
+            
+            df_modificado.loc[mask_pref_420, 'ID_PREFEITURA'] = 297
+            df_modificado.loc[mask_pref_420, 'PREFEITURA'] = nome_pref_padrao
+
+        # 2️⃣ Mesclar Secretarias 1650 e 1653 (Rio Grande do Sul)
+        mask_sec_rs = id_sec_serie.isin([1650, 1653])
+        if mask_sec_rs.any():
+            df_modificado.loc[mask_sec_rs, 'ID_SECRETARIA'] = 1650
+            df_modificado.loc[mask_sec_rs, 'SECRETARIA'] = "RECEITA FEDERAL DE RIO GRANDE DO SUL"
+
+        # 3️⃣ Ajustar nome das demais secretarias que contém "SUP_REG_RECEITA"
+        mask_sup_reg = df_modificado['SECRETARIA'].astype(str).str.contains('SUP_REG_RECEITA', na=False)
+        if mask_sup_reg.any():
+            df_modificado.loc[mask_sup_reg, 'SECRETARIA'] = df_modificado.loc[mask_sup_reg, 'SECRETARIA'].str.replace('SUP_REG_RECEITA', 'RECEITA FEDERAL', regex=False).str.strip()
+
+        return df_modificado
+
     def _unificar_sao_luis(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
         
@@ -352,13 +400,15 @@ class MigracaoClientes:
         df_clean['id_clean'] = pd.to_numeric(df_clean['ID_CLIENTE'], errors='coerce').fillna(0).astype(int)
         df_clean = df_clean[~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)]
 
-        # --- APLICA EXCEÇÕES (PCPB, Hospitais PB, São Luís e Ministérios) ---
+        # --- APLICA EXCEÇÕES ---
+        df_clean = self._unificar_receita_federal(df_clean)
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._padronizar_hospitais_pb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
         df_clean = self._unificar_ministerio_transportes(df_clean)
         df_clean = self._reestruturar_detran(df_clean)
+        df_clean = self._achatar_secretarias_iguais_prefeitura(df_clean)
 
         # --- MERGE DE RESERVAS ---
         mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
@@ -411,7 +461,7 @@ class MigracaoClientes:
         mask_sem_pref = df_mod['ID_PREF_STR'].isna() & df_mod['ID_SEC_STR'].notna()
         df_mod.loc[mask_sem_pref, 'ID_PREF_STR'] = df_mod.loc[mask_sem_pref, 'ID_SEC_STR']
         df_mod.loc[mask_sem_pref, 'PREFEITURA'] = df_mod.loc[mask_sem_pref, 'SECRETARIA']
-        df_mod.loc[mask_sem_pref, 'ID_SEC_STR'] = None # Esvazia a secretaria para ela não duplicar
+        df_mod.loc[mask_sem_pref, 'ID_SEC_STR'] = None
         df_mod.loc[mask_sem_pref, 'SECRETARIA'] = None
 
         # 🎯 REGRA 2: Se não sobrou nem PREFEITURA nem SECRETARIA, o CLIENTE assume a liderança!
@@ -485,7 +535,6 @@ class MigracaoClientes:
                 novo_id = res.lastrowid
                 dict_traducao_pais[id_legado] = novo_id
                 self.stats["pais"] += 1
-                enderecos_batch.append({"type": "customer", "id": novo_id, "alias": f"BASE - {info['nome']}", "zip": "NULO", "street": "NÃO INFORMADO", "num": "S/N", "city": info["row"]['CIDADE'], "state": info["row"]['ESTADO'], "leg_id": None, "res_id": None})
 
             # Filhos
             dict_traducao_filhos = {}
@@ -496,7 +545,6 @@ class MigracaoClientes:
                 novo_id = res.lastrowid
                 dict_traducao_filhos[id_legado] = novo_id
                 self.stats["filhos"] += 1
-                enderecos_batch.append({"type": "customer", "id": novo_id, "alias": f"BASE - {info['nome']}", "zip": "NULO", "street": "NÃO INFORMADO", "num": "S/N", "city": info["row"]['CIDADE'], "state": info["row"]['ESTADO'], "leg_id": None, "res_id": None})
 
             # Netos (Preparação)
             for id_legado, info in tqdm(destinos.items(), desc="Preparando Endereços Finais"):
