@@ -17,6 +17,12 @@ CLIENTES_BLOQUEADOS = {2131, 2707, 10672, 10651}
 FALSOS_RESERVAS = {10487}
 
 # =========================================================================
+# EXCEÇÃO DE TIPOS PARA INSUMOS (MIGRAÇÃO DE EQUIPAMENTOS)
+# =========================================================================
+EQUIPAMENTOS_TIPOS = {'MULTIFUNCIONAL', 'IMPRESSORA', 'SCANNER', 'MONITOR', 'NOBREAK', 'ESTABILIZADOR', 'SWITCH', 'FONE DE OUVIDO', 'CAIXA DE SOM', 'NOTEBOOK', 'IMPRESSORAS REVISADAS', 'IMPRESSORA'}
+
+
+# =========================================================================
 # ENDEREÇOS BASES (ORGANIZAÇÕES)
 # =========================================================================
 ENDERECOS_BASES = [
