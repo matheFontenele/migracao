@@ -75,7 +75,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     eq.tipo_id,
                     ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
                 FROM aluguel_substituicao sub
-                INNER JOIN aluguel_movimento mov ON sub.substituicao_devolucao_id = mov.id
+                -- Lembrando: substituicao_aluguel_id guarda a DEVOLUÇÃO no legado
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_aluguel_id = mov.id
                 INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
                 INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
                 WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
@@ -91,9 +92,11 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     eq.numero AS tombo,
                     eq.nome,
                     eq.tipo_id,
+                    eq.situacao_id,
                     ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
                 FROM aluguel_substituicao sub
-                INNER JOIN aluguel_movimento mov ON sub.substituicao_aluguel_id = mov.id
+                -- Lembrando: substituicao_devolucao_id guarda o ALUGUEL (ida) no legado
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_devolucao_id = mov.id
                 INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
                 INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
                 WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
@@ -102,7 +105,10 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 d.substituicao_id,
                 d.cliente_id AS CLIENTE_ID,
                 COALESCE(NULLIF(d.usuario_id, 0), 1) AS USR_SUBST,
+                d.data_mov AS DATA_DEVOLUCAO,
+                a.data_mov AS DATA_ALUGUEL,
                 COALESCE(a.data_mov, d.data_mov) AS DATA_SUBST,
+                
                 d.deleted_at AS DEL_SUBST,
 
                 d.movimento_id AS MOV_DEV_ID,
@@ -179,6 +185,9 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         log_nao_match = []
         eqs_antigos_alterar = []
         eqs_novos_alterar = []
+        map_eqs_antigos = {} 
+        eqs_antigos_alterar_8 = []
+        eqs_antigos_alterar_1 = []
 
         for _, row in tqdm(df_subst.iterrows(), total=df_subst.shape[0], desc="Processando Ciclos"):
             
@@ -275,7 +284,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 cliente_final_address_id=endereco_base_id,
                 usuario_id=int(row['USR_SUBST']),
                 organization_id=int(org_id_cascata),
-                mov_date=row['DATA_SUBST'],
+                mov_date=row['DATA_DEVOLUCAO'],
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 contrato_id=contrato_id_res,
                 contrato_item_id=item_id_res,
@@ -291,7 +300,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 details_capa=f"Devolução da Substituição Legado: {row['substituicao_id']}",
                 details_item=f"Devolução da Substituição Legado: {row['substituicao_id']}"
             )
-            eqs_antigos_alterar.append({int(eq_id_antigo): int(id_mov_item_dev)})
+            map_eqs_antigos[tombo_antigo] = {int(eq_id_antigo): int(id_mov_item_dev)}
 
             # =========================================================
             # 📤 FASE 3: O PRESENTE (ENVIAMOS A MÁQUINA NOVA)
@@ -327,9 +336,49 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         if log_nao_match:
             pd.DataFrame(log_nao_match).to_csv("log_divergencias_substituicao.csv", index=False)
 
+        #Validação de situação de equipamentos antigos para atualizar status
+        if map_eqs_antigos:
+            print(f"\n🔍 Verificando situação final de {len(map_eqs_antigos)} equipamentos antigos no legado...")
+            tombos_in = "(" + ", ".join([f"'{t}'" for t in map_eqs_antigos.keys()]) + ")"
+            
+            query_situacao = f"""
+                SELECT
+                    alq.numero AS tombo,
+                    alq.situacao_id AS situacao
+                FROM aluguel_equipamentos alq
+                WHERE alq.numero IN {tombos_in}
+            """
+            
+            with self.engine_legado.connect() as conn:
+                df_situacoes = pd.read_sql(text(query_situacao), conn)
+                
+            for _, row_sit in df_situacoes.iterrows():
+                t_antigo = str(row_sit['tombo']).strip()
+                situacao = int(row_sit['situacao'])
+                
+                dict_update = map_eqs_antigos.get(t_antigo)
+                if dict_update:
+                    if situacao == 14:
+                        eqs_antigos_alterar_8.append(dict_update)
+                    else:
+                        eqs_antigos_alterar_1.append(dict_update)
+
+        # 👇 1. Salva primeiro todos os movimentos pendentes na transação
         self.salvar_movimentos_banco()
-        self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=eqs_antigos_alterar)
-        self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=eqs_novos_alterar)
+        
+        # 👇 2. Atualiza os equipamentos velhos que continuam quebrados (14 vai pra 8)
+        if eqs_antigos_alterar_8:
+            self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=eqs_antigos_alterar_8)
+            
+        # 👇 3. Atualiza os equipamentos velhos que já foram salvos/consertados (Qualquer outra vai pra 1)
+        if eqs_antigos_alterar_1:
+            self.atualizar_equipamentos_banco(id_status_equipamento=1, lista_dicionarios=eqs_antigos_alterar_1)
+            
+        # 👇 4. Atualiza os equipamentos novos que foram alugados nesta substituição (vai pra 2)
+        if eqs_novos_alterar:
+            self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=eqs_novos_alterar)
+            
+        # 👇 5. Atualiza os saldos de contrato impactados
         self._atualizar_saldos_mysql()
 
 # ==============================================================================

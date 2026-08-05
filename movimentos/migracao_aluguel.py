@@ -40,6 +40,72 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 if res.rowcount > 0: atualizados += 1
         print(f"  ✔️ {atualizados} itens de contrato atualizados com sucesso!")
     
+    # ==============================================================================
+    # MÉTODO CUSTOMIZADO: BUSCA DE MOVIMENTOS COM FILTRO DE TOMBOS (PARQUET)
+    # ==============================================================================
+    def _buscar_ultimos_movimentos_aluguel(self, tombos_list):
+        if not tombos_list: return {}
+        
+        print(f"🔍 Buscando últimos movimentos no legado cruzando com {len(tombos_list)} tombos do Parquet...")
+        
+        # Formata a lista para '1234', '5678', etc. para o clause IN do SQL
+        tombos_formatados = ",".join(f"'{str(t).strip()}'" for t in tombos_list)
+        
+        query = f"""
+            WITH UltimosMovimentos AS (
+                SELECT
+                    movi.equipamento_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_movimento,
+                    mov.updated_at,
+                    mov.deleted_at,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    mov.tipo_id AS tipo_mov_id,
+                    mov.tipo AS tipo_movimento,
+                    ROW_NUMBER() OVER(PARTITION BY movi.equipamento_id ORDER BY mov.data DESC, mov.id DESC) as rn
+                FROM aluguel_movimento mov
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                WHERE mov.deleted_at IS NULL
+                  AND movi.deleted_at IS NULL
+            )
+            SELECT
+                eq.id AS equipamento_id,
+                eq.numero AS tombo,
+                eq.nome AS nome_equipamento,
+                eq.tipo_id AS eq_tipo_id,
+                
+                um.movimento_id AS id,
+                um.data_movimento,
+                um.updated_at,
+                um.deleted_at,
+                um.cliente_id,
+                um.usuario_id,
+                um.tipo_mov_id AS tipo_id,
+                um.tipo_movimento
+            FROM aluguel_equipamentos eq
+            INNER JOIN UltimosMovimentos um
+                ON eq.id = um.equipamento_id
+                AND um.rn = 1
+            WHERE eq.deleted_at IS NULL
+              AND eq.situacao_id = 1
+              AND um.tipo_mov_id IN (1, 2)
+              AND eq.numero IN ({tombos_formatados})
+        """
+        
+        with self.engine_legado.connect() as conn:
+            df_movs = pd.read_sql(text(query), conn)
+            
+        dict_retorno = {}
+        for _, row in df_movs.iterrows():
+            dict_retorno[str(row['tombo']).strip()] = {
+                'movimento': row.to_dict()
+            }
+        return dict_retorno
+
+    # ==============================================================================
+    # ORQUESTRAÇÃO
+    # ==============================================================================
     def executar(self):
         print("\n" + "-" * 70)
         print("📦 MÓDULO: ALUGUEL (Fonte: CSV Parquet)")
@@ -71,7 +137,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         
         tombos = df_csv['TOMBO'].unique().tolist()
         
-        dict_ultimo_mov = self.buscar_ultimo_movimento_cte(tombos, tipos_permitidos=(1,), situacoes_permitidas=(1,))
+        # 👇 INJEÇÃO DO NOVO MÉTODO SQL AQUI
+        dict_ultimo_mov = self._buscar_ultimos_movimentos_aluguel(tombos)
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
 
         with self.engine_new.connect() as conn:
@@ -87,7 +154,8 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             tombo = str(row_csv['TOMBO']).strip()
             ultimo_mov = dict_ultimo_mov.get(tombo)
 
-            if not ultimo_mov or ultimo_mov['movimento']['tipo_id'] != 1: 
+            # O SQL já garante que se veio algo, é tipo 1 ou 2, com situação 1, e não deletado!
+            if not ultimo_mov: 
                 rejeitados += 1
                 continue
 

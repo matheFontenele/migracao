@@ -66,9 +66,9 @@ class OrquestradorMovimentos:
             atualizacao = AtualizacaoContratosData(self.engine_new)
             atualizacao.executar()
 
-            # print("\n▶️ Iniciando Módulo: REVISÃO DE STATUS (SANITY CHECK)")
-            # revisao = RevisaoStatusEquipamentos(self.engine_new, self.engine_legado)
-            # revisao.executar()
+            print("\n▶️ Iniciando Módulo: REVISÃO DE STATUS (SANITY CHECK)")
+            revisao = RevisaoStatusEquipamentos(self.engine_new, self.engine_legado)
+            revisao.executar()
 
             print("\n" + "=" * 80)
             print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")
