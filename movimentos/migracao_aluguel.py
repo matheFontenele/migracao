@@ -199,7 +199,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 })
 
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
-            dt_mov = row_mov['updated_at'] if pd.notna(row_mov['updated_at']) else self.now
+            dt_mov = row_mov['data_movimento'] if pd.notna(row_mov['data_movimento']) else self.now
 
             detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)" if is_avulso else "Equipamento Kit (Imune a saldo, sem item vinculado)" if is_kit else "Equipamento Excedente (Contrato sem saldo)" if is_excedente else "Item Extra Oficial (Fallback de Contrato/Item)" if not teve_match_perfeito else None
 
