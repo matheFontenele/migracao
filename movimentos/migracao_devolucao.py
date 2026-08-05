@@ -1,11 +1,10 @@
 import os
 import pandas as pd
 from sqlalchemy import text
-from datetime import datetime
 from tqdm import tqdm
 
 from config.config import ENDERECOS_BASES
-from movimentos.migracao_movimentos import BaseMigracaoMovimento, carregar_dados_compartilhados, descobrir_id_organizacao_destino, limpar_codigo
+from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino, limpar_codigo
 
 class MigracaoDevolucao(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=800000):
@@ -50,94 +49,79 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         print("   ✅ Shipments salvos com sucesso.")
 
     def _extrair_dados_devolucao(self):
-        print("   📖 Extraindo O PRESENTE (Devoluções puras e deduplicadas)...")
+        print("   📖 Extraindo Histórico Completo (Passado e Presente) em Query Única...")
         
         # ==================================================================
-        # 1. QUERY Pega apenas o movimento absoluto final de devolução
+        # 1. QUERY MESTRA: Cruzamento de histórico usando CTE e RN 1 e RN 2
         # ==================================================================
-        query_presente = """
+        query = """
+            WITH HistoricoMovimentos AS (
+                SELECT
+                    movi.equipamento_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_movimento,
+                    mov.updated_at,
+                    mov.deleted_at,
+                    mov.cliente_id,
+                    ac.orgao_id,
+                    mov.usuario_id,
+                    mov.tipo_id AS tipo_mov_id,
+                    -- Numera os movimentos de cada equipamento, do mais recente (1) pro mais antigo (N)
+                    ROW_NUMBER() OVER(PARTITION BY movi.equipamento_id ORDER BY COALESCE(mov.data, '1900-01-01') DESC, mov.id DESC) as rn
+                FROM aluguel_movimento mov
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                LEFT JOIN aluguel_clientes ac ON mov.cliente_id = ac.id
+                WHERE mov.deleted_at IS NULL
+                  AND movi.deleted_at IS NULL
+            )
             SELECT
-                eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-                mov.id AS DEV_MOV_ID, ac.id AS DEV_CLIENTE_ID,
-                ac.orgao_id as ORGAO_ID,
-                COALESCE(NULLIF(mov.usuario_id, 0), 1) AS DEV_USR_ID,
-                COALESCE(mov.updated_at, mov.data) AS DEV_DATA,
-                mov.deleted_at AS DEV_DEL
+                eq.id AS equipamento_id,
+                eq.numero AS TOMBO,
+                eq.nome AS NOME_EQUIPAMENTO,
+                
+                -- 👇 FASE 2: DADOS DO PRESENTE (A DEVOLUÇÃO / rn = 1)
+                dev.movimento_id AS DEV_MOV_ID,
+                COALESCE(dev.updated_at, dev.data_movimento) AS DEV_DATA,
+                dev.deleted_at AS DEV_DEL,
+                dev.cliente_id AS DEV_CLIENTE_ID,
+                COALESCE(NULLIF(dev.usuario_id, 0), 1) AS DEV_USR_ID,
+
+                -- 👇 FASE 1: DADOS DO PASSADO (O ALUGUEL ORIGINAL / rn = 2)
+                alu.movimento_id AS ORIG_MOV_ID,
+                COALESCE(alu.updated_at, alu.data_movimento) AS ORIG_DATA,
+                alu.deleted_at AS ORIG_DEL,
+                alu.cliente_id AS ORIG_CLIENTE_ID,
+                alu.orgao_id AS ORIG_ORGAO_ID,
+                COALESCE(NULLIF(alu.usuario_id, 0), 1) AS ORIG_USR_ID,
+                alu.tipo_mov_id AS ORIG_TIPO_LEGADO
             FROM aluguel_equipamentos eq
-            INNER JOIN (
-                SELECT mi.equipamento_id, MAX(m.id) as ultimo_mov_id
-                FROM aluguel_movimento_itens mi
-                INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-                WHERE m.deleted_at IS NULL
-                GROUP BY mi.equipamento_id
-            ) ult_mov ON ult_mov.equipamento_id = eq.id
-            INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_mov_id
-            LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
+            -- Cruzamento 1: Pega o último movimento absoluto (A Devolução)
+            INNER JOIN HistoricoMovimentos dev
+                ON eq.id = dev.equipamento_id
+                AND dev.rn = 1
+            -- Cruzamento 2: Pega o movimento imediatamente anterior (A Saída/Aluguel)
+            LEFT JOIN HistoricoMovimentos alu
+                ON eq.id = alu.equipamento_id
+                AND alu.rn = 2
             WHERE eq.deleted_at IS NULL
               AND eq.situacao_id = 14
-              AND mov.tipo_id = 2
+              AND dev.tipo_mov_id IN (2);
         """
-        with self.engine_legado.connect() as conn:
-            df_presente = pd.read_sql(text(query_presente), conn)
-
-        if df_presente.empty:
-            return pd.DataFrame()
-            
-        tombos_presente = df_presente['TOMBO'].dropna().unique().tolist()
-        tombos_sql = "(" + ", ".join([f"'{t}'" for t in tombos_presente]) + ")"
-
-        print(f"   📖 Extraindo O PASSADO (Histórico de Origens para {len(tombos_presente)} equipamentos)...")
-
-        # ==================================================================
-        # 2. O PASSADO: Busca o histórico de Aluguel/Reserva só para esses equipamentos
-        # ==================================================================
-        query_passado = f"""
-            SELECT
-                eq.numero AS TOMBO,
-                mov.id AS ORIG_MOV_ID, ac.id AS ORIG_CLIENTE_ID,
-                ac.orgao_id as ORIG_ORGAO_ID,
-                COALESCE(NULLIF(mov.usuario_id, 0), 1) AS ORIG_USR_ID,
-                COALESCE(mov.updated_at, mov.data) AS ORIG_DATA,
-                mov.deleted_at AS ORIG_DEL,
-                mov.tipo_id AS ORIG_TIPO_LEGADO,
-                mov.data AS DATA_REAL_ORDENACAO
-            FROM aluguel_equipamentos eq
-            INNER JOIN aluguel_movimento_itens ami ON ami.equipamento_id = eq.id
-            INNER JOIN aluguel_movimento mov ON mov.id = ami.movimento_id
-            LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
-            WHERE eq.deleted_at IS NULL
-              AND mov.deleted_at IS NULL
-              AND eq.numero IN {tombos_sql}
-              AND mov.tipo_id IN (1, 7)
-        """
-        with self.engine_legado.connect() as conn:
-            df_historico_origens = pd.read_sql(text(query_passado), conn)
         
-        # Ordena cronologicamente e pega a origem válida mais recente de cada máquina
-        df_historico_origens.sort_values(by=['TOMBO', 'DATA_REAL_ORDENACAO', 'ORIG_MOV_ID'], ascending=[True, False, False], inplace=True)
-        df_passado = df_historico_origens.groupby('TOMBO').first().reset_index()
-
-        # ==================================================================
-        # 3. MERGE: Junta o Passado e o Presente na mesma linha
-        # ==================================================================
-        df_final = pd.merge(
-            df_presente, 
-            df_passado[['TOMBO', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_ORGAO_ID', 'ORIG_USR_ID', 'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO']], 
-            on='TOMBO', 
-            how='inner' 
-        )
+        with self.engine_legado.connect() as conn:
+            df_final = pd.read_sql(text(query), conn)
 
         return df_final
 
     def executar(self):
         print("\n" + "=" * 70)
-        print("📦 MÓDULO: DEVOLUÇÃO (RECONSTRUÇÃO BIFÁSICA)")
+        print("📦 MÓDULO: DEVOLUÇÃO (RECONSTRUÇÃO BIFÁSICA SIMPLIFICADA)")
         print("=" * 70)
 
-        # 1. Extrai o DataFrame estruturado com Presente e Passado na mesma linha
+        # 1. Extrai o DataFrame estruturado
         df_devolucoes = self._extrair_dados_devolucao()
         if df_devolucoes.empty:
-            print("⚠️ Nenhuma Devolução válida com histórico de aluguel/reserva encontrada.")
+            print("⚠️ Nenhuma Devolução válida com status 14 encontrada.")
             return
 
         # 2. Busca os IDs do banco novo baseados nos tombos extraídos
@@ -175,7 +159,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # =========================================================
             # ROTEAMENTO INTELIGENTE FISICO (Qual base vai receber o frete?)
             # =========================================================
-            orgao_id_legado = row['ORIG_ORGAO_ID'] if pd.notna(row.get('ORIG_ORGAO_ID')) else row['ORGAO_ID']
+            orgao_id_legado = row['ORIG_ORGAO_ID'] if pd.notna(row.get('ORIG_ORGAO_ID')) else None
             org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
             endereco_base_id = self.dict_enderecos_base_org.get(org_id_destino)
             
@@ -191,49 +175,42 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             item_id_ativo = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
 
             # =========================================================
-            # 🕰️ FASE 1: RECONSTRUIR O PASSADO (ALUGUEL / RESERVA)
+            # 🕰️ FASE 1: RECONSTRUIR O PASSADO (FORÇANDO COMO ALUGUEL)
             # =========================================================
-            id_mov_origem = int(row['ORIG_MOV_ID'])
-            tipo_legado_origem = int(row['ORIG_TIPO_LEGADO'])
-            dt_origem = row['ORIG_DATA']
-            usr_origem = int(row['ORIG_USR_ID'])
-            
-            if tipo_legado_origem == 1:
-                tipo_mov_novo = 1
-                op_type = 'ALUGUEL'
-            else:
-                tipo_mov_novo = 4
-                op_type = 'RESERVA'
+            # Executa apenas se o banco legado encontrou um movimento anterior
+            if pd.notna(row.get('ORIG_MOV_ID')):
+                id_mov_origem = int(row['ORIG_MOV_ID'])
+                dt_origem = row['ORIG_DATA']
+                usr_origem = int(row['ORIG_USR_ID'])
 
-            self.registrar_movimento(
-                id_final=id_mov_origem,
-                recipient_id=recipient_id,
-                cliente_final_address_id=cliente_final_address,
-                usuario_id=usr_origem,
-                mov_date=dt_origem,
-                deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
+                self.registrar_movimento(
+                    id_final=id_mov_origem,
+                    recipient_id=recipient_id,
+                    cliente_final_address_id=cliente_final_address,
+                    usuario_id=usr_origem,
+                    mov_date=dt_origem,
+                    deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
 
-                contrato_id=contrato_id_ativo,
-                contrato_item_id=item_id_ativo,
-                equipment_id_ref=equip_id_novo,
-                type_id_ref=None,
-                product_id_ref=None,
-                
-                status_shipment=2,
-                tipo_movimento_id=tipo_mov_novo,
-                operation_type=op_type,
-
-                status_equipment_id=2, 
-                history_reason='SHIPPING_CONFIRMED_SEPARATE',
-                
-                is_exchange=False, # 🎯 Devolução não mexe com is_exchange
-                forcar_extra=False,
-                
-                organization_id=org_id_destino,
-                alias_movimento=row['NOME_EQUIPAMENTO'],
-                details_capa=f"Migração (Reconstrução): {op_type} Histórico",
-                details_item="Alocado no Cliente (Histórico)"
-            )
+                    contrato_id=contrato_id_ativo,
+                    contrato_item_id=item_id_ativo,
+                    equipment_id_ref=equip_id_novo,
+                    type_id_ref=None,
+                    product_id_ref=None,
+                    
+                    status_shipment=2,
+                    tipo_movimento_id=1,  # 👈 Força ser 1 (Aluguel)
+                    operation_type='ALUGUEL', # 👈 Força ser Aluguel
+                    status_equipment_id=2, 
+                    history_reason='SHIPPING_CONFIRMED_RENT',
+                    
+                    is_exchange=False,
+                    forcar_extra=False,
+                    
+                    organization_id=org_id_destino,
+                    alias_movimento=row['NOME_EQUIPAMENTO'],
+                    details_capa="Migração (Reconstrução): Aluguel Histórico",
+                    details_item="Alocado no Cliente (Histórico Anterior à Devolução)"
+                )
 
             # =========================================================
             # 📦 FASE 2: REGISTRAR A DEVOLUÇÃO (O PRESENTE)
@@ -263,7 +240,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 tipo_movimento_id=3,
                 operation_type='DEVOLUCAO',
                 
-                is_exchange=False, # 🎯 Devolução não mexe com is_exchange
+                is_exchange=False,
                 forcar_extra=False,
                 
                 organization_id=org_id_destino,
@@ -276,13 +253,14 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         # FINALIZAÇÃO: SALVAR TUDO
         # ==================================================================
         if rejeitados > 0:
-            print(f"\n⚠️ Equipamentos rejeitados (Não encontrados no banco novo): {rejeitados}")
+            print(f"\n⚠️ Equipamentos rejeitados (Não encontrados no banco novo ou sem cliente): {rejeitados}")
 
         self.salvar_movimentos_banco()
+        # Coloca a máquina como Inativa/Manutenção no parque, conforme o 14 original
         self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=self.equipamentos_alterados)
 
 # ==============================================================================
-# WRAPPER (Ponte para a execução dinâmica do main.py no Modo Debug)
+# WRAPPER 
 # ==============================================================================
 def executar(eng_novo, eng_legado):
     from movimentos.migracao_movimentos import carregar_dados_compartilhados

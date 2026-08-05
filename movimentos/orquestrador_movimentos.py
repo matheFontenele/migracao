@@ -46,17 +46,17 @@ class OrquestradorMovimentos:
             aluguel = MigracaoAluguel(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1)
             aluguel.executar()
 
+            print("\n▶️ Iniciando Módulo: SUBSTITUIÇÃO")
+            substituicao = MigracaoSubstituicao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=500000)
+            substituicao.executar()
+
             print("\n▶️ Iniciando Módulo: RESERVA")
-            reserva = MigracaoReserva(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=500000)
+            reserva = MigracaoReserva(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1000000)
             reserva.executar()
 
             print("\n▶️ Iniciando Módulo: DEVOLUÇÃO")
-            devolucao = MigracaoDevolucao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1000000)
+            devolucao = MigracaoDevolucao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1500000)
             devolucao.executar()
-
-            print("\n▶️ Iniciando Módulo: SUBSTITUIÇÃO")
-            substituicao = MigracaoSubstituicao(self.engine_new, self.engine_legado, dados_compartilhados, start_counter=1500000)
-            substituicao.executar()
 
             print("\n▶️ Iniciando Módulo: MANUTENÇÃO")
             manutencao = MigracaoManutencao(self.engine_new, self.engine_legado, dados_compartilhados)
