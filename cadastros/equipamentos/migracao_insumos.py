@@ -20,7 +20,7 @@ class MigracaoInsumos:
         self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         self.stats = {
-            "grupos": 0, "types": 0, "products": 0,
+            "grupos": 0, "types": 0, "products": 0, "locations": 0,
             "transacoes_entrada": 0, "transacoes_saida": 0, 
             "product_items_criados": 0, "transaction_items": 0,
             "itens_ignorados_equipamento": 0
@@ -61,6 +61,34 @@ class MigracaoInsumos:
         s = str(texto).upper().strip()
         return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
+    def _carregar_mapa_org_address(self):
+        print("\n📍 Carregando addresses default (BASE) por organização...")
+        with self.engine_new.begin() as conn:
+            # 1) Address com alias BASE
+            rows = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                  AND UPPER(alias) LIKE '%BASE%'
+                GROUP BY addressable_id
+            """)).fetchall()
+            mapa = {int(r[0]): int(r[1]) for r in rows}
+
+            # 2) Fallback: org sem BASE pega o primeiro address
+            rows_all = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                GROUP BY addressable_id
+            """)).fetchall()
+            for org_id, addr_id in rows_all:
+                mapa.setdefault(int(org_id), int(addr_id))
+
+        print(f"   ✅ Mapa ORG→ADDRESS: {mapa}")
+        return mapa
+
     # ==============================================================================
     # ETL: EXTRAÇÃO (100K+ MOVIMENTOS DO LEGADO)
     # ==============================================================================
@@ -81,12 +109,15 @@ class MigracaoInsumos:
                  , O.ORG_ID AS LEGACY_ORG_ID
                  , O.ORG_NOME AS ORGAO
                  , IESA.CREATED_AT AS DATA_TRANSACAO
+                 , DEP.DPA_ID AS ID_DEPARTAMENTO
+                 , DEP.DPA_NOME AS DEPARTAMENTO
             FROM PRODUTOS_ALM PA
             LEFT JOIN SUBGRUPOS_PRODUTO_ALM SPA ON PA.SGA_ID = SPA.SGA_ID
             LEFT JOIN GRUPOS_PRODUTO_ALM GPA ON SPA.GPA_ID = GPA.GPA_ID
             INNER JOIN ITENS_ENTRADA_SAIDA_ALM IESA ON PA.PRO_ID = IESA.PRO_ID
             INNER JOIN ENTRADAS_SAIDAS_ALM ESA ON IESA.ESA_ID = ESA.ESA_ID
             LEFT JOIN ORGAOS O ON ESA.ORG_ID = O.ORG_ID
+            LEFT JOIN DEPARTAMENTOS_ALM DEP ON ESA.DPA_ID = DEP.DPA_ID
             WHERE GPA.ORG_ID IN (1122, 1264, 1313, 1326, 1328, 1351, 1358, 1360, 1369)
               AND ESA.DELETED_AT IS NULL
               AND PA.PRO_ATIVO = 'S'
@@ -111,6 +142,9 @@ class MigracaoInsumos:
             grupo = self._extrair_grupo_do_nome(nome_produto, tipo)
             condicao_id = self._mapear_condicao(row['CONDICAO'])
             
+            raw_dep = str(row['DEPARTAMENTO']).strip() if pd.notna(row['DEPARTAMENTO']) else ""
+            departamento = raw_dep if raw_dep and raw_dep.upper() != 'NONE' else "ALMOXARIFADO"
+            
             qtd = float(row['QUANTIDADE_MOVIMENTO'])
             tipo_mov = str(row['TIPO_MOVIMENTO']).strip().upper() 
             org_destino = self._descobrir_id_organizacao_destino(row['LEGACY_ORG_ID'])
@@ -133,6 +167,7 @@ class MigracaoInsumos:
                 "nome_produto": nome_produto,
                 "grupo": grupo,
                 "tipo": tipo,
+                "departamento": departamento,
                 "min_quantity": min_q,
                 "max_quantity": max_q,
                 "preco_unitario": float(row['PRECO']) if pd.notna(row['PRECO']) else 0.0,
@@ -257,6 +292,59 @@ class MigracaoInsumos:
             else:
                 fornecedor_padrao_id = res[0]
 
+        # ORG -> ADDRESS DEFAULT (BASE)
+        mapa_org_address = self._carregar_mapa_org_address()
+
+        # --- CRIAÇÃO DE LOCATIONS ---
+        print("   📍 Mapeando e criando Locations por Address (Almoxarifados/Departamentos)...")
+        mapa_locations = {}           # chave: (address_id, departamento) -> location_id
+        fallback_almox_por_addr = {}  # address_id -> location_id do ALMOXARIFADO
+
+        df_master['departamento'] = df_master['departamento'].astype(str).str.strip().str.upper()
+        pares_org_dep = df_master[['org_destino', 'departamento']].drop_duplicates()
+
+        addr_ids = sorted(set(mapa_org_address.values()))
+        ids_str = ",".join(str(i) for i in addr_ids)
+
+        with self.engine_new.begin() as conn:
+            # Locations existentes dos addresses das orgs mapeadas
+            db_locations = conn.execute(text(
+                f"SELECT id, address_id, area FROM locations "
+                f"WHERE address_id IN ({ids_str}) AND deleted_at IS NULL"
+            )).fetchall()
+            for loc_id, addr_id, area in db_locations:
+                mapa_locations[(int(addr_id), str(area).strip().upper())] = loc_id
+
+            # Fallback ALMOXARIFADO por address
+            for addr_id in addr_ids:
+                existe = conn.execute(text(
+                    "SELECT id FROM locations WHERE address_id = :a "
+                    "AND UPPER(area) = 'ALMOXARIFADO' AND deleted_at IS NULL"
+                ), {"a": addr_id}).fetchone()
+                if existe:
+                    fallback_almox_por_addr[addr_id] = existe[0]
+                else:
+                    res_loc = conn.execute(text("""
+                        INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
+                        VALUES (:addr, 'ALMOXARIFADO', 'ÚNICA', 'ÚNICO', 'Criado via Migração (Fallback)', :now, :now)
+                    """), {"addr": addr_id, "now": self.now})
+                    fallback_almox_por_addr[addr_id] = res_loc.lastrowid
+                    self.stats["locations"] += 1
+
+            # Departamentos que não existem em cada address
+            for _, row in pares_org_dep.iterrows():
+                addr_id = mapa_org_address.get(int(row['org_destino']))
+                if not addr_id:
+                    continue
+                dep = row['departamento']
+                if dep and (addr_id, dep) not in mapa_locations:
+                    res_loc = conn.execute(text("""
+                        INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
+                        VALUES (:addr, :area, 'ÚNICA', 'ÚNICO', 'Criado via Migração', :now, :now)
+                    """), {"addr": addr_id, "area": dep, "now": self.now})
+                    mapa_locations[(addr_id, dep)] = res_loc.lastrowid
+                    self.stats["locations"] += 1
+
         # 1. ORDENAÇÃO CRONOLÓGICA ABSOLUTA
         df_master['data_transacao'] = pd.to_datetime(df_master['data_transacao'])
         df_master = df_master.sort_values(by='data_transacao')
@@ -274,6 +362,7 @@ class MigracaoInsumos:
         with self.engine_new.begin() as conn:
             for (legacy_tx, org_id, tipo_mov), df_itens in tqdm(grupos_transacoes, desc="Gerando Transações"):
                 buyer_id_int = int(org_id)
+                addr_id = mapa_org_address.get(buyer_id_int, 1)
                 data_tx = df_itens['data_transacao'].iloc[0].strftime('%Y-%m-%d %H:%M:%S')
 
                 if tipo_mov == 'E':
@@ -316,9 +405,12 @@ class MigracaoInsumos:
                     qtd = float(row['quantidade'])
                     preco_unit = float(row['preco_unitario'])
                     data_item = row['data_transacao'].strftime('%Y-%m-%d %H:%M:%S')
+                    dep_nome = str(row['departamento']).strip().upper()
+                    loc_id = mapa_locations.get((addr_id, dep_nome), fallback_almox_por_addr.get(addr_id))
 
-                    # 2. CÁLCULO INTERNO: ATUALIZA O ESTOQUE NESTE EXATO MOMENTO DA HISTÓRIA
-                    chave_estoque = (pid, buyer_id_int, cond)
+
+                    # 2. CÁLCULO INTERNO: ATUALIZA O ESTOQUE CONSIDERANDO A LOCATION
+                    chave_estoque = (pid, buyer_id_int, cond, loc_id)
                     ultimos_precos[chave_estoque] = preco_unit
                     
                     if chave_estoque not in livro_razao:
@@ -330,7 +422,9 @@ class MigracaoInsumos:
                         livro_razao[chave_estoque] -= qtd
 
                     transaction_items_batch.append({
-                        "tid": tx_id, "pid": pid, "cond": cond, "addr": 1, 
+                        "tid": tx_id, "pid": pid, "cond": cond,
+                        "addr": addr_id,
+                        "loc": loc_id,
                         "unit_cost": preco_unit,
                         "qty": qtd, "now": data_item
                     })
@@ -339,35 +433,51 @@ class MigracaoInsumos:
                 print(f"\n   💾 Despejando {len(transaction_items_batch)} itens de transação no banco...")
                 for i in range(0, len(transaction_items_batch), 5000):
                     conn.execute(text("""
-                        INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, :cond, :now, :addr, :unit_cost, :qty, :now, :now, NULL)
+                        INSERT INTO transaction_items (
+                            transaction_id, product_id, category_id, condition_id, warranty_date,
+                            address_id, location_id, unit_cost, quantity,
+                            created_at, updated_at, deleted_at
+                        )
+                        VALUES (
+                            :tid, :pid, 1, :cond, :now,
+                            :addr, :loc, :unit_cost, :qty,
+                            :now, :now, NULL
+                        )
                     """), transaction_items_batch[i:i+5000])
-                    self.stats["transaction_items"] += len(transaction_items_batch[i:i+5000])
 
-        # 3. GERA OS 'PRODUCT ITEMS' APENAS COM O QUE SOBROU NO LIVRO RAZÃO
+        # 3. GERA OS 'PRODUCT ITEMS' COM LOCATION_ID MANTENDO A DIVISÃO CORRETA
         print("\n   📦 Consolidando o Saldo Final Físico (Product Items)...")
         product_items_batch = []
         contador_codigo_unico = 9000000 
         
         for chave_estoque, saldo_final in livro_razao.items():
             if saldo_final > 0:
-                pid, org_id, cond = chave_estoque
-                # 🎯 Pega o preço exato que ficou armazenado por último no dicionário
+                pid, org_id, cond, loc_id = chave_estoque
+                addr_id = mapa_org_address.get(org_id, 1) 
                 avg_cost_final = ultimos_precos.get(chave_estoque, 0.0)
                 
                 product_items_batch.append({
-                    "pid": pid, "code": contador_codigo_unico, "cond": cond, 
-                    "addr": 1, "org": org_id, "qty": saldo_final, "avg_cost": avg_cost_final, "now": self.now
+                    "pid": pid, "code": contador_codigo_unico, "cond": cond,
+                    "addr": addr_id, "org": org_id, "qty": saldo_final,
+                    "avg_cost": avg_cost_final, "loc_id": loc_id, "now": self.now
                 })
                 contador_codigo_unico += 1
                 
         if product_items_batch:
-            print(f"   💾 Injetando {len(product_items_batch)} lotes de estoque real (product_items)...")
+            print(f"   💾 Injetando {len(product_items_batch)} lotes de estoque real com Locations (product_items)...")
             with self.engine_new.begin() as conn:
                 for i in range(0, len(product_items_batch), 5000):
                     conn.execute(text("""
-                        INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
-                        VALUES (:pid, :code, 1, :cond, :addr, :org, :avg_cost, :qty, :now, :now)
+                        INSERT INTO product_items (
+                            product_id, code, category_id, condition_id, address_id, 
+                            organization_id, location_id, average_cost, quantity, 
+                            created_at, updated_at
+                        ) 
+                        VALUES (
+                            :pid, :code, 1, :cond, :addr, 
+                            :org, :loc_id, :avg_cost, :qty, 
+                            :now, :now
+                        )
                     """), product_items_batch[i:i+5000])
                     self.stats["product_items_criados"] += len(product_items_batch[i:i+5000])
 
@@ -389,6 +499,7 @@ class MigracaoInsumos:
             print("=" * 50)
             print(f"📦 Novos Grupos:           {self.stats['grupos']}")
             print(f"📁 Novos Tipos:            {self.stats['types']}")
+            print(f"📍 Novas Locations:        {self.stats['locations']}")
             print(f"🛒 Produtos (Insumos):     {self.stats['products']}")
             print(f"🚫 Movimentos ignorados (Equipamentos): {self.stats['itens_ignorados_equipamento']}")
             print("-" * 50)

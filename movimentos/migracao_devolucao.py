@@ -152,22 +152,16 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
             cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id)
             
-            if not recipient_id:
+            if not recipient_id or not cliente_final_address:
                 rejeitados += 1
                 continue
 
             # =========================================================
-            # ROTEAMENTO INTELIGENTE FISICO (Qual base vai receber o frete?)
+            # ROTEAMENTO INTELIGENTE FISICO (Qual base gerencia a operação?)
             # =========================================================
             orgao_id_legado = row['ORIG_ORGAO_ID'] if pd.notna(row.get('ORIG_ORGAO_ID')) else None
             org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
-            endereco_base_id = self.dict_enderecos_base_org.get(org_id_destino)
             
-            # Fallback de segurança (Se falhar, vai para a Base Principal - 1115)
-            if not endereco_base_id:
-                endereco_base_id = self.dict_enderecos_base_org.get(1115, 1) 
-                org_id_destino = 1115
-
             # ==================================================================
             # 🎯 REGRA DE DEVOLUÇÃO (Sem Parquets, usa o que tá ativo pro cliente)
             # ==================================================================
@@ -186,7 +180,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 self.registrar_movimento(
                     id_final=id_mov_origem,
                     recipient_id=recipient_id,
-                    cliente_final_address_id=cliente_final_address,
+                    cliente_final_address_id=cliente_final_address, # 👈 Endereço físico do cliente
                     usuario_id=usr_origem,
                     mov_date=dt_origem,
                     deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
@@ -222,7 +216,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             self.registrar_movimento(
                 id_final=id_mov_dev,
                 recipient_id=recipient_id, 
-                cliente_final_address_id=endereco_base_id,
+                cliente_final_address_id=cliente_final_address, # 👈 AGORA APONTA PARA O ENDEREÇO DO CLIENTE DE ONDE FOI RETIRADO
                 usuario_id=usr_dev,
                 mov_date=dt_dev,
                 deleted_at_mov=row['DEV_DEL'] if pd.notna(row['DEV_DEL']) else None,
@@ -246,14 +240,14 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 organization_id=org_id_destino,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
-                details_item="Retorno para a Base"
+                details_item="Retirado do Cliente (Retorno para a Base)"
             )
 
         # ==================================================================
         # FINALIZAÇÃO: SALVAR TUDO
         # ==================================================================
         if rejeitados > 0:
-            print(f"\n⚠️ Equipamentos rejeitados (Não encontrados no banco novo ou sem cliente): {rejeitados}")
+            print(f"\n⚠️ Equipamentos rejeitados (Não encontrados no banco novo ou sem cliente/endereço): {rejeitados}")
 
         self.salvar_movimentos_banco()
         # Coloca a máquina como Inativa/Manutenção no parque, conforme o 14 original

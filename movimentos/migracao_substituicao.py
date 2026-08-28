@@ -281,7 +281,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             _, _, id_mov_item_dev = self.registrar_movimento(
                 id_final=id_mov_dev,
                 recipient_id=recipient_id,
-                cliente_final_address_id=endereco_base_id,
+                cliente_final_address_id=recipient_id,
                 usuario_id=int(row['USR_SUBST']),
                 organization_id=int(org_id_cascata),
                 mov_date=row['DATA_DEVOLUCAO'],

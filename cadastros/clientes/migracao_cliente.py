@@ -146,6 +146,7 @@ class MigracaoClientes:
 
     def _extrair(self):
         print("📖 Extraindo dados do legado...")
+        # 👇 QUERY ATUALIZADA: Incluindo updated_at e created_at
         query = """
                 SELECT
                     ald.id as ID_PREFEITURA,
@@ -160,7 +161,9 @@ class MigracaoClientes:
                     ac.endereco as ENDERECO,
                     ac.estado as ESTADO,
                     ac.cidade as CIDADE,
-                    ac.telefone as PHONE
+                    ac.telefone as PHONE,
+                    ac.updated_at as updated_at,
+                    ac.created_at as created_at
                 FROM aluguel_clientes ac
                 LEFT JOIN aluguel_setor als ON als.id = ac.setor_id
                 LEFT JOIN aluguel_departamento ald ON ald.id = als.departamento_id
@@ -182,7 +185,6 @@ class MigracaoClientes:
 
 
      # ==============================================================================
-    #==============================================================================
     # 2. APLICANDO REGRAS DE EXCEÇÃO E LIMPEZA DE DADOS
     # ==============================================================================
     def _achatar_secretarias_iguais_prefeitura(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -253,6 +255,7 @@ class MigracaoClientes:
             df_modificado.at[idx, 'SECRETARIA'] = nome_sec_alvo
             df_modificado.at[idx, 'CLIENTE'] = nome_cliente_limpo
         return df_modificado
+        
     def _regionalizar_pcpb(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
         
@@ -274,6 +277,7 @@ class MigracaoClientes:
             df_modificado.at[idx, 'ID_SECRETARIA'] = id_sintetico
             df_modificado.at[idx, 'SECRETARIA'] = f"POLÍCIA CIVIL - {regiao_encontrada}"
         return df_modificado
+        
     def _unificar_ministerio_relacoes(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
 
@@ -302,6 +306,7 @@ class MigracaoClientes:
             df_modificado.loc[mask_ministerio, 'SECRETARIA'] = None
         
         return df_modificado
+        
     def _unificar_ministerio_transportes(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
 
@@ -320,6 +325,7 @@ class MigracaoClientes:
             df_modificado.loc[mask_transportes, 'SECRETARIA'] = None
         
         return df_modificado
+        
     def _reestruturar_detran(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
 
@@ -353,6 +359,7 @@ class MigracaoClientes:
             ]
 
         return df_modificado
+        
     def _padronizar_hospitais_pb(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
         
@@ -372,6 +379,7 @@ class MigracaoClientes:
                 df_modificado.loc[mask_hosp, 'CLIENTE'] = info['nome']
                 
         return df_modificado
+        
     # ==============================================================================
     # FUNÇÕES AUXILIARES DE SANETIZAÇÃO
     # ==============================================================================
@@ -401,7 +409,7 @@ class MigracaoClientes:
         df_clean = df_clean[~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)]
 
         # --- APLICA EXCEÇÕES ---
-        df_clean = self._unificar_receita_federal(df_clean)
+        # df_clean = self._unificar_receita_federal(df_clean)
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._padronizar_hospitais_pb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
@@ -475,6 +483,7 @@ class MigracaoClientes:
 
         df_mod = df_mod.drop(columns=['ID_PREF_STR', 'ID_SEC_STR', 'ID_CLI_STR'])
         return df_mod
+        
     # ==============================================================================
     # 3. CARGA (Bulk Inserts)
     # ==============================================================================
@@ -519,44 +528,85 @@ class MigracaoClientes:
                     "city": box["city"],
                     "state": box["state"],
                     "leg_id": None,
-                    "res_id": None
+                    "res_id": None,
+                    "created_at": self.now,
+                    "updated_at": self.now
                 })
         
         enderecos_batch.extend(novos_boxes)
 
         print("🚀 Gravando dados no banco de dados...")
         with self.engine_new.begin() as conn:
-            query_cust = text("INSERT INTO customers (alias, name, cpf_cnpj, organization_id, parent_id, created_at, updated_at) VALUES (:n, :n, :d, :o, :p, :now, :now)")
+            query_cust = text("""
+                INSERT INTO customers (alias, name, cpf_cnpj, organization_id, parent_id, created_at, updated_at) 
+                VALUES (:n, :n, :d, :o, :p, :created_at, :updated_at)
+            """)
             
-            # Pais
+            # Pais (Prefeituras)
             dict_traducao_pais = {}
             for id_legado, info in tqdm(prefeituras.items(), desc="Inserindo Prefeituras"):
-                res = conn.execute(query_cust, {"n": info["nome"], "d": self._limpar_cnpj(info["row"].get('CNPJ')), "o": descobrir_id_organizacao(info["row"]['ORGANIZACAO']), "p": None, "now": self.now})
+                c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
+                u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
+                
+                res = conn.execute(query_cust, {
+                    "n": info["nome"], "d": self._limpar_cnpj(info["row"].get('CNPJ')), 
+                    "o": descobrir_id_organizacao(info["row"]['ORGANIZACAO']), "p": None, 
+                    "created_at": c_at, "updated_at": u_at
+                })
                 novo_id = res.lastrowid
                 dict_traducao_pais[id_legado] = novo_id
                 self.stats["pais"] += 1
 
-            # Filhos
+            # Filhos (Secretarias)
             dict_traducao_filhos = {}
             for id_legado, info in tqdm(secretarias.items(), desc="Inserindo Secretarias"):
                 id_pai = dict_traducao_pais.get(info["id_pai"])
                 if info["id_pai"] and not id_pai: continue
-                res = conn.execute(query_cust, {"n": info["nome"], "d": self._limpar_cnpj(info["row"].get('CNPJ')), "o": descobrir_id_organizacao(info["row"]['ORGANIZACAO']), "p": id_pai, "now": self.now})
+                
+                c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
+                u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
+
+                res = conn.execute(query_cust, {
+                    "n": info["nome"], "d": self._limpar_cnpj(info["row"].get('CNPJ')), 
+                    "o": descobrir_id_organizacao(info["row"]['ORGANIZACAO']), "p": id_pai, 
+                    "created_at": c_at, "updated_at": u_at
+                })
                 novo_id = res.lastrowid
                 dict_traducao_filhos[id_legado] = novo_id
                 self.stats["filhos"] += 1
 
-            # Netos (Preparação)
+            # Netos (Endereços) - Preparação
             for id_legado, info in tqdm(destinos.items(), desc="Preparando Endereços Finais"):
                 target_id = dict_traducao_filhos.get(info["id_sec"]) or dict_traducao_pais.get(info["id_pref"])
                 if target_id:
-                    enderecos_batch.append({"type": "customer", "id": target_id, "alias": info["nome"], "zip": info["row"]['CEP'], "street": info["row"]['ENDERECO'], "num": "S/N", "city": info["row"]['CIDADE'], "state": info["row"]['ESTADO'], "leg_id": info["legacy_id"], "res_id": info["res_id"]})
+                    c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
+                    u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
+                    
+                    enderecos_batch.append({
+                        "type": "customer", "id": target_id, "alias": info["nome"], 
+                        "zip": info["row"]['CEP'], "street": info["row"]['ENDERECO'], 
+                        "num": "S/N", "city": info["row"]['CIDADE'], "state": info["row"]['ESTADO'], 
+                        "leg_id": info["legacy_id"], "res_id": info["res_id"],
+                        "created_at": c_at, "updated_at": u_at
+                    })
                     self.stats["enderecos"] += 1
 
-            # BULK INSERT MÁGICO (O fim do gargalo de rede)
+            # BULK INSERT MÁGICO
             print(f"📦 Arremessando Lote de {len(enderecos_batch)} Endereços de uma só vez...")
-            query_add = text("INSERT INTO addresses (addressable_type, addressable_id, alias, zip, street, number, city, state, country, legacy_customer_id, reserved_customer_id, created_at, updated_at) VALUES (:type, :id, :alias, :zip, :street, :num, :city, :state, 'Brasil', :leg_id, :res_id, :now, :now)")
-            conn.execute(query_add, [{"type": a["type"], "id": a["id"], "alias": a["alias"], "zip": a["zip"], "street": a["street"], "num": a["num"], "city": a["city"], "state": a["state"], "leg_id": a["leg_id"], "res_id": a["res_id"], "now": self.now} for a in enderecos_batch])
+            # 👇 Ajustado: query dos Addresses agora insere as datas variáveis
+            query_add = text("""
+                INSERT INTO addresses (addressable_type, addressable_id, alias, zip, street, number, city, state, country, legacy_customer_id, reserved_customer_id, created_at, updated_at) 
+                VALUES (:type, :id, :alias, :zip, :street, :num, :city, :state, 'Brasil', :leg_id, :res_id, :created_at, :updated_at)
+            """)
+            
+            conn.execute(query_add, [{
+                "type": a["type"], "id": a["id"], "alias": a["alias"], 
+                "zip": a.get("zip"), "street": a.get("street"), "num": a.get("num"), 
+                "city": a.get("city"), "state": a.get("state"), 
+                "leg_id": a.get("leg_id"), "res_id": a.get("res_id"),
+                "created_at": a.get("created_at", self.now), 
+                "updated_at": a.get("updated_at", self.now)
+            } for a in enderecos_batch])
 
         print("\n" + "="*50)
         print("📊 RELATÓRIO FINAL DA ESTRUTURA HIERÁRQUICA")
