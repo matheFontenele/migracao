@@ -108,7 +108,9 @@ class MigracaoEquipamentos:
                 alq.situacao_id,
                 alq.created_at,
                 alq.updated_at,
-                alq.deleted_at
+                alq.deleted_at,
+                alq.data_aquisicao,
+                alq.data_garantia
             FROM aluguel_equipamentos alq
             LEFT JOIN aluguel_tipos tipe ON alq.tipo_id = tipe.id
             INNER JOIN ORGAOS og ON alq.orgao_id = og.ORG_ID
@@ -207,6 +209,8 @@ class MigracaoEquipamentos:
                 "created_at":    created_at_destino,
                 "updated_at":    updated_at_destino,
                 "deleted_at":    deleted_at_destino,
+                "data_aquisicao": self._nula(dados_db['data_aquisicao']),
+                "data_garantia":  self._nula(dados_db['data_garantia']),
                 "transaction_id": None
             })
 
@@ -408,28 +412,26 @@ class MigracaoEquipamentos:
         print("📊 Gerando agrupamento de Inventário (Fornecedor + Órgão + Produto)...")
         
         df_validos = df_master[df_master['org_destino'].notna()]
-        grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino'], dropna=False)
+        grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino', 'data_aquisicao'], dropna=False)
 
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
 
         with self.engine_new.begin() as conn:
-            for (s_id, org_id), df_transacao in grupos_transacao:
+            for (s_id, org_id, data_aquisicao_chave), df_transacao in grupos_transacao:
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
-                datas_lote = pd.to_datetime(df_transacao['created_at'], errors='coerce').dropna()
-                
-                if not datas_lote.empty:
-                    data_minima_dt = datas_lote.min()
-                    data_transacao = data_minima_dt.strftime('%Y-%m-%d %H:%M:%S')
-                    # Adiciona 1 mês para a garantia
-                    data_garantia = (data_minima_dt + pd.DateOffset(months=1)).strftime('%Y-%m-%d %H:%M:%S')
-                else:
-                    data_transacao = self.now
-                    data_garantia = (pd.to_datetime(self.now) + pd.DateOffset(months=1)).strftime('%Y-%m-%d %H:%M:%S')
+                addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
 
-                # A. Transação Mãe
+                # DATA DE COMPRA: data_aquisicao do legado; fallback = menor created_at do lote
+                data_compra_dt = pd.to_datetime(data_aquisicao_chave, errors='coerce')
+                if pd.isna(data_compra_dt):
+                    datas_lote = pd.to_datetime(df_transacao['created_at'], errors='coerce').dropna()
+                    data_compra_dt = datas_lote.min() if not datas_lote.empty else pd.to_datetime(self.now)
+                data_transacao = data_compra_dt.strftime('%Y-%m-%d %H:%M:%S')
+
+                # A. Transação Mãe (purchase_date = data de compra real)
                 result_tx = conn.execute(text("""
                     INSERT INTO transactions (transaction_date, transaction_type_id, supplier_id, buyer_id, 
                     doc_type_id, doc_date, purchase_date, created_by, details, amount_total, amount_discount, created_at, updated_at) 
@@ -445,12 +447,20 @@ class MigracaoEquipamentos:
 
                 grupos_produtos = df_transacao.groupby('product_id', dropna=False)
 
+                # UM ÚNICO loop por produto (SEM duplicação)
                 for p_id, df_equipamentos_identicos in grupos_produtos:
-                    
                     p_id_val = int(p_id) if pd.notna(p_id) else None
                     qtd_repeticoes = len(df_equipamentos_identicos)
-                    addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
 
+                    # GARANTIA POR PRODUTO: data_garantia REAL do legado; fallback = compra + 1 ANO
+                    garantias_lote = pd.to_datetime(df_equipamentos_identicos['data_garantia'], errors='coerce').dropna()
+                    if not garantias_lote.empty:
+                        data_garantia_dt = garantias_lote.min()
+                    else:
+                        data_garantia_dt = data_compra_dt + pd.DateOffset(years=1)
+                    data_garantia = data_garantia_dt.strftime('%Y-%m-%d %H:%M:%S')
+
+                    # B. Bloco de Estoque (product_items)
                     result_pi = conn.execute(text("""
                         INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
                         VALUES (:pid, :code, 1, 1, :addr, :org, 1, :qty, :now, :now)
@@ -462,13 +472,14 @@ class MigracaoEquipamentos:
                     contador_codigo_unico += 1
                     self.stats["product_items_criados"] += 1
 
+                    # C. Item de Transação (transaction_items com garantia real)
                     result_item = conn.execute(text("""
                         INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
                         VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, 0, :qty, :now, :now, NULL)
                     """), {
                         "tid": tx_id_gerado, 
                         "pid": p_id_val, 
-                        "warranty_date": data_garantia, # <-- Aqui entra o +1 mês
+                        "warranty_date": data_garantia,
                         "now": self.now, 
                         "addr": addr_id, 
                         "qty": qtd_repeticoes
@@ -476,6 +487,7 @@ class MigracaoEquipamentos:
                     ti_id_gerado = result_item.lastrowid
                     self.stats["transaction_items"] += 1
 
+                    # D. Equipamentos físicos + histórico
                     for _, linha_equip in df_equipamentos_identicos.iterrows():
                         eq_id = int(linha_equip['id_legado'])
                         eq_created_at = linha_equip['created_at']
@@ -511,6 +523,7 @@ class MigracaoEquipamentos:
                             "user_id": 1 
                         })
 
+            # Inserção em lote (DENTRO do with, FORA dos loops - uma vez só)
             if lista_equipamentos_global:
                 print(f"💾 Inserindo {len(lista_equipamentos_global)} máquinas físicas no MySQL...")
                 conn.execute(text("""
