@@ -3,20 +3,19 @@ import os
 from sqlalchemy import create_engine
 
 def obter_engines():
-    
-    HOST_NOVO = os.getenv("DB_HOST_NEW", "localhost")
+    HOST_NEW = os.getenv("DB_HOST_NEW", "localhost")
+    HOST_LEGADO = os.getenv("DB_HOST_LEGADO", "172.16.0.200")
 
     config_new = {
-        "host": HOST_NOVO, "port": "3307", "db": "controle-interno",
+        "host": HOST_NEW, "port": "3307", "db": "controle-interno",
         "user": "root", "pass": "root"
     }
 
     config_legado = {
-        "host": HOST_NOVO, "port": "3307", "db": "aluguel_legado",
-        "user": "root", "pass": "root"
+        "host": HOST_LEGADO, "port": "3310", "db": "aluguel_legado",
+        "user": "root", "pass": "1234"
     }
 
-    # pool_pre_ping=True testa se o MySQL não "dormiu" antes de disparar a query
     url_new = f"mysql+pymysql://{config_new['user']}:{config_new['pass']}@{config_new['host']}:{config_new['port']}/{config_new['db']}"
     engine_new = create_engine(url_new, pool_pre_ping=True)
 

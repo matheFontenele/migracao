@@ -90,14 +90,6 @@ class MigracaoEquipamentos:
         }
 
         query_legado = """
-            WITH UltimoMovimento AS (
-                SELECT 
-                    equipamento_id,
-                    novo_orgao_id,
-                    ROW_NUMBER() OVER(PARTITION BY equipamento_id ORDER BY id DESC) AS ordem
-                FROM aluguel_movimento_itens
-                WHERE deleted_at IS NULL
-            )
             SELECT 
                 alq.id AS id_legado,
                 alq.numero AS tombo_legado,
@@ -114,7 +106,17 @@ class MigracaoEquipamentos:
             FROM aluguel_equipamentos alq
             LEFT JOIN aluguel_tipos tipe ON alq.tipo_id = tipe.id
             INNER JOIN ORGAOS og ON alq.orgao_id = og.ORG_ID
-            LEFT JOIN UltimoMovimento ult_movi ON alq.id = ult_movi.equipamento_id AND ult_movi.ordem = 1
+            LEFT JOIN (
+                SELECT mi.equipamento_id, mi.novo_orgao_id
+                FROM aluguel_movimento_itens mi
+                INNER JOIN (
+                    SELECT equipamento_id, MAX(id) AS max_id
+                    FROM aluguel_movimento_itens
+                    WHERE deleted_at IS NULL
+                    GROUP BY equipamento_id
+                ) mx ON mx.max_id = mi.id
+                WHERE mi.deleted_at IS NULL
+            ) ult_movi ON alq.id = ult_movi.equipamento_id
             LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
             WHERE alq.deleted_at IS NULL;
         """

@@ -354,32 +354,40 @@ class BaseMigracaoMovimento:
         situacoes_sql = "(" + ", ".join(map(str, situacoes_permitidas)) + ")"
 
         query = f"""
-            WITH MovimentosOrdenados AS (
-                SELECT
-                    alq.id AS equipment_id,
-                    alq.numero AS tombo,
-                    tipo.nome AS tipo_nome,
-                    alq.situacao_id,
-                    mov.id,
-                    mov.data,
-                    mov.updated_at,
-                    mov.deleted_at,
-                    mov.tipo_id,
-                    mov.cliente_id,
-                    mov.usuario_id,
-                    ROW_NUMBER() OVER(PARTITION BY alq.id ORDER BY mov.data DESC, mov.id DESC) AS ordem
-                FROM aluguel_equipamentos alq
-                INNER JOIN aluguel_movimento_itens movi ON alq.id = movi.equipamento_id
-                INNER JOIN aluguel_movimento mov ON movi.movimento_id = mov.id
-                INNER JOIN aluguel_clientes cli ON mov.cliente_id = cli.id
-                INNER JOIN aluguel_tipos tipo ON alq.tipo_id = tipo.id
-                WHERE mov.deleted_at IS NULL 
-                  AND alq.deleted_at IS NULL 
-                  AND alq.situacao_id IN {situacoes_sql}
-                  AND mov.tipo_id IN {tipos_sql}
-                  AND alq.numero IN {lista_tombos_sql}
+            SELECT
+                alq.id AS equipment_id,
+                alq.numero AS tombo,
+                tipo.nome AS tipo_nome,
+                alq.situacao_id,
+                mov.id,
+                mov.data,
+                mov.updated_at,
+                mov.deleted_at,
+                mov.tipo_id,
+                mov.cliente_id,
+                mov.usuario_id
+            FROM aluguel_equipamentos alq
+            INNER JOIN aluguel_movimento_itens movi ON alq.id = movi.equipamento_id
+            INNER JOIN aluguel_movimento mov ON movi.movimento_id = mov.id
+            INNER JOIN aluguel_clientes cli ON mov.cliente_id = cli.id
+            INNER JOIN aluguel_tipos tipo ON alq.tipo_id = tipo.id
+            WHERE mov.deleted_at IS NULL 
+            AND alq.deleted_at IS NULL 
+            AND alq.situacao_id IN {situacoes_sql}
+            AND mov.tipo_id IN {tipos_sql}
+            AND alq.numero IN {lista_tombos_sql}
+            AND mov.id = (
+                    -- 🆕 Substitui ROW_NUMBER() ... ordem = 1:
+                    -- último movimento do equipamento (por data, desempate por id)
+                    SELECT mov_x.id
+                    FROM aluguel_movimento_itens movi_x
+                    INNER JOIN aluguel_movimento mov_x ON mov_x.id = movi_x.movimento_id
+                    WHERE movi_x.equipamento_id = alq.id
+                    AND mov_x.deleted_at IS NULL
+                    AND movi_x.deleted_at IS NULL
+                    ORDER BY mov_x.data DESC, mov_x.id DESC
+                    LIMIT 1
             )
-            SELECT * FROM MovimentosOrdenados WHERE ordem = 1;
         """
         
         # Executa no banco legado
