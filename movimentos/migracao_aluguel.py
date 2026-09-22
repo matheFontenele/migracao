@@ -52,45 +52,41 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         tombos_formatados = ",".join(f"'{str(t).strip()}'" for t in tombos_list)
         
         query = f"""
-            WITH UltimosMovimentos AS (
-                SELECT
-                    movi.equipamento_id,
-                    mov.id AS movimento_id,
-                    mov.data AS data_movimento,
-                    mov.updated_at,
-                    mov.deleted_at,
-                    mov.cliente_id,
-                    mov.usuario_id,
-                    mov.tipo_id AS tipo_mov_id,
-                    mov.tipo AS tipo_movimento,
-                    ROW_NUMBER() OVER(PARTITION BY movi.equipamento_id ORDER BY mov.data DESC, mov.id DESC) as rn
-                FROM aluguel_movimento mov
-                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
-                WHERE mov.deleted_at IS NULL
-                  AND movi.deleted_at IS NULL
-            )
             SELECT
                 eq.id AS equipamento_id,
                 eq.numero AS tombo,
                 eq.nome AS nome_equipamento,
                 eq.tipo_id AS eq_tipo_id,
-                
-                um.movimento_id AS id,
-                um.data_movimento,
-                um.updated_at,
-                um.deleted_at,
-                um.cliente_id,
-                um.usuario_id,
-                um.tipo_mov_id AS tipo_id,
-                um.tipo_movimento
+
+                mov.id AS id,
+                mov.data AS data_movimento,
+                mov.updated_at,
+                mov.deleted_at,
+                mov.cliente_id,
+                mov.usuario_id,
+                mov.tipo_id AS tipo_id,
+                mov.tipo AS tipo_movimento
             FROM aluguel_equipamentos eq
-            INNER JOIN UltimosMovimentos um
-                ON eq.id = um.equipamento_id
-                AND um.rn = 1
-            WHERE eq.deleted_at IS NULL
-              AND eq.situacao_id = 1
-              AND um.tipo_mov_id IN (1, 2)
-              AND eq.numero IN ({tombos_formatados})
+            INNER JOIN aluguel_movimento_itens movi ON movi.equipamento_id = eq.id
+            INNER JOIN aluguel_movimento mov       ON mov.id = movi.movimento_id
+            WHERE mov.deleted_at IS NULL
+            AND movi.deleted_at IS NULL
+            AND eq.deleted_at IS NULL
+            AND eq.situacao_id = 1
+            AND mov.tipo_id IN (1, 2)
+            AND eq.numero IN ({tombos_formatados})
+            AND mov.id = (
+                    -- 🆕 substitui o ROW_NUMBER() ... rn = 1:
+                    -- último movimento do equipamento (por data, desempate por id)
+                    SELECT mov_x.id
+                    FROM aluguel_movimento_itens movi_x
+                    INNER JOIN aluguel_movimento mov_x ON mov_x.id = movi_x.movimento_id
+                    WHERE movi_x.equipamento_id = eq.id
+                    AND mov_x.deleted_at IS NULL
+                    AND movi_x.deleted_at IS NULL
+                    ORDER BY mov_x.data DESC, mov_x.id DESC
+                    LIMIT 1
+            )
         """
         
         with self.engine_legado.connect() as conn:

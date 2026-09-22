@@ -62,45 +62,6 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         print("   📖 Extraindo O PRESENTE (Pareamento exato por TIPO de Equipamento)...")
 
         query_presente = """
-            WITH devolucoes AS (
-                SELECT
-                    sub.id AS substituicao_id,
-                    mov.id AS movimento_id,
-                    mov.data AS data_mov,
-                    mov.cliente_id,
-                    mov.usuario_id,
-                    mov.deleted_at,
-                    eq.numero AS tombo,
-                    eq.nome,
-                    eq.tipo_id,
-                    ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
-                FROM aluguel_substituicao sub
-                -- Lembrando: substituicao_aluguel_id guarda a DEVOLUÇÃO no legado
-                INNER JOIN aluguel_movimento mov ON sub.substituicao_aluguel_id = mov.id
-                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
-                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
-                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
-            ),
-            alugueis AS (
-                SELECT
-                    sub.id AS substituicao_id,
-                    mov.id AS movimento_id,
-                    mov.data AS data_mov,
-                    mov.cliente_id,
-                    mov.usuario_id,
-                    mov.deleted_at,
-                    eq.numero AS tombo,
-                    eq.nome,
-                    eq.tipo_id,
-                    eq.situacao_id,
-                    ROW_NUMBER() OVER(PARTITION BY sub.id, eq.tipo_id ORDER BY eq.numero) as par_index
-                FROM aluguel_substituicao sub
-                -- Lembrando: substituicao_devolucao_id guarda o ALUGUEL (ida) no legado
-                INNER JOIN aluguel_movimento mov ON sub.substituicao_devolucao_id = mov.id
-                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
-                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
-                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
-            )
             SELECT
                 d.substituicao_id,
                 d.cliente_id AS CLIENTE_ID,
@@ -108,7 +69,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 d.data_mov AS DATA_DEVOLUCAO,
                 a.data_mov AS DATA_ALUGUEL,
                 COALESCE(a.data_mov, d.data_mov) AS DATA_SUBST,
-                
+
                 d.deleted_at AS DEL_SUBST,
 
                 d.movimento_id AS MOV_DEV_ID,
@@ -120,10 +81,66 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 a.tombo AS TOMBO_NOVO,
                 a.nome AS NOME_NOVO,
                 a.tipo_id AS TIPO_NOVO
-            FROM devolucoes d
-            INNER JOIN alugueis a 
-                ON d.substituicao_id = a.substituicao_id 
-                AND d.tipo_id = a.tipo_id 
+            FROM (
+                -- 🆕 ex-CTE "devolucoes" (substituicao_aluguel_id = DEVOLUÇÃO no legado)
+                SELECT
+                    sub.id AS substituicao_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_mov,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    mov.deleted_at,
+                    eq.numero AS tombo,
+                    eq.nome,
+                    eq.tipo_id,
+                    (
+                        SELECT COUNT(*) + 1
+                        FROM aluguel_substituicao sub2
+                        INNER JOIN aluguel_movimento mov2 ON sub2.substituicao_aluguel_id = mov2.id
+                        INNER JOIN aluguel_movimento_itens movi2 ON mov2.id = movi2.movimento_id
+                        INNER JOIN aluguel_equipamentos eq2 ON movi2.equipamento_id = eq2.id
+                        WHERE mov2.deleted_at IS NULL AND eq2.deleted_at IS NULL
+                        AND sub2.id = sub.id
+                        AND eq2.tipo_id = eq.tipo_id
+                        AND eq2.numero < eq.numero
+                    ) AS par_index
+                FROM aluguel_substituicao sub
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_aluguel_id = mov.id
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
+                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
+            ) d
+            INNER JOIN (
+                -- 🆕 ex-CTE "alugueis" (substituicao_devolucao_id = ALUGUEL/ida no legado)
+                SELECT
+                    sub.id AS substituicao_id,
+                    mov.id AS movimento_id,
+                    mov.data AS data_mov,
+                    mov.cliente_id,
+                    mov.usuario_id,
+                    mov.deleted_at,
+                    eq.numero AS tombo,
+                    eq.nome,
+                    eq.tipo_id,
+                    (
+                        SELECT COUNT(*) + 1
+                        FROM aluguel_substituicao sub2
+                        INNER JOIN aluguel_movimento mov2 ON sub2.substituicao_devolucao_id = mov2.id
+                        INNER JOIN aluguel_movimento_itens movi2 ON mov2.id = movi2.movimento_id
+                        INNER JOIN aluguel_equipamentos eq2 ON movi2.equipamento_id = eq2.id
+                        WHERE mov2.deleted_at IS NULL AND eq2.deleted_at IS NULL
+                        AND sub2.id = sub.id
+                        AND eq2.tipo_id = eq.tipo_id
+                        AND eq2.numero < eq.numero
+                    ) AS par_index
+                FROM aluguel_substituicao sub
+                INNER JOIN aluguel_movimento mov ON sub.substituicao_devolucao_id = mov.id
+                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
+                INNER JOIN aluguel_equipamentos eq ON movi.equipamento_id = eq.id
+                WHERE mov.deleted_at IS NULL AND eq.deleted_at IS NULL
+            ) a
+                ON d.substituicao_id = a.substituicao_id
+                AND d.tipo_id = a.tipo_id
                 AND d.par_index = a.par_index
         """
         with self.engine_legado.connect() as conn:

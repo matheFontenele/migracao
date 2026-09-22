@@ -55,57 +55,74 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
         # 1. QUERY MESTRA: Cruzamento de histórico usando CTE e RN 1 e RN 2
         # ==================================================================
         query = """
-            WITH HistoricoMovimentos AS (
-                SELECT
-                    movi.equipamento_id,
-                    mov.id AS movimento_id,
-                    mov.data AS data_movimento,
-                    mov.updated_at,
-                    mov.deleted_at,
-                    mov.cliente_id,
-                    ac.orgao_id,
-                    mov.usuario_id,
-                    mov.tipo_id AS tipo_mov_id,
-                    -- Numera os movimentos de cada equipamento, do mais recente (1) pro mais antigo (N)
-                    ROW_NUMBER() OVER(PARTITION BY movi.equipamento_id ORDER BY COALESCE(mov.data, '1900-01-01') DESC, mov.id DESC) as rn
-                FROM aluguel_movimento mov
-                INNER JOIN aluguel_movimento_itens movi ON mov.id = movi.movimento_id
-                LEFT JOIN aluguel_clientes ac ON mov.cliente_id = ac.id
-                WHERE mov.deleted_at IS NULL
-                  AND movi.deleted_at IS NULL
-            )
             SELECT
                 eq.id AS equipamento_id,
                 eq.numero AS TOMBO,
                 eq.nome AS NOME_EQUIPAMENTO,
                 
                 -- 👇 FASE 2: DADOS DO PRESENTE (A DEVOLUÇÃO / rn = 1)
-                dev.movimento_id AS DEV_MOV_ID,
-                COALESCE(dev.updated_at, dev.data_movimento) AS DEV_DATA,
+                dev.id AS DEV_MOV_ID,
+                COALESCE(dev.updated_at, dev.data) AS DEV_DATA,
                 dev.deleted_at AS DEV_DEL,
                 dev.cliente_id AS DEV_CLIENTE_ID,
                 COALESCE(NULLIF(dev.usuario_id, 0), 1) AS DEV_USR_ID,
 
                 -- 👇 FASE 1: DADOS DO PASSADO (O ALUGUEL ORIGINAL / rn = 2)
-                alu.movimento_id AS ORIG_MOV_ID,
-                COALESCE(alu.updated_at, alu.data_movimento) AS ORIG_DATA,
+                alu.id AS ORIG_MOV_ID,
+                COALESCE(alu.updated_at, alu.data) AS ORIG_DATA,
                 alu.deleted_at AS ORIG_DEL,
                 alu.cliente_id AS ORIG_CLIENTE_ID,
-                alu.orgao_id AS ORIG_ORGAO_ID,
+                ac_alu.orgao_id AS ORIG_ORGAO_ID,
                 COALESCE(NULLIF(alu.usuario_id, 0), 1) AS ORIG_USR_ID,
-                alu.tipo_mov_id AS ORIG_TIPO_LEGADO
+                alu.tipo_id AS ORIG_TIPO_LEGADO
             FROM aluguel_equipamentos eq
-            -- Cruzamento 1: Pega o último movimento absoluto (A Devolução)
-            INNER JOIN HistoricoMovimentos dev
-                ON eq.id = dev.equipamento_id
-                AND dev.rn = 1
-            -- Cruzamento 2: Pega o movimento imediatamente anterior (A Saída/Aluguel)
-            LEFT JOIN HistoricoMovimentos alu
-                ON eq.id = alu.equipamento_id
-                AND alu.rn = 2
+            
+            -- Cruzamento 1: Último movimento (rn = 1)
+            INNER JOIN aluguel_movimento_itens movi_dev ON movi_dev.equipamento_id = eq.id
+            INNER JOIN aluguel_movimento dev ON movi_dev.movimento_id = dev.id
+            LEFT JOIN aluguel_clientes ac_dev ON dev.cliente_id = ac_dev.id
+            
+            -- Cruzamento 2: Penúltimo movimento (rn = 2)
+            LEFT JOIN aluguel_movimento_itens movi_alu ON movi_alu.equipamento_id = eq.id
+            LEFT JOIN aluguel_movimento alu ON movi_alu.movimento_id = alu.id
+            LEFT JOIN aluguel_clientes ac_alu ON alu.cliente_id = ac_alu.id
+            
             WHERE eq.deleted_at IS NULL
-              AND eq.situacao_id = 14
-              AND dev.tipo_mov_id IN (2);
+            AND eq.situacao_id = 14
+            
+            -- Filtros do dev (rn = 1)
+            AND dev.deleted_at IS NULL
+            AND movi_dev.deleted_at IS NULL
+            AND dev.tipo_id IN (2)
+            AND (
+                SELECT COUNT(*)
+                FROM aluguel_movimento_itens movi_x
+                INNER JOIN aluguel_movimento mov_x ON movi_x.movimento_id = mov_x.id
+                WHERE movi_x.equipamento_id = eq.id
+                    AND mov_x.deleted_at IS NULL
+                    AND movi_x.deleted_at IS NULL
+                    AND COALESCE(mov_x.data, '1900-01-01') > COALESCE(dev.data, '1900-01-01')
+            ) = 0
+            
+            -- Filtros do alu (rn = 2)
+            -- Se não houver movimento anterior (LEFT JOIN falhou), alu.id é NULL e a condição é verdadeira.
+            -- Se houver, validamos se ele é exatamente o penúltimo (count = 1).
+            AND (
+                alu.id IS NULL 
+                OR (
+                    alu.deleted_at IS NULL
+                    AND movi_alu.deleted_at IS NULL
+                    AND (
+                        SELECT COUNT(*)
+                        FROM aluguel_movimento_itens movi_y
+                        INNER JOIN aluguel_movimento mov_y ON movi_y.movimento_id = mov_y.id
+                        WHERE movi_y.equipamento_id = eq.id
+                            AND mov_y.deleted_at IS NULL
+                            AND movi_y.deleted_at IS NULL
+                            AND COALESCE(mov_y.data, '1900-01-01') > COALESCE(alu.data, '1900-01-01')
+                    ) = 1
+                )
+            )
         """
         
         with self.engine_legado.connect() as conn:
