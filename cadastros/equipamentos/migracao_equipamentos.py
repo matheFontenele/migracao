@@ -365,16 +365,16 @@ class MigracaoEquipamentos:
 
         # 2. Garantir que o Fallback 'ALUCOM LTDA' Exista
         with self.engine_new.begin() as conn:
-            res = conn.execute(text("SELECT id FROM suppliers WHERE name = 'ALUCOM LTDA'")).fetchone()
+            res = conn.execute(text("SELECT id FROM suppliers WHERE name = 'MIGRACAO'")).fetchone()
             if res:
                 self.id_generico = res[0]
             else:
                 res = conn.execute(text("""
                     INSERT INTO suppliers (name, alias, cpf_cnpj, phone, email, created_at, updated_at)
-                    VALUES ('ALUCOM LTDA', 'ALUCOM', '00000000000000', '0000000000', 'nao@informado.com', :now, :now)
+                    VALUES ('MIGRACAO', 'MIGRACAO', '00000000000000', '0000000000', 'nao@informado.com', :now, :now)
                 """), {"now": self.now})
                 self.id_generico = res.lastrowid
-                print("   ✅ Fornecedor fallback 'ALUCOM LTDA' não existia, criado automaticamente.")
+                print("   ✅ Fornecedor fallback 'MIGRACAO' não existia, criado automaticamente.")
 
         # 3. Mapear os Fornecedores com Base no Nome
         with self.engine_new.begin() as conn:
@@ -403,7 +403,7 @@ class MigracaoEquipamentos:
         
         # Estatística rápida de quantos foram para o fallback
         qtd_fallback = sum(df_master['supplier_id'] == self.id_generico)
-        print(f"   ✅ Relacionamento concluído. {qtd_fallback} equipamentos usarão o fornecedor ALUCOM LTDA.")
+        print(f"   ✅ Relacionamento concluído. {qtd_fallback} equipamentos usarão o fornecedor MIGRACAO.")
 
         return df_master
 
@@ -414,20 +414,20 @@ class MigracaoEquipamentos:
         print("📊 Gerando agrupamento de Inventário (Fornecedor + Órgão + Produto)...")
         
         df_validos = df_master[df_master['org_destino'].notna()]
-        grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino', 'data_aquisicao'], dropna=False)
+        grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino', 'created_at'], dropna=False)
 
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
 
         with self.engine_new.begin() as conn:
-            for (s_id, org_id, data_aquisicao_chave), df_transacao in grupos_transacao:
+            for (s_id, org_id, created_at_chave), df_transacao in grupos_transacao:
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
                 addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
 
                 # DATA DE COMPRA: data_aquisicao do legado; fallback = menor created_at do lote
-                data_compra_dt = pd.to_datetime(data_aquisicao_chave, errors='coerce')
+                data_compra_dt = pd.to_datetime(created_at_chave, errors='coerce')
                 if pd.isna(data_compra_dt):
                     datas_lote = pd.to_datetime(df_transacao['created_at'], errors='coerce').dropna()
                     data_compra_dt = datas_lote.min() if not datas_lote.empty else pd.to_datetime(self.now)
