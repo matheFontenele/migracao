@@ -5,7 +5,7 @@ from datetime import datetime
 from tqdm import tqdm
 
 from utils.sanetizador import executar_truncate_tabelas
-from movimentos.migracao_movimentos import BaseMigracaoMovimento
+from movimentos.migracao_movimentos import BaseMigracaoMovimento, limpar_codigo
 
 TABELAS_MANUTENCAO = [
     'maintenance_items',
@@ -35,11 +35,6 @@ class MigracaoManutencao(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=1):
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter, limpar_ambiente=False)
         
-        # Carrega apenas o que é exclusivo da manutenção
-        with self.engine_new.connect() as conn:
-            df_equipments = pd.read_sql("SELECT id, product_item_id FROM equipments", conn)
-            self.dict_product_items = dict(zip(df_equipments['id'], df_equipments['product_item_id']))
-
     # ==============================================================================
     # HELPER DE VALIDAÇÃO DA ORGANIZAÇÃO (Regra de Negócio)
     # ==============================================================================
@@ -114,6 +109,7 @@ class MigracaoManutencao(BaseMigracaoMovimento):
         maintenances_batch = []
         maintenance_items_batch = []
         equipamentos_para_atualizar = set()
+        manutencoes_sem_equipamento = 0
         
         id_maintenance_counter = 1
         id_item_counter = 1
@@ -121,11 +117,15 @@ class MigracaoManutencao(BaseMigracaoMovimento):
 
         for _, row in tqdm(df_bruto.iterrows(), total=df_bruto.shape[0], desc="Processando Manutenções"):
             legacy_id = row['manutencao_id']
-            equip_id = row['id_equipamento']
-            
-            if equip_id not in self.dict_product_items:
+            tombo = limpar_codigo(row['tombo'])
+            equip_id = self.dados['dict_equip_ref_por_number'].get(tombo)
+
+            # Só cria a manutenção se o equipamento correspondente existir no destino.
+            if equip_id is None or pd.isna(equip_id):
+                manutencoes_sem_equipamento += 1
                 continue
-                
+            equip_id = int(equip_id)
+
             # Adiciona o equipamento na lista para atualizar o status no final
             equipamentos_para_atualizar.add(equip_id)
 
@@ -166,9 +166,10 @@ class MigracaoManutencao(BaseMigracaoMovimento):
                     "maintenance_date": dt_maintenance,
                     "created_by": tech_id,
                     "equipment_id": equip_id,
-                    "product_item_id": self.dict_product_items.get(equip_id),
+                    # Manutenção de equipamento não implica consumo de insumo.
+                    "product_item_id": None,
                     "organization_id": organization_id,
-                    "product_quantity": 1,
+                    "product_quantity": None,
                     "is_closed": 0,  
                     "details": details_text,
                     "created_at": dt_created,
@@ -214,6 +215,11 @@ class MigracaoManutencao(BaseMigracaoMovimento):
         # PERSISTÊNCIA NO BANCO
         # ------------------------------------------------------------------
         print(f"\n🚀 Inserindo {len(maintenances_batch)} capas e {len(maintenance_items_batch)} itens no banco...")
+        if manutencoes_sem_equipamento:
+            print(
+                f"⚠️ {manutencoes_sem_equipamento} registros de manutenção foram ignorados "
+                "porque o tombo não foi encontrado entre os equipamentos do destino."
+            )
         with self.engine_new.begin() as conn:
             if maintenances_batch:
                 pd.DataFrame(maintenances_batch).to_sql('maintenances', con=conn, if_exists='append', index=False)
