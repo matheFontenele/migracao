@@ -71,8 +71,50 @@ BASES_AVULSOS = {
         "city": "Distrito Federal",
         "state": "DF",
         "country": "Brasil"
+    },
+    "Estoque Caucaia": {
+        "alias": "Box Caucaia",
+        "zip": "13579-246",
+        "street": "Rua Exemplo 3",
+        "number": "654",
+        "city": "Caucaia",
+        "state": "CE",
+        "country": "Brasil"
+    },
+    "Estoque Aracati": {
+        "alias": "Box Aracati",
+        "zip": "24680-135",
+        "street": "Avenida Exemplo 3",
+        "number": "987",
+        "city": "Aracati",
+        "state": "CE",
+        "country": "Brasil"
     }
 }
 
+# Reservas legadas sem cliente titular correspondente: criaremos o endereço de
+# reserva no pai hierárquico migrado, usando os dados da base indicada. A
+# organização efetiva da reserva continua sendo resolvida pelo contrato no
+# módulo de movimentos.
+RESERVAS_BASE_AVULSA = {
+    10835: "Estoque Paraíba",
+    11405: "Estoque Paraíba",
+    10722: "Estoque Paraíba",
+    3259: "Estoque Aracati",
+    4468: "Box São Luis",
+    10859: "Estoque Paraíba",
+    4089: "Estoque Caucaia",
+}
 
+# DE/PARA das reservas avulsas para os clientes titulares que receberão os
+# equipamentos. O endereço do cliente usará a base configurada acima.
+DEPARA_RESERVAS_BASE = {
+    10835: "POLÍCIA CIVIL - GUARABIRA",
+    11405: "POLÍCIA CIVIL - CAMPINA GRANDE",
+    10722: "POLÍCIA CIVIL - JOÃO PESSOA",
+    3259: "PREFEITURA MUNICIPAL DE ARACATI",
+    4468: "PM SÃO LUÍS",
+    10859: "SECRETARIA DE ESTADO DA SAÚDE DA PARAÍBA - HEMOCENTRO",
+    4089: "P M DE CAUCAIA - RESERVA",
+}
 

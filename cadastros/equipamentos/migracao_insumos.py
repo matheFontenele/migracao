@@ -180,13 +180,23 @@ class MigracaoInsumos:
                 "data_curta": pd.to_datetime(data_full).strftime('%Y-%m-%d')
             })
 
-        return pd.DataFrame(lista_mestre)
+        colunas_master = [
+            "id_legado", "legacy_tx_id", "nome_produto", "grupo", "tipo",
+            "departamento", "min_quantity", "max_quantity", "preco_unitario",
+            "condition_id", "tipo_movimento", "quantidade", "net_qty",
+            "org_destino", "data_transacao", "data_curta",
+        ]
+        return pd.DataFrame(lista_mestre, columns=colunas_master)
 
     # ==============================================================================
     # ETL: CARGA DE CADASTROS (Com Dicionário Anti-Colisão)
     # ==============================================================================
     def _carregar_dimensionais(self, df_master):
         print("\n🚀 Persistindo Cadastros Base (Grupos, Tipos, Produtos)...")
+
+        if df_master.empty:
+            print("   ℹ️ Sem movimentos de insumos: nenhuma dimensão será criada.")
+            return df_master.copy()
         
         # --- 1. GROUPS ---
         grupos_unicos = df_master['grupo'].dropna().unique()
@@ -283,6 +293,10 @@ class MigracaoInsumos:
     # ==============================================================================
     def _gerar_inventario(self, df_master):
         print("\n📊 Processando Linha do Tempo e Saldo Final...")
+
+        if df_master.empty:
+            print("   ℹ️ Sem movimentos de insumos: inventário não será alterado.")
+            return
         
         with self.engine_new.begin() as conn:
             res = conn.execute(text("SELECT id FROM suppliers WHERE name = 'ALUCOM LTDA'")).fetchone()
@@ -491,6 +505,14 @@ class MigracaoInsumos:
         
         try:
             df_master = self._extrair_e_transformar()
+            if df_master.empty:
+                print(
+                    "\n⚠️ A extração não encontrou movimentos de insumos para os "
+                    "filtros atuais. Nenhum cadastro ou estoque foi alterado. "
+                    "Confira GPA.ORG_ID, ESA.DELETED_AT e PA.PRO_ATIVO na consulta."
+                )
+                return
+
             df_master = self._carregar_dimensionais(df_master)
             self._gerar_inventario(df_master)
 
