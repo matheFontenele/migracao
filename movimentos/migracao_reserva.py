@@ -2,6 +2,7 @@ import pandas as pd
 from sqlalchemy import text
 from tqdm import tqdm
 
+from config.config import FALSOS_RESERVAS
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
 
@@ -18,33 +19,76 @@ class MigracaoReserva(BaseMigracaoMovimento):
         """
         return 0, None, int(args[0]) if pd.notna(args[0]) else None
 
-    def _extrair_dados_reserva(self, frente):
+    def _carregar_mapa_reservas_refatorado(self):
+        """reserved_customer_id legado -> (addressable_id, addresses.id)."""
+        with self.engine_new.connect() as conn:
+            df = pd.read_sql(text("""
+                SELECT id AS address_id, addressable_id, reserved_customer_id
+                FROM addresses
+                WHERE addressable_type = 'customer'
+                  AND reserved_customer_id IS NOT NULL
+            """), conn)
+
+        mapa = {}
+        duplicados = {}
+        for _, row in df.iterrows():
+            reserva_id = int(row['reserved_customer_id'])
+            rota = (int(row['addressable_id']), int(row['address_id']))
+            if reserva_id in mapa and mapa[reserva_id] != rota:
+                duplicados.setdefault(reserva_id, [mapa[reserva_id]]).append(rota)
+                continue
+            mapa[reserva_id] = rota
+
+        if duplicados:
+            print("⚠️ IDs de reserva vinculados a mais de um address; usando o primeiro:")
+            for reserva_id, rotas in duplicados.items():
+                print(f"   - reserved_customer_id={reserva_id}: {rotas}")
+
+        print(f"🗺️ Endereços de reserva carregados: {len(mapa)} IDs legados")
+        return mapa
+
+    def _extrair_dados_reserva(self, frente, ids_clientes_reserva=None):
         print(f"   📖 Extraindo Frente {frente} de Reservas...")
-        
-        # O %% escapa o % no SQLAlchemy para não bugar a query
+
+        ids_sql = ""
         if frente == 1:
-            filtro_where = "ac.nome_razao_social LIKE '%%RESERV%%' AND ac.id != 10487 AND mov.tipo_id IN (1, 7)"
+            ids_clientes_reserva = sorted({int(value) for value in (ids_clientes_reserva or [])})
+            if not ids_clientes_reserva:
+                print("   ℹ️ Nenhum reserved_customer_id cadastrado em addresses.")
+                return pd.DataFrame(columns=[
+                    'TOMBO', 'NOME_EQUIPAMENTO', 'ID_CLIENTE', 'CLIENTE',
+                    'orgao_id', 'MOVIMENTO_ID', 'usuario_id', 'updated_at', 'deleted_at',
+                ])
+            ids_sql = f"AND ac.id IN ({', '.join(map(str, ids_clientes_reserva))})"
+
+        if frente == 1:
+            filtro_where = "mov.tipo_id IN (1, 7)"
+            filtro_situacao = "eq.situacao_id = 1"
         else:
-            filtro_where = "(ac.nome_razao_social NOT LIKE '%%RESERV%%' OR ac.id = 10487) AND mov.tipo_id = 7"
+            filtro_where = "mov.tipo_id = 7"
+            filtro_situacao = "eq.situacao_id IN (1, 15)"
 
         query = f"""
             SELECT
                 eq.numero AS TOMBO, eq.nome AS NOME_EQUIPAMENTO,
-                ac.id AS ID_CLIENTE, ac.orgao_id, mov.id as MOVIMENTO_ID, 
+                ac.id AS ID_CLIENTE, ac.nome_razao_social AS CLIENTE,
+                ac.orgao_id, mov.id as MOVIMENTO_ID,
                 mov.usuario_id, mov.updated_at, mov.deleted_at
             FROM aluguel_equipamentos eq
             INNER JOIN (
-                SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-                FROM aluguel_movimento_itens mi
-                INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-                WHERE m.deleted_at IS NULL
+                    SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
+                    FROM aluguel_movimento_itens mi
+                    INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+                    WHERE m.deleted_at IS NULL
+                      AND mi.deleted_at IS NULL
                 GROUP BY mi.equipamento_id
             ) ult_mov ON ult_mov.equipamento_id = eq.id
             INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
             LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
             WHERE eq.deleted_at IS NULL 
               AND ac.deleted_at IS NULL 
-              AND eq.situacao_id IN (1, 15)
+              AND {filtro_situacao}
+              {ids_sql}
               AND {filtro_where}
         """
         
@@ -56,37 +100,47 @@ class MigracaoReserva(BaseMigracaoMovimento):
         print("📦 MÓDULO: ALOCAÇÃO DE RESERVAS (ESTOQUE E CLIENTES)")
         print("=" * 70)
 
-        # 1. Carrega o mapeamento específico para a Frente 1 (clientes reservados)
-        dict_recipient_por_reserved = {}
-        dict_endereco_por_reserved = {}
+        # 1. Cada reserved_customer_id do destino informa qual address recebe
+        # a reserva. Não recalculamos pareamentos por nome neste módulo.
         with self.engine_new.connect() as conn:
-            res = conn.execute(text("""
-                SELECT addressable_id, id, reserved_customer_id 
-                FROM addresses 
-                WHERE addressable_type = 'customer' AND reserved_customer_id IS NOT NULL
-            """))
-            for r in res.mappings():
-                res_id = int(r['reserved_customer_id'])
-                dict_recipient_por_reserved[res_id] = int(r['addressable_id'])
-                dict_endereco_por_reserved[res_id] = int(r['id'])
-
             dict_contract_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM contracts", conn).values.T))
             dict_customer_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM customers", conn).values.T))
             dict_equip_org = dict(zip(*pd.read_sql("SELECT id, current_organization_id FROM equipments", conn).values.T))
 
-        # 2. Executa as Extrações (Frente 1 e Frente 2)
-        df_frente1 = self._extrair_dados_reserva(frente=1)
+        mapa_address_por_reserva = self._carregar_mapa_reservas_refatorado()
+
+        # 2. Executa as extrações. A Frente 1 é filtrada pelos IDs de reserva
+        # mapeados, inclusive exceções manuais cujo nome não contém RESERVA.
+        df_frente1 = self._extrair_dados_reserva(
+            frente=1,
+            ids_clientes_reserva=mapa_address_por_reserva.keys(),
+        )
         df_frente2 = self._extrair_dados_reserva(frente=2)
+
+        ids_reserva = set(mapa_address_por_reserva)
+        df_frente1 = df_frente1[
+            pd.to_numeric(df_frente1['ID_CLIENTE'], errors='coerce').isin(ids_reserva)
+        ].copy()
+        nomes_reserva = df_frente2['CLIENTE'].fillna('').str.contains(
+            r'\b(?:RESERVA|RESERVADO)\b', case=False, regex=True
+        )
+        ids_cliente_frente2 = pd.to_numeric(df_frente2['ID_CLIENTE'], errors='coerce')
+        df_frente2 = df_frente2[
+            (~nomes_reserva | ids_cliente_frente2.isin(FALSOS_RESERVAS))
+            & ~ids_cliente_frente2.isin(ids_reserva)
+        ].copy()
 
         if df_frente1.empty and df_frente2.empty:
             print("⚠️ Nenhum movimento de reserva encontrado nas duas frentes.")
             return
 
         rejeitados = 0
+        rejeitados_sem_equipamento = 0
+        rejeitados_sem_destino = 0
 
         # 3. Lógica central de processamento linha a linha
         def processar_linha(row, frente):
-            nonlocal rejeitados
+            nonlocal rejeitados, rejeitados_sem_equipamento, rejeitados_sem_destino
             id_final = int(row['MOVIMENTO_ID'])
             tombo = str(row['TOMBO']).strip()
             cliente_id_legado = int(row['ID_CLIENTE'])
@@ -95,18 +149,21 @@ class MigracaoReserva(BaseMigracaoMovimento):
             equipment_id_ref = self.dados["dict_equip_ref_por_number"].get(tombo)
             if not equipment_id_ref:
                 rejeitados += 1
+                rejeitados_sem_equipamento += 1
                 return
 
             # Roteamento baseado na Frente
             if frente == 1:
-                recipient_id = dict_recipient_por_reserved.get(cliente_id_legado)
-                cliente_final = dict_endereco_por_reserved.get(cliente_id_legado)
+                rota_refatorada = mapa_address_por_reserva.get(cliente_id_legado)
+                recipient_id = rota_refatorada[0] if rota_refatorada else None
+                cliente_final = rota_refatorada[1] if rota_refatorada else None
             else:
                 recipient_id = self.dados["dict_cliente_adress"].get(cliente_id_legado)
                 cliente_final = self.dados["dict_endereco_por_legacy_client"].get(cliente_id_legado)
 
-            if not recipient_id: 
+            if not recipient_id or not cliente_final:
                 rejeitados += 1
+                rejeitados_sem_destino += 1
                 return
             
             usr_id = int(row['usuario_id']) if pd.notna(row['usuario_id']) and row['usuario_id'] != 0 else 1
@@ -159,6 +216,8 @@ class MigracaoReserva(BaseMigracaoMovimento):
             processar_linha(row, frente=2)
 
         print(f"\n⚠️ Registros rejeitados (Sem equipamento ou sem endereço válido): {rejeitados}")
+        print(f"   - Sem equipamento correspondente: {rejeitados_sem_equipamento}")
+        print(f"   - Sem titular/endereço refatorado: {rejeitados_sem_destino}")
 
         # 5. Salva em lote no banco (Status 3 = Reservado)
         self.salvar_movimentos_banco()

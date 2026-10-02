@@ -95,6 +95,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
             SELECT
                 coi.id AS contract_item_id,
                 coi.alias AS contract_item_alias,
+                coi.description AS contract_item_description,
                 con.id AS contract_id,
                 con.name AS contract_name,
                 coi.quantity,
@@ -254,6 +255,20 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         for _, row in df_saldos_contract_items.iterrows()
         if pd.notna(row['contract_item_id'])
     }
+    dict_contrato_por_item = {
+        int(row['contract_item_id']): int(row['contract_id'])
+        for _, row in df_saldos_contract_items.iterrows()
+        if pd.notna(row['contract_item_id']) and pd.notna(row['contract_id'])
+    }
+    dict_item_por_id = {
+        int(row['contract_item_id']): {
+            'contract_id': int(row['contract_id']),
+            'alias': row['contract_item_alias'],
+            'description': row['contract_item_description'],
+        }
+        for _, row in df_saldos_contract_items.iterrows()
+        if pd.notna(row['contract_item_id']) and pd.notna(row['contract_id'])
+    }
 
     # Mantém o dicionário legacy apenas para a lógica de 'is_kit_override' do Aluguel
     dict_tipo_por_equipamento = {
@@ -280,6 +295,8 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_tipo_por_equipamento": dict_tipo_por_equipamento,
         "dict_refs_por_equipamento": dict_refs_por_equipamento,
         "saldos_por_id": saldos_por_id,
+        "dict_contrato_por_item": dict_contrato_por_item,
+        "dict_item_por_id": dict_item_por_id,
         "df_movimento_item_legado": df_movimento_item_legado,
     }
 
@@ -613,6 +630,40 @@ class BaseMigracaoMovimento:
                     type_id_override=type_id_override
                 )
 
+        # Última proteção comum a aluguel, substituição e reserva: movimentos
+        # históricos também podem carregar item_ids de outra versão do banco.
+        # Nunca persistir contract_item_id sem confirmar que existe.
+        if contrato_item_id_resolvido is not None:
+            item_id_validado = limpar_valor_inteiro(contrato_item_id_resolvido)
+            item_info = self.dados.get('dict_item_por_id', {}).get(item_id_validado)
+            if item_info is None:
+                item_fallback = self.dados.get('dict_primeiro_item_por_contrato', {}).get(
+                    int(contrato_id) if contrato_id is not None and pd.notna(contrato_id) else None
+                )
+                fallback_info = self.dados.get('dict_item_por_id', {}).get(
+                    limpar_valor_inteiro(item_fallback)
+                ) if item_fallback is not None else None
+                if fallback_info and (
+                    contrato_id is None or fallback_info['contract_id'] == int(contrato_id)
+                ):
+                    contrato_item_id_resolvido = int(item_fallback)
+                    if details_item:
+                        details_item = f"{details_item} (item legado inválido; fallback aplicado)"
+                    else:
+                        details_item = "Item de contrato legado inválido; fallback aplicado"
+                else:
+                    contrato_item_id_resolvido = None
+                    if details_item:
+                        details_item = f"{details_item} (item legado não localizado)"
+                    else:
+                        details_item = "Item de contrato legado não localizado"
+            elif contrato_id is not None and item_info['contract_id'] != int(contrato_id):
+                contrato_item_id_resolvido = None
+                if details_item:
+                    details_item = f"{details_item} (item não pertence ao contrato informado)"
+                else:
+                    details_item = "Item não pertence ao contrato informado"
+
         refs_equip = self.dados.get("dict_refs_por_equipamento", {}).get(int(equipment_id_ref), {})
         type_id_resolvido = type_id_ref if type_id_ref is not None else refs_equip.get('type_id')
         product_id_resolvido = product_id_ref if product_id_ref is not None else refs_equip.get('product_id')
@@ -753,6 +804,39 @@ class BaseMigracaoMovimento:
     def salvar_movimentos_banco(self):
         print(f"\n🚀 Persistindo capas e itens de movimento no MySQL...")
         with self.engine_new.begin() as conn:
+            # Sanity check final para registros montados por caminhos legados
+            # (por exemplo, as fases históricas da substituição), que podem
+            # não ter passado pelo validador do Parquet.
+            item_ids_validos = {
+                int(row[0]) for row in conn.execute(text("SELECT id FROM contract_items"))
+            }
+            itens_sem_fk = set()
+            for item in self.service_itens_mestre:
+                raw_id = item.get('contract_item_id')
+                if raw_id is None or pd.isna(raw_id):
+                    continue
+                item_id = limpar_valor_inteiro(raw_id)
+                if item_id not in item_ids_validos:
+                    itens_sem_fk.add(item_id)
+                    item['contract_item_id'] = None
+                    detail = item.get('details')
+                    aviso = f"Item de contrato legado {item_id} não encontrado; vínculo removido"
+                    item['details'] = f"{detail}; {aviso}" if detail else aviso
+
+            for history in self.equipment_histories_mestre:
+                raw_id = history.get('contract_item_id')
+                if raw_id is not None and pd.notna(raw_id):
+                    item_id = limpar_valor_inteiro(raw_id)
+                    if item_id not in item_ids_validos:
+                        history['contract_item_id'] = None
+
+            if itens_sem_fk:
+                print(
+                    f"⚠️ {len(itens_sem_fk)} IDs de contract_item inexistentes foram "
+                    "desvinculados dos itens de movimento para respeitar a FK. "
+                    f"Amostra: {sorted(itens_sem_fk)[:20]}"
+                )
+
             if self.servicos_mestre: pd.DataFrame(self.servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)
             if self.service_itens_mestre: pd.DataFrame(self.service_itens_mestre).to_sql("service_order_items", con=conn, if_exists="append", index=False)
             if self.movimentos_mestre: pd.DataFrame(self.movimentos_mestre).to_sql("movements", con=conn, if_exists="append", index=False)

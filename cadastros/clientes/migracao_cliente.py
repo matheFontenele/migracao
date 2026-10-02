@@ -9,7 +9,8 @@ from config.config import (
     CLIENTES_BLOQUEADOS,
     ORGANIZACOES_BLOQUEADAS,
     FALSOS_RESERVAS,
-    BASES_AVULSOS, ENDERECOS_BASES
+    BASES_AVULSOS, ENDERECOS_BASES, RESERVAS_BASE_AVULSA,
+    DEPARA_RESERVAS_BASE,
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
@@ -33,6 +34,69 @@ DEPARA_EXCECOES = {
         4464: 4466,
         11920: 11919,
         10935: 10823,
+        10862: 10819,
+        # 3259:
+        # 4089:
+        # 4468:
+        # 4504:
+        # 4516:
+        # 4544:
+        # 10401:
+        # 10482:
+        # 10487:
+        # 10513:
+        # 10522:
+        # 10556:
+        # 10557:
+        # 10558:
+        # 10559:
+        # 10560:
+        # 10561:
+        # 10562:
+        # 10563:
+        # 10590:
+        # 10654:
+        # 10671:
+        # 10681:
+        # 10696:
+        # 10708:
+        # 10714:
+        # 10716:
+        # 10722:
+        # 10752:
+        # 10754:
+        # 10816:
+        # 10822:
+        # 10825:
+        # 10827:
+        # 10830:
+        # 10835:
+        # 10838:
+        # 10843:
+        # 10850:
+        # 10854:
+        # 10859:
+        # 10866:
+        # 10872:
+        # 10932:
+        # 10947:
+        # 10972:
+        # 10973:
+        # 11054:
+        # 11059:
+        # 11060:
+        # 11061:
+        # 11062:
+        # 11063:
+        # 11064:
+        # 11065:
+        # 11066:
+        # 11067:
+        # 11068:
+        # 11069:
+        # 11405:
+        # 11421:
+
 }
 MAPA_SAO_LUIS = {
         # === IPAM (Secretaria 1194) ===
@@ -437,13 +501,39 @@ class MigracaoClientes:
         for id_reserva, id_titular in DEPARA_EXCECOES.items():
             df_merged.loc[df_merged['id_clean'] == id_titular, 'reserved_customer_id'] = id_reserva
 
+        # Reservas sem titular pareado automaticamente: usa o DE/PARA
+        # explícito pelo nome do cliente, preservando o ID da reserva.
+        for id_reserva, nome_titular in DEPARA_RESERVAS_BASE.items():
+            nome_normalizado = normalizar_para_match(nome_titular)
+            mask_titular = df_merged['nome_ajustado'] == nome_normalizado
+            df_merged.loc[mask_titular, 'reserved_customer_id'] = id_reserva
+
         reservas_pareadas = df_merged['reserved_customer_id'].dropna().unique()
         df_orfas = df_reservas[~df_reservas['id_clean'].isin(reservas_pareadas)].copy()
         df_orfas['reserved_customer_id'] = None
+        # Reservas sem titular pareado continuam precisando de um endereço de
+        # reserva para que o módulo de movimentos consiga roteá-las.
+        mask_reserva_base = df_orfas['id_clean'].isin(RESERVAS_BASE_AVULSA)
+        df_orfas.loc[mask_reserva_base, 'reserved_customer_id'] = df_orfas.loc[
+            mask_reserva_base, 'id_clean'
+        ]
 
-        print(f"\n❌ ÓRFÃS ({len(df_orfas)} viraram endereços avulsos):")
-        for _, r in df_orfas.iterrows(): print(f"   ⚠️ ÓRFÃ: [{r['id_clean']}] '{r['CLIENTE']}'")
-        print("="*75 + "\n")
+        print(
+            f"\n🔎 Reservas sem match por nome/escopo ou DEPARA manual: "
+            f"{len(df_orfas)}"
+        )
+        for _, row in df_orfas.iterrows():
+            reserva_id = int(row['id_clean'])
+            base_reserva = RESERVAS_BASE_AVULSA.get(reserva_id)
+            if base_reserva:
+                resultado = f"será direcionada para o endereço-base '{base_reserva}'"
+            else:
+                resultado = "sem endereço-base configurado; não foi possível atrelar"
+            print(
+                f"   ⚠️ ID reserva [{reserva_id}] '{row['CLIENTE']}' — "
+                f"{resultado}."
+            )
+        print("=" * 75 + "\n")
 
         return pd.concat([df_merged, df_orfas], ignore_index=True), df_clean
 
@@ -511,16 +601,19 @@ class MigracaoClientes:
         # ==============================================================================
         enderecos_batch = ENDERECOS_BASES.copy()
         
-        organizacoes = [end for end in enderecos_batch if end.get("type") == "organization"]
+        enderecos_organizacoes = [
+            endereco for endereco in enderecos_batch
+            if endereco.get("type") == "organization"
+        ]
         
         # 2. Criamos uma lista temporária para não quebrar a iteração
         novos_boxes = []
 
-        for base in organizacoes:
+        for endereco_organizacao in enderecos_organizacoes:
             for box in BASES_AVULSOS.values():
                 novos_boxes.append({
                     "type": "organization",
-                    "id": base["id"],
+                    "id": endereco_organizacao["id"],
                     "alias": box["alias"],
                     "zip": box["zip"],
                     "street": box["street"],
@@ -581,12 +674,36 @@ class MigracaoClientes:
                 if target_id:
                     c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
                     u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
-                    
+
+                    base_configurada = RESERVAS_BASE_AVULSA.get(info["res_id"]) or RESERVAS_BASE_AVULSA.get(id_legado)
+                    dados_base_reserva = BASES_AVULSOS.get(base_configurada)
+                    usa_endereco_base = dados_base_reserva is not None
+
+                    # Por padrão, address representa o destino final do legado.
+                    # Só as exceções explicitamente mapeadas usam endereço-base.
+                    dados_endereco = dados_base_reserva or {
+                        "alias": info["nome"],
+                        "zip": info["row"]['CEP'],
+                        "street": info["row"]['ENDERECO'],
+                        "number": "S/N",
+                        "city": info["row"]['CIDADE'],
+                        "state": info["row"]['ESTADO'],
+                    }
+
                     enderecos_batch.append({
-                        "type": "customer", "id": target_id, "alias": info["nome"], 
-                        "zip": info["row"]['CEP'], "street": info["row"]['ENDERECO'], 
-                        "num": "S/N", "city": info["row"]['CIDADE'], "state": info["row"]['ESTADO'], 
-                        "leg_id": info["legacy_id"], "res_id": info["res_id"],
+                        "type": "customer", "id": target_id,
+                        "alias": dados_endereco["alias"],
+                        "zip": dados_endereco["zip"],
+                        "street": dados_endereco["street"],
+                        "num": dados_endereco["number"],
+                        "city": dados_endereco["city"],
+                        "state": dados_endereco["state"],
+                        "leg_id": info["legacy_id"],
+                        "res_id": (
+                            info["res_id"]
+                            if info["res_id"] is not None
+                            else (id_legado if usa_endereco_base else None)
+                        ),
                         "created_at": c_at, "updated_at": u_at
                     })
                     self.stats["enderecos"] += 1
