@@ -89,6 +89,22 @@ class MigracaoInsumos:
         print(f"   ✅ Mapa ORG→ADDRESS: {mapa}")
         return mapa
 
+    def _validar_mapa_org_address(self, df_master):
+        mapa_org_address = self._carregar_mapa_org_address()
+        orgs_necessarias = {
+            int(org_id)
+            for org_id in df_master['org_destino'].dropna().unique()
+        }
+        orgs_sem_address = sorted(orgs_necessarias - set(mapa_org_address))
+        if orgs_sem_address:
+            raise RuntimeError(
+                "Não foi possível iniciar a carga dos insumos: faltam "
+                f"addresses ativos para as organizações {orgs_sem_address}. "
+                "Verifique se a migração de clientes/endereço-base foi executada "
+                "e se os addresses das organizações existem no banco novo."
+            )
+        return mapa_org_address
+
     # ==============================================================================
     # ETL: EXTRAÇÃO (100K+ MOVIMENTOS DO LEGADO)
     # ==============================================================================
@@ -291,13 +307,19 @@ class MigracaoInsumos:
     # ==============================================================================
     # ETL: PROCESSAMENTO MASSIVO (EVENT SOURCING E SALDO FINAL)
     # ==============================================================================
-    def _gerar_inventario(self, df_master):
+    def _gerar_inventario(self, df_master, mapa_org_address=None):
         print("\n📊 Processando Linha do Tempo e Saldo Final...")
 
         if df_master.empty:
             print("   ℹ️ Sem movimentos de insumos: inventário não será alterado.")
             return
         
+        # ORG -> ADDRESS DEFAULT (BASE)
+        # Sem endereços-base não é seguro continuar: além de gerar `IN ()`
+        # inválido, os itens poderiam cair no address_id fallback 1.
+        if mapa_org_address is None:
+            mapa_org_address = self._validar_mapa_org_address(df_master)
+
         with self.engine_new.begin() as conn:
             res = conn.execute(text("SELECT id FROM suppliers WHERE name = 'ALUCOM LTDA'")).fetchone()
             if not res:
@@ -305,9 +327,6 @@ class MigracaoInsumos:
                 fornecedor_padrao_id = res.lastrowid
             else:
                 fornecedor_padrao_id = res[0]
-
-        # ORG -> ADDRESS DEFAULT (BASE)
-        mapa_org_address = self._carregar_mapa_org_address()
 
         # --- CRIAÇÃO DE LOCATIONS ---
         print("   📍 Mapeando e criando Locations por Address (Almoxarifados/Departamentos)...")
@@ -322,10 +341,12 @@ class MigracaoInsumos:
 
         with self.engine_new.begin() as conn:
             # Locations existentes dos addresses das orgs mapeadas
-            db_locations = conn.execute(text(
-                f"SELECT id, address_id, area FROM locations "
-                f"WHERE address_id IN ({ids_str}) AND deleted_at IS NULL"
-            )).fetchall()
+            db_locations = []
+            if addr_ids:
+                db_locations = conn.execute(text(
+                    f"SELECT id, address_id, area FROM locations "
+                    f"WHERE address_id IN ({ids_str}) AND deleted_at IS NULL"
+                )).fetchall()
             for loc_id, addr_id, area in db_locations:
                 mapa_locations[(int(addr_id), str(area).strip().upper())] = loc_id
 
@@ -513,8 +534,11 @@ class MigracaoInsumos:
                 )
                 return
 
+            # Validar os destinos antes de inserir grupos, tipos ou produtos;
+            # evita deixar dimensões parcialmente carregadas se faltar address.
+            mapa_org_address = self._validar_mapa_org_address(df_master)
             df_master = self._carregar_dimensionais(df_master)
-            self._gerar_inventario(df_master)
+            self._gerar_inventario(df_master, mapa_org_address)
 
             print("\n" + "=" * 50)
             print("📊 RELATÓRIO FINAL DE INSUMOS")
