@@ -1,5 +1,6 @@
 import sys
 import re
+import os
 import sqlalchemy as sa
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -91,7 +92,7 @@ class MigracaoContratos:
             'contratos_criados': 0, 'contratos_atualizados': 0, 'contratos_ignorados': 0,
             'eventos_criados': 0, 'eventos_ignorados': 0, 'aditivos_criados': 0,
             'itens_criados': 0, 'itens_atualizados': 0, 'jobs_criados': 0, 'jobs_atualizados': 0,
-            'infos_criadas': 0, 'infos_atualizadas': 0, 'erros': 0
+            'infos_criadas': 0, 'infos_atualizadas': 0, 'infos_datas_ausentes': 0, 'erros': 0
         }
 
         # Caches em Memória
@@ -107,6 +108,10 @@ class MigracaoContratos:
         self.ultimo_aditivo_por_contrato = {}
         self.additive_to_contract = {}
         self.item_roots_cache = {}
+        self.contratos_sem_cadastro_ids = set()
+        self.event_contract_name_map = {}
+        self.contract_ids_persistidos = set()
+        self.datas_criacao_contrato = {}
 
     # ==============================================================================
     # CARREGAMENTO DE CACHES DO BANCO DE DADOS
@@ -270,6 +275,163 @@ class MigracaoContratos:
         print(f"   ⚠️ Tipo de evento não mapeado: '{tipo_planilha}'. Usando CADASTRO.")
         return [MAP_EVENT_TYPES['CADASTRO']]
 
+    def _identificar_contratos_sem_cadastro(self, df_ex_contract, df_ex_events):
+        eventos_cadastro = df_ex_events[
+            df_ex_events['TIPO'].apply(lambda tipo: ultra_normalizar(tipo) == 'CADASTRO')
+        ].copy()
+
+        eventos_por_contratante = {}
+        for _, evento in eventos_cadastro.iterrows():
+            chave = ultra_normalizar(evento.get('CONTRATO'))
+            if chave:
+                eventos_por_contratante.setdefault(chave, []).append(
+                    limpar_valor_inteiro(evento.get('ID'))
+                )
+
+        contratos_por_contratante = {}
+        for _, contrato in df_ex_contract.iterrows():
+            chave = ultra_normalizar(contrato.get('CONTRATANTE'))
+            if chave and limpar_valor_inteiro(contrato.get('ID')):
+                contratos_por_contratante.setdefault(chave, []).append(contrato)
+
+        nomes_cadastro = set(eventos_por_contratante)
+        self.event_contract_name_map = {}
+
+        pendencias = []
+        for _, contrato in df_ex_contract.iterrows():
+            contract_id = limpar_valor_inteiro(contrato.get('ID'))
+            nome_contrato = contrato.get('APELIDO_CONTRATO')
+            chave_contrato = ultra_normalizar(nome_contrato)
+
+            if not contract_id or not chave_contrato:
+                continue
+
+            contratante = contrato.get('CONTRATANTE')
+            chave_contratante = ultra_normalizar(contratante)
+            candidatos = eventos_por_contratante.get(chave_contratante, [])
+
+            if chave_contrato in nomes_cadastro:
+                continue
+
+            # Fallback seguro: só associa pelo contratante quando existe
+            # exatamente um contrato e exatamente um evento de cadastro para
+            # aquele nome. Havendo mais de um, exige de/para explícito.
+            contratos_do_cliente = contratos_por_contratante.get(chave_contratante, [])
+            if len(contratos_do_cliente) == 1 and len(candidatos) == 1:
+                self.event_contract_name_map[chave_contratante] = contract_id
+                continue
+
+            numero = contrato.get('NUMERO_CONTRATO')
+
+            pendencias.append({
+                'CONTRATO_ID': contract_id,
+                'CONTRATO': str(nome_contrato).strip(),
+                'NUMERO': str(numero).strip() if pd.notna(numero) else '',
+                'CONTRATANTE': str(contratante).strip() if pd.notna(contratante) else '',
+                'EVENTOS_CADASTRO_CANDIDATOS': ', '.join(map(str, candidatos)),
+                'MOTIVO': (
+                    'Nenhum evento CADASTRO associado pelo nome do contrato; '
+                    'preencher o de/para na planilha antes de migrar.'
+                ),
+            })
+
+        self.contratos_sem_cadastro_ids = {item['CONTRATO_ID'] for item in pendencias}
+
+        pasta_ajustes = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            'ajustes',
+        )
+        os.makedirs(pasta_ajustes, exist_ok=True)
+        caminho_relatorio = os.path.join(pasta_ajustes, 'contratos_sem_evento_cadastro.xlsx')
+        colunas = [
+            'CONTRATO_ID', 'CONTRATO', 'NUMERO', 'CONTRATANTE',
+            'EVENTOS_CADASTRO_CANDIDATOS', 'MOTIVO',
+        ]
+        pd.DataFrame(pendencias, columns=colunas).to_excel(caminho_relatorio, index=False)
+        print(
+            f"📄 Relatório de contratos sem evento de cadastro associado salvo em "
+            f"'{caminho_relatorio}' ({len(pendencias)} contratos)."
+        )
+
+    def _mapear_datas_criacao_contrato(self, df_ex_contract, df_ex_events, df_ex_infos):
+        """Relaciona cada contrato à DATA_INICIAL da informação do evento CADASTRO."""
+        datas_por_evento = {}
+        for _, info in df_ex_infos.iterrows():
+            evento_id = limpar_valor_inteiro(info.get('EVENTO'))
+            data_inicio = info.get('DATA_INICIAL')
+            if evento_id and pd.notna(data_inicio) and evento_id not in datas_por_evento:
+                datas_por_evento[evento_id] = data_inicio
+
+        eventos_cadastro_por_nome = {}
+        for _, evento in df_ex_events.iterrows():
+            if ultra_normalizar(evento.get('TIPO')) != 'CADASTRO':
+                continue
+
+            evento_id = limpar_valor_inteiro(evento.get('ID'))
+            nome_contrato = ultra_normalizar(evento.get('CONTRATO'))
+            data_inicio = datas_por_evento.get(evento_id)
+            if nome_contrato:
+                if hasattr(data_inicio, 'date'):
+                    data_inicio = data_inicio.date()
+                eventos_cadastro_por_nome.setdefault(nome_contrato, []).append(data_inicio)
+
+        contratos_validos = df_ex_contract[
+            df_ex_contract['ID'].notna()
+            & df_ex_contract['APELIDO_CONTRATO'].notna()
+            & df_ex_contract['APELIDO_CONTRATO'].astype(str).str.strip().ne('')
+        ]
+        contratos_por_contratante = {}
+        for _, contrato in contratos_validos.iterrows():
+            chave_contratante = ultra_normalizar(contrato.get('CONTRATANTE'))
+            if chave_contratante:
+                contratos_por_contratante.setdefault(chave_contratante, []).append(contrato)
+
+        self.datas_criacao_contrato = {}
+        for _, contrato in contratos_validos.iterrows():
+            contract_id = limpar_valor_inteiro(contrato.get('ID'))
+            chave_contrato = ultra_normalizar(contrato.get('APELIDO_CONTRATO'))
+
+            # Associação direta pelo apelido do contrato.
+            candidatos = eventos_cadastro_por_nome.get(chave_contrato, [])
+            if candidatos:
+                data_inicio = next((data for data in candidatos if data is not None), None)
+                if data_inicio is not None:
+                    self.datas_criacao_contrato[contract_id] = data_inicio
+                continue
+
+            # Mesmo fallback seguro usado na validação: só usa o contratante
+            # quando há exatamente um contrato e um evento CADASTRO candidato.
+            chave_contratante = ultra_normalizar(contrato.get('CONTRATANTE'))
+            contratos_cliente = contratos_por_contratante.get(chave_contratante, [])
+            eventos_cliente = eventos_cadastro_por_nome.get(chave_contratante, [])
+            if len(contratos_cliente) == 1 and len(eventos_cliente) == 1:
+                data_inicio = eventos_cliente[0]
+                if data_inicio is not None:
+                    self.datas_criacao_contrato[contract_id] = data_inicio
+
+        sem_data = len(contratos_validos) - len(self.datas_criacao_contrato)
+
+        if sem_data:
+            print(
+                f"⚠️ {sem_data} contrato(s) sem DATA_INICIAL no evento CADASTRO; "
+                "created_at/updated_at usarão a data da execução da migração."
+            )
+
+    def _validar_schema_destino(self):
+        """Confirma pré-requisitos de schema antes do TRUNCATE das tabelas."""
+        with self.engine_new.connect() as conn:
+            coluna = conn.execute(text(
+                "SHOW COLUMNS FROM contracts LIKE 'original_start_date'"
+            )).fetchone()
+
+        if not coluna:
+            raise RuntimeError(
+                "A coluna contracts.original_start_date não existe no banco novo. "
+                "Aplique a migration/schema do Laravel que cria a coluna "
+                "DATE NULL antes de executar a migração de contratos. "
+                "Nenhuma tabela de contratos foi limpa nesta execução."
+            )
+
     def _processar_contratos(self, conn, df_ex_contract):
         print("\n🔄 Processando Contratos (UPSERT)...")
         for idx, row in df_ex_contract.iterrows():
@@ -279,6 +441,10 @@ class MigracaoContratos:
 
             id_contrato_excel = limpar_valor_inteiro(row.get('ID'))
             if id_contrato_excel == 0:
+                self.stats['contratos_ignorados'] += 1
+                continue
+
+            if id_contrato_excel in self.contratos_sem_cadastro_ids:
                 self.stats['contratos_ignorados'] += 1
                 continue
 
@@ -301,6 +467,8 @@ class MigracaoContratos:
             cust_id = cust_info['parent_id'] if cust_info['parent_id'] else cust_info['id']
             
             nome_contrato = str(row['APELIDO_CONTRATO']).strip().upper()
+            id_contrato_excel = limpar_valor_inteiro(row.get('ID'))
+            data_criacao = self.datas_criacao_contrato.get(id_contrato_excel, self.now)
             numero_original = str(row['NUMERO_CONTRATO']).strip() if pd.notna(row['NUMERO_CONTRATO']) else "SEM_NUMERO"
             numero_contrato = numero_original if numero_original != "SEM_NUMERO" else f"SEM_NUMERO ({nome_contrato})"[:255]
 
@@ -320,7 +488,8 @@ class MigracaoContratos:
                 'organization_id': org_id,
                 'customer_id': int(cust_id),
                 'object': str(row['OBJETO_DO_CONTRATO'])[:500] if not pd.isna(row['OBJETO_DO_CONTRATO']) else "NÃO INFORMADO",
-                'updated_at': self.now
+                'created_at': data_criacao,
+                'updated_at': data_criacao,
             }
 
             if contract_info:
@@ -328,16 +497,19 @@ class MigracaoContratos:
                 conn.execute(text("""
                     UPDATE contracts 
                     SET contract_type_id = :contract_type_id, contract_status_id = :contract_status_id,
-                        customer_id = :customer_id, object = :object, updated_at = :updated_at, number = :number
+                        customer_id = :customer_id, object = :object,
+                        created_at = :created_at, updated_at = :updated_at, number = :number
                     WHERE id = :id
                 """), {**dados_contrato, 'id': contract_id})
                 self.stats['contratos_atualizados'] += 1
             else:
-                dados_contrato['created_at'] = self.now
                 res = conn.execute(text("""
-                    INSERT INTO contracts (id, name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, created_at, updated_at)
-                    VALUES (:id, :name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :created_at, :updated_at)
-                """), dados_contrato)
+                INSERT INTO contracts (id, name, number, contract_type_id, contract_status_id, organization_id, customer_id, object, original_start_date, created_at, updated_at)
+                VALUES (:id, :name, :number, :contract_type_id, :contract_status_id, :organization_id, :customer_id, :object, :original_start_date, :created_at, :updated_at)
+                """), {
+                    **dados_contrato,
+                    'original_start_date': self.datas_criacao_contrato.get(id_contrato_excel),
+                })
                 
                 contract_id = id_contrato_excel
                 
@@ -349,7 +521,8 @@ class MigracaoContratos:
             conn.execute(text("INSERT IGNORE INTO contract_recipient_customers (contract_id, customer_id) VALUES (:c_id, :cust_id)"), 
                          {'c_id': int(contract_id), 'cust_id': int(cust_id)})
 
-            self.contract_id_map[nome_contrato] = contract_id
+            self.contract_ids_persistidos.add(int(contract_id))
+            self.contract_id_map[ultra_normalizar(nome_contrato)] = contract_id
 
     def _processar_eventos(self, conn, df_ex_events):
         print("\n📅 Processando Eventos e Aditivos (UPSERT + CLONAGEM)...")
@@ -358,8 +531,10 @@ class MigracaoContratos:
                 self.stats['eventos_ignorados'] += 1
                 continue
             
-            nome_contrato = str(row['CONTRATO']).strip().upper()
+            nome_contrato = ultra_normalizar(row['CONTRATO'])
             contract_id = self.contract_id_map.get(nome_contrato)
+            if not contract_id:
+                contract_id = self.event_contract_name_map.get(nome_contrato)
             
             if not contract_id:
                 cache_info = self.contracts_cache.get(nome_contrato)
@@ -369,6 +544,19 @@ class MigracaoContratos:
             
             if not contract_id:
                 self.stats['eventos_ignorados'] += 1
+                continue
+
+            # O mapa por nome pode resolver para um contrato que foi
+            # descartado durante _processar_contratos (ex.: cliente não
+            # encontrado). Não crie evento órfão nem dependa da FK para
+            # descobrir essa inconsistência.
+            if int(contract_id) not in self.contract_ids_persistidos:
+                self.stats['eventos_ignorados'] += 1
+                print(
+                    f"   ⚠️ Evento {row.get('ID')} ignorado: contrato "
+                    f"'{row.get('CONTRATO')}' resolveu para ID {contract_id}, "
+                    "mas esse contrato não foi persistido nesta execução."
+                )
                 continue
 
             id_evento_planilha = row['ID']
@@ -549,6 +737,14 @@ class MigracaoContratos:
             }
 
             if exists:
+                # As linhas de eventos/aditivos são inicialmente clonadas do
+                # snapshot anterior. Células vazias na planilha devem manter
+                # esses valores, não apagá-los com NULL no UPSERT.
+                previous_info = conn.execute(text("SELECT start_date, end_date, max_end_date FROM contract_infos WHERE id = :id"), {'id': exists[0]}).fetchone()
+                for field, previous_value in zip(('start_date', 'end_date', 'max_end_date'), previous_info):
+                    if dados_info[field] is None:
+                        dados_info[field] = previous_value
+
                 conn.execute(text("UPDATE contract_infos SET start_date = :start_date, end_date = :end_date, max_end_date = :max_end_date, duration = :duration, max_duration = :max_duration, total_amount = :total_amount, updated_at = :updated_at WHERE id = :id"), {**dados_info, 'id': exists[0]})
                 self.stats['infos_atualizadas'] += 1
             else:
@@ -556,6 +752,10 @@ class MigracaoContratos:
                 dados_info['created_at'] = self.now
                 conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) VALUES (:event_additive_id, :start_date, :end_date, :max_end_date, :duration, :max_duration, :total_amount, :created_at, :updated_at)"), dados_info)
                 self.stats['infos_criadas'] += 1
+
+            self.stats['infos_datas_ausentes'] += sum(
+                dados_info[field] is None for field in ('start_date', 'end_date', 'max_end_date')
+            )
 
     # ==============================================================================
     # ORQUESTRADOR PRINCIPAL DA CLASSE
@@ -566,14 +766,17 @@ class MigracaoContratos:
         print("=" * 80)
         
         try:
-            executar_truncate_tabelas(self.engine_new, TABELAS_CONTRATOS)
-
             print(f"\n📖 Lendo abas da planilha {self.caminho_planilha}...")
             df_ex_contract = pd.read_excel(self.caminho_planilha, sheet_name='CONTRATOS')
             df_ex_events = pd.read_excel(self.caminho_planilha, sheet_name='EVENTO')
             df_ex_itens = pd.read_excel(self.caminho_planilha, sheet_name='ITENS')
             df_ex_jobs = pd.read_excel(self.caminho_planilha, sheet_name='SERVICOS')
             df_ex_infos = pd.read_excel(self.caminho_planilha, sheet_name='INFORMAÇÕES')
+
+            self._mapear_datas_criacao_contrato(df_ex_contract, df_ex_events, df_ex_infos)
+            self._identificar_contratos_sem_cadastro(df_ex_contract, df_ex_events)
+            self._validar_schema_destino()
+            executar_truncate_tabelas(self.engine_new, TABELAS_CONTRATOS)
 
             with self.engine_new.begin() as conn:
                 self._construir_caches(conn)
@@ -592,6 +795,8 @@ class MigracaoContratos:
             print(f"{'ITENS:':<20} ✅ Criados: {self.stats['itens_criados']:<5} 🔄 Atualizados: {self.stats['itens_atualizados']}")
             print(f"{'SERVIÇOS:':<20} ✅ Criados: {self.stats['jobs_criados']:<5} 🔄 Atualizados: {self.stats['jobs_atualizados']}")
             print(f"{'INFORMAÇÕES:':<20} ✅ Criadas: {self.stats['infos_criadas']:<5} 🔄 Atualizadas: {self.stats['infos_atualizadas']}")
+            if self.stats['infos_datas_ausentes']:
+                print(f"⚠️ Datas de vigência ainda ausentes após herdar do snapshot anterior: {self.stats['infos_datas_ausentes']} campo(s). Não foram inventadas datas sem fonte.")
             print("=" * 80)
             print("🚀 Migração concluída com sucesso!")
 
