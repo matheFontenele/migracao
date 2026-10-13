@@ -75,6 +75,27 @@ class MigracaoEquipamentos:
             if matches:
                 return matches[0]
             return None
+
+    def _salvar_relatorio_tombos_repetidos(self, df_master):
+        colunas = ['ID', 'TOMBO', 'EQUIPAMENTO', 'ORG_ID']
+        caminho_ajustes = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            'ajustes',
+        )
+        os.makedirs(caminho_ajustes, exist_ok=True)
+        caminho_relatorio = os.path.join(caminho_ajustes, 'relatorio_duplicatas_tombos.csv')
+
+        if df_master.empty or 'TOMBO' not in df_master.columns:
+            duplicados = pd.DataFrame(columns=colunas)
+        else:
+            tombo_normalizado = df_master['TOMBO'].astype('string').str.strip()
+            mask_duplicados = tombo_normalizado.notna() & tombo_normalizado.ne('') & tombo_normalizado.duplicated(keep=False)
+            duplicados = df_master.loc[mask_duplicados, ['id_legado', 'TOMBO', 'NOME_AJUSTADO', 'org_destino']].copy()
+            duplicados.columns = colunas
+            duplicados = duplicados.sort_values(['TOMBO', 'ID'], kind='stable')
+
+        duplicados.to_csv(caminho_relatorio, index=False, encoding='utf-8-sig')
+        print(f"📄 Relatório de equipamentos com tombo repetido salvo em '{caminho_relatorio}' ({len(duplicados)} registros).")
             
     # ==============================================================================
     # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS + NOVA CTE)
@@ -561,6 +582,7 @@ class MigracaoEquipamentos:
             executar_truncate_tabelas(self.engine_new, TABELAS)
 
             df_master = self._extrair_e_transformar()
+            self._salvar_relatorio_tombos_repetidos(df_master)
             df_master = self._carregar_tabelas_dimensionais(df_master)
             df_master = self._tratar_fornecedores(df_master)
             self._gerar_inventario(df_master)

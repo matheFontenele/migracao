@@ -60,7 +60,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             })
 
         df_relatorio = pd.DataFrame(linhas, columns=colunas)
-        caminho = 'docs/clientes_sem_contrato.xlsx'
+        pasta_ajustes = os.path.join(os.path.dirname(BASE_DIR), 'ajustes')
+        os.makedirs(pasta_ajustes, exist_ok=True)
+        caminho = os.path.join(pasta_ajustes, 'clientes_sem_contrato.xlsx')
         df_relatorio.to_excel(caminho, index=False)
         print(
             f"📄 Relatório de clientes/movimentos sem contrato salvo em "
