@@ -847,6 +847,67 @@ class BaseMigracaoMovimento:
             if self.shipment_items_mestre: pd.DataFrame(self.shipment_items_mestre).to_sql("shipment_items", con=conn, if_exists="append", index=False)
             if self.equipment_histories_mestre: pd.DataFrame(self.equipment_histories_mestre).to_sql("equipment_history", con=conn, if_exists="append", index=False)
 
+            # ==========================================================================
+            # CRIAÇÃO DE VOLUMES PARA MOVIMENTOS DE MIGRAÇÃO
+            # ==========================================================================
+            if self.movimentos_mestre and self.movimento_itens_mestre:
+                print("   📦 Criando volumes para movimentos de migração...")
+                # Mapear movement_id -> lista de movement_item_ids
+                mov_to_items = {}
+                for item in self.movimento_itens_mestre:
+                    mov_id = item.get('movement_id')
+                    item_id = item.get('id')
+                    if mov_id and item_id:
+                        mov_to_items.setdefault(int(mov_id), []).append(int(item_id))
+
+                # Criar volumes
+                volumes_batch = []
+                volume_items_batch = []
+                volume_id_counter = 1
+
+                # Buscar próximo ID disponível para volumes
+                max_vol = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM volumes")).scalar()
+                volume_id_counter = max_vol + 1
+
+                for mov in self.movimentos_mestre:
+                    mov_id = mov.get('id')
+                    if mov_id in mov_to_items and mov_to_items[mov_id]:
+                        volume_id = volume_id_counter
+                        volume_id_counter += 1
+
+                        volumes_batch.append({
+                            "id": volume_id,
+                            "movement_id": int(mov_id),
+                            "name": f"MIGRACAO {mov_id}",
+                            "code": f"MIG-{mov_id}",
+                            "shipped": 0,
+                            "created_at": mov.get('created_at', self.now),
+                            "updated_at": mov.get('updated_at', self.now)
+                        })
+
+                        for mi_id in mov_to_items[mov_id]:
+                            volume_items_batch.append({
+                                "volume_id": volume_id,
+                                "movement_item_id": mi_id,
+                                "quantity": 1,  # Cada item de movimento = 1 unidade no volume
+                                "created_at": self.now,
+                                "updated_at": self.now
+                            })
+
+                if volumes_batch:
+                    conn.execute(text("""
+                        INSERT INTO volumes (id, movement_id, name, code, shipped, created_at, updated_at)
+                        VALUES (:id, :movement_id, :name, :code, :shipped, :created_at, :updated_at)
+                    """), volumes_batch)
+                    print(f"      ✅ {len(volumes_batch)} volumes criados")
+
+                if volume_items_batch:
+                    conn.execute(text("""
+                        INSERT INTO volume_items (volume_id, movement_item_id, quantity, created_at, updated_at)
+                        VALUES (:volume_id, :movement_item_id, :quantity, :created_at, :updated_at)
+                    """), volume_items_batch)
+                    print(f"      ✅ {len(volume_items_batch)} itens de volume criados")
+
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
         print(f"📦 Capas Pais Criadas: {len(self.servicos_mestre)}")
         print(f"📦 Itens Criados: {len(self.service_itens_mestre)}")

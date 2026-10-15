@@ -139,7 +139,9 @@ TABELAS = [
     'maintenance_items',
     'maintenances',
     'billing_items',
-    'billings'
+    'billings',
+    'volumes',
+    'volume_items'
 ]
 
 TABELAS_MOVIMENTOS = [
@@ -155,7 +157,9 @@ TABELAS_MOVIMENTOS = [
     'maintenance_items',
     'maintenances',
     'billing_items',
-    'billings'
+    'billings',
+    'volumes',
+    'volume_items'
 ]
 
 TAREFAS = {
