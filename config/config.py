@@ -16,6 +16,38 @@ ORGANIZACOES_BLOQUEADAS = {1123, 1366}
 CLIENTES_BLOQUEADOS = {2131, 2707, 10672, 10651}
 FALSOS_RESERVAS = {10487}
 
+# Clientes internos usados no legado como estoque/base da própria ALUCOM.
+# Eles não existirão no banco refatorado e os equipamentos alugados para eles
+# devem voltar como DISPONÍVEL PARA LOCAÇÃO (status_id = 1).
+# Ajuste esta lista sempre que um novo cliente-estoque for identificado.
+CLIENTES_ESTOQUE = {
+    3192,   # ALUCOM SÃO PAULO - 2018
+    3622,   # ALUCOM LOCACOES
+    3967,   # ALUCOM LOCACOES
+    10428,  # ALUCOM LTDA
+    10431,  # ALUCOM LTDA
+    10432,  # ALUCOM LTDA
+    10468,  # ALUCOM ESTOQUE
+    10475,  # ALUCOM SAO LUIS
+    10484,  # SAO LUIS ALUCOM LOCACOES
+    10662,  # ALUCOM - BASE SANTOS DUMONT
+    10663,  # ALUCOM - BASE SANTOS DUMONT
+    10672,  # BASE ALUCOM - SÃO LUIS (já bloqueado)
+    10847,  # ALUCOM - BASE ARACATI
+    10856,  # ALUCOM EDUCATION
+    10857,  # ALUCOM DISTRIBUIÇÃO
+    11001,  # DEPOSITO FLORIANOPOLIS - ALUCOM
+    11070,  # ALUCOM - BASE JOÃO PESSOA
+    11460,  # BASE ALUCOM - FLORIANOPOLIS
+    11651,  # BASE ALUCOM - SÃO LUIS
+}
+
+# Setores internos que NÃO devem virar customer (secretaria). Seus clientes
+# são anexados diretamente ao departamento pai.
+# 1187 = ALUCOM SEDE RIACHUELO (departamento 283 = ADI)
+# 1715 = Secretaria da Prefeitura 439 (cliente 12196 vai direto para a prefeitura)
+SETORES_IGNORADOS = {1187, 1715}
+
 # =========================================================================
 # EXCEÇÃO DE TIPOS PARA INSUMOS (MIGRAÇÃO DE EQUIPAMENTOS)
 # =========================================================================

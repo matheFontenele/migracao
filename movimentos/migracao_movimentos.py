@@ -4,7 +4,15 @@ import sqlalchemy as sa
 from sqlalchemy import text
 from datetime import datetime
 
-from config.config import CLIENTES_BLOQUEADOS, ORGANIZACOES_BLOQUEADAS, MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS
+from config.config import (
+    CLIENTES_BLOQUEADOS,
+    CLIENTES_ESTOQUE,
+    ORGANIZACOES_BLOQUEADAS,
+    MAPPING_ALUCOM,
+    MAPPING_IP,
+    MAPPING_MOREIA,
+    MAPPING_AS,
+)
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, normalizar_para_match
 
 # ==============================================================================
@@ -41,6 +49,115 @@ def resetar_saldo_contract_items(engine):
     with engine.begin() as conn:
         conn.execute(text("UPDATE contract_items SET available_quantity = quantity"))
     print("   ✅ Saldos reestabelecidos.")
+
+
+def liberar_equipamentos_clientes_estoque(engine_new, engine_legado):
+    """Libera para locação os equipamentos alugados para clientes internos de
+    estoque/base (CLIENTES_ESTOQUE), que não existem no banco refatorado.
+
+    Regra:
+      - considera o ÚLTIMO movimento válido do equipamento no legado;
+      - só atua quando o destinatário é um cliente de CLIENTES_ESTOQUE e o
+        equipamento está ALUGADO (situação 1);
+      - status destino = 1 (DISPONÍVEL PARA LOCAÇÃO);
+      - endereço = endereço BASE da organização (fallback: primeiro endereço);
+      - registra equipment_history com o motivo WAREHOUSE_CLIENT_RELEASE.
+    """
+    if not CLIENTES_ESTOQUE:
+        print("   ℹ️ CLIENTES_ESTOQUE vazio: nenhuma liberação de estoque será feita.")
+        return 0
+
+    ids_clientes = ",".join(str(int(i)) for i in sorted(CLIENTES_ESTOQUE))
+    query_legado = text(f"""
+        SELECT DISTINCT eq.id AS equipment_id
+        FROM aluguel_equipamentos eq
+        INNER JOIN (
+            SELECT mi.equipamento_id, MAX(mi.id) AS max_item_id
+            FROM aluguel_movimento_itens mi
+            INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+            WHERE m.deleted_at IS NULL
+            GROUP BY mi.equipamento_id
+        ) ult ON ult.equipamento_id = eq.id
+        INNER JOIN aluguel_movimento_itens mi2 ON mi2.id = ult.max_item_id
+        INNER JOIN aluguel_movimento m2 ON m2.id = mi2.movimento_id
+        WHERE eq.deleted_at IS NULL
+          AND eq.situacao_id = 1
+          AND m2.cliente_id IN ({ids_clientes})
+    """)
+
+    with engine_legado.connect() as conn_legado:
+        equipamentos = sorted(
+            {int(row[0]) for row in conn_legado.execute(query_legado)}
+        )
+
+    if not equipamentos:
+        print("   ℹ️ Nenhum equipamento alugado para clientes de estoque no legado.")
+        return 0
+
+    ids_equipamentos = ",".join(str(i) for i in equipamentos)
+    atualizado_em = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    with engine_new.begin() as conn:
+        rows = conn.execute(text(f"""
+            SELECT id, current_organization_id
+            FROM equipments
+            WHERE id IN ({ids_equipamentos})
+        """)).fetchall()
+
+        if not rows:
+            print("   ℹ️ Equipamentos de estoque ainda não existem no banco novo.")
+            return 0
+
+        mapa_endereco_base = {}
+        for org_id in {int(row[1]) for row in rows if row[1] is not None}:
+            endereco = conn.execute(text("""
+                SELECT id
+                FROM addresses
+                WHERE addressable_id = :org_id
+                  AND deleted_at IS NULL
+                ORDER BY (UPPER(alias) LIKE '%BASE%') DESC, id ASC
+                LIMIT 1
+            """), {"org_id": org_id}).fetchone()
+            if endereco:
+                mapa_endereco_base[org_id] = int(endereco[0])
+
+        updates = [{
+            "e_id": int(row[0]),
+            "addr_id": mapa_endereco_base.get(int(row[1])) if row[1] is not None else None,
+        } for row in rows]
+
+        conn.execute(text("""
+            UPDATE equipments
+            SET status_id = 1,
+                address_id = COALESCE(:addr_id, address_id),
+                last_movement_item_customer_id = NULL,
+                deleted_at = NULL
+            WHERE id = :e_id
+        """), updates)
+
+        historico = [{
+            "equipment_id": item["e_id"],
+            "occurred_at": atualizado_em,
+        } for item in updates]
+
+        conn.execute(text("""
+            INSERT INTO equipment_history
+                (equipment_id, status_id, occurred_at, is_conversion, reason, user_id)
+            SELECT :equipment_id, 1, :occurred_at, 0, 'WAREHOUSE_CLIENT_RELEASE', 1
+            FROM DUAL
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM equipment_history
+                WHERE equipment_id = :equipment_id
+                  AND reason = 'WAREHOUSE_CLIENT_RELEASE'
+            )
+        """), historico)
+
+    print(
+        f"   ✅ {len(updates)} equipamento(s) de clientes de estoque "
+        f"liberados para locação (status 1)."
+    )
+    return len(updates)
 
 # ==============================================================================
 # CARGA DE DADOS COMPARTILHADOS
@@ -907,6 +1024,10 @@ class BaseMigracaoMovimento:
                         VALUES (:volume_id, :movement_item_id, :quantity, :created_at, :updated_at)
                     """), volume_items_batch)
                     print(f"      ✅ {len(volume_items_batch)} itens de volume criados")
+
+        # Clientes internos de estoque/base não existem no refatorado: seus
+        # equipamentos alugados precisam voltar como DISPONÍVEL PARA LOCAÇÃO.
+        liberar_equipamentos_clientes_estoque(self.engine_new, self.engine_legado)
 
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
         print(f"📦 Capas Pais Criadas: {len(self.servicos_mestre)}")

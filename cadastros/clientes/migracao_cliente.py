@@ -7,6 +7,8 @@ from tqdm import tqdm
 
 from config.config import (
     CLIENTES_BLOQUEADOS,
+    CLIENTES_ESTOQUE,
+    SETORES_IGNORADOS,
     ORGANIZACOES_BLOQUEADAS,
     FALSOS_RESERVAS,
     BASES_AVULSOS, ENDERECOS_BASES, RESERVAS_BASE_AVULSA,
@@ -470,7 +472,11 @@ class MigracaoClientes:
         df_clean['ORG_DESTINO'] = df_clean['ORGANIZACAO'].apply(descobrir_id_organizacao)
         df_clean = df_clean[~df_clean['ORG_DESTINO'].isin(ORGANIZACOES_BLOQUEADAS)]
         df_clean['id_clean'] = pd.to_numeric(df_clean['ID_CLIENTE'], errors='coerce').fillna(0).astype(int)
-        df_clean = df_clean[~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)]
+        # Clientes internos de estoque/base não existirão no refatorado. Seus
+        # equipamentos alugados são liberados para locação na etapa de movimentos.
+        df_clean = df_clean[
+            ~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS | CLIENTES_ESTOQUE)
+        ]
 
         # --- APLICA EXCEÇÕES ---
         # df_clean = self._unificar_receita_federal(df_clean)
@@ -481,6 +487,20 @@ class MigracaoClientes:
         df_clean = self._unificar_ministerio_transportes(df_clean)
         df_clean = self._reestruturar_detran(df_clean)
         df_clean = self._achatar_secretarias_iguais_prefeitura(df_clean)
+
+        # Setores internos não devem virar customer (secretaria). Os clientes
+        # desses setores são anexados diretamente ao departamento pai.
+        if SETORES_IGNORADOS:
+            mask_setor_ignorado = pd.to_numeric(
+                df_clean['ID_SECRETARIA'], errors='coerce'
+            ).isin(SETORES_IGNORADOS)
+            if mask_setor_ignorado.any():
+                df_clean.loc[mask_setor_ignorado, 'ID_SECRETARIA'] = None
+                df_clean.loc[mask_setor_ignorado, 'SECRETARIA'] = None
+                print(
+                    f"   🧩 {int(mask_setor_ignorado.sum())} cliente(s) de setor(es) "
+                    f"interno(s) foram anexados diretamente ao departamento pai."
+                )
 
         # --- MERGE DE RESERVAS ---
         mask_reserva = df_clean['CLIENTE'].str.contains(r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
