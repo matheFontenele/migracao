@@ -104,6 +104,10 @@ def iniciar_movimentos(eng_novo, eng_legado):
     from movimentos import orquestrador_movimentos
     orquestrador_movimentos.executar(eng_novo, eng_legado)
 
+def iniciar_liberacao_estoque(eng_novo, eng_legado):
+    from movimentos.migracao_movimentos import liberar_equipamentos_clientes_estoque
+    liberar_equipamentos_clientes_estoque(eng_novo, eng_legado)
+
 def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
     from movimentos.atualizacao_contratos_data import AtualizacaoContratosData
     # Se a classe exigir apenas engine_new, passe apenas ela.
@@ -175,6 +179,7 @@ TAREFAS = {
     "movimentos_substituicao": iniciar_substituicao,
     "movimentos_manutencao": iniciar_manutencao,
     "movimentos": iniciar_movimentos,
+    "liberar_estoque": iniciar_liberacao_estoque,
     "reset_movimentos": iniciar_reset_movimentos,
     "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato
 }

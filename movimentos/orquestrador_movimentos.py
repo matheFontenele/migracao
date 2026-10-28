@@ -4,6 +4,7 @@ import sys
 from movimentos.migracao_movimentos import (
     carregar_dados_compartilhados,
     executar_truncate_tabelas,
+    liberar_equipamentos_clientes_estoque,
     resetar_saldo_contract_items
 )
 
@@ -69,6 +70,9 @@ class OrquestradorMovimentos:
             print("\n▶️ Iniciando Módulo: REVISÃO DE STATUS (SANITY CHECK)")
             revisao = RevisaoStatusEquipamentos(self.engine_new, self.engine_legado)
             revisao.executar()
+
+            print("\n▶️ Liberando equipamentos de clientes de estoque/base")
+            liberar_equipamentos_clientes_estoque(self.engine_new, self.engine_legado)
 
             print("\n" + "=" * 80)
             print("🎉 PIPELINE DE MOVIMENTOS CONCLUÍDO COM SUCESSO")
