@@ -118,6 +118,10 @@ def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
     migrador = AtualizacaoContratosData(eng_novo)
     migrador.executar()
 
+def iniciar_requisicoes_2026(eng_novo, eng_legado, argumentos_cli=None):
+    from movimentos.migracao_requisicoes_2026 import main as executar_migracao
+    executar_migracao(argv=argumentos_cli, engine_new=eng_novo)
+
 # ==============================================================================
 # 2. MAPEAMENTO DE TAREFAS E GRUPOS
 # ==============================================================================
@@ -186,7 +190,8 @@ TAREFAS = {
     "liberar_estoque": iniciar_liberacao_estoque,
     "backfill_delivery_date": iniciar_backfill_delivery_date,
     "reset_movimentos": iniciar_reset_movimentos,
-    "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato
+    "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato,
+    "requisicoes": iniciar_requisicoes_2026,
 }
 
 GRUPOS = {
@@ -199,7 +204,7 @@ def despachar_tarefa(nome_tarefa, eng_novo, eng_legado, argumentos_cli=None):
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
     try:
-        if nome_tarefa == "backfill_delivery_date":
+        if nome_tarefa in {"backfill_delivery_date", "requisicoes"}:
             funcao_alvo(eng_novo, eng_legado, argumentos_cli)
         else:
             funcao_alvo(eng_novo, eng_legado)
@@ -223,13 +228,13 @@ def main():
     parser.add_argument(
         "argumentos_extra",
         nargs=argparse.REMAINDER,
-        help="Argumentos específicos da tarefa backfill_delivery_date.",
+        help="Argumentos específicos de backfill_delivery_date ou requisicoes.",
     )
 
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
-    if args.argumentos_extra and alvo != "backfill_delivery_date":
-        parser.error("argumentos extras só são aceitos com backfill_delivery_date")
+    if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes"}:
+        parser.error("argumentos extras só são aceitos com backfill_delivery_date ou requisicoes")
 
     if alvo not in TAREFAS and alvo not in GRUPOS:
         print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.\n")
