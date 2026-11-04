@@ -3,7 +3,7 @@
 # =========================================================================
 # DE-PARA DE ORGANIZAÇÕES (DOMÍNIO DO NEGÓCIO)
 # =========================================================================
-MAPPING_ALUCOM = {1115, 1327, 1329, 1363, 1365, 1366, 1367, 1370,1353, 1373, 1377}
+MAPPING_ALUCOM = {1115, 1327, 1329, 1363, 1365, 1366, 1367, 1370, 1353, 1373, 1377}
 MAPPING_IP = {1311, 1346, 1349, 1350, 1364, 1368, 1371}
 MAPPING_MOREIA = {1122, 1326, 1328, 1358, 1369}
 MAPPING_AS = {1378}
@@ -12,7 +12,7 @@ MAPPING_SC = {1379}
 # =========================================================================
 # REGRAS DE EXCEÇÃO E FILTROS
 # =========================================================================
-ORGANIZACOES_BLOQUEADAS = {1123, 1366}
+ORGANIZACOES_BLOQUEADAS = {1123, 1351, 1366}  # 1351 = TONER ADI (não migrar seus clientes)
 CLIENTES_BLOQUEADOS = {2131, 2707, 10672, 10651}
 FALSOS_RESERVAS = {10487}
 
@@ -149,4 +149,3 @@ DEPARA_RESERVAS_BASE = {
     10859: "SECRETARIA DE ESTADO DA SAÚDE DA PARAÍBA - HEMOCENTRO",
     4089: "P M DE CAUCAIA - RESERVA",
 }
-

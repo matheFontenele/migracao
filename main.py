@@ -108,6 +108,10 @@ def iniciar_liberacao_estoque(eng_novo, eng_legado):
     from movimentos.migracao_movimentos import liberar_equipamentos_clientes_estoque
     liberar_equipamentos_clientes_estoque(eng_novo, eng_legado)
 
+def iniciar_backfill_delivery_date(eng_novo, eng_legado, argumentos_cli=None):
+    from backfill_shipment_delivery_date import main as executar_backfill_cli
+    executar_backfill_cli(argv=argumentos_cli, engine_new=eng_novo)
+
 def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
     from movimentos.atualizacao_contratos_data import AtualizacaoContratosData
     # Se a classe exigir apenas engine_new, passe apenas ela.
@@ -180,6 +184,7 @@ TAREFAS = {
     "movimentos_manutencao": iniciar_manutencao,
     "movimentos": iniciar_movimentos,
     "liberar_estoque": iniciar_liberacao_estoque,
+    "backfill_delivery_date": iniciar_backfill_delivery_date,
     "reset_movimentos": iniciar_reset_movimentos,
     "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato
 }
@@ -189,12 +194,15 @@ GRUPOS = {
     "todos": ["clientes", "contratos", "contratantes", "equipamentos", "insumos", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato"]
 }
 
-def despachar_tarefa(nome_tarefa, eng_novo, eng_legado):
+def despachar_tarefa(nome_tarefa, eng_novo, eng_legado, argumentos_cli=None):
     funcao_alvo = TAREFAS[nome_tarefa]
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
     try:
-        funcao_alvo(eng_novo, eng_legado)
+        if nome_tarefa == "backfill_delivery_date":
+            funcao_alvo(eng_novo, eng_legado, argumentos_cli)
+        else:
+            funcao_alvo(eng_novo, eng_legado)
         print(f"✅ {nome_tarefa.upper()} concluído com sucesso.")
         
     except Exception as e:
@@ -212,9 +220,16 @@ def main():
         "alvo", nargs="?", default="todos",
         help="Opções: cadastros, todos OU módulos individuais (clientes, contratos, equipamentos...)"
     )
+    parser.add_argument(
+        "argumentos_extra",
+        nargs=argparse.REMAINDER,
+        help="Argumentos específicos da tarefa backfill_delivery_date.",
+    )
 
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
+    if args.argumentos_extra and alvo != "backfill_delivery_date":
+        parser.error("argumentos extras só são aceitos com backfill_delivery_date")
 
     if alvo not in TAREFAS and alvo not in GRUPOS:
         print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.\n")
@@ -240,7 +255,12 @@ def main():
         
     else:
         print(f"🐛 Modo Debug Ativado: Execução isolada.")
-        despachar_tarefa(alvo, eng_novo, eng_legado)
+        despachar_tarefa(
+            alvo,
+            eng_novo,
+            eng_legado,
+            argumentos_cli=args.argumentos_extra,
+        )
 
 
 if __name__ == "__main__":
