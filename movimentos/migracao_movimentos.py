@@ -876,6 +876,10 @@ class BaseMigracaoMovimento:
             "volume_id": None,
             "details": f"Guia de transporte (Operação: {operation_type})",
             "address_id": cliente_final_address_id,
+            # A data é DATE no banco; ao gravar o timestamp do movimento,
+            # o MySQL preserva a data correspondente. Guias não entregues
+            # continuam sem delivery_date.
+            "delivery_date": mov_date if status_shipment == 2 else None,
             'created_at': mov_date,
             'updated_at': mov_date
         })

@@ -8,6 +8,13 @@ TABELAS = [
     'contract_recipient_customers'
 ]
 
+# Destinatários adicionais autorizados fora da relação contratante -> filhos
+# diretos. Regra confirmada para o contrato 2025/2208.09 de Aquiraz.
+# Manter explícito para não conceder acesso automaticamente a toda a organização.
+VINCULOS_DESTINATARIOS_ADICIONAIS = {
+    230: (2462,),  # Contrato 2025/2208.09 -> Gabinete do Prefeito de Aquiraz
+}
+
 class MigracaoContratantes:
 
     def __init__(self, engine_new, engine_legado):
@@ -17,7 +24,8 @@ class MigracaoContratantes:
         self.stats = {
             "contratos": 0, 
             "vinculos_contratantes": 0, 
-            "vinculos_filhos": 0
+            "vinculos_filhos": 0,
+            "vinculos_adicionais": 0,
         }
 
     def _vincular_destinatarios(self, conn):
@@ -60,6 +68,29 @@ class MigracaoContratantes:
                 )
                 
                 self.stats["vinculos_filhos"] += res_filhos.rowcount
+
+                # 4. PASSO C: Destinatários adicionais explicitamente aprovados.
+                # INSERT IGNORE mantém a operação idempotente caso o destinatário
+                # também esteja entre o contratante ou seus filhos diretos.
+                destinatarios_adicionais = VINCULOS_DESTINATARIOS_ADICIONAIS.get(
+                    contract_id, ()
+                )
+                for destinatario_id in destinatarios_adicionais:
+                    res_adicional = conn.execute(
+                        text("""
+                            INSERT IGNORE INTO contract_recipient_customers
+                                (contract_id, customer_id)
+                            SELECT :contract_id, id
+                            FROM customers
+                            WHERE id = :customer_id
+                        """),
+                        {
+                            "contract_id": contract_id,
+                            "customer_id": destinatario_id,
+                        },
+                    )
+                    self.stats["vinculos_adicionais"] += res_adicional.rowcount
+
                 self.stats["contratos"] += 1
 
     # ==============================================================================
@@ -81,7 +112,11 @@ class MigracaoContratantes:
             print(f"📊 Contratos processados:        {self.stats['contratos']}")
             print(f"🔗 Contratantes vinculados:      {self.stats['vinculos_contratantes']}")
             print(f"🔗 Secretarias/Filhos vinculados: {self.stats['vinculos_filhos']}")
-            print(f"📈 Total de vínculos gerados:    {self.stats['vinculos_contratantes'] + self.stats['vinculos_filhos']}")
+            print(f"🔗 Vínculos adicionais:          {self.stats['vinculos_adicionais']}")
+            print(
+                "📈 Total de vínculos gerados:    "
+                f"{self.stats['vinculos_contratantes'] + self.stats['vinculos_filhos'] + self.stats['vinculos_adicionais']}"
+            )
             print("=" * 50)
 
         except Exception as e:

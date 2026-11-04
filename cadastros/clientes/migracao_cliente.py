@@ -204,6 +204,44 @@ class MigracaoClientes:
         self.engine_legado = engine_legado
         self.now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.stats = {"pais": 0, "filhos": 0, "enderecos": 0, "mesclados": 0}
+        self.clientes_descartados = []
+        self.arquivo_log_descartados = 'ajustes/clientes_descartados_migracao.csv'
+
+    def _registrar_clientes_descartados(self, df: pd.DataFrame, motivo: str):
+        """Acumula linhas de clientes excluídos para auditoria, sem alterar o fluxo."""
+        if df.empty:
+            return
+
+        colunas = [
+            'ID_CLIENTE', 'CLIENTE', 'ID_PREFEITURA', 'PREFEITURA',
+            'ID_SECRETARIA', 'SECRETARIA', 'ORGANIZACAO', 'ORG_DESTINO',
+            'CNPJ', 'CIDADE', 'ESTADO', 'MOTIVO_DESCARTE',
+        ]
+        registro = df.copy()
+        registro['MOTIVO_DESCARTE'] = motivo
+        for coluna in colunas:
+            if coluna not in registro.columns:
+                registro[coluna] = None
+        self.clientes_descartados.append(registro[colunas])
+
+    def _salvar_log_clientes_descartados(self):
+        import os
+
+        os.makedirs(os.path.dirname(self.arquivo_log_descartados), exist_ok=True)
+        if self.clientes_descartados:
+            df_log = pd.concat(self.clientes_descartados, ignore_index=True)
+            df_log = df_log.drop_duplicates(subset=['ID_CLIENTE', 'MOTIVO_DESCARTE'])
+        else:
+            df_log = pd.DataFrame(columns=[
+                'ID_CLIENTE', 'CLIENTE', 'ID_PREFEITURA', 'PREFEITURA',
+                'ID_SECRETARIA', 'SECRETARIA', 'ORGANIZACAO', 'ORG_DESTINO',
+                'CNPJ', 'CIDADE', 'ESTADO', 'MOTIVO_DESCARTE',
+            ])
+        df_log.to_csv(self.arquivo_log_descartados, index=False, encoding='utf-8-sig')
+        print(
+            f"📄 Log de clientes descartados salvo em '{self.arquivo_log_descartados}' "
+            f"({len(df_log)} registros)."
+        )
 
 
     # ==============================================================================
@@ -470,13 +508,23 @@ class MigracaoClientes:
         df_clean['CEP'] = df_clean['CEP'].fillna('NULO').astype(str).str.slice(0, 8)
         
         df_clean['ORG_DESTINO'] = df_clean['ORGANIZACAO'].apply(descobrir_id_organizacao)
-        df_clean = df_clean[~df_clean['ORG_DESTINO'].isin(ORGANIZACOES_BLOQUEADAS)]
+        mask_org_bloqueada = df_clean['ORG_DESTINO'].isin(ORGANIZACOES_BLOQUEADAS)
+        self._registrar_clientes_descartados(
+            df_clean.loc[mask_org_bloqueada], 'ORGANIZACAO_BLOQUEADA'
+        )
+        df_clean = df_clean[~mask_org_bloqueada]
         df_clean['id_clean'] = pd.to_numeric(df_clean['ID_CLIENTE'], errors='coerce').fillna(0).astype(int)
         # Clientes internos de estoque/base não existirão no refatorado. Seus
         # equipamentos alugados são liberados para locação na etapa de movimentos.
-        df_clean = df_clean[
-            ~df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS | CLIENTES_ESTOQUE)
-        ]
+        mask_cliente_bloqueado = df_clean['id_clean'].isin(CLIENTES_BLOQUEADOS)
+        mask_cliente_estoque = df_clean['id_clean'].isin(CLIENTES_ESTOQUE)
+        self._registrar_clientes_descartados(
+            df_clean.loc[mask_cliente_bloqueado], 'CLIENTE_BLOQUEADO'
+        )
+        self._registrar_clientes_descartados(
+            df_clean.loc[mask_cliente_estoque], 'CLIENTE_INTERNO_ESTOQUE_BASE'
+        )
+        df_clean = df_clean[~(mask_cliente_bloqueado | mask_cliente_estoque)]
 
         # --- APLICA EXCEÇÕES ---
         # df_clean = self._unificar_receita_federal(df_clean)
@@ -527,6 +575,40 @@ class MigracaoClientes:
             nome_normalizado = normalizar_para_match(nome_titular)
             mask_titular = df_merged['nome_ajustado'] == nome_normalizado
             df_merged.loc[mask_titular, 'reserved_customer_id'] = id_reserva
+
+        # Clientes normais sem hierarquia precisam de uma raiz para a carga
+        # conseguir criar seu customer/address. Fazemos isso depois do pareamento
+        # para que a alteração de escopo não interfira no match das reservas.
+        mask_reserva_hierarquia = df_clean['CLIENTE'].str.contains(
+            r'\b(?:RESERVA|RESERVADO)\b', case=False, na=False
+        ) & ~df_clean['id_clean'].isin(FALSOS_RESERVAS)
+        mask_sem_pai = (
+            df_clean['ID_PREFEITURA'].isna()
+            & df_clean['ID_SECRETARIA'].isna()
+            & df_clean['ID_CLIENTE'].notna()
+            & ~mask_reserva_hierarquia
+        )
+        if mask_sem_pai.any():
+            ids_sem_pai = set(df_clean.loc[mask_sem_pai, 'id_clean'])
+            for frame in (df_clean, df_merged):
+                mask_promover = (
+                    frame['id_clean'].isin(ids_sem_pai)
+                    & frame['ID_PREFEITURA'].isna()
+                    & frame['ID_SECRETARIA'].isna()
+                )
+                # IDs negativos são chaves sintéticas internas: evitam colisão
+                # entre, por exemplo, o departamento legado 439 e o cliente 439.
+                ids_raiz_sintetica = pd.to_numeric(
+                    frame.loc[mask_promover, 'ID_CLIENTE'], errors='coerce'
+                ).abs()
+                frame.loc[mask_promover, 'ID_PREFEITURA'] = -ids_raiz_sintetica
+                frame.loc[mask_promover, 'PREFEITURA'] = frame.loc[
+                    mask_promover, 'CLIENTE'
+                ]
+            print(
+                f"   🌱 {int(mask_sem_pai.sum())} cliente(s) sem hierarquia "
+                "promovido(s) a raiz para migração."
+            )
 
         reservas_pareadas = df_merged['reserved_customer_id'].dropna().unique()
         df_orfas = df_reservas[~df_reservas['id_clean'].isin(reservas_pareadas)].copy()
@@ -674,7 +756,11 @@ class MigracaoClientes:
             dict_traducao_filhos = {}
             for id_legado, info in tqdm(secretarias.items(), desc="Inserindo Secretarias"):
                 id_pai = dict_traducao_pais.get(info["id_pai"])
-                if info["id_pai"] and not id_pai: continue
+                if info["id_pai"] and not id_pai:
+                    self._registrar_clientes_descartados(
+                        pd.DataFrame([info['row']]), 'SECRETARIA_SEM_PREFEITURA_MIGRADA'
+                    )
+                    continue
                 
                 c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
                 u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
@@ -727,6 +813,10 @@ class MigracaoClientes:
                         "created_at": c_at, "updated_at": u_at
                     })
                     self.stats["enderecos"] += 1
+                else:
+                    self._registrar_clientes_descartados(
+                        pd.DataFrame([info['row']]), 'CLIENTE_SEM_PAI_HIERARQUICO_MIGRADO'
+                    )
 
             # BULK INSERT MÁGICO
             print(f"📦 Arremessando Lote de {len(enderecos_batch)} Endereços de uma só vez...")
@@ -761,7 +851,9 @@ class MigracaoClientes:
         print("\n🚀 Iniciando Migração de Clientes...")
         df_bruto = self._extrair()
         df_finais, df_limpo = self._transformar(df_bruto)
-        
-        executar_truncate_tabelas(self.engine_new, TABELAS_CLIENTES)
-        self._carregar(df_finais, df_limpo)
+        try:
+            executar_truncate_tabelas(self.engine_new, TABELAS_CLIENTES)
+            self._carregar(df_finais, df_limpo)
+        finally:
+            self._salvar_log_clientes_descartados()
         print("✅ Migração de Clientes Finalizada.")

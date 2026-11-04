@@ -436,13 +436,20 @@ class MigracaoEquipamentos:
         
         df_validos = df_master[df_master['org_destino'].notna()]
         grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino', 'created_at'], dropna=False)
+        total_grupos = grupos_transacao.ngroups
 
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
 
         with self.engine_new.begin() as conn:
-            for (s_id, org_id, created_at_chave), df_transacao in grupos_transacao:
+            for (s_id, org_id, created_at_chave), df_transacao in tqdm(
+                grupos_transacao,
+                total=total_grupos,
+                desc="Gerando inventário",
+                unit="lote",
+                dynamic_ncols=True,
+            ):
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
                 addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
