@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 from sqlalchemy import text
+from tqdm import tqdm
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -130,8 +131,13 @@ def match_customer(name: str, customers: list[dict]) -> tuple[dict | None, float
 
 
 def preparar(engine, arquivo: Path = ARQUIVO_FONTE) -> tuple[list[dict], list[dict]]:
+    print("\n" + "=" * 72)
+    print("📦 MÓDULO: MIGRAÇÃO DE REQUISIÇÕES 2026")
+    print("=" * 72)
+    print(f"📖 Lendo arquivo de origem: {arquivo}")
     df = pd.read_csv(arquivo, encoding="utf-8-sig", dtype=str).fillna("")
     df.columns = [str(c).strip() for c in df.columns]
+    print(f"   Linhas carregadas: {len(df):,}")
     required = ["Solicitado Por", "Data", "Previsão", "Envio", "Cliente", "Etiquetas",
                 "Qtd Sol", "Equipamento | Insumos", "Substituição ou Novo", "PAT",
                 "Qtd Entregue", "Data Separação", "Separado por", "Req"]
@@ -139,6 +145,7 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE) -> tuple[list[dict], list[di
     if missing:
         raise ValueError(f"Colunas ausentes no CSV: {', '.join(sorted(missing))}")
 
+    print("\n🔗 Carregando clientes, usuários, organizações, transportes e equipamentos...")
     with engine.connect() as conn:
         customers, user_ids, org_ids, transports = carregar_referencias(conn)
         equipment_numbers = [int(float(v)) for v in df["PAT"] if str(v).strip().isdigit()]
@@ -160,10 +167,15 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE) -> tuple[list[dict], list[di
                     id=int(row.id), number=int(row.number), status_id=int(row.status_id),
                     name=row.name, organization_id=row.current_organization_id,
                 ))
+    print(
+        f"   Referências carregadas: {len(customers):,} clientes, "
+        f"{len(user_ids):,} usuários, {len(all_numbers):,} números de equipamento consultados."
+    )
 
     audit, prepared = [], []
     customer_match_cache = {}
-    for index, row in df.iterrows():
+    print("\n🔍 Validando linhas, equipamentos e correspondência de clientes...")
+    for index, row in tqdm(df.iterrows(), total=len(df), desc="Validando requisições", unit="linha"):
         line = index + 2
         req = normalizar(row["Req"])
         reason = ""
@@ -263,6 +275,8 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE) -> tuple[list[dict], list[di
                               "motivo": f"Separador sem correspondência: {separator_name}",
                               "cliente": row["Cliente"], "cliente_sugerido": record["customer_match"],
                               "similaridade": round(score, 4), "PAT": row["PAT"], "Req": row["Req"]})
+    print(f"\n   ✅ Linhas válidas para migração: {len(prepared):,}")
+    print(f"   ⚠️ Linhas registradas na auditoria: {len(audit):,}")
     return prepared, audit
 
 
@@ -277,8 +291,10 @@ def criar(engine, registros: list[dict]) -> tuple[int, int, list[dict]]:
         headers[key].append(r)
     order_count = movement_count = 0
     created_log_rows = []
+    print(f"\n📝 Preparando gravação de {len(headers):,} requisições agrupadas...")
+    print("🔒 Abrindo transação no banco de destino...")
     with engine.begin() as conn:
-        for key, rows in headers.items():
+        for key, rows in tqdm(headers.items(), total=len(headers), desc="Gravando requisições", unit="req"):
             customer_id, user_id, created, deadline, org_id, transport, movement_type, status_id, situation = key
             cur = conn.execute(text("""
                 INSERT INTO service_orders
@@ -303,7 +319,10 @@ def criar(engine, registros: list[dict]) -> tuple[int, int, list[dict]]:
                 # alugado/reservado indicado na coluna de referência.
                 item_key = (r["item_alias"], r["old_equipment_id"])
                 by_item[item_key].append(r)
-            for (alias, requested_equipment_id), item_rows in by_item.items():
+            for (alias, requested_equipment_id), item_rows in tqdm(
+                by_item.items(), total=len(by_item), desc=f"Itens da requisição {service_order_id}",
+                unit="item", leave=False,
+            ):
                 entered_quantities = [r["requested_quantity"] for r in item_rows if r["requested_quantity"]]
                 # A planilha informa Qtd Sol apenas na primeira linha do grupo;
                 # as linhas seguintes representam equipamentos dessa quantidade.
@@ -331,7 +350,10 @@ def criar(engine, registros: list[dict]) -> tuple[int, int, list[dict]]:
                 by_movement = defaultdict(list)
                 for r in movement_rows:
                     by_movement[(r["separated_at"], r["separator_id"])].append(r)
-                for (movement_date, separator_id), separated in by_movement.items():
+                for (movement_date, separator_id), separated in tqdm(
+                    by_movement.items(), total=len(by_movement),
+                    desc=f"Movimentos da requisição {service_order_id}", unit="mov", leave=False,
+                ):
                     mov_result = conn.execute(text("""
                         INSERT INTO movements
                             (number, movement_date, service_order_id, recipient_customer_id,
@@ -412,6 +434,7 @@ def criar(engine, registros: list[dict]) -> tuple[int, int, list[dict]]:
                     "separador": None,
                     "itens_movimento": "",
                 })
+    print("✅ Transação concluída e confirmada no banco.")
     return order_count, movement_count, created_log_rows
 
 
@@ -499,15 +522,17 @@ def main(argv=None, engine_new=None):
         from config.database import obter_engines
         engine_new, _ = obter_engines()
 
+    print("\n🚀 Iniciando rotina de requisições...")
     records, audit = preparar(engine_new, args.arquivo)
     args.auditoria.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(audit, columns=["linha", "resultado", "motivo", "cliente",
                                  "cliente_sugerido", "similaridade", "PAT", "Req"]).to_csv(
         args.auditoria, index=False, encoding="utf-8-sig", quoting=csv.QUOTE_MINIMAL)
     movement_records = sum(bool(r["create_movement"]) for r in records)
-    print(f"Linhas aprovadas para requisição: {len(records)}")
-    print(f"Movimentos previstos: {movement_records}")
-    print(f"Linhas/ocorrências auditadas: {len(audit)} — {args.auditoria}")
+    print("\n📊 RESUMO DA VALIDAÇÃO")
+    print(f"   Requisições/linhas elegíveis: {len(records):,}")
+    print(f"   Equipamentos com separação prevista para movimento: {movement_records:,}")
+    print(f"   Ocorrências na auditoria: {len(audit):,} — {args.auditoria}")
     if args.dry_run:
         print("Dry-run: nenhuma gravação foi feita.")
         return
@@ -516,15 +541,19 @@ def main(argv=None, engine_new=None):
             "SELECT COUNT(*) FROM service_orders WHERE details LIKE :marker AND deleted_at IS NULL"
         ), {"marker": f"%{MARCADOR_MIGRACAO}%"}).scalar_one()
     if existing_count:
+        print(f"\nℹ️ Foram encontradas {existing_count} requisições anteriores desta migração.")
+        print("   A rotina não repetirá as gravações; vai apenas reconstruir o log existente.")
         orders, movements, log_rows = recuperar_log_existentes(engine_new)
         log_path = salvar_log(log_rows)
-        print(f"Já existem {orders} requisições dessa migração; nenhuma duplicata foi criada.")
-        print(f"Log dos registros existentes ({movements} movimentos): {log_path}")
+        print(f"   Requisições localizadas: {orders:,} | Movimentos localizados: {movements:,}")
+        print(f"📄 Log salvo em: {log_path}")
         return
     orders, movements, log_rows = criar(engine_new, records)
     log_path = salvar_log(log_rows)
-    print(f"Gravação concluída: {orders} requisições e {movements} movimentos.")
-    print(f"Log de criação: {log_path}")
+    print("\n🏁 MIGRAÇÃO CONCLUÍDA")
+    print(f"   Requisições criadas: {orders:,}")
+    print(f"   Movimentos criados: {movements:,}")
+    print(f"📄 Log de criação salvo em: {log_path}")
 
 
 if __name__ == "__main__":
