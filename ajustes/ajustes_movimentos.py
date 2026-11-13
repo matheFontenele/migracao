@@ -48,6 +48,7 @@ from tqdm import tqdm
 from config.config import (
     CLIENTES_BLOQUEADOS,
     CLIENTES_ESTOQUE,
+    FALSOS_RESERVAS,
 )
 from config.database import obter_engines
 
@@ -63,6 +64,7 @@ ARQ_DIVERGENCIAS = os.path.join(PASTA_AJUSTES, "divergencias_movimentos.csv")
 ARQ_DIVERGENCIAS_POS = os.path.join(PASTA_AJUSTES, "divergencias_movimentos_pos_ajuste.csv")
 ARQ_RESUMO = os.path.join(PASTA_AJUSTES, "resumo_divergencias_movimentos.csv")
 ARQ_RESULTADO = os.path.join(PASTA_AJUSTES, "resultado_ajustes_movimentos.csv")
+ARQ_DUPLICADOS_PENDENTES = os.path.join(PASTA_AJUSTES, "duplicados_pendentes_pos_migracao.csv")
 
 
 # ==============================================================================
@@ -223,6 +225,16 @@ WHERE legacy_customer_id IS NOT NULL
   AND deleted_at IS NULL
 """
 
+QUERY_MAPA_RESERVAS = """
+SELECT
+    reserved_customer_id AS legacy_reserva_id,
+    addressable_id AS id_customer
+FROM addresses
+WHERE reserved_customer_id IS NOT NULL
+  AND addressable_type = 'customer'
+  AND deleted_at IS NULL
+"""
+
 
 # ==============================================================================
 # HELPERS
@@ -251,6 +263,84 @@ def _str_or_none(valor):
         pass
     texto = str(valor).strip()
     return texto or None
+
+
+def _tombo_key(valor):
+    """Normaliza o tombo para agrupar copias no legado (710 e 710.0 = 710)."""
+    numero = _int_or_none(valor)
+    if numero is not None:
+        return str(numero)
+    return _str_or_none(valor)
+
+
+def _rotulo_copias(qtd):
+    """Rotulo de ocorrencia do tombo no legado."""
+    qtd = _int_or_none(qtd) or 0
+    if qtd <= 1:
+        return "UNICO"
+    if qtd == 2:
+        return "DUPLICADO"
+    if qtd == 3:
+        return "TRIPLICADO"
+    if qtd == 4:
+        return "QUADRIPLICADO"
+    return f"{qtd} COPIAS"
+
+
+def separar_tombo_duplicado(df):
+    """Separa linhas com tombo repetido no banco migrado das ajustaveis.
+
+    A duplicidade considerada e a refletida na migracao (copias do mesmo
+    tombo entre equipamentos migrados). O conteudo do legado fica apenas
+    como diagnostico, pois insumos podem repetir o tombo sem virar equipamento.
+    """
+    coluna = (
+        "copias_tombo_refatorado"
+        if "copias_tombo_refatorado" in df.columns
+        else "copias_tombo_legado"
+    )
+    if coluna not in df.columns:
+        return df.copy(), df.iloc[0:0].copy()
+    repetidos = df[coluna].fillna(0).astype(int) > 1
+    return df[~repetidos].copy(), df[repetidos].copy()
+
+
+def identificar_reserva_mesclada(df, reservas_mapeadas=None):
+    """Marca equipamentos alugados no legado para clientes de RESERVA.
+
+    A migracao de clientes mescla esses clientes com o titular e transforma o
+    aluguel em reserva. Logo, legado ALUGADO x refatorado RESERVADO e o
+    comportamento esperado, nao uma divergencia.
+
+    A reserva pode ser identificada pelo nome (RESERVA/RESERVADO) ou pelo
+    de/para registrado em addresses.reserved_customer_id.
+    """
+    if df.empty:
+        return pd.Series(False, index=df.index)
+    nomes = (
+        df.get("cliente_legado", pd.Series("", index=df.index))
+        .fillna("").astype(str)
+        .str.contains(r"\b(?:RESERVA|RESERVADO)\b", case=False, regex=True)
+    )
+    ids = df.get("id_cliente_legado", pd.Series(None, index=df.index)).apply(_int_or_none)
+    situacao = df.get("situacao_id", pd.Series(None, index=df.index)).apply(_int_or_none)
+    status_novo = df.get("status_id_novo", pd.Series(None, index=df.index)).apply(_int_or_none)
+    ids_validos = ~ids.isin(FALSOS_RESERVAS)
+
+    por_nome = nomes & ids_validos
+    por_mescla = pd.Series(False, index=df.index)
+    if reservas_mapeadas:
+        customer_novo = df.get(
+            "id_customer_novo", pd.Series(None, index=df.index)
+        ).apply(_int_or_none)
+        customer_reserva = ids.map(reservas_mapeadas)
+        por_mescla = (
+            customer_reserva.notna()
+            & customer_novo.notna()
+            & (customer_reserva == customer_novo)
+            & ids_validos
+        )
+    return (por_nome | por_mescla) & (situacao == 1) & (status_novo == 3)
 
 
 def _data_str(valor, default=None):
@@ -328,10 +418,16 @@ class AjustesMovimentos:
     def _carregar_mapas_clientes(self, conn):
         df = pd.read_sql(text(QUERY_MAPA_CLIENTES), conn)
         if df.empty:
-            return {}, {}
+            return {}, {}, {}
         mapa_customer = dict(zip(df["legacy_customer_id"].astype(int), df["id_customer"].astype(int)))
         mapa_address = dict(zip(df["legacy_customer_id"].astype(int), df["address_id"].astype(int)))
-        return mapa_customer, mapa_address
+        df_reservas = pd.read_sql(text(QUERY_MAPA_RESERVAS), conn)
+        mapa_reservas = (
+            dict(zip(df_reservas["legacy_reserva_id"].astype(int),
+                     df_reservas["id_customer"].astype(int)))
+            if not df_reservas.empty else {}
+        )
+        return mapa_customer, mapa_address, mapa_reservas
 
     def comparar(self):
         print("\n" + "=" * 78)
@@ -345,7 +441,7 @@ class AjustesMovimentos:
         print("📖 Lendo último movimento/status no REFATORADO...")
         with self.engine_new.connect() as conn:
             df_novo = pd.read_sql(text(QUERY_NOVO), conn)
-            mapa_customer, mapa_address = self._carregar_mapas_clientes(conn)
+            mapa_customer, mapa_address, mapa_reservas = self._carregar_mapas_clientes(conn)
 
         print(
             f"   Legado: {len(df_legado):,} equipamentos | "
@@ -364,6 +460,28 @@ class AjustesMovimentos:
         )
 
         # ------------------------------------------------------------------
+        # Ocorrencia do tombo no legado (todas as copias ativas)
+        # ------------------------------------------------------------------
+        chave_legado = df_legado["tombo_legado"].apply(_tombo_key)
+        contagem_tombo = chave_legado.value_counts()
+        df["copias_tombo_legado"] = (
+            df["tombo_legado"].apply(_tombo_key).map(contagem_tombo).fillna(0).astype(int)
+        )
+        df["status_tombo_legado"] = df["copias_tombo_legado"].apply(_rotulo_copias)
+
+        # ------------------------------------------------------------------
+        # Ocorrencia do tombo no banco refatorado (equipamentos migrados).
+        # A duplicidade so e considerada quando aparece na migracao; insumos
+        # que repetem o tombo no legado nao contam aqui.
+        # ------------------------------------------------------------------
+        chave_refatorado = df_novo["tombo_novo"].apply(_tombo_key)
+        contagem_refatorado = chave_refatorado.value_counts()
+        df["copias_tombo_refatorado"] = (
+            df["tombo_novo"].apply(_tombo_key).map(contagem_refatorado).fillna(0).astype(int)
+        )
+        df["status_tombo_refatorado"] = df["copias_tombo_refatorado"].apply(_rotulo_copias)
+
+        # ------------------------------------------------------------------
         # De/para de status e cliente
         # ------------------------------------------------------------------
         df["status_esperado_id"] = df["situacao_id"].apply(
@@ -372,6 +490,10 @@ class AjustesMovimentos:
         df["status_esperado"] = df["status_esperado_id"].apply(
             lambda v: NOMES_STATUS.get(_int_or_none(v), "")
         )
+
+        # Aluguel para cliente de RESERVA no legado vira RESERVA no refatorado
+        # por regra da migracao de clientes. Nao e divergencia.
+        df["reserva_mesclada"] = identificar_reserva_mesclada(df, mapa_reservas)
 
         clientes_legado = df["id_cliente_legado"].apply(_int_or_none)
         df["id_customer_esperado"] = clientes_legado.map(mapa_customer)
@@ -412,6 +534,13 @@ class AjustesMovimentos:
             & df["id_customer_esperado"].isna()
         )
 
+        # Reservas mescladas sao regra esperada: nao contam como divergencia.
+        if df["reserva_mesclada"].any():
+            df.loc[
+                df["reserva_mesclada"],
+                ["div_status", "div_cliente", "div_movimento", "cliente_sem_mapa"],
+            ] = False
+
         # ------------------------------------------------------------------
         # Classificação da linha
         # ------------------------------------------------------------------
@@ -449,6 +578,11 @@ class AjustesMovimentos:
         def motivo_excecao(row):
             cliente = _int_or_none(row["id_cliente_legado"])
             situacao = _int_or_none(row["situacao_id"])
+
+            # Aluguel para cliente de RESERVA: a migracao mescla o cliente com
+            # o titular e o equipamento passa a RESERVADO. Regra esperada.
+            if bool(row.get("reserva_mesclada")):
+                return "RESERVA_MESCLADA"
 
             # Equipamentos alugados para clientes internos de estoque/base são
             # liberados para locação (status 1) pela própria migração.
@@ -530,7 +664,7 @@ class AjustesMovimentos:
             | df["classificacao"].isin(
                 ["NOVO_MAIS_RECENTE", "LEGADO_SEM_MOVIMENTO_NOVO_TEM"]
             )
-        )
+        ) & ~df["reserva_mesclada"]
         df_div = df[mask_divergencia].copy()
 
         # ------------------------------------------------------------------
@@ -541,6 +675,10 @@ class AjustesMovimentos:
             "id_equipamento",
             "tombo_novo",
             "equipamento_novo",
+            "copias_tombo_refatorado",
+            "status_tombo_refatorado",
+            "copias_tombo_legado",
+            "status_tombo_legado",
             "situacao_id",
             "status_legado",
             "status_novo",
@@ -586,6 +724,12 @@ class AjustesMovimentos:
         print(f"   • Status divergente:   {int(df['div_status'].sum()):,}")
         print(f"   • Cliente divergente:  {int(df['div_cliente'].sum()):,}")
         print(f"   • Movimento ausente/diferente: {int(df['div_movimento'].sum()):,}")
+        com_copias = df_div[df_div["copias_tombo_refatorado"] > 1]
+        print(f"   • Tombo duplicado na migração (ignorados no ajuste): {len(com_copias):,}")
+        for rotulo, qtd in com_copias["status_tombo_refatorado"].value_counts().items():
+            print(f"       {rotulo:<18} {qtd:>7,}")
+        com_copias_legado = df_div[df_div["copias_tombo_legado"] > 1]
+        print(f"   • Tombo repetido no legado (diagnóstico):  {len(com_copias_legado):,}")
         print(f"   • Elegíveis p/ correção automática: {int(df['corrigivel'].sum()):,}")
         print("-" * 78)
         print("Divergências por classificação:")
@@ -620,6 +764,18 @@ class AjustesMovimentos:
         linhas.append(
             {"tipo_resumo": "CORRIGIVEIS", "chave": "", "quantidade": int(df["corrigivel"].sum())}
         )
+        com_copias = df_div[df_div["copias_tombo_refatorado"] > 1]
+        linhas.append(
+            {"tipo_resumo": "TOMBOS_COM_COPIAS", "chave": "", "quantidade": len(com_copias)}
+        )
+        for chave, qtd in com_copias["status_tombo_refatorado"].value_counts().items():
+            linhas.append(
+                {"tipo_resumo": "TOMBO_OCORRENCIA", "chave": chave, "quantidade": int(qtd)}
+            )
+        com_copias_legado = df_div[df_div["copias_tombo_legado"] > 1]
+        linhas.append(
+            {"tipo_resumo": "TOMBOS_COM_COPIAS_LEGADO", "chave": "", "quantidade": len(com_copias_legado)}
+        )
 
         for chave, qtd in df_div["classificacao"].value_counts().items():
             linhas.append(
@@ -653,23 +809,41 @@ class AjustesMovimentos:
         print(f"📄 Arquivo de divergências gerado: {caminho}")
         print(f"📄 Resumo gerado: {ARQ_RESUMO}")
 
+    def salvar_duplicados_pendentes(self, df_div, caminho=ARQ_DUPLICADOS_PENDENTES):
+        """Registra os equipamentos com tombo repetido que o ajuste ignorou."""
+        _, duplicados = separar_tombo_duplicado(df_div)
+        if not duplicados.empty:
+            duplicados = duplicados.assign(
+                _tombo_ordem=pd.to_numeric(duplicados["tombo_novo"], errors="coerce")
+            ).sort_values(
+                ["status_tombo_refatorado", "_tombo_ordem", "id_equipamento"]
+            ).drop(columns="_tombo_ordem")
+        duplicados.to_csv(caminho, index=False, encoding="utf-8-sig")
+        print(
+            f"📄 {len(duplicados):,} equipamentos com tombo duplicado na migração "
+            f"foram ignorados e salvos em: {caminho}"
+        )
+        return duplicados
+
     # --------------------------------------------------------------------------
     # CORREÇÃO INDIVIDUAL (SEM BULK INSERT)
     # --------------------------------------------------------------------------
     def _selecionar_elegiveis(self, df, forcar_status_legado=False):
         """Linhas corrigíveis. Com --forcar-status-legado também inclui as
         exceções de cliente interno/bloqueado (nunca Parquet ou movimento mais
-        recente no refatorado)."""
-        mask = df["corrigivel"]
+        recente no refatorado). Tombos repetidos no legado são sempre
+        ignorados: ficam pendentes de revisão manual."""
+        df_ajustavel, _ = separar_tombo_duplicado(df)
+        mask = df_ajustavel["corrigivel"]
         if forcar_status_legado:
             forcaveis = (
-                df["classificacao"].isin(
+                df_ajustavel["classificacao"].isin(
                     ["REINSERIR_MOVIMENTO", "CORRIGIR_EQUIPAMENTO", "SEM_MOVIMENTO_AMBOS"]
                 )
-                & df["motivo_excecao"].isin(["CLIENTE_ESTOQUE", "CLIENTE_BLOQUEADO"])
+                & df_ajustavel["motivo_excecao"].isin(["CLIENTE_ESTOQUE", "CLIENTE_BLOQUEADO"])
             )
             mask = mask | forcaveis
-        return df[mask].copy()
+        return df_ajustavel[mask].copy()
 
     def aplicar(self, df, limite=None, forcar_status_legado=False, movimentos=None):
         elegiveis = self._selecionar_elegiveis(df, forcar_status_legado)
@@ -1265,6 +1439,7 @@ class AjustesMovimentos:
             )
             return
 
+        self.salvar_duplicados_pendentes(df_div)
         self.aplicar(
             df,
             limite=limite,

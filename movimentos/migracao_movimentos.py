@@ -31,16 +31,73 @@ def limpar_codigo(val):
     return s[:-2] if s.endswith(".0") else s
 
 
-def selecionar_equipamento_por_tombo(candidatos):
-    """Select the lowest-ID non-supply candidate, falling back to lowest ID."""
+def _valor_candidato(candidato, campo):
+    if isinstance(candidato, dict):
+        return candidato.get(campo)
+    if hasattr(candidato, "get"):
+        try:
+            return candidato.get(campo)
+        except Exception:
+            pass
+    return None
+
+
+def _como_int(valor):
+    try:
+        if pd.isna(valor):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
+
+
+CAMPOS_CLIENTE_LEGADO = ("cliente_id", "legacy_customer_id", "cliente_legado_id")
+CAMPOS_CLIENTE_REFATORADO = ("last_movement_item_customer_id", "customer_id", "recipient_customer_id")
+
+
+def selecionar_equipamento_por_tombo(candidatos, clientes_estoque=None, clientes_estoque_ref=None):
+    """Escolhe uma copia deterministica do tombo.
+
+    Preferencia: nao insumo (toner/cartucho) e nao vinculado a base/estoque.
+    Se todas as copias forem base, mantem a escolha deterministica por menor ID.
+    """
     candidatos = list(candidatos)
     if not candidatos:
         return None
+    clientes_estoque = CLIENTES_ESTOQUE if clientes_estoque is None else set(clientes_estoque)
+    clientes_estoque_ref = set(clientes_estoque_ref or ())
+
+    def nome(candidato):
+        for campo in ("name", "nome_equipamento", "nome", "equipamento"):
+            valor = _valor_candidato(candidato, campo)
+            if valor:
+                return valor
+        return ""
+
     def eh_insumo(candidato):
-        nome = candidato.get('name', '') if isinstance(candidato, dict) else getattr(candidato, 'name', '')
-        return bool(re.search(r'(?<!\w)(?:TONER|CARTUCHO)(?!\w)', str(nome or ''), re.IGNORECASE))
+        return bool(re.search(r'(?<!\w)(?:TONER|CARTUCHO)(?!\w)', str(nome(candidato) or ''), re.IGNORECASE))
+
+    def eh_base(candidato):
+        if _valor_candidato(candidato, "cliente_estoque") or _valor_candidato(candidato, "is_base"):
+            return True
+        for campo in CAMPOS_CLIENTE_LEGADO:
+            cliente = _como_int(_valor_candidato(candidato, campo))
+            if cliente is not None and cliente in clientes_estoque:
+                return True
+        for campo in CAMPOS_CLIENTE_REFATORADO:
+            cliente = _como_int(_valor_candidato(candidato, campo))
+            if cliente is not None and cliente in clientes_estoque_ref:
+                return True
+        return False
+
     nao_insumos = [c for c in candidatos if not eh_insumo(c)]
-    return min(nao_insumos or candidatos, key=lambda c: int(c.get('id') if isinstance(c, dict) else c.id))
+    preferidos = nao_insumos or candidatos
+    fora_da_base = [c for c in preferidos if not eh_base(c)]
+    escolhidos = fora_da_base or preferidos
+    return min(escolhidos, key=lambda c: int(_valor_candidato(c, "id")))
 
 
 def selecionar_situacao_preferida_por_tombo(candidatos):
@@ -243,12 +300,18 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_saldos_contract_items = pd.read_sql(query_saldos, conn)
 
         df_equipamentos_refatorado = pd.read_sql(
-            "SELECT id, number, name, current_organization_id, deleted_at FROM equipments", conn
+            "SELECT id, number, name, current_organization_id, last_movement_item_customer_id, deleted_at FROM equipments", conn
         )
         
         df_enderecos_valido = pd.read_sql(
             "SELECT id, addressable_id, legacy_customer_id FROM addresses WHERE legacy_customer_id IS NOT NULL", conn
         )
+
+        clientes_estoque_ref = {
+            int(row['addressable_id'])
+            for _, row in df_enderecos_valido.iterrows()
+            if _como_int(row['legacy_customer_id']) in CLIENTES_ESTOQUE
+        }
 
         query_primeiro_item = text("""
             SELECT c.customer_id, c.id AS contract_id, ci.id AS contract_item_id
@@ -309,7 +372,8 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         if chave:
             candidatos_por_number.setdefault(chave, []).append(row)
     dict_equip_ref_por_number = {
-        chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+        chave: int(selecionar_equipamento_por_tombo(
+            candidatos, clientes_estoque_ref=clientes_estoque_ref)['id'])
         for chave, candidatos in candidatos_por_number.items()
     }
     
@@ -425,6 +489,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_movimentos_legado": dict_movimentos_legado,
         "dict_cliente_adress": dict_cliente_adress,
         "dict_endereco_por_legacy_client": dict_endereco_por_legacy_client,
+        "clientes_estoque_ref": clientes_estoque_ref,
         "dict_primeiro_item_por_cliente": dict_primeiro_item_por_cliente,
         "dict_primeiro_contrato_por_cliente": dict_primeiro_contrato_por_cliente,
         "dict_primeiro_item_por_contrato": dict_primeiro_item_por_contrato,
@@ -589,7 +654,9 @@ class BaseMigracaoMovimento:
             if tombo_chave:
                 candidatos_por_tombo.setdefault(tombo_chave, []).append(row)
         dict_res = {
-            chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+            chave: int(selecionar_equipamento_por_tombo(
+                candidatos,
+                clientes_estoque_ref=self.dados.get("clientes_estoque_ref"))['id'])
             for chave, candidatos in candidatos_por_tombo.items()
         }
                 

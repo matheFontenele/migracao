@@ -405,8 +405,21 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     alq.id AS id,
                     alq.numero AS tombo,
                     alq.nome AS name,
-                    alq.situacao_id AS situacao
+                    alq.situacao_id AS situacao,
+                    ult.cliente_id AS cliente_id
                 FROM aluguel_equipamentos alq
+                LEFT JOIN (
+                    SELECT mi.equipamento_id, mov.cliente_id
+                    FROM aluguel_movimento_itens mi
+                    INNER JOIN (
+                        SELECT equipamento_id, MAX(id) AS max_id
+                        FROM aluguel_movimento_itens
+                        WHERE deleted_at IS NULL
+                        GROUP BY equipamento_id
+                    ) mx ON mx.max_id = mi.id
+                    INNER JOIN aluguel_movimento mov ON mov.id = mi.movimento_id
+                    WHERE mi.deleted_at IS NULL
+                ) ult ON ult.equipamento_id = alq.id
                 WHERE alq.numero IN {tombos_in}
             """
             
@@ -417,7 +430,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             for _, row_sit in df_situacoes.iterrows():
                 situacoes_por_tombo.setdefault(str(row_sit['tombo']).strip(), []).append({
                     'id': int(row_sit['id']), 'name': row_sit['name'],
-                    'situacao': int(row_sit['situacao'])
+                    'situacao': int(row_sit['situacao']),
+                    'cliente_id': row_sit['cliente_id']
                 })
             for t_antigo, candidatos in situacoes_por_tombo.items():
                 situacao = int(selecionar_situacao_preferida_por_tombo(candidatos))

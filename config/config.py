@@ -22,6 +22,7 @@ FALSOS_RESERVAS = {10487}
 # Ajuste esta lista sempre que um novo cliente-estoque for identificado.
 CLIENTES_ESTOQUE = {
     3192,   # ALUCOM SÃO PAULO - 2018
+    4029,   # MOREIA TECNOLOGIA - LOCACOES
     3622,   # ALUCOM LOCACOES
     3967,   # ALUCOM LOCACOES
     10428,  # ALUCOM LTDA
@@ -49,19 +50,36 @@ CLIENTES_ESTOQUE = {
 SETORES_IGNORADOS = {1187, 1715}
 
 # =========================================================================
-# ESTOQUE CONSOLIDADO DA ALUCOM (insumos) - "Peças ADI"
+# ESTOQUES CONSOLIDADOS DO BANCO REFATORADO
 # =========================================================================
-# Quando a movimentação pertence a uma destas organizações legadas (campo
-# GPA.ORG_ID na extração de insumos), todo o estoque é consolidado em uma
-# única location no endereço da ALUCOM, em vez de abrir uma location por
-# departamento/setor.
+# Regra dos insumos:
+#   - Produto da lista "Peças ADI" (GPA.ORG_ID = 1360 com saldo > 0 na query
+#     legada de montagem) -> location PEÇAS ADI.
+#   - Qualquer outro insumo -> location GERAL.
+# Regra dos equipamentos (is_asset = 1):
+#   - Todos -> location EQUIPAMENTOS no endereço-base da organização.
 ORGS_ESTOQUE_ALUCOM = {1360}
 
 LOCATION_ESTOQUE_ALUCOM = {
     "address_id": 1,
     "area": "Peças ADI",
-    "section": "Unica",
-    "spot": "Unico",
+    "section": None,
+    "spot": None,
+    "details": "Migração",
+}
+
+LOCATION_ESTOQUE_GERAL = {
+    "address_id": 1,
+    "area": "Geral",
+    "section": None,
+    "spot": None,
+    "details": "Migração",
+}
+
+LOCATION_ESTOQUE_EQUIPAMENTOS = {
+    "area": "Equipamentos",
+    "section": None,
+    "spot": None,
     "details": "Migração",
 }
 

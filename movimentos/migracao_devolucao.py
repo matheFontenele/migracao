@@ -65,6 +65,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 COALESCE(dev.updated_at, dev.data) AS DEV_DATA,
                 dev.deleted_at AS DEV_DEL,
                 dev.cliente_id AS DEV_CLIENTE_ID,
+                movi_dev.novo_orgao_id AS DEV_ORGAO_ID,
                 COALESCE(NULLIF(dev.usuario_id, 0), 1) AS DEV_USR_ID,
 
                 -- 👇 FASE 1: DADOS DO PASSADO (O ALUGUEL ORIGINAL / rn = 2)
@@ -72,6 +73,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 COALESCE(alu.updated_at, alu.data) AS ORIG_DATA,
                 alu.deleted_at AS ORIG_DEL,
                 alu.cliente_id AS ORIG_CLIENTE_ID,
+                movi_alu.novo_orgao_id AS ORIG_MOV_ORGAO_ID,
                 ac_alu.orgao_id AS ORIG_ORGAO_ID,
                 COALESCE(NULLIF(alu.usuario_id, 0), 1) AS ORIG_USR_ID,
                 alu.tipo_id AS ORIG_TIPO_LEGADO
@@ -176,8 +178,8 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # =========================================================
             # ROTEAMENTO INTELIGENTE FISICO (Qual base gerencia a operação?)
             # =========================================================
-            orgao_id_legado = row['ORIG_ORGAO_ID'] if pd.notna(row.get('ORIG_ORGAO_ID')) else None
-            org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
+            org_id_origem = descobrir_id_organizacao_destino(row['ORIG_MOV_ORGAO_ID']) if pd.notna(row.get('ORIG_MOV_ORGAO_ID')) else descobrir_id_organizacao_destino(row.get('ORIG_ORGAO_ID'))
+            org_id_devolucao = descobrir_id_organizacao_destino(row['DEV_ORGAO_ID']) if pd.notna(row.get('DEV_ORGAO_ID')) else org_id_origem
             
             # ==================================================================
             # 🎯 REGRA DE DEVOLUÇÃO (Sem Parquets, usa o que tá ativo pro cliente)
@@ -217,7 +219,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                     is_exchange=False,
                     forcar_extra=False,
                     
-                    organization_id=org_id_destino,
+                    organization_id=org_id_origem,
                     alias_movimento=row['NOME_EQUIPAMENTO'],
                     details_capa="Migração (Reconstrução): Aluguel Histórico",
                     details_item="Alocado no Cliente (Histórico Anterior à Devolução)"
@@ -254,7 +256,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 is_exchange=False,
                 forcar_extra=False,
                 
-                organization_id=org_id_destino,
+                organization_id=org_id_devolucao,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
                 details_item="Retirado do Cliente (Retorno para a Base)"

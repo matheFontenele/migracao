@@ -188,6 +188,13 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         print("📦 MÓDULO: ALUGUEL (Fonte: CSV Parquet)")
         print("-" * 70)
 
+        arquivos_parquet = glob.glob(os.path.join("./docs/parquets", "*.parquet"))
+        if not arquivos_parquet:
+            raise RuntimeError(
+                "Nenhum arquivo .parquet encontrado em ./docs/parquets. "
+                "A migração de ALUGUEL foi abortada ANTES de limpar as tabelas."
+            )
+
         self.limpar_tabelas_movimento()
         
         caminho_types = "./docs/types.csv"
@@ -197,9 +204,6 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         else:
             print("⚠️ Arquivo types.csv não encontrado. Todos os equipamentos assumirão is_kit = 0.")
             self.dict_is_kit = {}
-
-        arquivos_parquet = glob.glob(os.path.join("./docs/parquets", "*.parquet"))
-        if not arquivos_parquet: return
 
         print(f"📖 Lendo dados de {len(arquivos_parquet)} arquivos Parquet...")
         df_csv = pd.concat([pd.read_parquet(arq).rename(columns=str.upper) for arq in arquivos_parquet], ignore_index=True)
