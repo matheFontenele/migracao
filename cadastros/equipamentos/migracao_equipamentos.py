@@ -13,6 +13,11 @@ from utils.sanetizador import executar_truncate_tabelas
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
 
+
+def _product_item_combination_key(product_id, address_id, location_id, organization_id):
+    """Return the columns that define a unique product-item stock combination."""
+    return (product_id, 1, 1, address_id, location_id, organization_id)
+
 TABELAS = [
     'equipments',
     'equipment_history',
@@ -507,6 +512,7 @@ class MigracaoEquipamentos:
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
+        product_items_existentes = {}
 
         with self.engine_new.begin() as conn:
             for (s_id, org_id, created_at_chave), df_transacao in tqdm(
@@ -558,16 +564,34 @@ class MigracaoEquipamentos:
                     data_garantia = data_garantia_dt.strftime('%Y-%m-%d %H:%M:%S')
 
                     # B. Bloco de Estoque (product_items)
-                    result_pi = conn.execute(text("""
-                        INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, location_id, organization_id, average_cost, quantity, created_at, updated_at)
-                        VALUES (:pid, :code, 1, 1, :addr, :loc, :org, 1, :qty, :now, :now)
-                    """), {
-                        "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, "loc": loc_id,
-                        "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
-                    })
-                    pi_id_gerado = result_pi.lastrowid
-                    contador_codigo_unico += 1
-                    self.stats["product_items_criados"] += 1
+                    pi_key = _product_item_combination_key(p_id_val, addr_id, loc_id, buyer_id_int)
+                    pi_id_gerado = product_items_existentes.get(pi_key)
+                    if pi_id_gerado is None:
+                        existing_pi = conn.execute(text("""
+                            SELECT id, quantity FROM product_items
+                            WHERE product_id = :pid AND category_id = 1 AND condition_id = 1
+                              AND address_id = :addr AND location_id = :loc AND organization_id = :org
+                            LIMIT 1
+                        """), {"pid": p_id_val, "addr": addr_id, "loc": loc_id, "org": buyer_id_int}).fetchone()
+                        if existing_pi:
+                            pi_id_gerado = existing_pi[0]
+                            conn.execute(text("UPDATE product_items SET quantity = quantity + :qty, updated_at = :now WHERE id = :id"),
+                                         {"qty": qtd_repeticoes, "now": self.now, "id": pi_id_gerado})
+                        else:
+                            result_pi = conn.execute(text("""
+                                INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, location_id, organization_id, average_cost, quantity, created_at, updated_at)
+                                VALUES (:pid, :code, 1, 1, :addr, :loc, :org, 1, :qty, :now, :now)
+                            """), {
+                                "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, "loc": loc_id,
+                                "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
+                            })
+                            pi_id_gerado = result_pi.lastrowid
+                            contador_codigo_unico += 1
+                            self.stats["product_items_criados"] += 1
+                        product_items_existentes[pi_key] = pi_id_gerado
+                    else:
+                        conn.execute(text("UPDATE product_items SET quantity = quantity + :qty, updated_at = :now WHERE id = :id"),
+                                     {"qty": qtd_repeticoes, "now": self.now, "id": pi_id_gerado})
 
                     # C. Item de Transação (transaction_items com garantia real)
                     result_item = conn.execute(text("""
