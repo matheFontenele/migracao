@@ -5,6 +5,7 @@ import pandas as pd
 from cadastros.equipamentos.migracao_equipamentos import (
     selecionar_descartes_cliente_estoque,
 )
+from config.config import CLIENTES_ESTOQUE
 
 
 class DescarteBaseTests(unittest.TestCase):
@@ -46,6 +47,10 @@ class DescarteBaseTests(unittest.TestCase):
     def test_missing_client_column_degrades_safely(self):
         df = pd.DataFrame({"id_legado": [1, 2], "tombo_legado": [10, 10]})
         self.assertEqual(selecionar_descartes_cliente_estoque(df, {10468}), set())
+
+    def test_novos_clientes_estoque_estao_na_lista(self):
+        novos = {255, 1023, 1069, 1071, 1318, 1321, 1323, 1324}
+        self.assertTrue(novos.issubset(CLIENTES_ESTOQUE))
 
 
 if __name__ == "__main__":

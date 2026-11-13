@@ -8,11 +8,46 @@ from tqdm import tqdm
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items, descobrir_id_organizacao_destino
 from utils.sanetizador import executar_truncate_tabelas, normalizar_para_match
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, selecionar_equipamento_por_tombo
+from config.config import CLIENTES_ESTOQUE
 
 TABELAS = [
     "service_order_item_extra_equipments", "movement_items", "movements", "service_order_items", "service_orders"
 ]
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _cliente_int(valor):
+    try:
+        if pd.isna(valor):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(float(valor))
+    except (TypeError, ValueError):
+        return None
+
+
+def escolher_cliente_aluguel(cliente_legado, cliente_parquet, clientes_estoque=None):
+    """Escolhe o cliente do aluguel: legado primeiro, Parquet como fallback.
+
+    Clientes de estoque/base nao devem ser usados como destinatario; nesse
+    caso, tenta o Parquet e, se ele tambem for base, mantem o legado.
+    Retorna (cliente_id ou None, origem).
+    """
+    estoque = set(clientes_estoque or CLIENTES_ESTOQUE)
+    legado = _cliente_int(cliente_legado)
+    parquet = _cliente_int(cliente_parquet)
+
+    if legado is not None and legado not in estoque:
+        return legado, "legado"
+    if parquet is not None and parquet not in estoque:
+        return parquet, "parquet"
+    if legado is not None:
+        return legado, "legado_base"
+    if parquet is not None:
+        return parquet, "parquet_base"
+    return None, "nenhum"
 
 class MigracaoAluguel(BaseMigracaoMovimento):
 
@@ -275,11 +310,12 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
             row_mov = ultimo_mov['movimento']
             
-            cli_leg_parquet = row_csv.get('CLIENTE_ID')
-            if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).lower() not in ['', 'nan', 'none']:
-                cli_legado_id = int(float(cli_leg_parquet))
-            else:
-                cli_legado_id = int(row_mov['cliente_id'])
+            cli_legado_id, _origem_cliente = escolher_cliente_aluguel(
+                row_mov.get('cliente_id'), row_csv.get('CLIENTE_ID')
+            )
+            if cli_legado_id is None:
+                rejeitados += 1
+                continue
             
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
             equipment_id_ref = dict_equipamentos_novo.get(tombo)

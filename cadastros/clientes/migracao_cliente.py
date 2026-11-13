@@ -358,6 +358,29 @@ class MigracaoClientes:
             df_modificado.at[idx, 'ID_SECRETARIA'] = id_sec_alvo
             df_modificado.at[idx, 'SECRETARIA'] = nome_sec_alvo
             df_modificado.at[idx, 'CLIENTE'] = nome_cliente_limpo
+
+        # Unifica tambem as linhas de prefeitura/secretaria que nao estao
+        # vinculadas aos IDs de cliente mapeados acima (variacoes de nome,
+        # acento e sufixo 2026).
+        def normalizar_texto(valor):
+            texto = unicodedata.normalize('NFKD', str(valor or ''))
+            return texto.encode('ascii', 'ignore').decode('utf-8').upper()
+
+        mask_pref_sl = df_modificado['PREFEITURA'].apply(normalizar_texto).str.contains(
+            'PREFEITURA MUNICIPAL DE SAO LUIS', regex=False
+        )
+        if mask_pref_sl.any():
+            df_modificado.loc[mask_pref_sl, 'ID_PREFEITURA'] = SAO_LUIS_CONFIG['ID_PREF_ALVO']
+            df_modificado.loc[mask_pref_sl, 'PREFEITURA'] = SAO_LUIS_CONFIG['NOME_PREF_ALVO']
+
+        mask_sec_semusc = df_modificado['SECRETARIA'].apply(normalizar_texto).str.contains(
+            'SEGURANCA COM CIDADANIA|SEMUSC', regex=True
+        )
+        if mask_sec_semusc.any():
+            df_modificado.loc[mask_sec_semusc, 'ID_SECRETARIA'] = 1197
+            df_modificado.loc[mask_sec_semusc, 'SECRETARIA'] = (
+                "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"
+            )
         return df_modificado
         
     def _regionalizar_pcpb(self, df: pd.DataFrame) -> pd.DataFrame:
