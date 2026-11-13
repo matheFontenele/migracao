@@ -4,14 +4,66 @@ import os
 import time
 import sys
 import difflib
+import re
 from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC
+from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, LOCATION_ESTOQUE_EQUIPAMENTOS, CLIENTES_ESTOQUE
 from utils.sanetizador import executar_truncate_tabelas
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
+
+
+def _id_int(valor):
+    try:
+        if pd.isna(valor):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
+
+
+def _tombo_key_equip(valor):
+    if pd.isna(valor):
+        return None
+    texto = str(valor).strip()
+    if texto.endswith(".0"):
+        texto = texto[:-2]
+    return texto or None
+
+
+def selecionar_descartes_cliente_estoque(df, clientes_estoque=None):
+    """IDs de equipamentos de base que devem ser descartados quando o tombo
+    possui ao menos uma copia fora da base/estoque.
+
+    Se todas as copias do tombo forem de base, nada e descartado (evita
+    eliminar o equipamento por completo).
+    """
+    clientes_estoque = CLIENTES_ESTOQUE if clientes_estoque is None else set(clientes_estoque)
+    if df.empty or "cliente_ultimo_movimento" not in df.columns:
+        return set()
+    trabalho = df[["id_legado", "tombo_legado", "cliente_ultimo_movimento"]].copy()
+    trabalho["_tombo_key"] = trabalho["tombo_legado"].apply(_tombo_key_equip)
+    descartar = set()
+    for _, grupo in trabalho.dropna(subset=["_tombo_key"]).groupby("_tombo_key"):
+        if len(grupo) <= 1:
+            continue
+        na_base = grupo["cliente_ultimo_movimento"].apply(
+            lambda valor: _id_int(valor) in clientes_estoque
+        )
+        if na_base.any() and (~na_base).any():
+            descartar |= set(grupo.loc[na_base, "id_legado"].tolist())
+    return descartar
+
+
+def _product_item_combination_key(product_id, address_id, location_id, organization_id):
+    """Return the columns that define a unique product-item stock combination."""
+    return (product_id, 1, 1, address_id, location_id, organization_id)
+
 
 TABELAS = [
     'equipments',
@@ -38,6 +90,7 @@ class MigracaoEquipamentos:
         
         # Variáveis de Estado (Memória)
         self.mapa_enderecos = {}
+        self.mapa_locations = {}
         self.id_fallback = 1
         self.id_generico = None
         self.lista_fornecedores_legado = []
@@ -53,6 +106,64 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def _nula(self, val):
         return None if pd.isna(val) else val
+
+    def _carregar_enderecos_e_locations(self):
+        """Carrega o address BASE de cada organização e garante a location padrão."""
+        print("\n📍 Carregando addresses BASE e locations por organização...")
+
+        with self.engine_new.begin() as conn:
+            rows = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                  AND UPPER(alias) LIKE '%BASE%'
+                GROUP BY addressable_id
+            """)).fetchall()
+            mapa = {int(r[0]): int(r[1]) for r in rows}
+
+            rows_all = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                GROUP BY addressable_id
+            """)).fetchall()
+            for org_id, addr_id in rows_all:
+                mapa.setdefault(int(org_id), int(addr_id))
+
+            self.mapa_enderecos = mapa
+
+            for org_id, addr_id in mapa.items():
+                # Equipamentos ficam em location própria no endereço-base da organização
+                spec = LOCATION_ESTOQUE_EQUIPAMENTOS
+                area = str(spec["area"])
+                section = str(spec.get("section") or "Unica")
+                spot = str(spec.get("spot") or "Unico")
+                details = str(spec.get("details") or "Migração")
+                location_addr_id = int(spec.get("address_id") or addr_id)
+
+                existente = conn.execute(text(
+                    "SELECT id FROM locations WHERE address_id = :a "
+                    "AND UPPER(area) = :area AND deleted_at IS NULL"
+                ), {"a": location_addr_id, "area": area.upper()}).fetchone()
+
+                if existente:
+                    loc_id = existente[0]
+                else:
+                    res_loc = conn.execute(text("""
+                        INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
+                        VALUES (:addr, :area, :section, :spot, :details, :now, :now)
+                    """), {
+                        "addr": location_addr_id, "area": area, "section": section,
+                        "spot": spot, "details": details, "now": self.now,
+                    })
+                    loc_id = res_loc.lastrowid
+
+                self.mapa_locations[org_id] = loc_id
+
+        print(f"   ✅ Mapa ORG→ADDRESS: {self.mapa_enderecos}")
+        print(f"   ✅ Mapa ORG→LOCATION: {self.mapa_locations}")
     
     def _descobrir_id_organizacao_destino(self, id_legado):
         if pd.isna(id_legado): return 1115
@@ -76,6 +187,31 @@ class MigracaoEquipamentos:
                 return matches[0]
             return None
 
+    def _tipo_grupo_legado_especial(self, tipo_legado):
+        """Normalize selected legacy equipment categories and extract their spec group."""
+        if pd.isna(tipo_legado):
+            return None
+        texto = str(tipo_legado).strip().upper()
+        if re.search(r'\bESTABILIZADOR(?:ES)?\b', texto):
+            spec = re.search(r'\b\d+(?:[.,]\d+)?\s*VA\b', texto)
+            return 'ESTABILIZADOR', spec.group(0).replace(' ', '') if spec else None
+        if re.search(r'\bMONITOR(?:ES)?\b', texto):
+            spec = re.search(r'\b\d+(?:[.,]\d+)?\s*(?:"|”|\bPOL(?:EGADAS?)?\b)', texto)
+            group = spec.group(0).strip() if spec else None
+            if group:
+                group = re.sub(r'\s+', '', group).replace('”', '"')
+                if not group.endswith('"'):
+                    group = re.sub(r'(?:POL(?:EGADAS?)?)$', '"', group)
+            return 'MONITOR', group
+        if re.search(r'\bTRANSFORMADOR(?:ES)?\b', texto):
+            spec = re.search(r'\b\d+(?:[.,]\d+)?\s*VA\b', texto)
+            return 'TRANSFORMADOR', spec.group(0).replace(' ', '') if spec else None
+        return None
+
+    def _tipo_grupo_nome(self, nome):
+        """Infer special category/specification from an equipment name."""
+        return self._tipo_grupo_legado_especial(nome)
+
     def _salvar_relatorio_tombos_repetidos(self, df_master):
         colunas = ['ID', 'TOMBO', 'EQUIPAMENTO', 'ORG_ID']
         caminho_ajustes = os.path.join(
@@ -96,6 +232,35 @@ class MigracaoEquipamentos:
 
         duplicados.to_csv(caminho_relatorio, index=False, encoding='utf-8-sig')
         print(f"📄 Relatório de equipamentos com tombo repetido salvo em '{caminho_relatorio}' ({len(duplicados)} registros).")
+
+    def _salvar_relatorio_descartes_base(self, registros):
+        caminho_ajustes = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            'ajustes',
+        )
+        os.makedirs(caminho_ajustes, exist_ok=True)
+        caminho = os.path.join(caminho_ajustes, 'equipamentos_descartados_base.csv')
+        colunas = ['id_legado', 'tombo', 'nome', 'cliente_ultimo_movimento']
+        relatorio = pd.DataFrame(registros, columns=colunas)
+        relatorio.to_csv(caminho, index=False, encoding='utf-8-sig')
+        print(f"📄 Copias de base ignoradas salvas em '{caminho}' ({len(relatorio)} registros).")
+
+    def _salvar_relatorio_fallbacks(self, registros):
+        caminho_ajustes = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'ajustes')
+        os.makedirs(caminho_ajustes, exist_ok=True)
+        caminho_relatorio = os.path.join(caminho_ajustes, 'fallback_equipamentos.csv')
+        colunas = ['id_legado', 'tombo', 'nome', 'tipo', 'org_destino', 'grupo', 'marca', 'grupo_fallback', 'marca_fallback', 'situacao_id_legado', 'fornecedor_fallback', 'tipo_legado', 'tombo_legado']
+        relatorio = pd.DataFrame(registros, columns=colunas)
+        if not relatorio.empty:
+            relatorio = relatorio.sort_values(['tombo', 'id_legado'], kind='stable')
+        relatorio.to_csv(caminho_relatorio, index=False, encoding='utf-8-sig')
+        print(f"📄 Relatório de fallbacks salvo em '{caminho_relatorio}' ({len(relatorio)} registros).")
+
+    def _salvar_relatorio_fornecedores_fallback(self, registros):
+        caminho = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'ajustes')
+        os.makedirs(caminho, exist_ok=True)
+        pd.DataFrame(registros, columns=['id_legado', 'tombo', 'nome', 'tipo', 'org_destino', 'grupo', 'marca']).to_csv(
+            os.path.join(caminho, 'fallback_fornecedor_alcom.csv'), index=False, encoding='utf-8-sig')
             
     # ==============================================================================
     # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS + NOVA CTE)
@@ -123,12 +288,13 @@ class MigracaoEquipamentos:
                 alq.updated_at,
                 alq.deleted_at,
                 alq.data_aquisicao,
-                alq.data_garantia
+                alq.data_garantia,
+                ult_movi.cliente_id AS cliente_ultimo_movimento
             FROM aluguel_equipamentos alq
             LEFT JOIN aluguel_tipos tipe ON alq.tipo_id = tipe.id
             INNER JOIN ORGAOS og ON alq.orgao_id = og.ORG_ID
             LEFT JOIN (
-                SELECT mi.equipamento_id, mi.novo_orgao_id
+                SELECT mi.equipamento_id, mi.novo_orgao_id, mov.cliente_id
                 FROM aluguel_movimento_itens mi
                 INNER JOIN (
                     SELECT equipamento_id, MAX(id) AS max_id
@@ -136,6 +302,7 @@ class MigracaoEquipamentos:
                     WHERE deleted_at IS NULL
                     GROUP BY equipamento_id
                 ) mx ON mx.max_id = mi.id
+                LEFT JOIN aluguel_movimento mov ON mov.id = mi.movimento_id
                 WHERE mi.deleted_at IS NULL
             ) ult_movi ON alq.id = ult_movi.equipamento_id
             LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
@@ -147,15 +314,30 @@ class MigracaoEquipamentos:
 
         print(f"\n🔍 Total retornado pelo SQL: {len(df_equipamentos_legado)}")
 
+        # Tombos com mais de uma copia: descarta as copias ligadas a bases
+        # (CLIENTES_ESTOQUE) quando existe ao menos uma copia fora da base.
+        orgao_para_migrar = df_equipamentos_legado['orgao_atual'].fillna(
+            df_equipamentos_legado['orgao_original']
+        )
+        ids_descartar_base = selecionar_descartes_cliente_estoque(
+            df_equipamentos_legado[orgao_para_migrar.isin(TODOS_ORGAOS_MAPEADOS)],
+            CLIENTES_ESTOQUE,
+        )
+        if ids_descartar_base:
+            print(f"♻️  {len(ids_descartar_base)} equipamentos de base serão ignorados por tombo repetido.")
+
         self.lista_fornecedores_legado = df_planilha['MARCA_AJUSTADA'].dropna().unique()
         tipos_existentes = [str(t).strip().upper() for t in df_planilha['TIPO_AJUSTADO'].dropna().unique() if str(t).strip()]
         tipos_existentes.sort(key=len, reverse=True)
 
         lista_mestre = []
+        registros_fallback = []
 
         # CONTADORES DE DESCARTE
         descartados_tombo_zero = 0
         descartados_org_nao_mapeada = 0
+        descartados_tombo_base = 0
+        registros_descartados_base = []
         orgaos_nao_mapeados_amostra = set()
         
         for index, dados_db in tqdm(df_equipamentos_legado.iterrows(), total=df_equipamentos_legado.shape[0], desc="Refatorando dados"):
@@ -168,6 +350,16 @@ class MigracaoEquipamentos:
                 continue
 
             id_equipamento_legado = dados_db['id_legado']
+
+            if id_equipamento_legado in ids_descartar_base:
+                descartados_tombo_base += 1
+                registros_descartados_base.append({
+                    'id_legado': id_equipamento_legado,
+                    'tombo': tombo_atual,
+                    'nome': dados_db['nome_legado'],
+                    'cliente_ultimo_movimento': dados_db['cliente_ultimo_movimento'],
+                })
+                continue
             
             # Regra de Órgão: Usa o Órgão Atual. Se for Nulo, usa o Original.
             orgao_bruto = dados_db['orgao_atual'] if pd.notna(dados_db['orgao_atual']) else dados_db['orgao_original']
@@ -192,7 +384,31 @@ class MigracaoEquipamentos:
             
             # TRATAMENTO DO TIPO
             tipo_original = row_plan.get("TIPO_AJUSTADO")
-            if pd.isna(tipo_original) or str(tipo_original).strip() == "":
+            categoria_legado = self._tipo_grupo_legado_especial(dados_db.get('tipo_legado'))
+            nome_categoria = self._tipo_grupo_nome(row_plan.get('NOME_AJUSTADO') if pd.notna(row_plan.get('NOME_AJUSTADO')) else dados_db.get('nome_legado'))
+            if categoria_legado is None:
+                categoria_legado = nome_categoria
+            elif nome_categoria and categoria_legado[0] == nome_categoria[0] and not categoria_legado[1]:
+                categoria_legado = nome_categoria
+            nome_multi_grupo = None
+            nome_aux = row_plan.get('NOME_AJUSTADO')
+            marca_aux = row_plan.get('MARCA_AJUSTADA')
+            if pd.notna(nome_aux) and pd.notna(marca_aux) and str(marca_aux).strip():
+                nome_upper = str(nome_aux).strip().upper()
+                marca_upper = str(marca_aux).strip().upper()
+                multi_match = re.match(r'^MULTIFUNCIONAL\s+(.+)$', nome_upper)
+                if multi_match:
+                    resto = multi_match.group(1).strip()
+                    if resto.endswith(marca_upper):
+                        frase = resto[:-len(marca_upper)].strip()
+                        frase = re.sub(r'\s+', ' ', frase)
+                        if frase:
+                            nome_multi_grupo = frase
+            if nome_multi_grupo:
+                tipo_final = 'MULTIFUNCIONAL'
+            elif categoria_legado:
+                tipo_final = categoria_legado[0]
+            elif pd.isna(tipo_original) or str(tipo_original).strip() == "":
                 tipo_bd = dados_db['tipo_legado']
                 if pd.notna(tipo_bd) and str(tipo_bd).strip() != "":
                     tipo_final = str(tipo_bd).strip().upper()
@@ -209,10 +425,35 @@ class MigracaoEquipamentos:
             if pd.isna(nome_final): nome_final = "SEM NOME REGISTRADO"
             
             marca_final = row_plan.get("MARCA_AJUSTADA")
-            if pd.isna(marca_final): marca_final = "FORNECEDOR NÃO IDENTIFICADO"
+            marca_fallback = pd.isna(marca_final) or not str(marca_final).strip()
+            if marca_fallback and categoria_legado and categoria_legado[0] == 'TRANSFORMADOR':
+                nome_marca = str(nome_final).upper()
+                nome_marca = re.sub(r'\bTRANSFORMADOR(?:ES)?\b', '', nome_marca)
+                nome_marca = re.sub(r'\b\d+(?:[.,]\d+)?\s*VA\b', '', nome_marca)
+                inferida = re.sub(r'[^A-Z0-9 ]', ' ', nome_marca).strip()
+                if inferida:
+                    marca_final = inferida
+                    marca_fallback = False
+            if marca_fallback: marca_final = "ALUCOM"
             
             grupo_final = row_plan.get("GRUPOS")
-            if pd.isna(grupo_final): grupo_final = "GERAL"
+            grupo_fallback = pd.isna(grupo_final) or not str(grupo_final).strip()
+            if nome_multi_grupo:
+                grupo_final = nome_multi_grupo
+                grupo_fallback = False
+            elif categoria_legado and categoria_legado[1]:
+                grupo_final = categoria_legado[1]
+                grupo_fallback = False
+            elif grupo_fallback:
+                grupo_final = "GERAL"
+
+            if marca_fallback or grupo_fallback:
+                registros_fallback.append({'id_legado': id_equipamento_legado, 'tombo': tombo_atual,
+                    'nome': nome_final, 'tipo': tipo_final, 'org_destino': org_destino,
+                    'grupo': grupo_final, 'marca': marca_final, 'grupo_fallback': int(grupo_fallback),
+                    'marca_fallback': int(marca_fallback), 'situacao_id_legado': id_situacao_legado,
+                    'fornecedor_fallback': '',
+                    'tipo_legado': dados_db.get('tipo_legado'), 'tombo_legado': tombo_atual})
 
             lista_mestre.append({
                 "id_legado":     id_equipamento_legado,
@@ -241,8 +482,11 @@ class MigracaoEquipamentos:
         print(f"   Total original (SQL):              {len(df_equipamentos_legado)}")
         print(f"   ❌ Descartados (tombo zero):  {descartados_tombo_zero}")
         print(f"   ❌ Descartados (órgão não mapeado): {descartados_org_nao_mapeada}")
+        print(f"   ❌ Descartados (base com tombo repetido): {descartados_tombo_base}")
         print(f"   ✅ Dados limpos: {len(lista_mestre)}")
         print(f"   🔍 Amostra de órgãos não mapeados: {orgaos_nao_mapeados_amostra}")
+        self._salvar_relatorio_fallbacks(registros_fallback)
+        self._salvar_relatorio_descartes_base(registros_descartados_base)
 
         return pd.DataFrame(lista_mestre).reset_index(drop=True)
 
@@ -384,47 +628,67 @@ class MigracaoEquipamentos:
         else:
             print(f"   ⚠️ Arquivo {self.ARQUIVO_SUPPLIERS} não encontrado no projeto.")
 
-        # 2. Garantir que o Fallback 'ALUCOM LTDA' Exista
-        with self.engine_new.begin() as conn:
-            res = conn.execute(text("SELECT id FROM suppliers WHERE name = 'MIGRACAO'")).fetchone()
-            if res:
-                self.id_generico = res[0]
-            else:
-                res = conn.execute(text("""
-                    INSERT INTO suppliers (name, alias, cpf_cnpj, phone, email, created_at, updated_at)
-                    VALUES ('MIGRACAO', 'MIGRACAO', '00000000000000', '0000000000', 'nao@informado.com', :now, :now)
-                """), {"now": self.now})
-                self.id_generico = res.lastrowid
-                print("   ✅ Fornecedor fallback 'MIGRACAO' não existia, criado automaticamente.")
-
         # 3. Mapear os Fornecedores com Base no Nome
         with self.engine_new.begin() as conn:
             df_todos_fornecedores = pd.read_sql("SELECT id, name FROM suppliers", conn)
             
         mapa_nome_id = {str(row['name']).strip().lower(): row['id'] for _, row in df_todos_fornecedores.iterrows()}
+        mapa_alias_id = {}
+        if os.path.exists(self.ARQUIVO_SUPPLIERS):
+            aliases = pd.read_csv(self.ARQUIVO_SUPPLIERS, sep=",", encoding="utf-8", on_bad_lines="skip")
+            aliases.columns = aliases.columns.str.lower()
+            nome_col = 'name' if 'name' in aliases.columns else ('nome' if 'nome' in aliases.columns else None)
+            if nome_col and 'alias' in aliases.columns:
+                for _, supplier in aliases.iterrows():
+                    if pd.notna(supplier.get('alias')) and pd.notna(supplier.get(nome_col)):
+                        supplier_id = mapa_nome_id.get(str(supplier[nome_col]).strip().lower())
+                        if supplier_id is not None:
+                            mapa_alias_id[str(supplier['alias']).strip().lower()] = supplier_id
+        alucom_id = mapa_nome_id.get('alucom') or mapa_nome_id.get('alucom ltda')
+        if alucom_id is None:
+            alucom_id = next((sid for alias, sid in mapa_alias_id.items() if alias in ('alucom', 'alucom ltda')), None)
+        if alucom_id is None:
+            raise ValueError("Fornecedor ALUCOM não encontrado em suppliers ou docs/suppliers.csv")
 
+        falhas_fornecedor = {}
         def buscar_fornecedor(marca):
             if pd.isna(marca) or not str(marca).strip():
-                return self.id_generico
+                falhas_fornecedor[str(marca)] = True
+                return alucom_id
                 
             marca_str = str(marca).strip().lower()
             
             # Match exato
             if marca_str in mapa_nome_id:
+                falhas_fornecedor[marca_str] = False
                 return mapa_nome_id[marca_str]
+            if marca_str in mapa_alias_id:
+                falhas_fornecedor[marca_str] = False
+                return mapa_alias_id[marca_str]
                 
             # Match parcial (procura substring no banco ou vice-versa)
             for db_name, db_id in mapa_nome_id.items():
                 if marca_str in db_name or db_name in marca_str:
+                    falhas_fornecedor[marca_str] = False
                     return db_id
-                    
-            return self.id_generico
+            falhas_fornecedor[marca_str] = True
+            return alucom_id
 
         df_master['supplier_id'] = df_master['marca'].apply(buscar_fornecedor).astype("Int64")
+        df_master['supplier_fallback'] = df_master['marca'].apply(
+            lambda marca: falhas_fornecedor.get(str(marca).strip().lower(), False)
+            if pd.notna(marca) else falhas_fornecedor.get(str(marca), False)
+        )
+        registros = []
+        for _, row in df_master[df_master['supplier_fallback']].iterrows():
+                registros.append({'id_legado': row.get('id_legado'), 'tombo': row.get('TOMBO'),
+                    'nome': row.get('NOME_AJUSTADO'), 'tipo': row.get('tipo'), 'org_destino': row.get('org_destino'),
+                    'grupo': row.get('grupo'), 'marca': row.get('marca')})
+        self._salvar_relatorio_fornecedores_fallback(registros)
         
         # Estatística rápida de quantos foram para o fallback
-        qtd_fallback = sum(df_master['supplier_id'] == self.id_generico)
-        print(f"   ✅ Relacionamento concluído. {qtd_fallback} equipamentos usarão o fornecedor MIGRACAO.")
+        qtd_fallback = int(df_master['supplier_fallback'].sum())
+        print(f"   ✅ Relacionamento concluído. {qtd_fallback} equipamentos usarão o fornecedor ALUCOM.")
 
         return df_master
 
@@ -441,6 +705,7 @@ class MigracaoEquipamentos:
         lista_equipamentos_global = []
         lista_historico_global = []
         contador_codigo_unico = 1000000
+        product_items_existentes = {}
 
         with self.engine_new.begin() as conn:
             for (s_id, org_id, created_at_chave), df_transacao in tqdm(
@@ -453,6 +718,7 @@ class MigracaoEquipamentos:
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
                 addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
+                loc_id = self.mapa_locations.get(buyer_id_int)
 
                 # DATA DE COMPRA: data_aquisicao do legado; fallback = menor created_at do lote
                 data_compra_dt = pd.to_datetime(created_at_chave, errors='coerce')
@@ -491,27 +757,46 @@ class MigracaoEquipamentos:
                     data_garantia = data_garantia_dt.strftime('%Y-%m-%d %H:%M:%S')
 
                     # B. Bloco de Estoque (product_items)
-                    result_pi = conn.execute(text("""
-                        INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
-                        VALUES (:pid, :code, 1, 1, :addr, :org, 1, :qty, :now, :now)
-                    """), {
-                        "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, 
-                        "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
-                    })
-                    pi_id_gerado = result_pi.lastrowid
-                    contador_codigo_unico += 1
-                    self.stats["product_items_criados"] += 1
+                    pi_key = _product_item_combination_key(p_id_val, addr_id, loc_id, buyer_id_int)
+                    pi_id_gerado = product_items_existentes.get(pi_key)
+                    if pi_id_gerado is None:
+                        existing_pi = conn.execute(text("""
+                            SELECT id, quantity FROM product_items
+                            WHERE product_id = :pid AND category_id = 1 AND condition_id = 1
+                              AND address_id = :addr AND location_id = :loc AND organization_id = :org
+                            LIMIT 1
+                        """), {"pid": p_id_val, "addr": addr_id, "loc": loc_id, "org": buyer_id_int}).fetchone()
+                        if existing_pi:
+                            pi_id_gerado = existing_pi[0]
+                            conn.execute(text("UPDATE product_items SET quantity = quantity + :qty, updated_at = :now WHERE id = :id"),
+                                         {"qty": qtd_repeticoes, "now": self.now, "id": pi_id_gerado})
+                        else:
+                            result_pi = conn.execute(text("""
+                                INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, location_id, organization_id, average_cost, quantity, created_at, updated_at)
+                                VALUES (:pid, :code, 1, 1, :addr, :loc, :org, 1, :qty, :now, :now)
+                            """), {
+                                "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, "loc": loc_id,
+                                "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
+                            })
+                            pi_id_gerado = result_pi.lastrowid
+                            contador_codigo_unico += 1
+                            self.stats["product_items_criados"] += 1
+                        product_items_existentes[pi_key] = pi_id_gerado
+                    else:
+                        conn.execute(text("UPDATE product_items SET quantity = quantity + :qty, updated_at = :now WHERE id = :id"),
+                                     {"qty": qtd_repeticoes, "now": self.now, "id": pi_id_gerado})
 
                     # C. Item de Transação (transaction_items com garantia real)
                     result_item = conn.execute(text("""
-                        INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, 0, :qty, :now, :now, NULL)
+                        INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, location_id, unit_cost, quantity, created_at, updated_at, deleted_at)
+                        VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, :loc, 0, :qty, :now, :now, NULL)
                     """), {
                         "tid": tx_id_gerado, 
                         "pid": p_id_val, 
                         "warranty_date": data_garantia,
                         "now": self.now, 
                         "addr": addr_id, 
+                        "loc": loc_id,
                         "qty": qtd_repeticoes
                     })
                     ti_id_gerado = result_item.lastrowid
@@ -533,7 +818,7 @@ class MigracaoEquipamentos:
                             "current_organization_id": buyer_id_int,
                             "status_id": linha_equip['status_id'],
                             "address_id": addr_id,
-                            "location_id": None,
+                            "location_id": loc_id,
                             "is_completed": 1,
                             "created_at": linha_equip['created_at'],
                             "updated_at": linha_equip['updated_at'],
@@ -590,6 +875,7 @@ class MigracaoEquipamentos:
 
             df_master = self._extrair_e_transformar()
             self._salvar_relatorio_tombos_repetidos(df_master)
+            self._carregar_enderecos_e_locations()
             df_master = self._carregar_tabelas_dimensionais(df_master)
             df_master = self._tratar_fornecedores(df_master)
             self._gerar_inventario(df_master)

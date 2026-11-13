@@ -22,6 +22,7 @@ FALSOS_RESERVAS = {10487}
 # Ajuste esta lista sempre que um novo cliente-estoque for identificado.
 CLIENTES_ESTOQUE = {
     3192,   # ALUCOM SÃO PAULO - 2018
+    4029,   # MOREIA TECNOLOGIA - LOCACOES
     3622,   # ALUCOM LOCACOES
     3967,   # ALUCOM LOCACOES
     10428,  # ALUCOM LTDA
@@ -47,6 +48,41 @@ CLIENTES_ESTOQUE = {
 # 1187 = ALUCOM SEDE RIACHUELO (departamento 283 = ADI)
 # 1715 = Secretaria da Prefeitura 439 (cliente 12196 vai direto para a prefeitura)
 SETORES_IGNORADOS = {1187, 1715}
+
+# =========================================================================
+# ESTOQUES CONSOLIDADOS DO BANCO REFATORADO
+# =========================================================================
+# Regra dos insumos:
+#   - Produto da lista "Peças ADI" (GPA.ORG_ID = 1360 com saldo > 0 na query
+#     legada de montagem) -> location PEÇAS ADI.
+#   - Qualquer outro insumo -> location GERAL.
+# Regra dos equipamentos (is_asset = 1):
+#   - Todos -> location EQUIPAMENTOS no endereço-base da organização.
+ORGS_ESTOQUE_ALUCOM = {1360}
+
+LOCATION_ESTOQUE_ALUCOM = {
+    "address_id": 1,
+    "area": "Peças ADI",
+    "section": "Unica",
+    "spot": "Unico",
+    "details": "Migração",
+}
+
+LOCATION_ESTOQUE_GERAL = {
+    "address_id": 1,
+    "area": "Geral",
+    "section": "Unica",
+    "spot": "Unico",
+    "details": "Migração",
+}
+
+LOCATION_ESTOQUE_EQUIPAMENTOS = {
+    "area": "Equipamentos",
+    "section": "Unica",
+    "spot": "Unico",
+    "details": "Migração",
+}
+
 
 # =========================================================================
 # EXCEÇÃO DE TIPOS PARA INSUMOS (MIGRAÇÃO DE EQUIPAMENTOS)

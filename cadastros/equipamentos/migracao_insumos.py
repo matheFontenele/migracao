@@ -8,7 +8,11 @@ from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, EQUIPAMENTOS_TIPOS
+from config.config import (
+    MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC,
+    EQUIPAMENTOS_TIPOS, ORGS_ESTOQUE_ALUCOM, LOCATION_ESTOQUE_ALUCOM,
+    LOCATION_ESTOQUE_GERAL,
+)
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
 
@@ -108,8 +112,46 @@ class MigracaoInsumos:
     # ==============================================================================
     # ETL: EXTRAÇÃO (100K+ MOVIMENTOS DO LEGADO)
     # ==============================================================================
+    def _carregar_produtos_pecas_adi(self):
+        """Lista legada de insumos que pertencem ao estoque Peças ADI.
+
+        Mesma regra da query de montagem: GPA.ORG_ID = 1360, produto ativo e
+        saldo > 0 (entradas convertidas por PRO_QUANT_UNS, saídas em unidades).
+        """
+        query = """
+            SELECT PA.PRO_ID
+            FROM PRODUTOS_ALM PA
+            JOIN SUBGRUPOS_PRODUTO_ALM SPA ON SPA.SGA_ID = PA.SGA_ID
+            JOIN GRUPOS_PRODUTO_ALM GPA ON GPA.GPA_ID = SPA.GPA_ID
+            JOIN (
+                SELECT IESA.PRO_ID,
+                       SUM(
+                           CASE ESA.ESA_TIPO
+                               WHEN 'E' THEN IESA.IES_QUANTIDADE * COALESCE(PA2.PRO_QUANT_UNS, 1)
+                               WHEN 'S' THEN -IESA.IES_QUANTIDADE
+                           END
+                       ) AS ESTOQUE
+                FROM ITENS_ENTRADA_SAIDA_ALM IESA
+                JOIN ENTRADAS_SAIDAS_ALM ESA ON ESA.ESA_ID = IESA.ESA_ID
+                JOIN PRODUTOS_ALM PA2 ON PA2.PRO_ID = IESA.PRO_ID
+                WHERE ESA.DELETED_AT IS NULL
+                  AND ESA.ORG_ID = 1360
+                GROUP BY IESA.PRO_ID
+            ) EST ON EST.PRO_ID = PA.PRO_ID
+            WHERE GPA.ORG_ID = 1360
+              AND PA.PRO_ATIVO = 'S'
+              AND EST.ESTOQUE > 0;
+        """
+        with self.engine_legado.connect() as conn:
+            df_lista = pd.read_sql(text(query), conn)
+
+        produtos = {int(pid) for pid in df_lista['PRO_ID']}
+        print(f"   📋 Lista Peças ADI: {len(produtos)} produtos com saldo > 0 no legado.")
+        return produtos
+
     def _extrair_e_transformar(self):
         print("\n📖 Extraindo histórico do banco legado...")
+        produtos_pecas_adi = self._carregar_produtos_pecas_adi()
         
         query_legado = """
             SELECT PA.PRO_ID AS ID
@@ -127,6 +169,7 @@ class MigracaoInsumos:
                  , IESA.CREATED_AT AS DATA_TRANSACAO
                  , DEP.DPA_ID AS ID_DEPARTAMENTO
                  , DEP.DPA_NOME AS DEPARTAMENTO
+                 , GPA.ORG_ID AS GRUPO_ORG_ID
             FROM PRODUTOS_ALM PA
             LEFT JOIN SUBGRUPOS_PRODUTO_ALM SPA ON PA.SGA_ID = SPA.SGA_ID
             LEFT JOIN GRUPOS_PRODUTO_ALM GPA ON SPA.GPA_ID = GPA.GPA_ID
@@ -165,6 +208,8 @@ class MigracaoInsumos:
             tipo_mov = str(row['TIPO_MOVIMENTO']).strip().upper() 
             org_destino = self._descobrir_id_organizacao_destino(row['LEGACY_ORG_ID'])
             data_full = row['DATA_TRANSACAO'] if pd.notna(row['DATA_TRANSACAO']) else self.now
+            grupo_org_id = int(row['GRUPO_ORG_ID']) if pd.notna(row['GRUPO_ORG_ID']) else None
+            pecas_adi = int(row['ID']) in produtos_pecas_adi
 
             try:
                 min_q = float(row['QUANTI_MININA']) if pd.notna(row['QUANTI_MININA']) else 0.0
@@ -192,6 +237,8 @@ class MigracaoInsumos:
                 "quantidade": qtd,
                 "net_qty": net_qty,
                 "org_destino": org_destino,
+                "grupo_org_id": grupo_org_id,
+                "pecas_adi": pecas_adi,
                 "data_transacao": data_full,
                 "data_curta": pd.to_datetime(data_full).strftime('%Y-%m-%d')
             })
@@ -200,7 +247,7 @@ class MigracaoInsumos:
             "id_legado", "legacy_tx_id", "nome_produto", "grupo", "tipo",
             "departamento", "min_quantity", "max_quantity", "preco_unitario",
             "condition_id", "tipo_movimento", "quantidade", "net_qty",
-            "org_destino", "data_transacao", "data_curta",
+            "org_destino", "grupo_org_id", "pecas_adi", "data_transacao", "data_curta",
         ]
         return pd.DataFrame(lista_mestre, columns=colunas_master)
 
@@ -307,6 +354,23 @@ class MigracaoInsumos:
     # ==============================================================================
     # ETL: PROCESSAMENTO MASSIVO (EVENT SOURCING E SALDO FINAL)
     # ==============================================================================
+    def _resolver_location(self, org_destino, grupo_org_id, pecas_adi, mapa_org_address):
+        """Define a location do insumo: Peças ADI (lista legada) ou Geral (restante)."""
+        addr_padrao = int(mapa_org_address.get(int(org_destino), 1))
+
+        if grupo_org_id in ORGS_ESTOQUE_ALUCOM and bool(pecas_adi):
+            spec = LOCATION_ESTOQUE_ALUCOM
+        else:
+            spec = LOCATION_ESTOQUE_GERAL
+
+        return (
+            int(spec.get("address_id") or addr_padrao),
+            str(spec["area"]),
+            str(spec.get("section") or "Unica"),
+            str(spec.get("spot") or "Unico"),
+            str(spec.get("details") or "Migração"),
+        )
+
     def _gerar_inventario(self, df_master, mapa_org_address=None):
         print("\n📊 Processando Linha do Tempo e Saldo Final...")
 
@@ -330,25 +394,37 @@ class MigracaoInsumos:
 
         # --- CRIAÇÃO DE LOCATIONS ---
         print("   📍 Mapeando e criando Locations por Address (Almoxarifados/Departamentos)...")
-        mapa_locations = {}           # chave: (address_id, departamento) -> location_id
+        mapa_locations = {}           # chave: (address_id, area_normalizada) -> location_id
         fallback_almox_por_addr = {}  # address_id -> location_id do ALMOXARIFADO
 
         df_master['departamento'] = df_master['departamento'].astype(str).str.strip().str.upper()
-        pares_org_dep = df_master[['org_destino', 'departamento']].drop_duplicates()
 
-        addr_ids = sorted(set(mapa_org_address.values()))
-        ids_str = ",".join(str(i) for i in addr_ids)
+        # Resolve a location de cada combinação (org destino, GPA.ORG_ID e lista
+        # Peças ADI). A lista consolida os insumos da org 1360; todo o restante
+        # (incluindo as demais orgs) vai para a location Geral.
+        locations_necessarias = {}
+        for _, row in df_master[['org_destino', 'grupo_org_id', 'pecas_adi']].drop_duplicates().iterrows():
+            org_destino = int(row['org_destino'])
+            grupo_org_id = int(row['grupo_org_id']) if pd.notna(row['grupo_org_id']) else None
+            addr_id, area, section, spot, details = self._resolver_location(
+                org_destino, grupo_org_id, bool(row['pecas_adi']), mapa_org_address
+            )
+            locations_necessarias[(addr_id, self._normalizar_string(area))] = {
+                "addr": addr_id, "area": area, "section": section,
+                "spot": spot, "details": details,
+            }
+
+        addr_ids = sorted({dados["addr"] for dados in locations_necessarias.values()})
+        ids_str = ",".join(str(i) for i in addr_ids) or "0"
 
         with self.engine_new.begin() as conn:
-            # Locations existentes dos addresses das orgs mapeadas
-            db_locations = []
-            if addr_ids:
-                db_locations = conn.execute(text(
-                    f"SELECT id, address_id, area FROM locations "
-                    f"WHERE address_id IN ({ids_str}) AND deleted_at IS NULL"
-                )).fetchall()
+            # Locations existentes dos addresses envolvidos
+            db_locations = conn.execute(text(
+                f"SELECT id, address_id, area FROM locations "
+                f"WHERE address_id IN ({ids_str}) AND deleted_at IS NULL"
+            )).fetchall()
             for loc_id, addr_id, area in db_locations:
-                mapa_locations[(int(addr_id), str(area).strip().upper())] = loc_id
+                mapa_locations[(int(addr_id), self._normalizar_string(area))] = loc_id
 
             # Fallback ALMOXARIFADO por address
             for addr_id in addr_ids:
@@ -366,19 +442,16 @@ class MigracaoInsumos:
                     fallback_almox_por_addr[addr_id] = res_loc.lastrowid
                     self.stats["locations"] += 1
 
-            # Departamentos que não existem em cada address
-            for _, row in pares_org_dep.iterrows():
-                addr_id = mapa_org_address.get(int(row['org_destino']))
-                if not addr_id:
+            # Locations requeridas (regra normal por departamento ou consolidada)
+            for chave, dados in locations_necessarias.items():
+                if chave in mapa_locations:
                     continue
-                dep = row['departamento']
-                if dep and (addr_id, dep) not in mapa_locations:
-                    res_loc = conn.execute(text("""
-                        INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
-                        VALUES (:addr, :area, 'ÚNICA', 'ÚNICO', 'Criado via Migração', :now, :now)
-                    """), {"addr": addr_id, "area": dep, "now": self.now})
-                    mapa_locations[(addr_id, dep)] = res_loc.lastrowid
-                    self.stats["locations"] += 1
+                res_loc = conn.execute(text("""
+                    INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
+                    VALUES (:addr, :area, :section, :spot, :details, :now, :now)
+                """), {**dados, "now": self.now})
+                mapa_locations[chave] = res_loc.lastrowid
+                self.stats["locations"] += 1
 
         # 1. ORDENAÇÃO CRONOLÓGICA ABSOLUTA
         df_master['data_transacao'] = pd.to_datetime(df_master['data_transacao'])
@@ -440,8 +513,14 @@ class MigracaoInsumos:
                     qtd = float(row['quantidade'])
                     preco_unit = float(row['preco_unitario'])
                     data_item = row['data_transacao'].strftime('%Y-%m-%d %H:%M:%S')
-                    dep_nome = str(row['departamento']).strip().upper()
-                    loc_id = mapa_locations.get((addr_id, dep_nome), fallback_almox_por_addr.get(addr_id))
+                    grupo_org_id = int(row['grupo_org_id']) if pd.notna(row['grupo_org_id']) else None
+                    loc_addr_id, loc_area, _, _, _ = self._resolver_location(
+                        buyer_id_int, grupo_org_id, bool(row['pecas_adi']), mapa_org_address
+                    )
+                    loc_id = mapa_locations.get(
+                        (loc_addr_id, self._normalizar_string(loc_area)),
+                        fallback_almox_por_addr.get(loc_addr_id),
+                    )
 
 
                     # 2. CÁLCULO INTERNO: ATUALIZA O ESTOQUE CONSIDERANDO A LOCATION
