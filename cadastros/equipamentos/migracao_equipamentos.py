@@ -8,7 +8,7 @@ from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC
+from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, LOCATION_ESTOQUE_ALUCOM
 from utils.sanetizador import executar_truncate_tabelas
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
@@ -16,13 +16,13 @@ TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, 
 TABELAS = [
     'equipments',
     'equipment_history',
-    'suppliers', 
-    'transaction_items', 
+    'suppliers',
+    'transaction_items',
     'product_items',
-    'products', 
-    'types', 
-    'brands', 
-    'groups', 
+    'products',
+    'types',
+    'brands',
+    'groups',
     'transactions'
 ]
 
@@ -35,13 +35,14 @@ class MigracaoEquipamentos:
         self.ARQUIVO_IMPORTACAO = "docs/planilha_equipamentos.csv"
         self.ARQUIVO_TYPES = "docs/types.csv"
         self.ARQUIVO_SUPPLIERS = "docs/suppliers.csv"
-        
+
         # Variáveis de Estado (Memória)
         self.mapa_enderecos = {}
+        self.mapa_locations = {}
         self.id_fallback = 1
         self.id_generico = None
         self.lista_fornecedores_legado = []
-        
+
         # Estatísticas
         self.stats = {
             "grupos": 0, "brands": 0, "types": 0, "products": 0,
@@ -53,15 +54,80 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def _nula(self, val):
         return None if pd.isna(val) else val
-    
+
+    def _carregar_enderecos_e_locations(self):
+        """Carrega o address BASE de cada organização e garante a location padrão."""
+        print("\n📍 Carregando addresses BASE e locations por organização...")
+
+        with self.engine_new.begin() as conn:
+            rows = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                  AND UPPER(alias) LIKE '%BASE%'
+                GROUP BY addressable_id
+            """)).fetchall()
+            mapa = {int(r[0]): int(r[1]) for r in rows}
+
+            rows_all = conn.execute(text("""
+                SELECT addressable_id AS org_id, MIN(id) AS address_id
+                FROM addresses
+                WHERE addressable_id IN (1115, 1311, 1122, 1378)
+                  AND deleted_at IS NULL
+                GROUP BY addressable_id
+            """)).fetchall()
+            for org_id, addr_id in rows_all:
+                mapa.setdefault(int(org_id), int(addr_id))
+
+            self.mapa_enderecos = mapa
+
+            for org_id, addr_id in mapa.items():
+                if org_id == 1115:
+                    # Estoque novo da ALUCOM consolidado em "Peças ADI"
+                    spec = LOCATION_ESTOQUE_ALUCOM
+                    area = str(spec["area"])
+                    section = str(spec.get("section") or "Unica")
+                    spot = str(spec.get("spot") or "Unico")
+                    details = str(spec.get("details") or "Migração")
+                    location_addr_id = int(spec.get("address_id") or addr_id)
+                else:
+                    area = "ALMOXARIFADO"
+                    section = "ÚNICA"
+                    spot = "ÚNICO"
+                    details = "Criado via Migração (Fallback)"
+                    location_addr_id = addr_id
+
+                existente = conn.execute(text(
+                    "SELECT id FROM locations WHERE address_id = :a "
+                    "AND UPPER(area) = :area AND deleted_at IS NULL"
+                ), {"a": location_addr_id, "area": area.upper()}).fetchone()
+
+                if existente:
+                    loc_id = existente[0]
+                else:
+                    res_loc = conn.execute(text("""
+                        INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
+                        VALUES (:addr, :area, :section, :spot, :details, :now, :now)
+                    """), {
+                        "addr": location_addr_id, "area": area, "section": section,
+                        "spot": spot, "details": details, "now": self.now,
+                    })
+                    loc_id = res_loc.lastrowid
+
+                self.mapa_locations[org_id] = loc_id
+
+        print(f"   ✅ Mapa ORG→ADDRESS: {self.mapa_enderecos}")
+        print(f"   ✅ Mapa ORG→LOCATION: {self.mapa_locations}")
+
     def _descobrir_id_organizacao_destino(self, id_legado):
         if pd.isna(id_legado): return 1115
         id_legado_int = int(id_legado)
         if id_legado_int in MAPPING_ALUCOM: return 1115
-        if id_legado_int in MAPPING_IP: return 1311 
+        if id_legado_int in MAPPING_IP: return 1311
         if id_legado_int in MAPPING_MOREIA: return 1122
-        if id_legado_int in MAPPING_AS: return 1378 
-        if id_legado_int in MAPPING_SC: return 1115  
+        if id_legado_int in MAPPING_AS: return 1378
+        if id_legado_int in MAPPING_SC: return 1115
         return id_legado_int
 
     def _inferir_tipo_por_similaridade(self, nome_equipamento, tipos_validos):
@@ -96,7 +162,7 @@ class MigracaoEquipamentos:
 
         duplicados.to_csv(caminho_relatorio, index=False, encoding='utf-8-sig')
         print(f"📄 Relatório de equipamentos com tombo repetido salvo em '{caminho_relatorio}' ({len(duplicados)} registros).")
-            
+
     # ==============================================================================
     # ETL: EXTRAÇÃO E TRANSFORMAÇÃO (PANDAS + NOVA CTE)
     # ==============================================================================
@@ -106,12 +172,12 @@ class MigracaoEquipamentos:
 
         df_planilha['ID_LEGADO'] = pd.to_numeric(df_planilha['ID_LEGADO'], errors='coerce')
         mapa_planilha = {
-            int(row['ID_LEGADO']): row 
+            int(row['ID_LEGADO']): row
             for _, row in df_planilha.dropna(subset=['ID_LEGADO']).iterrows()
         }
 
         query_legado = """
-            SELECT 
+            SELECT
                 alq.id AS id_legado,
                 alq.numero AS tombo_legado,
                 alq.nome AS nome_legado,
@@ -141,7 +207,7 @@ class MigracaoEquipamentos:
             LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
             WHERE alq.deleted_at IS NULL;
         """
-        
+
         with self.engine_legado.connect() as conn:
             df_equipamentos_legado = pd.read_sql(text(query_legado), conn)
 
@@ -157,39 +223,39 @@ class MigracaoEquipamentos:
         descartados_tombo_zero = 0
         descartados_org_nao_mapeada = 0
         orgaos_nao_mapeados_amostra = set()
-        
+
         for index, dados_db in tqdm(df_equipamentos_legado.iterrows(), total=df_equipamentos_legado.shape[0], desc="Refatorando dados"):
 
             tombo_atual = dados_db['tombo_legado']
-            
+
             # Pula tombos 0, 0.0 etc.
             if pd.notna(tombo_atual) and str(tombo_atual).strip() in ['0', '0.0', '0.00']:
                 descartados_tombo_zero += 1
                 continue
 
             id_equipamento_legado = dados_db['id_legado']
-            
+
             # Regra de Órgão: Usa o Órgão Atual. Se for Nulo, usa o Original.
             orgao_bruto = dados_db['orgao_atual'] if pd.notna(dados_db['orgao_atual']) else dados_db['orgao_original']
-            
+
             # Se a máquina pertence a um órgão que não estamos migrando, pula
             if orgao_bruto not in TODOS_ORGAOS_MAPEADOS:
                 descartados_org_nao_mapeada += 1
                 if len(orgaos_nao_mapeados_amostra) < 20:
                     orgaos_nao_mapeados_amostra.add(orgao_bruto)
                 continue
-                
+
             org_destino = self._descobrir_id_organizacao_destino(orgao_bruto)
             id_situacao_legado = dados_db['situacao_id']
 
             created_at_destino = dados_db['created_at'] if pd.notna(dados_db['created_at']) else self.now
             updated_at_destino = dados_db['updated_at'] if pd.notna(dados_db['updated_at']) else self.now
             deleted_at_destino = dados_db['deleted_at'] if pd.notna(dados_db['deleted_at']) else (self.now if id_situacao_legado == 10 else None)
-            
-            status_id_destino = 9 if id_situacao_legado == 10 else 1 
+
+            status_id_destino = 9 if id_situacao_legado == 10 else 1
 
             row_plan = mapa_planilha.get(id_equipamento_legado, {})
-            
+
             # TRATAMENTO DO TIPO
             tipo_original = row_plan.get("TIPO_AJUSTADO")
             if pd.isna(tipo_original) or str(tipo_original).strip() == "":
@@ -201,16 +267,16 @@ class MigracaoEquipamentos:
                     tipo_final = self._inferir_tipo_por_similaridade(nome_base, tipos_existentes)
                     self.stats["tipos_inferidos"] += 1
             else:
-                tipo_final = str(tipo_original).strip().upper() 
+                tipo_final = str(tipo_original).strip().upper()
 
             # TRATAMENTO DOS DEMAIS DADOS
             nome_final = row_plan.get("NOME_AJUSTADO")
             if pd.isna(nome_final): nome_final = dados_db['nome_legado']
             if pd.isna(nome_final): nome_final = "SEM NOME REGISTRADO"
-            
+
             marca_final = row_plan.get("MARCA_AJUSTADA")
             if pd.isna(marca_final): marca_final = "FORNECEDOR NÃO IDENTIFICADO"
-            
+
             grupo_final = row_plan.get("GRUPOS")
             if pd.isna(grupo_final): grupo_final = "GERAL"
 
@@ -251,7 +317,7 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def _carregar_tabelas_dimensionais(self, df_master):
         print("\n🚀 Iniciando a persistência de tabelas dimensionais...")
-        
+
         # 1. GROUPS
         print("💾 Inserindo groups...")
         grupos_unicos = df_master['grupo'].dropna().unique()
@@ -294,11 +360,11 @@ class MigracaoEquipamentos:
                 df_types = pd.DataFrame({
                     "name": tipos_unicos,
                     "is_kit": valores_is_kit,
-                    "created_at": self.now, 
+                    "created_at": self.now,
                     "updated_at": self.now
                 })
                 df_types.to_sql('types', con=conn, if_exists='append', index=False)
-                
+
         db_types = pd.read_sql("SELECT id as type_id, name FROM `types`", self.engine_new)
         df_master['type_id'] = df_master['tipo'].map(dict(zip(db_types['name'], db_types['type_id']))).astype("Int64")
         self.stats["types"] = len(tipos_unicos)
@@ -320,7 +386,7 @@ class MigracaoEquipamentos:
             "name": df_produtos_unicos['name'], "brand_id": df_produtos_unicos['brand_id'],
             "type_id": df_produtos_unicos['type_id'], "group_id": df_produtos_unicos['group_id'],
             "is_asset": 1, "length": 0, "width": 0, "height": 0, "weight": 0,
-            "min_quantity": 1, 
+            "min_quantity": 1,
             "max_quantity": 2,
             "created_at": self.now, "updated_at": self.now
         })
@@ -355,10 +421,10 @@ class MigracaoEquipamentos:
         if os.path.exists(self.ARQUIVO_SUPPLIERS):
             df_csv_suppliers = pd.read_csv(self.ARQUIVO_SUPPLIERS, sep=",", encoding="utf-8", on_bad_lines="skip")
             df_csv_suppliers.columns = df_csv_suppliers.columns.str.lower()
-            
+
             # Detecta qual é a coluna do nome
             col_name = 'name' if 'name' in df_csv_suppliers.columns else ('nome' if 'nome' in df_csv_suppliers.columns else None)
-            
+
             if col_name:
                 df_suppliers_inserir = pd.DataFrame()
                 df_suppliers_inserir['name'] = df_csv_suppliers[col_name].dropna().astype(str).str.strip()
@@ -374,7 +440,7 @@ class MigracaoEquipamentos:
                 df_suppliers_inserir['email'] = df_csv_suppliers.get('email', 'nao@informado.com').fillna('nao@informado.com')
                 df_suppliers_inserir['created_at'] = self.now
                 df_suppliers_inserir['updated_at'] = self.now
-                
+
                 with self.engine_new.begin() as conn:
                     df_suppliers_inserir.to_sql('suppliers', con=conn, if_exists='append', index=False)
                 self.stats["suppliers"] = len(df_suppliers_inserir)
@@ -400,28 +466,28 @@ class MigracaoEquipamentos:
         # 3. Mapear os Fornecedores com Base no Nome
         with self.engine_new.begin() as conn:
             df_todos_fornecedores = pd.read_sql("SELECT id, name FROM suppliers", conn)
-            
+
         mapa_nome_id = {str(row['name']).strip().lower(): row['id'] for _, row in df_todos_fornecedores.iterrows()}
 
         def buscar_fornecedor(marca):
             if pd.isna(marca) or not str(marca).strip():
                 return self.id_generico
-                
+
             marca_str = str(marca).strip().lower()
-            
+
             # Match exato
             if marca_str in mapa_nome_id:
                 return mapa_nome_id[marca_str]
-                
+
             # Match parcial (procura substring no banco ou vice-versa)
             for db_name, db_id in mapa_nome_id.items():
                 if marca_str in db_name or db_name in marca_str:
                     return db_id
-                    
+
             return self.id_generico
 
         df_master['supplier_id'] = df_master['marca'].apply(buscar_fornecedor).astype("Int64")
-        
+
         # Estatística rápida de quantos foram para o fallback
         qtd_fallback = sum(df_master['supplier_id'] == self.id_generico)
         print(f"   ✅ Relacionamento concluído. {qtd_fallback} equipamentos usarão o fornecedor MIGRACAO.")
@@ -433,7 +499,7 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def _gerar_inventario(self, df_master):
         print("📊 Gerando agrupamento de Inventário (Fornecedor + Órgão + Produto)...")
-        
+
         df_validos = df_master[df_master['org_destino'].notna()]
         grupos_transacao = df_validos.groupby(['supplier_id', 'org_destino', 'created_at'], dropna=False)
         total_grupos = grupos_transacao.ngroups
@@ -453,6 +519,7 @@ class MigracaoEquipamentos:
                 supplier_id_int = int(s_id) if pd.notna(s_id) else None
                 buyer_id_int = int(org_id)
                 addr_id = self.mapa_enderecos.get(buyer_id_int, self.id_fallback)
+                loc_id = self.mapa_locations.get(buyer_id_int)
 
                 # DATA DE COMPRA: data_aquisicao do legado; fallback = menor created_at do lote
                 data_compra_dt = pd.to_datetime(created_at_chave, errors='coerce')
@@ -463,13 +530,13 @@ class MigracaoEquipamentos:
 
                 # A. Transação Mãe (purchase_date = data de compra real)
                 result_tx = conn.execute(text("""
-                    INSERT INTO transactions (transaction_date, transaction_type_id, supplier_id, buyer_id, 
-                    doc_type_id, doc_date, purchase_date, created_by, details, amount_total, amount_discount, created_at, updated_at) 
+                    INSERT INTO transactions (transaction_date, transaction_type_id, supplier_id, buyer_id,
+                    doc_type_id, doc_date, purchase_date, created_by, details, amount_total, amount_discount, created_at, updated_at)
                     VALUES (:data_tx, 1, :sid, :bid, 3, :data_tx, :data_tx, 1, 'Migração Inicial (Lote)', 1, 0, :now, :now)
                 """), {
-                    "data_tx": data_transacao, 
-                    "now": self.now, 
-                    "sid": supplier_id_int, 
+                    "data_tx": data_transacao,
+                    "now": self.now,
+                    "sid": supplier_id_int,
                     "bid": buyer_id_int
                 })
                 tx_id_gerado = result_tx.lastrowid
@@ -492,10 +559,10 @@ class MigracaoEquipamentos:
 
                     # B. Bloco de Estoque (product_items)
                     result_pi = conn.execute(text("""
-                        INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, organization_id, average_cost, quantity, created_at, updated_at) 
-                        VALUES (:pid, :code, 1, 1, :addr, :org, 1, :qty, :now, :now)
+                        INSERT INTO product_items (product_id, code, category_id, condition_id, address_id, location_id, organization_id, average_cost, quantity, created_at, updated_at)
+                        VALUES (:pid, :code, 1, 1, :addr, :loc, :org, 1, :qty, :now, :now)
                     """), {
-                        "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, 
+                        "pid": p_id_val, "code": contador_codigo_unico, "addr": addr_id, "loc": loc_id,
                         "org": buyer_id_int, "qty": qtd_repeticoes, "now": self.now
                     })
                     pi_id_gerado = result_pi.lastrowid
@@ -504,14 +571,15 @@ class MigracaoEquipamentos:
 
                     # C. Item de Transação (transaction_items com garantia real)
                     result_item = conn.execute(text("""
-                        INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, unit_cost, quantity, created_at, updated_at, deleted_at) 
-                        VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, 0, :qty, :now, :now, NULL)
+                        INSERT INTO transaction_items (transaction_id, product_id, category_id, condition_id, warranty_date, address_id, location_id, unit_cost, quantity, created_at, updated_at, deleted_at)
+                        VALUES (:tid, :pid, 1, 1, :warranty_date, :addr, :loc, 0, :qty, :now, :now, NULL)
                     """), {
-                        "tid": tx_id_gerado, 
-                        "pid": p_id_val, 
+                        "tid": tx_id_gerado,
+                        "pid": p_id_val,
                         "warranty_date": data_garantia,
-                        "now": self.now, 
-                        "addr": addr_id, 
+                        "now": self.now,
+                        "addr": addr_id,
+                        "loc": loc_id,
                         "qty": qtd_repeticoes
                     })
                     ti_id_gerado = result_item.lastrowid
@@ -533,7 +601,7 @@ class MigracaoEquipamentos:
                             "current_organization_id": buyer_id_int,
                             "status_id": linha_equip['status_id'],
                             "address_id": addr_id,
-                            "location_id": None,
+                            "location_id": loc_id,
                             "is_completed": 1,
                             "created_at": linha_equip['created_at'],
                             "updated_at": linha_equip['updated_at'],
@@ -550,14 +618,14 @@ class MigracaoEquipamentos:
                             "shipment_item_id": None,
                             "is_conversion": 0,
                             "reason": "TRANSACTION_ENTRANCE_EQUIPMENT",
-                            "user_id": 1 
+                            "user_id": 1
                         })
 
             # Inserção em lote (DENTRO do with, FORA dos loops - uma vez só)
             if lista_equipamentos_global:
                 print(f"💾 Inserindo {len(lista_equipamentos_global)} máquinas físicas no MySQL...")
                 conn.execute(text("""
-                    INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at) 
+                    INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at)
                     VALUES (:id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, :serial_required, :current_organization_id, :status_id, :address_id, :location_id, :is_completed, :created_at, :updated_at, :deleted_at)
                 """), lista_equipamentos_global)
                 self.stats["equipments"] += len(lista_equipamentos_global)
@@ -566,12 +634,12 @@ class MigracaoEquipamentos:
                 print(f"💾 Inserindo {len(lista_historico_global)} logs de histórico no MySQL...")
                 conn.execute(text("""
                     INSERT INTO equipment_history (
-                        equipment_id, status_id, occurred_at, movement_item_id, 
-                        service_order_item_id, contract_item_id, shipment_item_id, 
+                        equipment_id, status_id, occurred_at, movement_item_id,
+                        service_order_item_id, contract_item_id, shipment_item_id,
                         is_conversion, reason, user_id
                     ) VALUES (
-                        :equipment_id, :status_id, :occurred_at, :movement_item_id, 
-                        :service_order_item_id, :contract_item_id, :shipment_item_id, 
+                        :equipment_id, :status_id, :occurred_at, :movement_item_id,
+                        :service_order_item_id, :contract_item_id, :shipment_item_id,
                         :is_conversion, :reason, :user_id
                     )
                 """), lista_historico_global)
@@ -584,12 +652,13 @@ class MigracaoEquipamentos:
         print("\n" + "=" * 80)
         print("🚀 INICIANDO MIGRAÇÃO: EQUIPAMENTOS E INVENTÁRIO (COM AGRUPAMENTO)")
         print("=" * 80)
-        
+
         try:
             executar_truncate_tabelas(self.engine_new, TABELAS)
 
             df_master = self._extrair_e_transformar()
             self._salvar_relatorio_tombos_repetidos(df_master)
+            self._carregar_enderecos_e_locations()
             df_master = self._carregar_tabelas_dimensionais(df_master)
             df_master = self._tratar_fornecedores(df_master)
             self._gerar_inventario(df_master)

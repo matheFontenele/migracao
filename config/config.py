@@ -49,6 +49,24 @@ CLIENTES_ESTOQUE = {
 SETORES_IGNORADOS = {1187, 1715}
 
 # =========================================================================
+# ESTOQUE CONSOLIDADO DA ALUCOM (insumos) - "Peças ADI"
+# =========================================================================
+# Quando a movimentação pertence a uma destas organizações legadas (campo
+# GPA.ORG_ID na extração de insumos), todo o estoque é consolidado em uma
+# única location no endereço da ALUCOM, em vez de abrir uma location por
+# departamento/setor.
+ORGS_ESTOQUE_ALUCOM = {1360}
+
+LOCATION_ESTOQUE_ALUCOM = {
+    "address_id": 1,
+    "area": "Peças ADI",
+    "section": "Unica",
+    "spot": "Unico",
+    "details": "Migração",
+}
+
+
+# =========================================================================
 # EXCEÇÃO DE TIPOS PARA INSUMOS (MIGRAÇÃO DE EQUIPAMENTOS)
 # =========================================================================
 EQUIPAMENTOS_TIPOS = {'MULTIFUNCIONAL', 'IMPRESSORA', 'SCANNER', 'MONITOR', 'NOBREAK', 'ESTABILIZADOR', 'SWITCH', 'FONE DE OUVIDO', 'CAIXA DE SOM', 'NOTEBOOK', 'IMPRESSORAS REVISADAS', 'IMPRESSORA'}
