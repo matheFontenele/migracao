@@ -5,13 +5,36 @@ from sqlalchemy import text
 from tqdm import tqdm
 
 from config.config import ENDERECOS_BASES
-from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino, limpar_codigo
+from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino, limpar_codigo, selecionar_situacao_preferida_por_tombo
+
+
+def deve_reconstruir_aluguel_historico(source_item_id, migrated_item_ids):
+    """Deduplicate by exact legacy movement-item identity, not movement ID."""
+    return source_item_id not in migrated_item_ids
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PASTA_PARQUETS = "./docs/parquets"
 ARQUIVO_TYPES = "./docs/types.csv"
 
 class MigracaoSubstituicao(BaseMigracaoMovimento):
+
+    @staticmethod
+    def selecionar_destinatarios(cliente_substituicao_id, cliente_origem_id, dict_cliente_adress, dict_endereco_por_legacy_client):
+        """Return current and historical customer/address pairs, with safe fallback."""
+        def resolver(cliente_id):
+            if pd.isna(cliente_id):
+                return None, None
+            cliente_id = int(cliente_id)
+            return (
+                dict_cliente_adress.get(cliente_id),
+                dict_endereco_por_legacy_client.get(cliente_id),
+            )
+
+        atual = resolver(cliente_substituicao_id)
+        passado = resolver(cliente_origem_id)
+        if not passado[0]:
+            passado = atual
+        return atual, passado
 
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=900000):
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter, limpar_ambiente=False)
@@ -65,9 +88,11 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             SELECT
                 d.substituicao_id,
                 d.cliente_id AS CLIENTE_ID,
+                d.orgao_id AS ORGAO_DEV,
                 COALESCE(NULLIF(d.usuario_id, 0), 1) AS USR_SUBST,
                 d.data_mov AS DATA_DEVOLUCAO,
                 a.data_mov AS DATA_ALUGUEL,
+                a.orgao_id AS ORGAO_ALUGUEL,
                 COALESCE(a.data_mov, d.data_mov) AS DATA_SUBST,
 
                 d.deleted_at AS DEL_SUBST,
@@ -88,6 +113,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     mov.id AS movimento_id,
                     mov.data AS data_mov,
                     mov.cliente_id,
+                    movi.novo_orgao_id AS orgao_id,
                     mov.usuario_id,
                     mov.deleted_at,
                     eq.numero AS tombo,
@@ -117,6 +143,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     mov.id AS movimento_id,
                     mov.data AS data_mov,
                     mov.cliente_id,
+                    movi.novo_orgao_id AS orgao_id,
                     mov.usuario_id,
                     mov.deleted_at,
                     eq.numero AS tombo,
@@ -153,7 +180,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
 
         print(f"   📖 Extraindo O PASSADO (Histórico de Origens para {len(tombos_antigos)} equipamentos antigos)...")
         query_passado = f"""
-            SELECT eq.numero AS TOMBO_ANTIGO, mov.id AS ORIG_MOV_ID, ac.id AS ORIG_CLIENTE_ID, COALESCE(NULLIF(mov.usuario_id, 0), 1) AS ORIG_USR_ID, COALESCE(mov.updated_at, mov.data) AS ORIG_DATA, mov.deleted_at AS ORIG_DEL, mov.tipo_id AS ORIG_TIPO_LEGADO, mov.data AS DATA_REAL_ORDENACAO
+            SELECT eq.numero AS TOMBO_ANTIGO, ami.id AS ORIG_MOV_ITEM_ID, mov.id AS ORIG_MOV_ID, ac.id AS ORIG_CLIENTE_ID, ami.novo_orgao_id AS ORIG_ORGAO_ID, COALESCE(NULLIF(mov.usuario_id, 0), 1) AS ORIG_USR_ID, COALESCE(mov.data, mov.updated_at) AS ORIG_DATA, mov.deleted_at AS ORIG_DEL, mov.tipo_id AS ORIG_TIPO_LEGADO, mov.data AS DATA_REAL_ORDENACAO
             FROM aluguel_equipamentos eq
             INNER JOIN aluguel_movimento_itens ami ON ami.equipamento_id = eq.id
             INNER JOIN aluguel_movimento mov ON mov.id = ami.movimento_id
@@ -166,7 +193,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         df_historico_origens.sort_values(by=['TOMBO_ANTIGO', 'DATA_REAL_ORDENACAO', 'ORIG_MOV_ID'], ascending=[True, False, False], inplace=True)
         df_passado = df_historico_origens.groupby('TOMBO_ANTIGO').first().reset_index()
 
-        return pd.merge(df_presente, df_passado[['TOMBO_ANTIGO', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_USR_ID', 'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO']], on='TOMBO_ANTIGO', how='inner')
+        return pd.merge(df_presente, df_passado[['TOMBO_ANTIGO', 'ORIG_MOV_ITEM_ID', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_USR_ID', 'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO', 'ORIG_ORGAO_ID']], on='TOMBO_ANTIGO', how='inner')
 
     def executar(self):
         print("\n" + "=" * 70)
@@ -224,17 +251,25 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 continue
 
             row_parquet = dict_row_parquet_by_tombo.get(tombo_novo)
-            cli_leg_parquet = row_parquet.get("CLIENTE_ID") if row_parquet is not None else None
-            
-            if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).strip() != '':
-                cli_legado_id = int(float(cli_leg_parquet))
+
+            # O cliente da substituição pertence ao próprio registro legado
+            # (d.cliente_id). O parquet é indexado somente pelo tombo e pode
+            # conter mais de um equipamento/cliente com o mesmo número; não
+            # deve sobrescrever a identidade explícita da substituição.
+            if pd.notna(row.get('CLIENTE_ID')):
+                cli_legado_id = int(row['CLIENTE_ID'])
             elif pd.notna(row.get('ORIG_CLIENTE_ID')):
                 cli_legado_id = int(row['ORIG_CLIENTE_ID'])
             else:
-                cli_legado_id = int(row['CLIENTE_ID']) if pd.notna(row['CLIENTE_ID']) else 0
+                cli_leg_parquet = row_parquet.get("CLIENTE_ID") if row_parquet is not None else None
+                cli_legado_id = int(float(cli_leg_parquet)) if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).strip() else 0
 
-            recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
-            cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id)
+            (recipient_id, cliente_final_address), (recipient_historico_id, endereco_historico) = self.selecionar_destinatarios(
+                cli_legado_id,
+                row.get('ORIG_CLIENTE_ID'),
+                self.dados["dict_cliente_adress"],
+                self.dados["dict_endereco_por_legacy_client"],
+            )
             
             if not recipient_id:
                 rejeitados += 1
@@ -262,18 +297,24 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 })
 
             org_id_cascata = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(eq_id_novo) or 1115
+            org_aluguel = descobrir_id_organizacao_destino(row['ORGAO_ALUGUEL']) if pd.notna(row.get('ORGAO_ALUGUEL')) else org_id_cascata
+            org_devolucao = descobrir_id_organizacao_destino(row['ORGAO_DEV']) if pd.notna(row.get('ORGAO_DEV')) else org_id_cascata
+            org_origem = descobrir_id_organizacao_destino(row['ORIG_ORGAO_ID']) if pd.notna(row.get('ORIG_ORGAO_ID')) else org_id_cascata
 
             # =========================================================
             # 🕰️ FASE 1: O PASSADO (ALUGAMOS A MÁQUINA ANTIGA)
             # =========================================================
             if pd.notna(row.get('ORIG_MOV_ID')):
-                id_legado_origem = int(row['ORIG_MOV_ID'])
-                self.registrar_movimento(
+                source_item_id = int(row['ORIG_MOV_ITEM_ID'])
+                migrated_item_ids = self.dados.setdefault("migrated_legacy_movement_item_ids", set())
+                if deve_reconstruir_aluguel_historico(source_item_id, migrated_item_ids):
+                    id_legado_origem = int(row['ORIG_MOV_ID'])
+                    self.registrar_movimento(
                     id_final=int(row['ORIG_MOV_ID']),
-                    recipient_id=recipient_id,
-                    cliente_final_address_id=cliente_final_address,
+                    recipient_id=recipient_historico_id,
+                    cliente_final_address_id=endereco_historico,
                     usuario_id=int(row['ORIG_USR_ID']),
-                    organization_id=int(org_id_cascata),
+                    organization_id=int(org_origem),
                     mov_date=row['ORIG_DATA'],
                     deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
                     contrato_id=contrato_id_res,
@@ -289,7 +330,8 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     alias_movimento=row['NOME_ANTIGO'],
                     details_capa=f"Aluguel Passado - Origem da Substituição: {id_legado_origem}",
                     details_item=f"Aluguel Passado - Origem da Substituição: {id_legado_origem}"
-                )
+                    )
+                    migrated_item_ids.add(source_item_id)
 
             # =========================================================
             # 📥 FASE 2: O PRESENTE (RECOLHEMOS A MÁQUINA ANTIGA)
@@ -300,7 +342,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 recipient_id=recipient_id,
                 cliente_final_address_id=recipient_id,
                 usuario_id=int(row['USR_SUBST']),
-                organization_id=int(org_id_cascata),
+                organization_id=int(org_devolucao),
                 mov_date=row['DATA_DEVOLUCAO'],
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 contrato_id=contrato_id_res,
@@ -327,7 +369,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                 recipient_id=recipient_id,
                 cliente_final_address_id=cliente_final_address,
                 usuario_id=int(row['USR_SUBST']),
-                organization_id=int(org_id_cascata),
+                organization_id=int(org_aluguel),
                 mov_date=row['DATA_SUBST'],
                 deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
                 contrato_id=contrato_id_res,
@@ -360,7 +402,9 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             
             query_situacao = f"""
                 SELECT
+                    alq.id AS id,
                     alq.numero AS tombo,
+                    alq.nome AS name,
                     alq.situacao_id AS situacao
                 FROM aluguel_equipamentos alq
                 WHERE alq.numero IN {tombos_in}
@@ -369,14 +413,27 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             with self.engine_legado.connect() as conn:
                 df_situacoes = pd.read_sql(text(query_situacao), conn)
                 
+            situacoes_por_tombo = {}
             for _, row_sit in df_situacoes.iterrows():
-                t_antigo = str(row_sit['tombo']).strip()
-                situacao = int(row_sit['situacao'])
+                situacoes_por_tombo.setdefault(str(row_sit['tombo']).strip(), []).append({
+                    'id': int(row_sit['id']), 'name': row_sit['name'],
+                    'situacao': int(row_sit['situacao'])
+                })
+            for t_antigo, candidatos in situacoes_por_tombo.items():
+                situacao = int(selecionar_situacao_preferida_por_tombo(candidatos))
                 
                 dict_update = map_eqs_antigos.get(t_antigo)
                 if dict_update:
                     if situacao == 14:
                         eqs_antigos_alterar_8.append(dict_update)
+                    elif situacao == 1:
+                        # A substituição encerra a posse antiga apenas para
+                        # equipamentos que realmente foram devolvidos. Se o
+                        # legado ainda os considera alugados, a fase ALUGUEL
+                        # (executada antes desta) já gravou o movimento ativo,
+                        # status e cliente corretos. Não sobrescrever essa
+                        # referência com a devolução da substituição.
+                        continue
                     else:
                         eqs_antigos_alterar_1.append(dict_update)
 

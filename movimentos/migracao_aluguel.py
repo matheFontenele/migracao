@@ -5,9 +5,9 @@ from sqlalchemy import text
 from datetime import datetime
 from tqdm import tqdm
 
-from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items
+from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items, descobrir_id_organizacao_destino
 from utils.sanetizador import executar_truncate_tabelas, normalizar_para_match
-from movimentos.migracao_movimentos import BaseMigracaoMovimento
+from movimentos.migracao_movimentos import BaseMigracaoMovimento, selecionar_equipamento_por_tombo
 
 TABELAS = [
     "service_order_item_extra_equipments", "movement_items", "movements", "service_order_items", "service_orders"
@@ -136,10 +136,12 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 eq.tipo_id AS eq_tipo_id,
 
                 mov.id AS id,
+                movi.id AS legacy_movement_item_id,
                 mov.data AS data_movimento,
                 mov.updated_at,
                 mov.deleted_at,
                 mov.cliente_id,
+                movi.novo_orgao_id AS orgao_id,
                 mov.usuario_id,
                 mov.tipo_id AS tipo_id,
                 mov.tipo AS tipo_movimento
@@ -169,11 +171,13 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         with self.engine_legado.connect() as conn:
             df_movs = pd.read_sql(text(query), conn)
             
-        dict_retorno = {}
+        candidatos = {}
         for _, row in df_movs.iterrows():
-            dict_retorno[str(row['tombo']).strip()] = {
-                'movimento': row.to_dict()
-            }
+            candidatos.setdefault(str(row['tombo']).strip(), []).append(row)
+        dict_retorno = {
+            tombo: {'movimento': selecionar_equipamento_por_tombo(rows).to_dict()}
+            for tombo, rows in candidatos.items()
+        }
         return dict_retorno
 
     # ==============================================================================
@@ -229,18 +233,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             df_contracts = pd.read_sql(
                 "SELECT id AS contract_id, customer_id FROM contracts", conn
             )
-            df_contract_recipients = pd.read_sql(
-                "SELECT contract_id, customer_id FROM contract_recipient_customers", conn
-            )
         contratos_validos = set(df_contracts['contract_id'].astype(int))
-        df_vinculos_contrato_cliente = pd.concat(
-            [df_contracts, df_contract_recipients], ignore_index=True
-        ).dropna(subset=['contract_id', 'customer_id'])
-        contratos_por_cliente = (
-            df_vinculos_contrato_cliente.groupby('customer_id')['contract_id']
-            .apply(lambda values: set(values.astype(int)))
-            .to_dict()
-        )
 
         def registrar_cliente_sem_contrato(row, cli_legado_id, recipient_id, motivo):
             chave = (cli_legado_id, motivo)
@@ -291,13 +284,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 rejeitados += 1
                 continue
 
-            contratos_cliente = contratos_por_cliente.get(int(recipient_id), set())
-            if not contratos_cliente:
-                registrar_cliente_sem_contrato(
-                    row_csv, cli_legado_id, recipient_id, 'CLIENTE_SEM_CONTRATO_NO_REFATORADO'
-                )
-                rejeitados += 1
-                continue
+            # Cliente sem contrato não é motivo para descartar: o Parquet pode
+            # representar aluguel avulso. Quando CONTRACT_ID é nulo, a regra
+            # abaixo classifica o movimento como AVULSO (tipo 7).
 
             # ==================================================================
             # 1. APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
@@ -358,7 +347,14 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
             detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)" if is_avulso else "Equipamento Kit (Imune a saldo, sem item vinculado)" if is_kit else "Equipamento Excedente (Contrato sem saldo)" if is_excedente else "Item Extra Oficial (Fallback de Contrato/Item)" if not teve_match_perfeito else None
 
-            org_id_resolvida = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(equipment_id_ref) or 1115
+            # A organização do próprio movimento prevalece; demais cadastros são fallback.
+            org_id_resolvida = (
+                descobrir_id_organizacao_destino(row_mov['orgao_id']) if pd.notna(row_mov.get('orgao_id')) else
+                dict_contract_org.get(contrato_id_res)
+                or dict_customer_org.get(recipient_id)
+                or dict_equip_org.get(equipment_id_ref)
+                or 1115
+            )
             id_legado_origem = int(row_mov['id'])
 
             self.registrar_movimento(
@@ -385,6 +381,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 details_item=detalhes_item,
                 forcar_atualizacao_parque=True
             )
+            self.dados.setdefault("migrated_legacy_movement_item_ids", set()).add(int(row_mov['legacy_movement_item_id']))
 
         if log_nao_match:
             print(f"📝 {len(log_nao_match)} regras comerciais processadas. Salvando log...")
