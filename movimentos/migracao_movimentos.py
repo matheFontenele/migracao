@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 import sqlalchemy as sa
 from sqlalchemy import text
@@ -28,6 +29,23 @@ def limpar_codigo(val):
         return ""
     s = str(val).strip()
     return s[:-2] if s.endswith(".0") else s
+
+
+def selecionar_equipamento_por_tombo(candidatos):
+    """Select the lowest-ID non-supply candidate, falling back to lowest ID."""
+    candidatos = list(candidatos)
+    if not candidatos:
+        return None
+    def eh_insumo(candidato):
+        nome = candidato.get('name', '') if isinstance(candidato, dict) else getattr(candidato, 'name', '')
+        return bool(re.search(r'(?<!\w)(?:TONER|CARTUCHO)(?!\w)', str(nome or ''), re.IGNORECASE))
+    nao_insumos = [c for c in candidatos if not eh_insumo(c)]
+    return min(nao_insumos or candidatos, key=lambda c: int(c.get('id') if isinstance(c, dict) else c.id))
+
+
+def selecionar_situacao_preferida_por_tombo(candidatos):
+    selecionado = selecionar_equipamento_por_tombo(candidatos)
+    return None if selecionado is None else selecionado['situacao']
 
 def descobrir_id_organizacao_destino(id_legado):
     """Mapeia o ID do legado para o ID correspondente no banco novo."""
@@ -285,9 +303,14 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_equipamentos_refatorado['deleted_at'].isna()
     ].sort_values('id')
     
+    candidatos_por_number = {}
+    for _, row in df_equipamentos_ativos.iterrows():
+        chave = limpar_codigo(row['number'])
+        if chave:
+            candidatos_por_number.setdefault(chave, []).append(row)
     dict_equip_ref_por_number = {
-        limpar_codigo(row['number']): int(row['id'])
-        for _, row in df_equipamentos_ativos.iterrows()
+        chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+        for chave, candidatos in candidatos_por_number.items()
     }
     
     ids_equipamentos_ref = set(df_equipamentos_refatorado['id'].astype(int))
@@ -560,11 +583,15 @@ class BaseMigracaoMovimento:
         
         df_resultado = pd.read_sql(text(query), self.engine_new)
 
-        dict_res = {}
+        candidatos_por_tombo = {}
         for _, row in df_resultado.iterrows():
             tombo_chave = limpar_codigo(row['number'])
             if tombo_chave:
-                dict_res[tombo_chave] = int(row['id'])
+                candidatos_por_tombo.setdefault(tombo_chave, []).append(row)
+        dict_res = {
+            chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+            for chave, candidatos in candidatos_por_tombo.items()
+        }
                 
         return dict_res
 
