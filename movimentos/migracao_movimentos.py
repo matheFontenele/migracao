@@ -15,6 +15,7 @@ from config.config import (
     MAPPING_AS,
 )
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, normalizar_para_match
+from utils.depara_clientes import propagar_depara_duplicados
 
 # ==============================================================================
 # CONFIGURAÇÕES DE MAPEAMENTO E BLOQUEIO DE ORGANIZAÇÕES
@@ -31,16 +32,97 @@ def limpar_codigo(val):
     return s[:-2] if s.endswith(".0") else s
 
 
-def selecionar_equipamento_por_tombo(candidatos):
-    """Select the lowest-ID non-supply candidate, falling back to lowest ID."""
+def _valor_candidato(candidato, campo):
+    if isinstance(candidato, dict):
+        return candidato.get(campo)
+    if hasattr(candidato, "get"):
+        try:
+            return candidato.get(campo)
+        except Exception:
+            pass
+    return None
+
+
+def _como_int(valor):
+    try:
+        if pd.isna(valor):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
+
+
+def sanitizar_address_ids_invalidos(registros, addresses_validos, campo="address_id"):
+    """Zera vínculos de endereço que não existem em `addresses`.
+
+    Um único valor inválido aborta o lote inteiro na FK
+    `service_order_items_address_id_foreign`. Em vez de falhar sem indicar a
+    linha culpada, o vínculo é removido e os valores são reportados.
+    """
+    invalidos = set()
+    for registro in registros:
+        valor = registro.get(campo)
+        if valor is None:
+            continue
+        try:
+            if pd.isna(valor):
+                continue
+        except (TypeError, ValueError):
+            pass
+        endereco_id = limpar_valor_inteiro(valor)
+        if endereco_id not in addresses_validos:
+            invalidos.add(endereco_id)
+            registro[campo] = None
+    return invalidos
+
+
+CAMPOS_CLIENTE_LEGADO = ("cliente_id", "legacy_customer_id", "cliente_legado_id")
+CAMPOS_CLIENTE_REFATORADO = ("last_movement_item_customer_id", "customer_id", "recipient_customer_id")
+
+
+def selecionar_equipamento_por_tombo(candidatos, clientes_estoque=None, clientes_estoque_ref=None):
+    """Escolhe uma copia deterministica do tombo.
+
+    Preferencia: nao insumo (toner/cartucho) e nao vinculado a base/estoque.
+    Se todas as copias forem base, mantem a escolha deterministica por menor ID.
+    """
     candidatos = list(candidatos)
     if not candidatos:
         return None
+    clientes_estoque = CLIENTES_ESTOQUE if clientes_estoque is None else set(clientes_estoque)
+    clientes_estoque_ref = set(clientes_estoque_ref or ())
+
+    def nome(candidato):
+        for campo in ("name", "nome_equipamento", "nome", "equipamento"):
+            valor = _valor_candidato(candidato, campo)
+            if valor:
+                return valor
+        return ""
+
     def eh_insumo(candidato):
-        nome = candidato.get('name', '') if isinstance(candidato, dict) else getattr(candidato, 'name', '')
-        return bool(re.search(r'(?<!\w)(?:TONER|CARTUCHO)(?!\w)', str(nome or ''), re.IGNORECASE))
+        return bool(re.search(r'(?<!\w)(?:TONER|CARTUCHO)(?!\w)', str(nome(candidato) or ''), re.IGNORECASE))
+
+    def eh_base(candidato):
+        if _valor_candidato(candidato, "cliente_estoque") or _valor_candidato(candidato, "is_base"):
+            return True
+        for campo in CAMPOS_CLIENTE_LEGADO:
+            cliente = _como_int(_valor_candidato(candidato, campo))
+            if cliente is not None and cliente in clientes_estoque:
+                return True
+        for campo in CAMPOS_CLIENTE_REFATORADO:
+            cliente = _como_int(_valor_candidato(candidato, campo))
+            if cliente is not None and cliente in clientes_estoque_ref:
+                return True
+        return False
+
     nao_insumos = [c for c in candidatos if not eh_insumo(c)]
-    return min(nao_insumos or candidatos, key=lambda c: int(c.get('id') if isinstance(c, dict) else c.id))
+    preferidos = nao_insumos or candidatos
+    fora_da_base = [c for c in preferidos if not eh_base(c)]
+    escolhidos = fora_da_base or preferidos
+    return min(escolhidos, key=lambda c: int(_valor_candidato(c, "id")))
 
 
 def selecionar_situacao_preferida_por_tombo(candidatos):
@@ -89,18 +171,22 @@ def liberar_equipamentos_clientes_estoque(engine_new, engine_legado):
     query_legado = text(f"""
         SELECT DISTINCT eq.id AS equipment_id
         FROM aluguel_equipamentos eq
-        INNER JOIN (
-            SELECT mi.equipamento_id, MAX(mi.id) AS max_item_id
-            FROM aluguel_movimento_itens mi
-            INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-            WHERE m.deleted_at IS NULL
-            GROUP BY mi.equipamento_id
-        ) ult ON ult.equipamento_id = eq.id
-        INNER JOIN aluguel_movimento_itens mi2 ON mi2.id = ult.max_item_id
-        INNER JOIN aluguel_movimento m2 ON m2.id = mi2.movimento_id
         WHERE eq.deleted_at IS NULL
           AND eq.situacao_id = 1
-          AND m2.cliente_id IN ({ids_clientes})
+          AND (
+              -- Último movimento real: data e id, nunca MAX(item_id).
+              -- Os IDs de aluguel_movimento_itens não são cronológicos
+              -- (lotes recriam itens com IDs maiores para movimentos antigos),
+              -- então MAX(mi.id) elegia um aluguel antigo para a base/estoque.
+              SELECT m2.cliente_id
+              FROM aluguel_movimento_itens mi2
+              INNER JOIN aluguel_movimento m2 ON m2.id = mi2.movimento_id
+              WHERE mi2.equipamento_id = eq.id
+                AND mi2.deleted_at IS NULL
+                AND m2.deleted_at IS NULL
+              ORDER BY m2.data DESC, m2.id DESC
+              LIMIT 1
+          ) IN ({ids_clientes})
     """)
 
     with engine_legado.connect() as conn_legado:
@@ -243,12 +329,18 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_saldos_contract_items = pd.read_sql(query_saldos, conn)
 
         df_equipamentos_refatorado = pd.read_sql(
-            "SELECT id, number, name, current_organization_id, deleted_at FROM equipments", conn
+            "SELECT id, number, name, current_organization_id, last_movement_item_customer_id, deleted_at FROM equipments", conn
         )
         
         df_enderecos_valido = pd.read_sql(
             "SELECT id, addressable_id, legacy_customer_id FROM addresses WHERE legacy_customer_id IS NOT NULL", conn
         )
+
+        clientes_estoque_ref = {
+            int(row['addressable_id'])
+            for _, row in df_enderecos_valido.iterrows()
+            if _como_int(row['legacy_customer_id']) in CLIENTES_ESTOQUE
+        }
 
         query_primeiro_item = text("""
             SELECT c.customer_id, c.id AS contract_id, ci.id AS contract_item_id
@@ -309,7 +401,8 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         if chave:
             candidatos_por_number.setdefault(chave, []).append(row)
     dict_equip_ref_por_number = {
-        chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+        chave: int(selecionar_equipamento_por_tombo(
+            candidatos, clientes_estoque_ref=clientes_estoque_ref)['id'])
         for chave, candidatos in candidatos_por_number.items()
     }
     
@@ -324,6 +417,11 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         df_enderecos_valido['legacy_customer_id'].astype(int),
         df_enderecos_valido['id'].astype(int)
     ))
+
+    # Cópias mescladas na migração de clientes não têm address próprio:
+    # herdam o endereço do cliente principal.
+    propagar_depara_duplicados(dict_cliente_adress)
+    propagar_depara_duplicados(dict_endereco_por_legacy_client)
     
     dict_primeiro_item_por_cliente = dict(zip(
         df_primeiro_item['customer_id'].astype(int),
@@ -425,6 +523,7 @@ def carregar_dados_compartilhados(engine_legado, engine_new):
         "dict_movimentos_legado": dict_movimentos_legado,
         "dict_cliente_adress": dict_cliente_adress,
         "dict_endereco_por_legacy_client": dict_endereco_por_legacy_client,
+        "clientes_estoque_ref": clientes_estoque_ref,
         "dict_primeiro_item_por_cliente": dict_primeiro_item_por_cliente,
         "dict_primeiro_contrato_por_cliente": dict_primeiro_contrato_por_cliente,
         "dict_primeiro_item_por_contrato": dict_primeiro_item_por_contrato,
@@ -589,7 +688,9 @@ class BaseMigracaoMovimento:
             if tombo_chave:
                 candidatos_por_tombo.setdefault(tombo_chave, []).append(row)
         dict_res = {
-            chave: int(selecionar_equipamento_por_tombo(candidatos)['id'])
+            chave: int(selecionar_equipamento_por_tombo(
+                candidatos,
+                clientes_estoque_ref=self.dados.get("clientes_estoque_ref"))['id'])
             for chave, candidatos in candidatos_por_tombo.items()
         }
                 
@@ -983,6 +1084,27 @@ class BaseMigracaoMovimento:
                     f"⚠️ {len(itens_sem_fk)} IDs de contract_item inexistentes foram "
                     "desvinculados dos itens de movimento para respeitar a FK. "
                     f"Amostra: {sorted(itens_sem_fk)[:20]}"
+                )
+
+            enderecos_validos = {
+                int(row[0]) for row in conn.execute(text("SELECT id FROM addresses"))
+            }
+            enderecos_invalidos = set()
+            enderecos_invalidos |= sanitizar_address_ids_invalidos(
+                self.service_itens_mestre, enderecos_validos
+            )
+            enderecos_invalidos |= sanitizar_address_ids_invalidos(
+                self.shipment_items_mestre, enderecos_validos
+            )
+            enderecos_invalidos |= sanitizar_address_ids_invalidos(
+                self.equipamentos_alterados, enderecos_validos, campo="addr_id"
+            )
+
+            if enderecos_invalidos:
+                print(
+                    f"⚠️ {len(enderecos_invalidos)} IDs de endereço inexistentes foram "
+                    "desvinculados para respeitar a FK `addresses`. "
+                    f"Amostra: {sorted(enderecos_invalidos)[:20]}"
                 )
 
             if self.servicos_mestre: pd.DataFrame(self.servicos_mestre).to_sql("service_orders", con=conn, if_exists="append", index=False)

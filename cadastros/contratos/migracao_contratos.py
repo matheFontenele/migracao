@@ -8,6 +8,7 @@ from datetime import datetime
 
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, ultra_normalizar
 from utils.mapeador import descobrir_id_organizacao
+from utils.depara_clientes import propagar_depara_duplicados
 
 # Lista de tabelas a serem utilizadas
 TABELAS_CONTRATOS = [
@@ -178,7 +179,11 @@ class MigracaoContratos:
                 if txt:
                     norm = ultra_normalizar(txt)
                     if norm: self.customer_cache[norm] = info
-                    
+
+        # Cópias mescladas na migração de clientes não têm address próprio:
+        # herdam o customer do principal.
+        propagar_depara_duplicados(self.dict_legacy_to_customer)
+
         print(f"   👥 {len(self.dict_legacy_to_customer)} IDs legados atrelados e {len(self.customer_cache)} variações de nomes em cache")
 
     # ==============================================================================

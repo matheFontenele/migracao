@@ -13,13 +13,13 @@ def obter_engines():
 
     config_new = {
         "host": HOST, "port": PORT,
-        "db": "controle-interno",      # banco novo refatorado (MySQL 8)
+        "db": os.getenv("DB_NAME_NEW", "controle-interno"),      # banco novo refatorado (MySQL 8)
         "user": USER, "pass": PASS,
     }
 
     config_legado = {
         "host": HOST, "port": PORT,
-        "db": "aluguel_legado",        # snapshot local do legado
+        "db": os.getenv("DB_NAME_LEGADO", "aluguel_legado"),        # snapshot local do legado
         "user": USER, "pass": PASS,
     }
 

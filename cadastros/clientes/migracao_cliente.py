@@ -130,6 +130,21 @@ SAO_LUIS_CONFIG = {
     "ID_PREF_ALVO": 287,
     "NOME_PREF_ALVO": "PREFEITURA MUNICIPAL DE SÃO LUÍS"
 }
+# Prefeituras que aparecem repetidas no legado e devem virar um único cliente
+# no refatorado. A mesclagem absorve as raízes, as secretarias e os clientes
+# de destino; o nome do destino original permanece no alias do endereço.
+MESCLAGENS_PREFEITURA = {
+    "CAUCAIA": {
+        "ids": (2, 295, 300),
+        "id_alvo": 2,
+        "nome_alvo": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    },
+    "BARROQUINHA": {
+        "ids": (6, 105),
+        "id_alvo": 6,
+        "nome_alvo": "PREFEITURA MUNICIPAL DE BARROQUINHA",
+    },
+}
 MAPA_REGIOS_PCPB = {
     "CAMPINA GRANDE": "CAMPINA GRANDE",
     "GUARABIRA": "GUARABIRA",
@@ -206,6 +221,9 @@ class MigracaoClientes:
         self.stats = {"pais": 0, "filhos": 0, "enderecos": 0, "mesclados": 0}
         self.clientes_descartados = []
         self.arquivo_log_descartados = 'ajustes/clientes_descartados_migracao.csv'
+        self.arquivo_duplicados = 'ajustes/clientes_duplicados_similaridade.csv'
+        self.arquivo_duplicados_json = 'ajustes/clientes_duplicados_similaridade.json'
+        self.arquivo_depara_duplicados = 'ajustes/clientes_de_para_duplicados.csv'
 
     def _registrar_clientes_descartados(self, df: pd.DataFrame, motivo: str):
         """Acumula linhas de clientes excluídos para auditoria, sem alterar o fluxo."""
@@ -242,6 +260,508 @@ class MigracaoClientes:
             f"📄 Log de clientes descartados salvo em '{self.arquivo_log_descartados}' "
             f"({len(df_log)} registros)."
         )
+
+    # ==============================================================================
+    # RELATÓRIO DE CLIENTES DUPLICADOS POR SIMILARIDADE DE NOME
+    # ==============================================================================
+    # Similaridade estritamente acima de 95% sobre o nome normalizado.
+    LIMIAR_DUPLICIDADE = 0.95
+    COLUNAS_DUPLICADOS = [
+        'similaridade_pct',
+        'id_legado_a', 'cliente_legado_a', 'customer_id_a', 'address_id_a',
+        'endereco_refatorado_a', 'id_prefeitura_a', 'prefeitura_a',
+        'id_secretaria_a', 'secretaria_a',
+        'id_legado_b', 'cliente_legado_b', 'customer_id_b', 'address_id_b',
+        'endereco_refatorado_b', 'id_prefeitura_b', 'prefeitura_b',
+        'id_secretaria_b', 'secretaria_b',
+        'mesma_hierarquia',
+    ]
+
+    @staticmethod
+    def _tokens_bloqueio(nome_normalizado: str):
+        return [token for token in nome_normalizado.split() if len(token) >= 3]
+
+    def _candidatos_por_bloco(self, nomes: list):
+        """Gera pares candidatos via índice invertido por token e prefixo.
+
+        Comparar todos contra todos seria quadrático numa base de milhares de
+        clientes. Como nomes com mais de 95% de similaridade compartilham
+        praticamente todos os tokens, bloqueamos por token. Tokens muito
+        frequentes (ex.: DE, SAO, SECRETARIA) são ignorados para não formar
+        blocos gigantes; nomes sem token útil caem num bloco pela própria chave.
+        """
+        total = len(nomes)
+        if total < 2:
+            return set()
+
+        frequencia = {}
+        tokens_por_nome = []
+        for nome in nomes:
+            tokens = set(self._tokens_bloqueio(nome))
+            tokens_por_nome.append(tokens)
+            for token in tokens:
+                frequencia[token] = frequencia.get(token, 0) + 1
+
+        limite_frequente = max(50, int(total * 0.05))
+        indice = {}
+        for idx, tokens in enumerate(tokens_por_nome):
+            chaves = [t for t in tokens if frequencia[t] <= limite_frequente]
+            if not chaves:
+                # Sem token distintivo: agrupa por prefixo e faixa de tamanho,
+                # que é o que ainda garante comparações plausíveis.
+                chaves = [
+                    '#' + nomes[idx][:12] + '|' + str(len(nomes[idx]) // 10)
+                ]
+            for chave in chaves:
+                indice.setdefault(chave, []).append(idx)
+
+        candidatos = set()
+        for chave, indices in indice.items():
+            if len(indices) < 2:
+                continue
+            if len(indices) > 3000:
+                print(
+                    f"   ⚠️ Bloco de similaridade '{chave}' com {len(indices)} "
+                    "nomes ignorado para evitar explosão combinatória."
+                )
+                continue
+            for pos_i in range(len(indices)):
+                for pos_j in range(pos_i + 1, len(indices)):
+                    candidatos.add((indices[pos_i], indices[pos_j]))
+        return candidatos
+
+    def _relacionar_duplicados_clientes(self, df_enderecos_finais, mapa_refatorado):
+        """Compara nomes normalizados e grava CSV ligando legado x refatorado.
+
+        Retorna o DataFrame do relatório (vazio se não houver pares acima do
+        limiar). Não altera o resultado da migração: é somente auditoria.
+        """
+        from difflib import SequenceMatcher
+        import os
+
+        df = df_enderecos_finais.copy()
+        colunas_base = [
+            'ID_CLIENTE', 'CLIENTE', 'ID_PREFEITURA', 'PREFEITURA',
+            'ID_SECRETARIA', 'SECRETARIA', 'reserved_customer_id',
+        ]
+        for coluna in colunas_base:
+            if coluna not in df.columns:
+                df[coluna] = None
+
+        base = df[colunas_base].copy()
+        base['id_legado'] = pd.to_numeric(base['ID_CLIENTE'], errors='coerce')
+        base = base.dropna(subset=['id_legado'])
+        base['id_legado'] = base['id_legado'].astype(int)
+        base = base[base['id_legado'].isin(mapa_refatorado)]
+        base = base.drop_duplicates(subset=['id_legado'], keep='first')
+        base['nome_normalizado'] = base['CLIENTE'].apply(normalizar_para_match)
+        base = base[base['nome_normalizado'] != ''].reset_index(drop=True)
+
+        # Agrupa ocorrências por nome normalizado: nomes idênticos geram pares
+        # de 100% e a comparação custosa roda só entre nomes distintos.
+        grupos = {}
+        ordem = []
+        for idx, linha in base.iterrows():
+            nome = linha['nome_normalizado']
+            if nome not in grupos:
+                grupos[nome] = []
+                ordem.append(nome)
+            grupos[nome].append(idx)
+
+        candidatos = self._candidatos_por_bloco(ordem)
+        max_pares = 500_000
+        truncado = False
+        registros = []
+
+        def montar_registro(pos_a, pos_b, similaridade):
+            linha_a = base.loc[pos_a]
+            linha_b = base.loc[pos_b]
+            destino_a = mapa_refatorado[int(linha_a['id_legado'])]
+            destino_b = mapa_refatorado[int(linha_b['id_legado'])]
+            return {
+                'similaridade_pct': round(similaridade * 100, 2),
+                'id_legado_a': int(linha_a['id_legado']),
+                'cliente_legado_a': linha_a['CLIENTE'],
+                'customer_id_a': destino_a.get('customer_id'),
+                'address_id_a': destino_a.get('address_id'),
+                'endereco_refatorado_a': destino_a.get('alias'),
+                'id_prefeitura_a': linha_a['ID_PREFEITURA'],
+                'prefeitura_a': linha_a['PREFEITURA'],
+                'id_secretaria_a': linha_a['ID_SECRETARIA'],
+                'secretaria_a': linha_a['SECRETARIA'],
+                'id_legado_b': int(linha_b['id_legado']),
+                'cliente_legado_b': linha_b['CLIENTE'],
+                'customer_id_b': destino_b.get('customer_id'),
+                'address_id_b': destino_b.get('address_id'),
+                'endereco_refatorado_b': destino_b.get('alias'),
+                'id_prefeitura_b': linha_b['ID_PREFEITURA'],
+                'prefeitura_b': linha_b['PREFEITURA'],
+                'id_secretaria_b': linha_b['ID_SECRETARIA'],
+                'secretaria_b': linha_b['SECRETARIA'],
+                'mesma_hierarquia': (
+                    str(linha_a['ID_PREFEITURA']) == str(linha_b['ID_PREFEITURA'])
+                    and str(linha_a['ID_SECRETARIA']) == str(linha_b['ID_SECRETARIA'])
+                ),
+            }
+
+        # Nomes idênticos após normalização (ex.: sufixo RESERVA removido).
+        for nome in ordem:
+            if truncado:
+                break
+            indices = grupos[nome]
+            for pos_i in range(len(indices)):
+                for pos_j in range(pos_i + 1, len(indices)):
+                    if len(registros) >= max_pares:
+                        truncado = True
+                        break
+                    registros.append(
+                        montar_registro(indices[pos_i], indices[pos_j], 1.0)
+                    )
+                if truncado:
+                    break
+
+        for pos_a, pos_b in candidatos:
+            if truncado:
+                break
+            nome_a, nome_b = ordem[pos_a], ordem[pos_b]
+            if nome_a == nome_b:
+                continue
+            menor, maior = sorted((len(nome_a), len(nome_b)))
+            # Limite superior do ratio: se já é <= limiar, não vale comparar.
+            if (2 * menor) / (menor + maior) <= self.LIMIAR_DUPLICIDADE:
+                continue
+            similaridade = SequenceMatcher(None, nome_a, nome_b).ratio()
+            if similaridade <= self.LIMIAR_DUPLICIDADE:
+                continue
+            for id_a in grupos[nome_a]:
+                for id_b in grupos[nome_b]:
+                    if len(registros) >= max_pares:
+                        truncado = True
+                        break
+                    registros.append(montar_registro(id_a, id_b, similaridade))
+                if truncado:
+                    break
+
+        relatorio = pd.DataFrame(registros, columns=self.COLUNAS_DUPLICADOS)
+        if not relatorio.empty:
+            relatorio = relatorio.sort_values(
+                'similaridade_pct', ascending=False
+            ).reset_index(drop=True)
+        if truncado:
+            print(
+                f"   ⚠️ Relatório truncado em {max_pares} pares; "
+                "refine o limiar ou a base para o restante."
+            )
+
+        os.makedirs(os.path.dirname(self.arquivo_duplicados) or '.', exist_ok=True)
+        relatorio.to_csv(self.arquivo_duplicados, index=False, encoding='utf-8-sig')
+        print(
+            f"🔗 Relatório de clientes duplicados (> {self.LIMIAR_DUPLICIDADE * 100:.0f}% "
+            f"de similaridade) salvo em '{self.arquivo_duplicados}' "
+            f"({len(relatorio)} pares)."
+        )
+        self._salvar_duplicados_json(relatorio)
+        return relatorio
+
+    # ------------------------------------------------------------------------------
+    # JSON DE DUPLICADOS: um cliente principal + suas cópias
+    # ------------------------------------------------------------------------------
+    @staticmethod
+    def _classificacao_ocorrencia(id_prefeitura, id_secretaria):
+        """Classifica a ocorrência do legado pelo nível que ela representa."""
+        if id_secretaria is not None and not pd.isna(id_secretaria):
+            return 'cliente'
+        if id_prefeitura is None or pd.isna(id_prefeitura):
+            return 'prefeitura'
+        try:
+            # IDs negativos são raízes sintéticas criadas para clientes sem
+            # hierarquia: no refatorado eles viram customer raiz (prefeitura).
+            if int(id_prefeitura) < 0:
+                return 'prefeitura'
+        except (TypeError, ValueError):
+            pass
+        return 'secretaria'
+
+    @staticmethod
+    def _ids_ja_tratados_por_regras():
+        """Clientes já resolvidos por DE/PARA e exceções da migração."""
+        return (
+            set(DEPARA_EXCECOES.keys())
+            | set(DEPARA_EXCECOES.values())
+            | set(MAPA_SAO_LUIS.keys())
+            | set(HOSPITAIS_PB_CONFIG.keys())
+        )
+
+    @staticmethod
+    def _valor_json(valor, inteiro=False):
+        if valor is None or pd.isna(valor):
+            return None
+        if inteiro:
+            try:
+                return int(valor)
+            except (TypeError, ValueError):
+                return None
+        return valor
+
+    def _ocorrencia_do_relatorio(self, linha, lado):
+        id_prefeitura = getattr(linha, f'id_prefeitura_{lado}')
+        id_secretaria = getattr(linha, f'id_secretaria_{lado}')
+        return {
+            'id_legado': int(getattr(linha, f'id_legado_{lado}')),
+            'cliente': self._valor_json(getattr(linha, f'cliente_legado_{lado}')),
+            'classificacao': self._classificacao_ocorrencia(
+                id_prefeitura, id_secretaria
+            ),
+            'customer_id': self._valor_json(
+                getattr(linha, f'customer_id_{lado}'), inteiro=True
+            ),
+            'address_id': self._valor_json(
+                getattr(linha, f'address_id_{lado}'), inteiro=True
+            ),
+            'endereco_refatorado': self._valor_json(
+                getattr(linha, f'endereco_refatorado_{lado}')
+            ),
+            'prefeitura': self._valor_json(getattr(linha, f'prefeitura_{lado}')),
+            'secretaria': self._valor_json(getattr(linha, f'secretaria_{lado}')),
+        }
+
+    def _agrupar_duplicados(self, relatorio):
+        """Agrupa pares em componentes conexos (cliente principal + cópias)."""
+        if relatorio.empty:
+            return [], 0
+
+        ids_ignorados = self._ids_ja_tratados_por_regras()
+        linhas = [
+            linha for linha in relatorio.itertuples(index=False)
+            if int(linha.id_legado_a) not in ids_ignorados
+            and int(linha.id_legado_b) not in ids_ignorados
+        ]
+        ignorados = len(relatorio) - len(linhas)
+        if not linhas:
+            return [], ignorados
+
+        pai = {}
+
+        def encontrar(item):
+            while pai[item] != item:
+                pai[item] = pai[pai[item]]
+                item = pai[item]
+            return item
+
+        def unir(item_a, item_b):
+            raiz_a, raiz_b = encontrar(item_a), encontrar(item_b)
+            if raiz_a != raiz_b:
+                pai[raiz_b] = raiz_a
+
+        ocorrencias = {}
+        for linha in linhas:
+            for lado in ('a', 'b'):
+                ocorrencia = self._ocorrencia_do_relatorio(linha, lado)
+                ocorrencias[ocorrencia['id_legado']] = ocorrencia
+        for item in ocorrencias:
+            pai.setdefault(item, item)
+        for linha in linhas:
+            unir(int(linha.id_legado_a), int(linha.id_legado_b))
+
+        grupos = {}
+        for item in ocorrencias:
+            grupos.setdefault(encontrar(item), []).append(item)
+
+        similares_por_grupo = {}
+        for linha in linhas:
+            raiz = encontrar(int(linha.id_legado_a))
+            similares_por_grupo.setdefault(raiz, []).append(
+                float(linha.similaridade_pct)
+            )
+
+        resultado = []
+        for raiz, ids in grupos.items():
+            ids = sorted(ids)
+            principal_id = ids[0]  # critério estável de principal
+            ocorrencias_grupo = [ocorrencias[i] for i in ids]
+            hierarquias = {
+                (o['prefeitura'], o['secretaria']) for o in ocorrencias_grupo
+            }
+            similaridades = similares_por_grupo.get(raiz, [])
+            resultado.append({
+                'similaridade_minima_pct': min(similaridades),
+                'similaridade_maxima_pct': max(similaridades),
+                'mesma_hierarquia': len(hierarquias) == 1,
+                'total_ocorrencias': len(ids),
+                'principal': ocorrencias[principal_id],
+                'copias': [
+                    ocorrencias[i] for i in ids if i != principal_id
+                ],
+            })
+
+        resultado.sort(
+            key=lambda grupo: (
+                -grupo['similaridade_maxima_pct'],
+                grupo['principal']['id_legado'],
+            )
+        )
+        return resultado, ignorados
+
+    def _salvar_duplicados_json(self, relatorio):
+        import json
+        import os
+
+        grupos, ignorados = self._agrupar_duplicados(relatorio)
+        conteudo = {
+            'limiar_similaridade_pct': self.LIMIAR_DUPLICIDADE * 100,
+            'criterio': (
+                'similaridade estrita de nome normalizado; '
+                'principal = menor id_legado do grupo'
+            ),
+            'resumo': {
+                'grupos': len(grupos),
+                'ocorrencias': sum(g['total_ocorrencias'] for g in grupos),
+                'pares_ignorados_por_regras': ignorados,
+            },
+            'grupos': grupos,
+        }
+        os.makedirs(os.path.dirname(self.arquivo_duplicados_json) or '.', exist_ok=True)
+        with open(self.arquivo_duplicados_json, 'w', encoding='utf-8') as arquivo:
+            json.dump(conteudo, arquivo, ensure_ascii=False, indent=2)
+        print(
+            f"🗂️ JSON de duplicados salvo em '{self.arquivo_duplicados_json}' "
+            f"({len(grupos)} grupos)."
+        )
+
+    # ------------------------------------------------------------------------------
+    # MERGE DAS CÓPIAS (mesmo customer e mesmo nível, sem reservas)
+    # ------------------------------------------------------------------------------
+    COLUNAS_DEPARA_DUPLICADOS = [
+        'id_legado_copia', 'id_legado_principal', 'cliente_copia',
+        'cliente_principal', 'classificacao', 'customer_id',
+        'address_id_principal', 'similaridade_pct',
+    ]
+
+    @staticmethod
+    def _parece_reserva(cliente, id_legado):
+        if id_legado in FALSOS_RESERVAS:
+            return False
+        return bool(re.search(r'\b(?:RESERVA|RESERVADO)\b', str(cliente or ''), re.IGNORECASE))
+
+    def _pares_mesclaveis(self, relatorio):
+        """Pares que podem ser fundidos: mesmo customer e mesma classificação.
+
+        O filtro é por par, não por grupo: um componente conexo pode ligar
+        clientes de customers diferentes por similaridade de nome, mas as
+        duplicatas reais dentro do mesmo customer continuam mescláveis.
+        """
+        if relatorio.empty:
+            return relatorio
+
+        manter = []
+        for linha in relatorio.itertuples(index=False):
+            customer_a = self._valor_json(linha.customer_id_a, inteiro=True)
+            customer_b = self._valor_json(linha.customer_id_b, inteiro=True)
+            if customer_a is None or customer_b is None or customer_a != customer_b:
+                manter.append(False)
+                continue
+            classificacao_a = self._classificacao_ocorrencia(
+                linha.id_prefeitura_a, linha.id_secretaria_a
+            )
+            classificacao_b = self._classificacao_ocorrencia(
+                linha.id_prefeitura_b, linha.id_secretaria_b
+            )
+            manter.append(classificacao_a == classificacao_b)
+        return relatorio[manter].reset_index(drop=True)
+
+    def _aplicar_merge_duplicados(self, relatorio, df_enderecos_finais):
+        """Mescla cópias do mesmo customer/nível e remove seus addresses.
+
+        Só entram pares no mesmo ``customer_id`` e mesma classificação.
+        Grupos com reservas ficam de fora para não quebrar o roteamento.
+        """
+        import os
+
+        grupos, _ = self._agrupar_duplicados(self._pares_mesclaveis(relatorio))
+
+        # IDs cujo address guarda roteamento de reserva e não pode ser apagado.
+        # Inclui os clientes mapeados para endereço-base, que recebem
+        # reserved_customer_id = próprio id na carga.
+        ids_com_reserva = {int(id_legado) for id_legado in RESERVAS_BASE_AVULSA}
+        if 'reserved_customer_id' in df_enderecos_finais.columns:
+            for id_cliente, reserva in zip(
+                df_enderecos_finais['ID_CLIENTE'],
+                df_enderecos_finais['reserved_customer_id'],
+            ):
+                if pd.notna(reserva):
+                    try:
+                        ids_com_reserva.add(int(id_cliente))
+                    except (TypeError, ValueError):
+                        pass
+
+        registros = []
+        enderecos_remover = []
+        grupos_preservados_reserva = 0
+        for grupo in grupos:
+            ocorrencias = [grupo['principal'], *grupo['copias']]
+            if len({o['customer_id'] for o in ocorrencias}) != 1:
+                continue
+            if len({o['classificacao'] for o in ocorrencias}) != 1:
+                continue
+            if any(
+                self._parece_reserva(o['cliente'], o['id_legado'])
+                or o['id_legado'] in ids_com_reserva
+                for o in ocorrencias
+            ):
+                grupos_preservados_reserva += 1
+                continue
+
+            principal = grupo['principal']
+            if principal['address_id'] is None or principal['customer_id'] is None:
+                continue
+
+            for copia in grupo['copias']:
+                if copia['address_id'] is None:
+                    continue
+                registros.append({
+                    'id_legado_copia': copia['id_legado'],
+                    'id_legado_principal': principal['id_legado'],
+                    'cliente_copia': copia['cliente'],
+                    'cliente_principal': principal['cliente'],
+                    'classificacao': principal['classificacao'],
+                    'customer_id': principal['customer_id'],
+                    'address_id_principal': principal['address_id'],
+                    'similaridade_pct': grupo['similaridade_maxima_pct'],
+                })
+                enderecos_remover.append(
+                    (copia['address_id'], principal['customer_id'])
+                )
+
+        depara = pd.DataFrame(
+            registros, columns=self.COLUNAS_DEPARA_DUPLICADOS
+        )
+
+        if enderecos_remover:
+            with self.engine_new.begin() as conn:
+                for address_id, customer_id in enderecos_remover:
+                    conn.execute(
+                        text("""
+                            DELETE FROM addresses
+                            WHERE id = :address_id
+                              AND addressable_id = :customer_id
+                        """),
+                        {'address_id': address_id, 'customer_id': customer_id},
+                    )
+
+        os.makedirs(
+            os.path.dirname(self.arquivo_depara_duplicados) or '.', exist_ok=True
+        )
+        depara.to_csv(
+            self.arquivo_depara_duplicados, index=False, encoding='utf-8-sig'
+        )
+
+        print(
+            f"🧬 Merge de duplicados: {len(depara)} cópia(s) mesclada(s); "
+            f"{grupos_preservados_reserva} grupo(s) preservado(s) por reserva. "
+            f"DE/PARA em '{self.arquivo_depara_duplicados}'."
+        )
+        return depara
+
 
 
     # ==============================================================================
@@ -310,6 +830,36 @@ class MigracaoClientes:
         return df_modificado
 
 
+    def _unificar_prefeituras(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Mescla prefeituras repetidas no legado em um único cliente.
+
+        Cada entrada de ``MESCLAGENS_PREFEITURA`` lista departamentos que são
+        o mesmo órgão com cadastro repetido. Todas as secretarias e clientes
+        de destino vinculados a eles passam a pertencer ao cliente alvo. A
+        hierarquia de secretaria é achatada: o destino é anexado direto à
+        prefeitura e o nome original do cliente é preservado no alias do
+        endereço.
+        """
+        df_modificado = df.copy()
+        ids_prefeitura = pd.to_numeric(
+            df_modificado['ID_PREFEITURA'], errors='coerce'
+        )
+
+        for rotulo, config in MESCLAGENS_PREFEITURA.items():
+            mask = ids_prefeitura.isin(config['ids'])
+            if not mask.any():
+                continue
+            df_modificado.loc[mask, 'ID_PREFEITURA'] = config['id_alvo']
+            df_modificado.loc[mask, 'PREFEITURA'] = config['nome_alvo']
+            df_modificado.loc[mask, 'ID_SECRETARIA'] = None
+            df_modificado.loc[mask, 'SECRETARIA'] = None
+            print(
+                f"   🏛️  {int(mask.sum())} cliente(s) das prefeituras de "
+                f"{rotulo} unificados em '{config['nome_alvo']}'."
+            )
+
+        return df_modificado
+
     def _unificar_receita_federal(self, df: pd.DataFrame) -> pd.DataFrame:
         df_modificado = df.copy()
 
@@ -358,6 +908,29 @@ class MigracaoClientes:
             df_modificado.at[idx, 'ID_SECRETARIA'] = id_sec_alvo
             df_modificado.at[idx, 'SECRETARIA'] = nome_sec_alvo
             df_modificado.at[idx, 'CLIENTE'] = nome_cliente_limpo
+
+        # Unifica tambem as linhas de prefeitura/secretaria que nao estao
+        # vinculadas aos IDs de cliente mapeados acima (variacoes de nome,
+        # acento e sufixo 2026).
+        def normalizar_texto(valor):
+            texto = unicodedata.normalize('NFKD', str(valor or ''))
+            return texto.encode('ascii', 'ignore').decode('utf-8').upper()
+
+        mask_pref_sl = df_modificado['PREFEITURA'].apply(normalizar_texto).str.contains(
+            'PREFEITURA MUNICIPAL DE SAO LUIS', regex=False
+        )
+        if mask_pref_sl.any():
+            df_modificado.loc[mask_pref_sl, 'ID_PREFEITURA'] = SAO_LUIS_CONFIG['ID_PREF_ALVO']
+            df_modificado.loc[mask_pref_sl, 'PREFEITURA'] = SAO_LUIS_CONFIG['NOME_PREF_ALVO']
+
+        mask_sec_semusc = df_modificado['SECRETARIA'].apply(normalizar_texto).str.contains(
+            'SEGURANCA COM CIDADANIA|SEMUSC', regex=True
+        )
+        if mask_sec_semusc.any():
+            df_modificado.loc[mask_sec_semusc, 'ID_SECRETARIA'] = 1197
+            df_modificado.loc[mask_sec_semusc, 'SECRETARIA'] = (
+                "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC"
+            )
         return df_modificado
         
     def _regionalizar_pcpb(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -531,6 +1104,7 @@ class MigracaoClientes:
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._padronizar_hospitais_pb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
+        df_clean = self._unificar_prefeituras(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
         df_clean = self._unificar_ministerio_transportes(df_clean)
         df_clean = self._reestruturar_detran(df_clean)
@@ -682,6 +1256,7 @@ class MigracaoClientes:
     def _carregar(self, df_enderecos_finais, df_bruto):
         print("🔄 Estruturando Dicionários de Pais e Filhos...")
         prefeituras, secretarias, destinos = {}, {}, {}
+        mapa_refatorado = {}
 
         for _, row in df_bruto.iterrows():
             if pd.notna(row['ID_PREFEITURA']):
@@ -813,6 +1388,16 @@ class MigracaoClientes:
                         "created_at": c_at, "updated_at": u_at
                     })
                     self.stats["enderecos"] += 1
+                    mapa_refatorado[int(id_legado)] = {
+                        "customer_id": target_id,
+                        "address_id": None,
+                        "alias": dados_endereco["alias"],
+                        "reserved_customer_id": (
+                            info["res_id"]
+                            if info["res_id"] is not None
+                            else (id_legado if usa_endereco_base else None)
+                        ),
+                    }
                 else:
                     self._registrar_clientes_descartados(
                         pd.DataFrame([info['row']]), 'CLIENTE_SEM_PAI_HIERARQUICO_MIGRADO'
@@ -834,6 +1419,31 @@ class MigracaoClientes:
                 "created_at": a.get("created_at", self.now), 
                 "updated_at": a.get("updated_at", self.now)
             } for a in enderecos_batch])
+
+            # Recupera o id gerado de cada endereço para o relatório de duplicados.
+            # legacy_customer_id guarda o vínculo com o cliente do legado.
+            if mapa_refatorado:
+                consulta_ids = conn.execute(text("""
+                    SELECT id, legacy_customer_id
+                    FROM addresses
+                    WHERE legacy_customer_id IS NOT NULL
+                """))
+                for address_id, legacy_customer_id in consulta_ids:
+                    destino = mapa_refatorado.get(int(legacy_customer_id))
+                    if destino is not None:
+                        destino["address_id"] = address_id
+
+        try:
+            relatorio = self._relacionar_duplicados_clientes(
+                df_enderecos_finais, mapa_refatorado
+            )
+        except Exception as erro:
+            # Auditoria não pode derrubar a migração após a carga.
+            print(f"⚠️ Não foi possível gerar o relatório de duplicados: {erro}")
+            relatorio = None
+        if relatorio is not None:
+            # O merge altera dados: falha aqui deve interromper a migração.
+            self._aplicar_merge_duplicados(relatorio, df_enderecos_finais)
 
         print("\n" + "="*50)
         print("📊 RELATÓRIO FINAL DA ESTRUTURA HIERÁRQUICA")

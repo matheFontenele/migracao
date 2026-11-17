@@ -12,9 +12,19 @@ class SelecionarDestinatariosTest(unittest.TestCase):
         self.assertEqual(atual, (2659, 12659))
         self.assertEqual(passado, (48, 1048))
 
-    def test_historico_sem_cliente_mapeado_reutiliza_cliente_atual(self):
+    def test_historico_com_cliente_sem_mapa_nao_usa_cliente_atual(self):
+        # Origem informada (9999) sem de/para: não pode herdar o cliente da
+        # substituição, senão o aluguel histórico fica com dono errado.
         atual, passado = MigracaoSubstituicao.selecionar_destinatarios(
             2659, 9999, {2659: 2659}, {2659: 12659}
+        )
+
+        self.assertEqual(atual, (2659, 12659))
+        self.assertEqual(passado, (None, None))
+
+    def test_historico_sem_origem_informada_reutiliza_cliente_atual(self):
+        atual, passado = MigracaoSubstituicao.selecionar_destinatarios(
+            2659, float("nan"), {2659: 2659}, {2659: 12659}
         )
 
         self.assertEqual(atual, (2659, 12659))

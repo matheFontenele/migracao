@@ -46,3 +46,4 @@ Thumbs.db
 # Local Codex/session metadata
 .codex/
 .agents/
+.migracao.lock

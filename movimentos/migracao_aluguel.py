@@ -8,11 +8,67 @@ from tqdm import tqdm
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items, descobrir_id_organizacao_destino
 from utils.sanetizador import executar_truncate_tabelas, normalizar_para_match
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, selecionar_equipamento_por_tombo
+from config.config import CLIENTES_ESTOQUE
+from config.parquet_excecoes import normalizar_tombo, tombos_priorizados
 
 TABELAS = [
     "service_order_item_extra_equipments", "movement_items", "movements", "service_order_items", "service_orders"
 ]
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _cliente_int(valor):
+    try:
+        if pd.isna(valor):
+            return None
+    except (TypeError, ValueError):
+        pass
+    try:
+        return int(float(valor))
+    except (TypeError, ValueError):
+        return None
+
+
+def escolher_cliente_aluguel(cliente_legado, cliente_parquet, clientes_estoque=None):
+    """Escolhe o cliente do aluguel: legado primeiro, Parquet como fallback.
+
+    Clientes de estoque/base nao devem ser usados como destinatario; nesse
+    caso, tenta o Parquet e, se ele tambem for base, mantem o legado.
+    Retorna (cliente_id ou None, origem).
+    """
+    estoque = set(clientes_estoque or CLIENTES_ESTOQUE)
+    legado = _cliente_int(cliente_legado)
+    parquet = _cliente_int(cliente_parquet)
+
+    if legado is not None and legado not in estoque:
+        return legado, "legado"
+    if parquet is not None and parquet not in estoque:
+        return parquet, "parquet"
+    if legado is not None:
+        return legado, "legado_base"
+    if parquet is not None:
+        return parquet, "parquet_base"
+    return None, "nenhum"
+
+def resolver_equipamento_do_parquet(
+    equipamento_id_parquet, tombo, dict_por_tombo, dict_por_id_legado
+):
+    """Resolve o equipamento do refatorado para uma linha do Parquet.
+
+    O tombo não é único no refatorado e a busca por tombo escolhe
+    deterministicamente a menor cópia — o que amarra o aluguel à máquina
+    errada quando duas máquinas compartilham o número. O Parquet traz o
+    ``EQUIPAMENTO_ID`` do legado, que identifica a máquina exata: ele é
+    preferido quando existe no refatorado e corresponde ao mesmo tombo.
+    Caso contrário, mantém a busca por tombo.
+    """
+    id_parquet = _cliente_int(equipamento_id_parquet)
+    if id_parquet is not None and dict_por_id_legado:
+        numero = dict_por_id_legado.get(id_parquet)
+        if numero is not None and str(numero).strip() == str(tombo).strip():
+            return id_parquet
+    return dict_por_tombo.get(tombo)
+
 
 class MigracaoAluguel(BaseMigracaoMovimento):
 
@@ -120,6 +176,31 @@ class MigracaoAluguel(BaseMigracaoMovimento):
     # ==============================================================================
     # MÉTODO CUSTOMIZADO: BUSCA DE MOVIMENTOS COM FILTRO DE TOMBOS (PARQUET)
     # ==============================================================================
+    def _carregar_equipamentos_por_id(self, df_csv):
+        """{id do equipamento no refatorado: number} para os EQUIPAMENTO_ID do Parquet.
+
+        Só entram ids que existem no refatorado; a checagem do tombo é feita em
+        ``resolver_equipamento_do_parquet``.
+        """
+        if 'EQUIPAMENTO_ID' not in df_csv.columns:
+            return {}
+        ids = pd.to_numeric(df_csv['EQUIPAMENTO_ID'], errors='coerce').dropna()
+        ids = sorted({int(valor) for valor in ids})
+        if not ids:
+            return {}
+
+        placeholders = ", ".join(f":id{i}" for i in range(len(ids)))
+        params = {f"id{i}": valor for i, valor in enumerate(ids)}
+        with self.engine_new.connect() as conn:
+            linhas = conn.execute(
+                text(
+                    "SELECT id, number FROM equipments "
+                    f"WHERE deleted_at IS NULL AND id IN ({placeholders})"
+                ),
+                params,
+            ).fetchall()
+        return {int(linha[0]): linha[1] for linha in linhas}
+
     def _buscar_ultimos_movimentos_aluguel(self, tombos_list):
         if not tombos_list: return {}
         
@@ -152,7 +233,18 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             AND movi.deleted_at IS NULL
             AND eq.deleted_at IS NULL
             AND eq.situacao_id = 1
-            AND mov.tipo_id IN (1, 2)
+            -- Tipo 5 (SA) também representa aluguel vigente quando a capa não
+            -- faz parte de um ciclo de substituição: os lotes de 2025-10-17
+            -- recriaram capas SA com o cliente corrigido e o último movimento
+            -- desses equipamentos deixou de ser 1/2. As capas SA que SÃO o
+            -- lado entregue de um ciclo ficam de fora — quem as migra é o
+            -- módulo de substituição (evita movements.number duplicado).
+            AND mov.tipo_id IN (1, 2, 5)
+            AND NOT EXISTS (
+                SELECT 1
+                FROM aluguel_substituicao sub
+                WHERE sub.substituicao_devolucao_id = mov.id
+            )
             AND eq.numero IN ({tombos_formatados})
             AND mov.id = (
                     -- 🆕 substitui o ROW_NUMBER() ... rn = 1:
@@ -188,6 +280,13 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         print("📦 MÓDULO: ALUGUEL (Fonte: CSV Parquet)")
         print("-" * 70)
 
+        arquivos_parquet = glob.glob(os.path.join("./docs/parquets", "*.parquet"))
+        if not arquivos_parquet:
+            raise RuntimeError(
+                "Nenhum arquivo .parquet encontrado em ./docs/parquets. "
+                "A migração de ALUGUEL foi abortada ANTES de limpar as tabelas."
+            )
+
         self.limpar_tabelas_movimento()
         
         caminho_types = "./docs/types.csv"
@@ -197,9 +296,6 @@ class MigracaoAluguel(BaseMigracaoMovimento):
         else:
             print("⚠️ Arquivo types.csv não encontrado. Todos os equipamentos assumirão is_kit = 0.")
             self.dict_is_kit = {}
-
-        arquivos_parquet = glob.glob(os.path.join("./docs/parquets", "*.parquet"))
-        if not arquivos_parquet: return
 
         print(f"📖 Lendo dados de {len(arquivos_parquet)} arquivos Parquet...")
         df_csv = pd.concat([pd.read_parquet(arq).rename(columns=str.upper) for arq in arquivos_parquet], ignore_index=True)
@@ -212,11 +308,27 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             df_csv = df_csv[df_csv['ITEM_DO_CONTRATO'].str.lower() != 'nan']
         df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
         
+        # 🔓 Exceções ao Parquet: tombos priorizados no legado não geram aluguel
+        # a partir do Parquet (o legado é quem manda para esses equipamentos).
+        excecoes = tombos_priorizados(self.engine_legado)
+        if excecoes:
+            ignorar = df_csv['TOMBO'].apply(normalizar_tombo).isin(excecoes)
+            if ignorar.any():
+                print(
+                    f"🔓 {int(ignorar.sum())} linha(s) do Parquet ignorada(s) por "
+                    f"priorização do legado: {', '.join(sorted(excecoes))}"
+                )
+                df_csv = df_csv[~ignorar]
+        
         tombos = df_csv['TOMBO'].unique().tolist()
         
         # 👇 INJEÇÃO DO NOVO MÉTODO SQL AQUI
         dict_ultimo_mov = self._buscar_ultimos_movimentos_aluguel(tombos)
         dict_equipamentos_novo = self.buscar_equipamentos_novo_por_tombo(tombos)
+        # O tombo se repete no refatorado; o Parquet traz o EQUIPAMENTO_ID do
+        # legado, que identifica a máquina exata. Validado contra o refatorado
+        # (existe e o `number` é o mesmo tombo) antes de ser usado.
+        dict_equip_por_id_legado = self._carregar_equipamentos_por_id(df_csv)
 
         with self.engine_new.connect() as conn:
             dict_contract_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM contracts", conn).values.T))
@@ -271,14 +383,20 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
             row_mov = ultimo_mov['movimento']
             
-            cli_leg_parquet = row_csv.get('CLIENTE_ID')
-            if pd.notna(cli_leg_parquet) and str(cli_leg_parquet).lower() not in ['', 'nan', 'none']:
-                cli_legado_id = int(float(cli_leg_parquet))
-            else:
-                cli_legado_id = int(row_mov['cliente_id'])
+            cli_legado_id, _origem_cliente = escolher_cliente_aluguel(
+                row_mov.get('cliente_id'), row_csv.get('CLIENTE_ID')
+            )
+            if cli_legado_id is None:
+                rejeitados += 1
+                continue
             
             recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
-            equipment_id_ref = dict_equipamentos_novo.get(tombo)
+            equipment_id_ref = resolver_equipamento_do_parquet(
+                row_csv.get('EQUIPAMENTO_ID'),
+                tombo,
+                dict_equipamentos_novo,
+                dict_equip_por_id_legado,
+            )
             
             if not recipient_id or not equipment_id_ref: 
                 rejeitados += 1

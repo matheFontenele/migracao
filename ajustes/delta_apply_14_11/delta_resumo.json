@@ -1,0 +1,92 @@
+{
+  "source_digest_sha256": "60b097173ac21e77ace0b3640cd4630985760fd3581b006ea31f22aab87e63fd",
+  "window": {
+    "inicio": "2026-11-04",
+    "fim": "2026-11-12"
+  },
+  "database": "controle-interno",
+  "importer_version": "3.0.0",
+  "closure_rows_loaded": 1250,
+  "audit_actions": {
+    "create": 3886,
+    "update": 2085,
+    "delete": 83
+  },
+  "updated_only_out_of_scope": {
+    "contract_items": 1,
+    "customers": 1,
+    "equipment_history": 2,
+    "equipments": 301,
+    "maintenance_items": 2,
+    "maintenances": 40,
+    "movement_items": 26,
+    "shipment_items": 26,
+    "shipments": 2
+  },
+  "excluded_outside_window": {
+    "equipments": 6,
+    "report_exports": 243
+  },
+  "status_updates": [],
+  "per_table": {
+    "brands": {},
+    "groups": {},
+    "types": {},
+    "products": {
+      "new": 4
+    },
+    "product_items": {
+      "new": 20
+    },
+    "locations": {
+      "new": 3
+    },
+    "transactions": {
+      "new": 14
+    },
+    "transaction_items": {
+      "new": 15
+    },
+    "equipments": {
+      "matched": 44,
+      "new": 766
+    },
+    "service_orders": {
+      "new": 91,
+      "matched": 31
+    },
+    "service_order_items": {
+      "new": 164
+    },
+    "movements": {
+      "new": 77,
+      "matched": 31
+    },
+    "movement_items": {
+      "new": 179
+    },
+    "volumes": {
+      "new": 84
+    },
+    "shipments": {
+      "new": 25
+    },
+    "shipment_items": {
+      "new": 86
+    },
+    "volume_items": {
+      "new": 182
+    },
+    "maintenances": {
+      "new": 60,
+      "matched": 2
+    },
+    "maintenance_items": {
+      "new": 91
+    },
+    "equipment_history": {
+      "new": 1413,
+      "blocked": 6
+    }
+  }
+}

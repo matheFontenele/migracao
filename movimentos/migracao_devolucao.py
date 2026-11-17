@@ -6,6 +6,50 @@ from tqdm import tqdm
 from config.config import ENDERECOS_BASES
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino, limpar_codigo
 
+
+def cliente_legado_id(valor):
+    """Normaliza o id de cliente do legado (NaN/0/negativo -> None)."""
+    if valor is None or pd.isna(valor):
+        return None
+    try:
+        numero = int(valor)
+    except (TypeError, ValueError):
+        return None
+    return numero if numero > 0 else None
+
+
+def resolver_clientes(orig_legado_id, dev_legado_id, mapa_customer, mapa_address):
+    """Resolve o cliente/endereço de cada fase da devolução.
+
+    A capa da devolução pertence ao cliente da própria devolução
+    (`DEV_CLIENTE_ID`); o aluguel reconstruído pertence ao cliente do movimento
+    anterior (`ORIG_CLIENTE_ID`). Quando um dos dois não tem de/para no
+    refatorado, o outro é usado como fallback — nenhum equipamento que já era
+    migrado deixa de ser migrado por causa desta regra.
+
+    Retorna ``((customer_orig, address_orig), (customer_dev, address_dev))``.
+    ``(None, None)`` no par da devolução significa que o equipamento deve ser
+    rejeitado: sem cliente não há como montar a capa principal.
+    """
+    orig_id = cliente_legado_id(orig_legado_id) or cliente_legado_id(dev_legado_id)
+    dev_id = cliente_legado_id(dev_legado_id) or orig_id
+
+    customer_orig = mapa_customer.get(orig_id) if orig_id else None
+    address_orig = mapa_address.get(orig_id) if orig_id else None
+    customer_dev = mapa_customer.get(dev_id) if dev_id else None
+    address_dev = mapa_address.get(dev_id) if dev_id else None
+
+    customer_dev = customer_dev or customer_orig
+    address_dev = address_dev or address_orig
+    customer_orig = customer_orig or customer_dev
+    address_orig = address_orig or address_dev
+
+    if not customer_dev or not address_dev:
+        return (None, None), (None, None)
+
+    return (customer_orig, address_orig), (customer_dev, address_dev)
+
+
 class MigracaoDevolucao(BaseMigracaoMovimento):
     def __init__(self, engine_new, engine_legado, dados_compartilhados, start_counter=800000):
         super().__init__(engine_new, engine_legado, dados_compartilhados, start_counter)
@@ -65,6 +109,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 COALESCE(dev.updated_at, dev.data) AS DEV_DATA,
                 dev.deleted_at AS DEV_DEL,
                 dev.cliente_id AS DEV_CLIENTE_ID,
+                movi_dev.novo_orgao_id AS DEV_ORGAO_ID,
                 COALESCE(NULLIF(dev.usuario_id, 0), 1) AS DEV_USR_ID,
 
                 -- 👇 FASE 1: DADOS DO PASSADO (O ALUGUEL ORIGINAL / rn = 2)
@@ -72,6 +117,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 COALESCE(alu.updated_at, alu.data) AS ORIG_DATA,
                 alu.deleted_at AS ORIG_DEL,
                 alu.cliente_id AS ORIG_CLIENTE_ID,
+                movi_alu.novo_orgao_id AS ORIG_MOV_ORGAO_ID,
                 ac_alu.orgao_id AS ORIG_ORGAO_ID,
                 COALESCE(NULLIF(alu.usuario_id, 0), 1) AS ORIG_USR_ID,
                 alu.tipo_id AS ORIG_TIPO_LEGADO
@@ -160,15 +206,22 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # =========================================================
             # 🎯 RESOLVENDO O CLIENTE E A ORGANIZAÇÃO (Roteamento)
             # =========================================================
-            # Prioriza o cliente da transação original (Passado) para amarrar os contratos corretos
-            if pd.notna(row.get('ORIG_CLIENTE_ID')):
-                cli_legado_id = int(row['ORIG_CLIENTE_ID'])
-            else:
-                cli_legado_id = int(row['DEV_CLIENTE_ID']) if pd.notna(row.get('DEV_CLIENTE_ID')) else 0
-                
-            recipient_id = self.dados["dict_cliente_adress"].get(cli_legado_id)
-            cliente_final_address = self.dados["dict_endereco_por_legacy_client"].get(cli_legado_id)
-            
+            # Cada movimento tem o SEU cliente. A devolução usa o cliente da
+            # própria devolução (DEV_CLIENTE_ID); o aluguel reconstruído usa o
+            # do movimento anterior (ORIG_CLIENTE_ID). Usar o cliente anterior
+            # na devolução amarrava a capa/endereço ao cliente errado quando o
+            # penúltimo movimento era de outra organização (ex.: duas
+            # devoluções seguidas para organizações diferentes).
+            (recipient_orig, cliente_final_address_orig), (
+                recipient_id,
+                cliente_final_address,
+            ) = resolver_clientes(
+                row.get('ORIG_CLIENTE_ID'),
+                row.get('DEV_CLIENTE_ID'),
+                self.dados["dict_cliente_adress"],
+                self.dados["dict_endereco_por_legacy_client"],
+            )
+
             if not recipient_id or not cliente_final_address:
                 rejeitados += 1
                 continue
@@ -176,14 +229,14 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
             # =========================================================
             # ROTEAMENTO INTELIGENTE FISICO (Qual base gerencia a operação?)
             # =========================================================
-            orgao_id_legado = row['ORIG_ORGAO_ID'] if pd.notna(row.get('ORIG_ORGAO_ID')) else None
-            org_id_destino = descobrir_id_organizacao_destino(orgao_id_legado)
+            org_id_origem = descobrir_id_organizacao_destino(row['ORIG_MOV_ORGAO_ID']) if pd.notna(row.get('ORIG_MOV_ORGAO_ID')) else descobrir_id_organizacao_destino(row.get('ORIG_ORGAO_ID'))
+            org_id_devolucao = descobrir_id_organizacao_destino(row['DEV_ORGAO_ID']) if pd.notna(row.get('DEV_ORGAO_ID')) else org_id_origem
             
             # ==================================================================
             # 🎯 REGRA DE DEVOLUÇÃO (Sem Parquets, usa o que tá ativo pro cliente)
             # ==================================================================
-            contrato_id_ativo = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_id)
-            item_id_ativo = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+            contrato_id_ativo = self.dados["dict_primeiro_contrato_por_cliente"].get(recipient_orig)
+            item_id_ativo = self.dados["dict_primeiro_item_por_cliente"].get(recipient_orig)
 
             # =========================================================
             # 🕰️ FASE 1: RECONSTRUIR O PASSADO (FORÇANDO COMO ALUGUEL)
@@ -196,8 +249,8 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
 
                 self.registrar_movimento(
                     id_final=id_mov_origem,
-                    recipient_id=recipient_id,
-                    cliente_final_address_id=cliente_final_address, # 👈 Endereço físico do cliente
+                    recipient_id=recipient_orig,
+                    cliente_final_address_id=cliente_final_address_orig, # 👈 Endereço físico do cliente
                     usuario_id=usr_origem,
                     mov_date=dt_origem,
                     deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
@@ -217,7 +270,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                     is_exchange=False,
                     forcar_extra=False,
                     
-                    organization_id=org_id_destino,
+                    organization_id=org_id_origem,
                     alias_movimento=row['NOME_EQUIPAMENTO'],
                     details_capa="Migração (Reconstrução): Aluguel Histórico",
                     details_item="Alocado no Cliente (Histórico Anterior à Devolução)"
@@ -254,7 +307,7 @@ class MigracaoDevolucao(BaseMigracaoMovimento):
                 is_exchange=False,
                 forcar_extra=False,
                 
-                organization_id=org_id_destino,
+                organization_id=org_id_devolucao,
                 alias_movimento=row['NOME_EQUIPAMENTO'],
                 details_capa="Migração: Devolução",
                 details_item="Retirado do Cliente (Retorno para a Base)"

@@ -10,6 +10,7 @@ from tqdm import tqdm
 from sqlalchemy import text
 
 from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, LOCATION_ESTOQUE_EQUIPAMENTOS, CLIENTES_ESTOQUE
+from config.parquet_excecoes import ids_priorizados
 from utils.sanetizador import executar_truncate_tabelas
 
 TODOS_ORGAOS_MAPEADOS = set().union(MAPPING_ALUCOM, MAPPING_IP, MAPPING_MOREIA, MAPPING_AS, MAPPING_SC)
@@ -36,14 +37,21 @@ def _tombo_key_equip(valor):
     return texto or None
 
 
-def selecionar_descartes_cliente_estoque(df, clientes_estoque=None):
+def selecionar_descartes_cliente_estoque(df, clientes_estoque=None, protegidos=None):
     """IDs de equipamentos de base que devem ser descartados quando o tombo
     possui ao menos uma copia fora da base/estoque.
 
     Se todas as copias do tombo forem de base, nada e descartado (evita
     eliminar o equipamento por completo).
+
+    ``protegidos`` são ids do legado que nunca podem ser descartados
+    (``config.parquet_excecoes``: equipamentos priorizados).
     """
     clientes_estoque = CLIENTES_ESTOQUE if clientes_estoque is None else set(clientes_estoque)
+    if protegidos is None:
+        protegidos = {int(i) for i in ids_priorizados()}
+    else:
+        protegidos = {int(i) for i in protegidos}
     if df.empty or "cliente_ultimo_movimento" not in df.columns:
         return set()
     trabalho = df[["id_legado", "tombo_legado", "cliente_ultimo_movimento"]].copy()
@@ -57,7 +65,7 @@ def selecionar_descartes_cliente_estoque(df, clientes_estoque=None):
         )
         if na_base.any() and (~na_base).any():
             descartar |= set(grupo.loc[na_base, "id_legado"].tolist())
-    return descartar
+    return {i for i in descartar if _id_int(i) not in protegidos}
 
 
 def _product_item_combination_key(product_id, address_id, location_id, organization_id):
@@ -138,8 +146,8 @@ class MigracaoEquipamentos:
                 # Equipamentos ficam em location própria no endereço-base da organização
                 spec = LOCATION_ESTOQUE_EQUIPAMENTOS
                 area = str(spec["area"])
-                section = str(spec.get("section") or "Unica")
-                spot = str(spec.get("spot") or "Unico")
+                section = spec.get("section")
+                spot = spec.get("spot")
                 details = str(spec.get("details") or "Migração")
                 location_addr_id = int(spec.get("address_id") or addr_id)
 

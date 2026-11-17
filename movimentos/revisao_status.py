@@ -4,6 +4,8 @@ import pandas as pd
 from sqlalchemy import text
 from tqdm import tqdm
 
+from config.parquet_excecoes import remover_priorizados
+
 # ==============================================================================
 # DICIONÁRIO DE AGRUPAMENTO (Foco Exclusivo em Reserva e Devolução)
 # ==============================================================================
@@ -58,9 +60,13 @@ class RevisaoStatusEquipamentos:
         df_csv = df_csv.dropna(subset=['TOMBO'])
         
         tombos_limpos = set(df_csv['TOMBO'].astype(int).astype(str).apply(limpar_codigo))
-        print(f"   🛡️ {len(tombos_limpos)} tombos exclusivos do Parquet protegidos contra alterações.")
+        protegidos = remover_priorizados(tombos_limpos, self.engine_legado)
+        liberados = tombos_limpos - protegidos
+        if liberados:
+            print(f"   🔓 {len(liberados)} tombo(s) priorizado(s) ignoram o escudo: {', '.join(sorted(liberados))}")
+        print(f"   🛡️ {len(protegidos)} tombos exclusivos do Parquet protegidos contra alterações.")
         
-        return tombos_limpos
+        return protegidos
 
     def executar(self):
         print("\n" + "=" * 70)
