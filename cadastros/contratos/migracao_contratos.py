@@ -9,6 +9,12 @@ from datetime import datetime
 from utils.sanetizador import executar_truncate_tabelas, limpar_valor_inteiro, limpar_valor_numerico, ultra_normalizar
 from utils.mapeador import descobrir_id_organizacao
 from utils.depara_clientes import propagar_depara_duplicados
+from cadastros.contratos.planilhas_contrato_2026 import (
+    carregar_planilhas,
+    gerar_relatorio,
+    importar_contratos,
+    resolver_clientes,
+)
 
 # Lista de tabelas a serem utilizadas
 TABELAS_CONTRATOS = [
@@ -781,6 +787,14 @@ class MigracaoContratos:
             self._mapear_datas_criacao_contrato(df_ex_contract, df_ex_events, df_ex_infos)
             self._identificar_contratos_sem_cadastro(df_ex_contract, df_ex_events)
             self._validar_schema_destino()
+
+            # As planilhas de contrato 2026 são validadas ANTES do truncate:
+            # um layout quebrado deve abortar a migração sem apagar os dados
+            # atuais. Os clientes são resolvidos por alias (nunca por id fixo).
+            contratos_planilhas = carregar_planilhas()
+            with self.engine_new.connect() as conn:
+                resolver_clientes(conn, contratos_planilhas)
+
             executar_truncate_tabelas(self.engine_new, TABELAS_CONTRATOS)
 
             with self.engine_new.begin() as conn:
@@ -790,6 +804,12 @@ class MigracaoContratos:
                 self._processar_itens(conn, df_ex_itens)
                 self._processar_servicos(conn, df_ex_jobs)
                 self._processar_infos(conn, df_ex_infos)
+                stats_planilhas = importar_contratos(
+                    conn, contratos_planilhas, self.now
+                )
+
+            gerar_relatorio(contratos_planilhas)
+            self.stats['planilhas_contratos'] = stats_planilhas
 
             print("\n" + "=" * 80)
             print("📊 RELATÓRIO DE MIGRAÇÃO")
@@ -802,6 +822,15 @@ class MigracaoContratos:
             print(f"{'INFORMAÇÕES:':<20} ✅ Criadas: {self.stats['infos_criadas']:<5} 🔄 Atualizadas: {self.stats['infos_atualizadas']}")
             if self.stats['infos_datas_ausentes']:
                 print(f"⚠️ Datas de vigência ainda ausentes após herdar do snapshot anterior: {self.stats['infos_datas_ausentes']} campo(s). Não foram inventadas datas sem fonte.")
+            planilhas = self.stats.get('planilhas_contratos') or {}
+            if planilhas:
+                print(
+                    "PLANILHAS 2026:      "
+                    f"✅ Criados: {planilhas.get('contratos_criados', 0):<5} "
+                    f"🔄 Atualizados: {planilhas.get('contratos_atualizados', 0):<5} "
+                    f"📦 Itens: {planilhas.get('itens_criados', 0) + planilhas.get('itens_atualizados', 0):<5} "
+                    f"🧾 Extras ignorados: {planilhas.get('extras_ignorados', 0)}"
+                )
             print("=" * 80)
             print("🚀 Migração concluída com sucesso!")
 

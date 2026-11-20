@@ -1,9 +1,39 @@
 import argparse
+import fcntl
 import sys
 import os
 
 from sqlalchemy import text
 from config.database import obter_engines
+
+ARQUIVO_LOCK = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".migracao.lock")
+_lock_handle = None
+
+
+def adquirir_lock_execucao():
+    """Impede duas execuções simultâneas do pipeline.
+
+    Execuções concorrentes truncam as mesmas tabelas e uma apaga os dados que a
+    outra acabou de inserir, deixando o banco com estado parcial.
+    """
+    global _lock_handle
+    handle = open(ARQUIVO_LOCK, "a+")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.seek(0)
+        pid = handle.read().strip() or "desconhecido"
+        print(
+            "❌ Já existe outra execução da migração em andamento "
+            f"(PID {pid}, lock {ARQUIVO_LOCK}). Abortando para evitar "
+            "sobrescrita concorrente dos dados."
+        )
+        sys.exit(2)
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(os.getpid()))
+    handle.flush()
+    _lock_handle = handle
 
 # ==============================================================================
 # 1. WRAPPERS COM LAZY LOADING (Importação Tardia)
@@ -80,6 +110,10 @@ def iniciar_insumos(eng_novo, eng_legado):
     from cadastros.equipamentos import migracao_insumos
     migracao_insumos.executar(eng_novo, eng_legado)
 
+def iniciar_parquets(eng_novo, eng_legado):
+    from movimentos import geracao_parquets
+    geracao_parquets.executar(eng_novo)
+
 def iniciar_aluguel(eng_novo, eng_legado):
     from movimentos import migracao_aluguel
     migracao_aluguel.executar(eng_novo, eng_legado)
@@ -120,11 +154,16 @@ def iniciar_atualizacao_datas_contrato(eng_novo, eng_legado):
 
 def iniciar_requisicoes_2026(eng_novo, eng_legado, argumentos_cli=None):
     from movimentos.migracao_requisicoes_2026 import main as executar_migracao
-    executar_migracao(argv=argumentos_cli, engine_new=eng_novo)
+    executar_migracao(argv=argumentos_cli, engine_new=eng_novo,
+                      engine_legado=eng_legado)
 
 def iniciar_analise_delta_producao(eng_novo, eng_legado, argumentos_cli=None):
     from sincronizar_atualizacoes_producao import main as sincronizar_delta
     sincronizar_delta(argv=argumentos_cli, engine_new=eng_novo)
+
+def iniciar_ajustes_movimentos(eng_novo, eng_legado, argumentos_cli=None):
+    from ajustes.ajustes_movimentos import executar as executar_ajustes
+    executar_ajustes(eng_novo, eng_legado, argumentos_cli)
 
 # ==============================================================================
 # 2. MAPEAMENTO DE TAREFAS E GRUPOS
@@ -157,7 +196,23 @@ TABELAS = [
     'billing_items',
     'billings',
     'volumes',
-    'volume_items'
+    'volume_items',
+    # Dependentes das entidades acima. Não são gerados pelos módulos de
+    # migração, mas guardam FKs para ids que o reset recria; sem a limpeza
+    # eles ficariam apontando para registros de outra execução.
+    'locations',
+    'return_confirmations_items',
+    'return_confirmations',
+    'romaneios',
+    'shipment_document_movements',
+    'shipment_documents',
+    'service_order_accessories',
+    'related_equipments',
+    'equipment_upgrades',
+    'maintenance_documents',
+    'destination_orders',
+    'groups_subgroups',
+    'type_groups'
 ]
 
 TABELAS_MOVIMENTOS = [
@@ -185,6 +240,7 @@ TAREFAS = {
     "contratantes": iniciar_contratantes,
     "equipamentos": iniciar_equipamentos,
     "insumos": iniciar_insumos,
+    "parquets": iniciar_parquets,
     "movimentos_aluguel": iniciar_aluguel,
     "movimentos_reserva": iniciar_reserva,
     "movimentos_devolucao": iniciar_devolucao,
@@ -197,11 +253,12 @@ TAREFAS = {
     "atualizar_datas_contrato": iniciar_atualizacao_datas_contrato,
     "requisicoes": iniciar_requisicoes_2026,
     "atualizacoes_producao": iniciar_analise_delta_producao,
+    "ajustes_movimentos": iniciar_ajustes_movimentos,
 }
 
 GRUPOS = {
     "cadastros": ["clientes", "contratos", "contratantes", "equipamentos", "insumos"],
-    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "insumos", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato"]
+    "todos": ["clientes", "contratos", "contratantes", "equipamentos", "insumos", "parquets", "movimentos", "movimentos_manutencao", "atualizar_datas_contrato", "ajustes_movimentos"]
 }
 
 def despachar_tarefa(nome_tarefa, eng_novo, eng_legado, argumentos_cli=None):
@@ -209,7 +266,7 @@ def despachar_tarefa(nome_tarefa, eng_novo, eng_legado, argumentos_cli=None):
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
     try:
-        if nome_tarefa in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao"}:
+        if nome_tarefa in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao", "ajustes_movimentos"}:
             funcao_alvo(eng_novo, eng_legado, argumentos_cli)
         else:
             funcao_alvo(eng_novo, eng_legado)
@@ -233,13 +290,15 @@ def main():
     parser.add_argument(
         "argumentos_extra",
         nargs=argparse.REMAINDER,
-        help="Argumentos específicos de backfill_delivery_date, requisicoes ou atualizacoes_producao.",
+        help="Argumentos específicos de backfill_delivery_date, requisicoes, atualizacoes_producao ou ajustes_movimentos.",
     )
 
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
-    if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao"}:
-        parser.error("argumentos extras só são aceitos com backfill_delivery_date, requisicoes ou atualizacoes_producao")
+    if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao", "ajustes_movimentos"}:
+        parser.error("argumentos extras só são aceitos com backfill_delivery_date, requisicoes, atualizacoes_producao ou ajustes_movimentos")
+
+    adquirir_lock_execucao()
 
     if alvo not in TAREFAS and alvo not in GRUPOS:
         print(f"❌ Erro: Alvo '{alvo}' não reconhecido pelo sistema.\n")

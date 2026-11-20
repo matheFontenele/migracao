@@ -2,8 +2,8 @@
 
 O relatório de similaridade gera ``ajustes/clientes_de_para_duplicados.csv``
 com os pares cópia -> principal. Este módulo centraliza a leitura desse
-arquivo para que clientes, contratos e movimentos resolvam o ID legado da
-cópia para o endereço do principal.
+arquivo (e das regras explícitas) para que clientes, contratos, movimentos e
+a importação de delta resolvam o ID legado da cópia para o principal.
 """
 
 import csv
@@ -12,6 +12,7 @@ import os
 from config.config import (
     DEPARA_CLIENTES_HIERARQUIA_DELETADA,
     DEPARA_CLIENTES_SEM_ENDERECO,
+    MESCLAGENS_CLIENTE,
 )
 
 CAMINHO_DEPARA_DUPLICADOS = os.path.join(
@@ -28,7 +29,24 @@ def _resolver_caminho(caminho):
     return alternativo if os.path.exists(alternativo) else caminho
 
 
+def depara_mesclagens_cliente():
+    """Pares cópia -> principal dos clientes unificados por exceção.
+
+    Só os grupos de ``MESCLAGENS_CLIENTE`` entram aqui: reservas seguem a
+    regra de ``reserved_customer_id`` e não são remapeadas.
+    """
+    depara = {}
+    for config in MESCLAGENS_CLIENTE.values():
+        principal = int(config['id_alvo'])
+        for id_legado in config['ids']:
+            id_legado = int(id_legado)
+            if id_legado != principal:
+                depara[id_legado] = principal
+    return depara
+
+
 def carregar_depara_duplicados(caminho=None):
+    """Lê somente o CSV gerado pelo merge de duplicados."""
     caminho = _resolver_caminho(caminho or CAMINHO_DEPARA_DUPLICADOS)
     if not os.path.exists(caminho):
         return {}
@@ -46,17 +64,23 @@ def carregar_depara_duplicados(caminho=None):
     return depara
 
 
+def carregar_depara_clientes(caminho=None):
+    """De/para completo: regras explícitas + CSV de duplicados mesclados."""
+    depara = dict(DEPARA_CLIENTES_HIERARQUIA_DELETADA)
+    depara.update(DEPARA_CLIENTES_SEM_ENDERECO)
+    depara.update(depara_mesclagens_cliente())
+    depara.update(carregar_depara_duplicados(caminho))
+    return depara
+
+
 def propagar_depara_duplicados(mapa, caminho=None):
     """Faz o ID da cópia apontar para o mesmo valor do principal.
 
-    Além das cópias mescladas por similaridade (CSV), aplica o de/para
-    explícito de clientes ativos cuja hierarquia legada foi excluída. O CSV
-    tem precedência caso o mesmo cliente apareça nos dois lugares.
+    Aplica as regras explícitas (hierarquia excluída, cliente sem endereço e
+    ``MESCLAGENS_CLIENTE``) e o CSV de duplicados mesclados por similaridade.
+    O CSV tem precedência caso o mesmo cliente apareça nos dois lugares.
     """
-    depara = dict(DEPARA_CLIENTES_HIERARQUIA_DELETADA)
-    depara.update(DEPARA_CLIENTES_SEM_ENDERECO)
-    depara.update(carregar_depara_duplicados(caminho))
-    for copia, principal in depara.items():
+    for copia, principal in carregar_depara_clientes(caminho).items():
         if copia not in mapa and principal in mapa:
             mapa[copia] = mapa[principal]
     return mapa

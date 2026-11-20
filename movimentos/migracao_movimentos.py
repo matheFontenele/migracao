@@ -1222,6 +1222,7 @@ class BaseMigracaoMovimento:
                             last_movement_item_customer_id = :mov_item_id, 
                             address_id = COALESCE(:addr_id, address_id) 
                         WHERE id = :e_id
+                          AND deleted_at IS NULL
                     """),
                     updates
                 )

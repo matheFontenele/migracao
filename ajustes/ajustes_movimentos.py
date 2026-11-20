@@ -1616,6 +1616,15 @@ class AjustesMovimentos:
     def _atualizar_equipamento(self, conn, row, item_id, forcar_status_legado):
         id_equipamento = int(row["id_equipamento"])
 
+        # Equipamento baixado/excluido no banco novo nao pode ter status,
+        # endereco nem cliente reaplicados pelo ajuste de movimentos.
+        excluido = conn.execute(
+            text("SELECT deleted_at FROM equipments WHERE id = :equipment_id"),
+            {"equipment_id": id_equipamento},
+        ).scalar()
+        if excluido is not None:
+            return None, None
+
         status_esperado = _int_or_none(row["status_esperado_id"])
         status_atual = _int_or_none(row["status_id_novo"])
 
@@ -1640,6 +1649,7 @@ class AjustesMovimentos:
                         :item_id, last_movement_item_customer_id
                     )
                 WHERE id = :equipment_id
+                  AND deleted_at IS NULL
                 """
             ),
             {

@@ -3,6 +3,11 @@ from sqlalchemy import create_engine, text
 from tqdm import tqdm
 import sys
 
+from cadastros.contratos.planilhas_contrato_2026 import (
+    DESTINATARIOS_ESPECIFICOS_POR_NUMERO,
+)
+from utils.sanetizador import ultra_normalizar
+
 
 TABELAS = [
     'contract_recipient_customers'
@@ -33,7 +38,11 @@ class MigracaoContratantes:
             
             # Filtramos direto na query para evitar trazer contratos sem cliente
             contratos = conn.execute(
-                text("SELECT id, customer_id FROM contracts WHERE customer_id IS NOT NULL")
+                text("""
+                    SELECT id, customer_id, number, organization_id
+                    FROM contracts
+                    WHERE customer_id IS NOT NULL
+                """)
             ).fetchall()
 
             for con in tqdm(contratos, desc="Sincronizando Destinatários"):
@@ -55,6 +64,53 @@ class MigracaoContratantes:
                     {"contract_id": contract_id, "customer_id": contratante_id},
                 )
                 self.stats["vinculos_contratantes"] += 1
+
+                # 2b. Contratos das planilhas 2026 de Tauá: o destinatário é
+                # apenas a secretaria indicada no arquivo. Nunca vincular todas
+                # as secretarias filhas da prefeitura nesses casos.
+                alias_especifico = DESTINATARIOS_ESPECIFICOS_POR_NUMERO.get(
+                    (con.number or '').strip()
+                )
+                if alias_especifico:
+                    filhos = conn.execute(
+                        text("""
+                            SELECT id, alias
+                            FROM customers
+                            WHERE parent_id = :customer_id
+                              AND organization_id = :org
+                              AND deleted_at IS NULL
+                        """),
+                        {
+                            "customer_id": contratante_id,
+                            "org": con.organization_id,
+                        },
+                    ).fetchall()
+                    chave = ultra_normalizar(alias_especifico)
+                    encontrados = [
+                        f for f in filhos
+                        if ultra_normalizar(f.alias) == chave
+                    ]
+                    if len(encontrados) != 1:
+                        raise RuntimeError(
+                            f"Contrato {con.number!r}: esperava exatamente um "
+                            f"destinatário {alias_especifico!r} filho do "
+                            f"contratante {contratante_id}; encontrados: "
+                            f"{[f.id for f in encontrados]}"
+                        )
+                    conn.execute(
+                        text("""
+                            INSERT INTO contract_recipient_customers
+                                (contract_id, customer_id)
+                            VALUES (:contract_id, :customer_id)
+                        """),
+                        {
+                            "contract_id": contract_id,
+                            "customer_id": encontrados[0].id,
+                        },
+                    )
+                    self.stats["vinculos_adicionais"] += 1
+                    self.stats["contratos"] += 1
+                    continue
 
                 # 3. PASSO B: Vincular o ÚLTIMO NÍVEL de Clientes (Secretarias / Filhos)
                 res_filhos = conn.execute(

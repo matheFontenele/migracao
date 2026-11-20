@@ -28,9 +28,21 @@ dist/
 # Logs and local run outputs
 *.log
 log_*.csv
+log_divergencias_*.csv
 
 # Generated data artifacts
 *.parquet
+docs/parquets/
+docs/contratos/
+
+# Relatorios e artefatos gerados pelas execucoes de migracao
+ajustes/*.csv
+ajustes/*.json
+ajustes/*.xlsx
+ajustes/delta_apply_*/
+ajustes/delta_plan_*/
+ajustes/logs_requisicoes_2026/
+docs/log_status_corrigidos.csv
 
 # Docker and compose local overrides
 docker-compose.override.yml

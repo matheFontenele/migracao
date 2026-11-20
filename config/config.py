@@ -127,6 +127,112 @@ DEPARA_CLIENTES_SEM_ENDERECO = {
     4027: 1840,    # HOSP. MUNICIPAL ABELARDO GADELHA - SAAD -> hospital
 }
 
+# Clientes da planilha de requisições 2026 que não existem no cadastro legado
+# (bases, estoques e rotas internas) ou cuja similaridade aponta para o
+# cliente errado.
+#
+# Os destinos são referenciados de forma estável — nunca pelo id do customer,
+# que muda a cada execução da migração. Formas aceitas:
+#   {"legado": 10720}
+#       ``aluguel_clientes.id`` do legado; resolve o customer e o endereço
+#       migrados desse cliente (o de/para de duplicados é aplicado antes).
+#   {"cliente": "NOME DO CUSTOMER", "org": 1115, "endereco": "ALIAS"}
+#       Procura o customer pelo nome exato; ``org`` só é necessário quando o
+#       nome se repete em mais de uma organização e ``endereco`` quando o
+#       destino não é o primeiro endereço do customer.
+#   {"cliente": "NOME DO CUSTOMER", "sem_endereco": True}
+#       Para customers sem endereço migrado (a requisição fica sem endereço).
+# ``observacao`` substitui o nome do cliente na auditoria.
+#
+# O importador resolve tudo ao carregar o índice e aborta com mensagem
+# explícita se o destino não existir ou ficar ambíguo.
+DEPARA_REQUISICOES_CLIENTES = {
+    # Bases e estoques internos
+    "BASE SÃO LUÍS": {"legado": 10673},          # BASE MOREIA - SÃO LUIS
+    "BASE ACOPIARA": {"legado": 2923},           # PEDRO ALMEIDA - ROTA CARIRI - ACOPIARA
+    "BASE ALUCOM - ACOPIARA": {"legado": 2923},
+    "BASE JOÃO PESSOA": {"legado": 1460},        # ALUCOM - JOÃO PESSOA
+    "BASE BRASÍLIA": {"legado": 11008},          # BASE - BRASILIA
+    "BASE ONORIO (CAMOCIM)": {"legado": 2672},   # RAFAEL ONORIO - ROTA ZONA NORTE
+    "Base - Onorio": {"legado": 2672},
+    "ROTA - CAUCAIA": {"legado": 3500},          # BASE CAUCAIA - ANTONIO VIEIRA
+    "ESTOQUE BASE CAUCAIA": {"legado": 3500},
+    "Estoque - Base Caucaia": {"legado": 3500},
+    "Rota Maranguape": {"legado": 4397},         # VINICIUS LIMA - ROTA SERRA - MARANGUAPE
+    "estoque - Base Maranguape": {"legado": 4397},
+    "ROTA ARACATI": {"legado": 4094},            # CLEITON ROCHA - ROTA LITORAL LESTE - ARACATI
+    "ROTA - SR. ONORIO": {"legado": 2672},
+    "ADI - SALA DA LOGÍSTICA": {"legado": 4395},  # ALUCOM - YAGO ESTOQUE
+    "LOGISTICA - ALUCOM": {"legado": 4395},
+    "ASSISTÊNCIA TECNICA": {"legado": 4372},     # ALUCOM - MANUTENÇÃO DE EQUIPAMENTOS
+    # Rotas técnicas (o nome da planilha identifica o técnico, não o cliente)
+    "ROTA - RENATO / ACOPIARA": {"legado": 12029},  # RENATO - ROTA CARIRI - ACOPIARA
+    "Insumo e Substituição - Renato": {"legado": 12029},
+    "INSUMOS E SUBSTITUIÇÕES - RENATO": {"legado": 12029},
+    "ROTA - CARLOS (CRATO/ BARBALHA)": {"legado": 3629},  # CARLOS OLIVEIRA - ROTA CARIRI - CRATO
+    "Insumo e Substituição - Carlos": {"legado": 3629},
+    "Insumo e Substituição - Mykael": {"legado": 2698},  # MYKAEL - ROTA CARIRI - IGUATU
+    "ROTA - MIKAEL (IGUATU / ICÓ)": {"legado": 2698},
+    "INSUMOS E SUBSTITUIÇÕES - MAURICIO (GRANJA)": {"legado": 2630},
+    "Insumos e Substituições - Mauricio GRANJA": {"legado": 2630},
+    "Insumos e Substituições - Mauricio": {"legado": 2630},
+    "Insumos e Substituições - tenicos de Taua": {"legado": 4547},  # MATHEUS - TECNICO TAUA
+    "Insumo e Substituição - Sandra Helena": {"legado": 10386},     # SANDRA HELENA - REDENÇÃO
+    # Órgão público que aparece abreviado na planilha
+    "ALEMA": {"legado": 10577},                  # ASSEMBLEIA LEGISLATIVA DO MARANHÃO
+    "Alema": {"legado": 10577},
+    "ALEMA - ASSEMBLEIA LEGISLATIVA DO MARANHÃO": {"legado": 10577},
+    # Casos em que a similaridade cai em outro órgão/cidade (conferido um a um)
+    "INSTITUTO ICÓ": {"legado": 12191},          # INSTITUTO DR BRASIL - ICÓ SAÚDE
+    "COMPANHIA NACIONAL DE ABASTECIMENTO  SUPERINTENDÊNCIA REGIONAL DO ESTADO DA PARAÍBA - PB":
+        {"legado": 12213},                       # UNIDADE ARMAZENADORA DE JOÃO PESSOA - CONAB
+    "UFC - CAMPUS PICI": {"legado": 10737},
+    "UFC - CAMPUS BENFICA": {"legado": 10720},
+    "UFC - CAMPUS PORANGABUSSU": {"legado": 10735},
+    "PM CAUCAIA - ASSISTÊNCIA SOCIAL": {"legado": 1498},
+    "PM CAUCAIA - SEC. PATRIMÔNIO": {"legado": 1575},
+    "PM CAUCAIA - SEC. PATRIMÔNIO E TRANSPORTE": {"legado": 1394},
+    "P M DE CAUCAIA - PATRIMONIO E TRANSPORTE": {"legado": 1575},
+    "PM CAUCAIA - ADMINISTRAÇÃO E RECURSOS HUMANOS": {"legado": 514},
+    "P M DE CRATO - SAUDE": {"legado": 3006},
+    "P M DE CRATO - PROCURADORIA GERAL DO MUNICIPIO": {"legado": 10394},
+    "PM DE ARACATI- CONTROLADORIA": {"legado": 4075},
+    "PM PALMÁCIA - SEC. SAÚDE": {"legado": 1267},
+    "P. M. DE PALMÁCIA - SAÚDE - ADM": {"legado": 1267},
+    "PM ACOPIARA - SEC. EDUCAÇÃO - 2026": {"legado": 11867},
+    # Contrato 2026 (org 1122): a similaridade caía no cadastro antigo 1115.
+    "PM ACOPIARA - SEC. ADMINISTRAÇÃO E FINANÇAS - 2026": {"legado": 11865},
+    "MTE-Brasilia": {"legado": 11329},
+    "GOVERNO DO CEARÁ - SEC. TRABALHO - IDT": {"legado": 12093},
+    "INEP - BRASÍLIA": {"legado": 12137},
+    "DOAÇÃO D. ANA": {"legado": 10515,
+                      "observacao": "doação avulsa (sem cadastro próprio no legado)"},
+    # Prefeitura sem endereço migrado: fica com address_id nulo e aviso na auditoria.
+    "PM DE TIANGUÁ": {"cliente": "PREFEITURA MUNICIPAL DE TIANGUÁ",
+                      "sem_endereco": True},
+    # A base ALUCOM de Aracati não é migrada como customer (CLIENTES_ESTOQUE);
+    # usa a rota que atende Aracati, como nas demais bases.
+    "TECNICA ADRIANA - ARACATI": {"legado": 4094},
+}
+
+# Clientes repetidos que NÃO são prefeitura/secretaria e devem virar um único
+# customer no refatorado. Cada grupo reúne variações do mesmo cliente no
+# legado (nome/CNPJ/órgão diferentes). O id_alvo permanece; as cópias são
+# absorvidas e o de/para é aplicado em movimentos, contratos e delta.
+# Reservas ("... - RESERVA") não entram aqui: continuam seguindo a regra de
+# reserved_customer_id já existente.
+# Formato: rotulo -> {"ids": (copias..., alvo), "id_alvo": id, "nome_alvo": ...}
+MESCLAGENS_CLIENTE = {
+    "IZZI": {
+        # 3576 (MOREIA, CNPJ 10.328.803/0001-23, endereço em Fortaleza) é o
+        # cadastro completo. 11455 (IP) e 2840 (ALUCOM, CNPJ zerado) são
+        # repetições do mesmo cliente. 10522 é a RESERVA do titular.
+        "ids": (2840, 3576, 11455),
+        "id_alvo": 3576,
+        "nome_alvo": "IZZI SOLUÇÕES EM COBRANÇAS E TELEATENDIMENTO LTDA",
+    },
+}
+
 # Clientes que atuam como base/estoque apenas para a regra de status do ajuste.
 # Diferente de CLIENTES_ESTOQUE (que também afeta a migração), esta lista
 # corrige somente a classificação do relatório de divergências: equipamento com

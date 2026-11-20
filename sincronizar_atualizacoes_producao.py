@@ -531,6 +531,12 @@ def main(argv=None, engine_new=None):
     print(f"   Registros já iguais: {unchanged:,}")
     print(f"   Conflitos/bloqueios: {len(conflicts):,}")
     if conflicts:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+        conflict_path = LOG_DIR.parent / f"conflitos_atualizacoes_producao_{datetime.now():%Y%m%d_%H%M%S}.csv"
+        pd.DataFrame(conflicts).to_csv(
+            conflict_path, index=False, encoding="utf-8-sig"
+        )
+        print(f"   📄 Relatório completo de conflitos: {conflict_path}")
         for conflict in conflicts[:30]:
             print(f"   - {conflict['table']} id={conflict.get('id')}: {conflict['reason']}")
     print("   Nenhuma gravação realizada. Use --apply somente após revisar o preview.")

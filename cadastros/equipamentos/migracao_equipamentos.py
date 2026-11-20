@@ -37,6 +37,43 @@ def _tombo_key_equip(valor):
     return texto or None
 
 
+ROTULO_RETOMBADO_ORIGEM = "Retombado do tombo antigo"
+ROTULO_RETOMBADO_DESTINO = "Retombado para o tombo"
+
+
+def montar_details(acessorio, notas=None):
+    """Monta o `details` do equipamento: acessorio do legado + anotacoes.
+
+    O retombamento usa o mesmo campo para o equipamento baixado ("retombado
+    para o tombo X") e para o novo ("retombado do tombo antigo Y").
+    """
+    partes = []
+    if acessorio is not None and str(acessorio).strip():
+        partes.append(str(acessorio).strip())
+    for nota in notas or []:
+        if nota:
+            partes.append(str(nota).strip())
+    return " | ".join(partes) if partes else None
+
+
+def textos_retombamento(numero_antigo, tombos_destino):
+    """Anotacoes de retombamento para um equipamento do legado.
+
+    `numero_antigo` preenchido => este equipamento e o novo, retombado do
+    tombo antigo. `tombos_destino` lista os tombos que o referenciam em
+    `numero_antigo` => este equipamento e o baixado, retombado para eles.
+    """
+    notas = []
+    antigo = _id_int(numero_antigo)
+    if antigo is not None:
+        notas.append(f"{ROTULO_RETOMBADO_ORIGEM} {antigo}")
+    for novo in tombos_destino or []:
+        novo = _id_int(novo)
+        if novo is not None:
+            notas.append(f"{ROTULO_RETOMBADO_DESTINO} {novo}")
+    return notas
+
+
 def selecionar_descartes_cliente_estoque(df, clientes_estoque=None, protegidos=None):
     """IDs de equipamentos de base que devem ser descartados quando o tombo
     possui ao menos uma copia fora da base/estoque.
@@ -114,6 +151,47 @@ class MigracaoEquipamentos:
     # ==============================================================================
     def _nula(self, val):
         return None if pd.isna(val) else val
+
+    @staticmethod
+    def _normalizar_acessorio(valor):
+        """Converte o acessorio do legado no details do equipamento.
+
+        A coluna e nullable e traz muitos valores vazios; '' e NaN viram None.
+        """
+        if valor is None:
+            return None
+        try:
+            if pd.isna(valor):
+                return None
+        except (TypeError, ValueError):
+            pass
+        texto = str(valor).strip()
+        return texto or None
+
+    def _carregar_retombamentos(self):
+        """Mapa tombo antigo -> tombo(s) novo(s) gravados em `numero_antigo`.
+
+        No legado, quando um equipamento recebe baixa e e retombado, o novo
+        registro nasce com `numero_antigo` igual ao tombo do equipamento
+        baixado. O mapa permite anotar os dois lados em `equipments.details`.
+        """
+        query = text("""
+            SELECT numero_antigo, numero
+            FROM aluguel_equipamentos
+            WHERE numero_antigo IS NOT NULL
+              AND numero_antigo <> ''
+            ORDER BY created_at, id
+        """)
+        mapa = {}
+        with self.engine_legado.connect() as conn:
+            for antigo, novo in conn.execute(query):
+                antigo, novo = _id_int(antigo), _id_int(novo)
+                if antigo is None or novo is None:
+                    continue
+                novos = mapa.setdefault(antigo, [])
+                if novo not in novos:
+                    novos.append(novo)
+        return mapa
 
     def _carregar_enderecos_e_locations(self):
         """Carrega o address BASE de cada organização e garante a location padrão."""
@@ -288,10 +366,12 @@ class MigracaoEquipamentos:
                 alq.id AS id_legado,
                 alq.numero AS tombo_legado,
                 alq.nome AS nome_legado,
+                alq.acessorio AS acessorio,
                 tipe.nome AS tipo_legado,
                 og.ORG_ID AS orgao_original,
                 org.ORG_ID AS orgao_atual,
                 alq.situacao_id,
+                alq.numero_antigo,
                 alq.created_at,
                 alq.updated_at,
                 alq.deleted_at,
@@ -314,7 +394,22 @@ class MigracaoEquipamentos:
                 WHERE mi.deleted_at IS NULL
             ) ult_movi ON alq.id = ult_movi.equipamento_id
             LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
-            WHERE alq.deleted_at IS NULL;
+            WHERE alq.deleted_at IS NULL
+               OR (
+                    -- Baixado que foi retombado: o legado cria um equipamento
+                    -- novo com `numero_antigo` igual a este tombo. Ele entra
+                    -- como status 9 + deleted_at para receber a anotacao
+                    -- "Retombado para o tombo X" em `details`.
+                    alq.deleted_at IS NOT NULL
+                    AND alq.situacao_id = 10
+                    AND alq.numero IN (
+                        SELECT ret.numero_antigo
+                        FROM aluguel_equipamentos ret
+                        WHERE ret.numero_antigo IS NOT NULL
+                          AND ret.numero_antigo <> ''
+                          AND ret.deleted_at IS NULL
+                    )
+               );
         """
         
         with self.engine_legado.connect() as conn:
@@ -322,13 +417,22 @@ class MigracaoEquipamentos:
 
         print(f"\n🔍 Total retornado pelo SQL: {len(df_equipamentos_legado)}")
 
+        self.retombamento_destino = self._carregar_retombamentos()
+        print(f"🔁 Retombamentos no legado: {len(self.retombamento_destino)} tombo(s) antigo(s)")
+
         # Tombos com mais de uma copia: descarta as copias ligadas a bases
         # (CLIENTES_ESTOQUE) quando existe ao menos uma copia fora da base.
         orgao_para_migrar = df_equipamentos_legado['orgao_atual'].fillna(
             df_equipamentos_legado['orgao_original']
         )
+        # A regra de descarte por tombo repetido continua olhando so os
+        # equipamentos ativos: os baixados incluidos para retombamento nao
+        # podem expulsar a copia ativa do mesmo tombo.
         ids_descartar_base = selecionar_descartes_cliente_estoque(
-            df_equipamentos_legado[orgao_para_migrar.isin(TODOS_ORGAOS_MAPEADOS)],
+            df_equipamentos_legado[
+                df_equipamentos_legado['deleted_at'].isna()
+                & orgao_para_migrar.isin(TODOS_ORGAOS_MAPEADOS)
+            ],
             CLIENTES_ESTOQUE,
         )
         if ids_descartar_base:
@@ -463,10 +567,21 @@ class MigracaoEquipamentos:
                     'fornecedor_fallback': '',
                     'tipo_legado': dados_db.get('tipo_legado'), 'tombo_legado': tombo_atual})
 
+            # Acessório do legado vira o campo details do equipamento no refatorado.
+            acessorio_final = self._normalizar_acessorio(dados_db.get('acessorio'))
+            details_final = montar_details(
+                acessorio_final,
+                textos_retombamento(
+                    dados_db.get('numero_antigo'),
+                    self.retombamento_destino.get(_id_int(tombo_atual)),
+                ),
+            )
+
             lista_mestre.append({
                 "id_legado":     id_equipamento_legado,
                 "TOMBO":         tombo_atual,
                 "NOME_AJUSTADO": nome_final,
+                "details":       details_final,
                 "NUMERO_SERIE":  row_plan.get("NUMERO_SERIE") if pd.notna(row_plan.get("NUMERO_SERIE")) else None,
                 "codigo_item":   row_plan.get("codigo_item") if pd.notna(row_plan.get("codigo_item")) else None,
                 "valor":         float(row_plan.get("valor")) if pd.notna(row_plan.get("valor")) else 0.0,
@@ -823,6 +938,9 @@ class MigracaoEquipamentos:
                             "name": linha_equip['NOME_AJUSTADO'],
                             "serial_number": self._nula(linha_equip['NUMERO_SERIE']),
                             "serial_required": 0,
+                            # O DataFrame converte coluna só de None em NaN;
+                            # normaliza de novo para não enviar nan ao MySQL.
+                            "details": self._normalizar_acessorio(linha_equip['details']),
                             "current_organization_id": buyer_id_int,
                             "status_id": linha_equip['status_id'],
                             "address_id": addr_id,
@@ -835,7 +953,8 @@ class MigracaoEquipamentos:
 
                         lista_historico_global.append({
                             "equipment_id": eq_id,
-                            "status_id": 1,
+                            # Baixado entra com o proprio status (9), nao com 1.
+                            "status_id": linha_equip['status_id'],
                             "occurred_at": eq_created_at,
                             "movement_item_id": None,
                             "service_order_item_id": None,
@@ -850,8 +969,8 @@ class MigracaoEquipamentos:
             if lista_equipamentos_global:
                 print(f"💾 Inserindo {len(lista_equipamentos_global)} máquinas físicas no MySQL...")
                 conn.execute(text("""
-                    INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at) 
-                    VALUES (:id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, :serial_required, :current_organization_id, :status_id, :address_id, :location_id, :is_completed, :created_at, :updated_at, :deleted_at)
+                    INSERT INTO equipments (id, product_item_id, transaction_item_id, number, name, serial_number, serial_required, details, current_organization_id, status_id, address_id, location_id, is_completed, created_at, updated_at, deleted_at) 
+                    VALUES (:id, :product_item_id, :transaction_item_id, :number, :name, :serial_number, :serial_required, :details, :current_organization_id, :status_id, :address_id, :location_id, :is_completed, :created_at, :updated_at, :deleted_at)
                 """), lista_equipamentos_global)
                 self.stats["equipments"] += len(lista_equipamentos_global)
 

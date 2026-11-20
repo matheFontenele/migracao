@@ -13,6 +13,7 @@ from config.config import (
     FALSOS_RESERVAS,
     BASES_AVULSOS, ENDERECOS_BASES, RESERVAS_BASE_AVULSA,
     DEPARA_RESERVAS_BASE,
+    MESCLAGENS_CLIENTE,
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
@@ -133,16 +134,29 @@ SAO_LUIS_CONFIG = {
 # Prefeituras que aparecem repetidas no legado e devem virar um único cliente
 # no refatorado. A mesclagem absorve as raízes, as secretarias e os clientes
 # de destino; o nome do destino original permanece no alias do endereço.
+# `organizacao_alvo` fixa a organização do cliente raiz (sem isso a última
+# linha lida decidiria a organização, o que varia conforme a ordem do legado).
 MESCLAGENS_PREFEITURA = {
     "CAUCAIA": {
         "ids": (2, 295, 300),
         "id_alvo": 2,
         "nome_alvo": "PREFEITURA MUNICIPAL DE CAUCAIA",
+        "organizacao_alvo": 1115,
     },
     "BARROQUINHA": {
         "ids": (6, 105),
         "id_alvo": 6,
         "nome_alvo": "PREFEITURA MUNICIPAL DE BARROQUINHA",
+        "organizacao_alvo": 1115,
+    },
+    # Duas raízes de Tauá no legado: 39 (org. 1115) e 77 (org. 1122).
+    # Os contratos de Tauá estão na org. 1115, então ela é a dona do cadastro
+    # unificado; os 23 destinos da org. 1122 passam a ser endereços dela.
+    "TAUA": {
+        "ids": (39, 77),
+        "id_alvo": 39,
+        "nome_alvo": "PREFEITURA MUNICIPAL DE TAUA",
+        "organizacao_alvo": 1115,
     },
 }
 MAPA_REGIOS_PCPB = {
@@ -853,9 +867,66 @@ class MigracaoClientes:
             df_modificado.loc[mask, 'PREFEITURA'] = config['nome_alvo']
             df_modificado.loc[mask, 'ID_SECRETARIA'] = None
             df_modificado.loc[mask, 'SECRETARIA'] = None
+            organizacao_alvo = config.get('organizacao_alvo')
+            if organizacao_alvo is not None:
+                df_modificado.loc[mask, 'ORGANIZACAO'] = organizacao_alvo
             print(
                 f"   🏛️  {int(mask.sum())} cliente(s) das prefeituras de "
                 f"{rotulo} unificados em '{config['nome_alvo']}'."
+            )
+
+        return df_modificado
+
+    def _unificar_clientes_repetidos(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Consolida clientes repetidos que não são prefeitura/secretaria.
+
+        Cada grupo de ``MESCLAGENS_CLIENTE`` mantém apenas o cadastro
+        principal (``id_alvo``). As cópias deixam de gerar customer e
+        endereço; movimentos, contratos e delta as resolvem pelo de/para
+        legado de ``utils.depara_clientes``. Reservas continuam fora daqui:
+        elas seguem a regra de ``reserved_customer_id``.
+        """
+        df_modificado = df.copy()
+        for rotulo, config in MESCLAGENS_CLIENTE.items():
+            id_alvo = int(config['id_alvo'])
+            ids_grupo = {int(id_legado) for id_legado in config['ids']}
+            mask_alvo = df_modificado['id_clean'] == id_alvo
+            if not mask_alvo.any():
+                print(
+                    f"   ⚠️ Mesclagem de clientes {rotulo} ignorada: cadastro "
+                    f"principal {id_alvo} não está na extração."
+                )
+                continue
+
+            # Um cadastro que é pai de outro cliente tem hierarquia própria:
+            # removê-lo apagaria a raiz/secretaria dos filhos.
+            ids_pais = set()
+            for coluna in ('ID_PREFEITURA', 'ID_SECRETARIA'):
+                valores = pd.to_numeric(
+                    df_modificado[coluna], errors='coerce'
+                ).dropna()
+                ids_pais.update(valores.astype(int))
+
+            copias = ids_grupo - {id_alvo}
+            if copias & ids_pais:
+                print(
+                    f"   ⚠️ Mesclagem de clientes {rotulo}: mantidos "
+                    f"{sorted(copias & ids_pais)} por serem pai de outro cliente."
+                )
+            copias -= ids_pais
+            mask_copias = df_modificado['id_clean'].isin(copias)
+            if not mask_copias.any():
+                continue
+
+            nome_alvo = config.get('nome_alvo')
+            if nome_alvo:
+                df_modificado.loc[mask_alvo, 'CLIENTE'] = nome_alvo
+
+            total_copias = int(mask_copias.sum())
+            df_modificado = df_modificado[~mask_copias].copy()
+            print(
+                f"   🔗 {total_copias} cadastro(s) de {rotulo} mesclado(s) ao "
+                f"cliente {id_alvo}."
             )
 
         return df_modificado
@@ -1109,6 +1180,7 @@ class MigracaoClientes:
         df_clean = self._unificar_ministerio_transportes(df_clean)
         df_clean = self._reestruturar_detran(df_clean)
         df_clean = self._achatar_secretarias_iguais_prefeitura(df_clean)
+        df_clean = self._unificar_clientes_repetidos(df_clean)
 
         # Setores internos não devem virar customer (secretaria). Os clientes
         # desses setores são anexados diretamente ao departamento pai.

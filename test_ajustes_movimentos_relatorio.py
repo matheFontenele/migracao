@@ -262,5 +262,40 @@ class AtualizarClienteCabecalhoTests(unittest.TestCase):
         self.assertEqual(conn.chamadas, [])
 
 
+class AtualizarEquipamentoExcluidoTests(unittest.TestCase):
+    """Baixado (status 9 + deleted_at) não pode voltar a status operacional."""
+
+    def _ajustes(self):
+        return object.__new__(AjustesMovimentos)
+
+    def _row(self):
+        return {"id_equipamento": 53709, "status_esperado_id": 1,
+                "status_id_novo": 9, "address_id_esperado": 3,
+                "address_id_novo": None, "id_customer_esperado": 16321,
+                "id_customer_novo": None, "motivo_excecao": ""}
+
+    def test_nao_reaplica_status_em_equipamento_excluido(self):
+        conn = _ConexaoFake(cliente_atual="2026-11-04 12:05:53")
+
+        status, cliente = self._ajustes()._atualizar_equipamento(
+            conn, self._row(), 999, False)
+
+        self.assertIsNone(status)
+        self.assertIsNone(cliente)
+        self.assertEqual(len(conn.chamadas), 1)
+        self.assertIn("SELECT deleted_at", conn.chamadas[0][0])
+
+    def test_atualiza_equipamento_ativo_com_guarda_de_deleted_at(self):
+        conn = _ConexaoFake(cliente_atual=None)
+
+        status, cliente = self._ajustes()._atualizar_equipamento(
+            conn, self._row(), 999, False)
+
+        self.assertEqual(status, 1)
+        self.assertEqual(cliente, 16321)
+        self.assertEqual(len(conn.chamadas), 2)
+        self.assertIn("deleted_at IS NULL", conn.chamadas[1][0])
+
+
 if __name__ == "__main__":
     unittest.main()

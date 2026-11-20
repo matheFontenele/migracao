@@ -366,8 +366,8 @@ class MigracaoInsumos:
         return (
             int(spec.get("address_id") or addr_padrao),
             str(spec["area"]),
-            str(spec.get("section") or "Unica"),
-            str(spec.get("spot") or "Unico"),
+            spec.get("section"),
+            spec.get("spot"),
             str(spec.get("details") or "Migração"),
         )
 
@@ -437,7 +437,7 @@ class MigracaoInsumos:
                 else:
                     res_loc = conn.execute(text("""
                         INSERT INTO locations (address_id, area, section, spot, details, created_at, updated_at)
-                        VALUES (:addr, 'ALMOXARIFADO', 'ÚNICA', 'ÚNICO', 'Criado via Migração (Fallback)', :now, :now)
+                        VALUES (:addr, 'ALMOXARIFADO', NULL, NULL, 'Criado via Migração (Fallback)', :now, :now)
                     """), {"addr": addr_id, "now": self.now})
                     fallback_almox_por_addr[addr_id] = res_loc.lastrowid
                     self.stats["locations"] += 1

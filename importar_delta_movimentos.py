@@ -60,14 +60,29 @@ DIMENSIONS = [
 PHASES = [
     "brands", "groups", "types", "products", "product_items", "equipments",
     "transactions", "transaction_items", "service_orders", "service_order_items",
-    "movements", "movement_items", "shipments", "shipment_items", "volumes",
-    "volume_items", "equipment_history", "maintenances", "maintenance_items",
-    "return_confirmations", "return_confirmations_items", "romaneios",
+    "movements", "movement_items", "shipments", "shipment_items",
+    "shipment_movements", "volumes", "volume_items", "equipment_history",
+    "maintenances", "maintenance_items", "return_confirmations",
+    "return_confirmations_items", "romaneios",
 ]
 
 # Tabelas cujo nome e chave natural (quando nao houver id local).
 NAME_TABLES = {"brands", "groups", "types"}
 PRODUCT_TABLE = "products"
+
+# Status "BAIXADO" no banco refatorado.
+STATUS_BAIXADO = 9
+
+
+def status_equipamento_insercao(values):
+    """Status com que um equipamento novo do delta entra no banco local.
+
+    Equipamento excluido na origem (deleted_at preenchido) e baixado: nao pode
+    herdar o status operacional que tinha antes da exclusao.
+    """
+    if values.get("deleted_at"):
+        return STATUS_BAIXADO
+    return values.get("status_id")
 
 
 def normalize(value) -> str:
@@ -435,7 +450,7 @@ class Planner:
                                 stamp_num(row.get("quantity")),
                                 stamp(row.get("created_at")))].append(row)
         for table in ("movement_items", "service_order_items", "shipment_items",
-                      "volume_items", "volumes", "shipments"):
+                      "shipment_movements", "volume_items", "volumes", "shipments"):
             idx[table] = defaultdict(list)
             for row in self.lookups.get(table, []):
                 idx[table][self.item_key(table, row)].append(row)
@@ -451,6 +466,8 @@ class Planner:
                     normalize(row.get("alias")))
         if table == "shipment_items":
             return (row.get("shipment_id"), row.get("movement_item_id"))
+        if table == "shipment_movements":
+            return (row.get("shipment_id"), row.get("movement_id"))
         if table == "volume_items":
             return (row.get("volume_id"), row.get("equipment_id"), row.get("product_item_id"),
                     row.get("movement_item_id"))
@@ -1103,6 +1120,41 @@ class Planner:
         for row in list(self.rows.get("shipment_items", [])):
             self._plan_child("shipment_items", row, "shipments", "shipment_id")
 
+    def match_shipment_movements(self):
+        """Vinculo envio x movimento: depende dos dois pais ja mapeados."""
+        for row in list(self.rows.get("shipment_movements", [])):
+            sid = row.get("id")
+            if ("shipment_movements", sid) in self.map:
+                continue
+            shipment_source = row.get("shipment_id")
+            movement_source = row.get("movement_id")
+            if ("shipments", shipment_source) not in self.map:
+                continue
+            if ("movements", movement_source) not in self.map:
+                continue
+            shipment = self.map[("shipments", shipment_source)]
+            movement = self.map[("movements", movement_source)]
+            if shipment in (None, DISCARD) or movement in (None, DISCARD):
+                self.register("shipment_movements", sid, None, "blocked",
+                              "vinculo com envio/movimento sem mapa")
+                continue
+            par = None
+            if NEW not in (shipment, movement):
+                par = self.local_item("shipment_movements", (shipment, movement))
+            if sid not in self.insertable_ids.get("shipment_movements", set()):
+                if par is not None:
+                    self.register("shipment_movements", sid, par["id"], "matched",
+                                  "vinculo local equivalente")
+                else:
+                    self.register("shipment_movements", sid, None, "skipped",
+                                  "vinculo de envio ja local")
+                continue
+            if par is not None:
+                self.register("shipment_movements", sid, par["id"], "matched",
+                              "vinculo local equivalente")
+                continue
+            self.register("shipment_movements", sid, NEW, "new", "vinculo de envio novo")
+
     def match_volume_items(self):
         for row in list(self.rows.get("volume_items", [])):
             self._plan_child("volume_items", row, "volumes", "volume_id")
@@ -1242,6 +1294,9 @@ class Planner:
         shipment_ids = {r.get("shipment_id") for r in shipment_items}
         self.rows["shipments"].extend(
             r for r in rows.get("shipments", []) if r.get("id") in shipment_ids)
+        self.rows["shipment_movements"].extend(
+            r for r in rows.get("shipment_movements", [])
+            if r.get("shipment_id") in shipment_ids)
         self.rows["volume_items"].extend(
             r for r in rows.get("volume_items", [])
             if r.get("volume_id") in volume_ids or r.get("movement_item_id") in item_ids)
@@ -1264,6 +1319,7 @@ class Planner:
             self.match_volumes()
             self.match_shipments()
             self.match_shipment_items()
+            self.match_shipment_movements()
             self.match_volume_items()
             self.match_maintenances()
             self.match_maintenance_items()
@@ -1369,8 +1425,8 @@ SCOPE_ORDER = [
     "brands", "groups", "types", "products", "product_items", "locations",
     "transactions", "transaction_items", "equipments",
     "service_orders", "service_order_items", "movements", "movement_items",
-    "volumes", "shipments", "shipment_items", "volume_items",
-    "maintenances", "maintenance_items", "equipment_history",
+    "volumes", "shipments", "shipment_items", "shipment_movements",
+    "volume_items", "maintenances", "maintenance_items", "equipment_history",
 ]
 
 
@@ -1409,6 +1465,9 @@ def mark_insertable(planner):
     for row in planner.rows.get("shipments", []):
         if row.get("id") in shipment_ids:
             mark["shipments"].add(row.get("id"))
+    for row in planner.rows.get("shipment_movements", []):
+        if row.get("shipment_id") in shipment_ids:
+            mark["shipment_movements"].add(row.get("id"))
     for row in planner.rows.get("volume_items", []):
         if (row.get("movement_item_id") in new_items
                 or row.get("id") in mark["shipment_items"]):
@@ -1514,6 +1573,35 @@ class SimulationRollback(Exception):
     """Sentinela para desfazer a transacao do modo --simular."""
 
 
+def sincronizar_sequencia_movimentos(conn):
+    """Alinha `movement_number_sequences.last_number` com MAX(movements.number).
+
+    O delta insere protocolos explicitos da producao sem passar pelo hook do
+    Laravel; sem esta sincronizacao a sequencia fica atras e o proximo
+    movimento criado pela tela reutilizaria um numero.
+    """
+    from sqlalchemy import text
+
+    existe = conn.execute(text(
+        "SELECT COUNT(*) FROM information_schema.TABLES "
+        "WHERE TABLE_SCHEMA = DATABASE() "
+        "AND TABLE_NAME = 'movement_number_sequences'")).scalar()
+    if not existe:
+        return None
+    ultimo = int(conn.execute(text(
+        "SELECT COALESCE(MAX(CAST(`number` AS UNSIGNED)), 0) FROM `movements` "
+        "WHERE `number` IS NOT NULL AND `number` <> ''")).scalar() or 0)
+    alterado = conn.execute(text(
+        "UPDATE `movement_number_sequences` "
+        "SET `last_number` = GREATEST(`last_number`, :ultimo) WHERE `id` = 1"),
+        {"ultimo": ultimo})
+    if alterado.rowcount == 0:
+        conn.execute(text(
+            "INSERT INTO `movement_number_sequences` (`id`, `last_number`) "
+            "VALUES (1, :ultimo)"), {"ultimo": ultimo})
+    return ultimo
+
+
 def apply_scope(engine, planner, digest, ledger_path, commit=True):
     from sqlalchemy import text
 
@@ -1554,6 +1642,8 @@ def apply_scope(engine, planner, digest, ledger_path, commit=True):
                                         "local_id": planned, "action": "matched"})
                         continue
                     values = resolve_values(planner, inserted, table, row)
+                    if table == "equipments":
+                        values["status_id"] = status_equipamento_insercao(values)
                     if table == "volumes":
                         code = values.get("code")
                         if code in volume_codes:
@@ -1589,6 +1679,8 @@ def apply_scope(engine, planner, digest, ledger_path, commit=True):
                 if equipment:
                     conn.execute(text("UPDATE `transaction_items` SET `equipment_id`=:e "
                                       "WHERE `id`=:i"), {"e": equipment, "i": transaction_item})
+
+            sincronizar_sequencia_movimentos(conn)
 
             if not commit:
                 raise SimulationRollback()
@@ -1626,14 +1718,15 @@ def main(argv=None):
 
     tables = set(rows) | set(DIMENSIONS) | {
         "addresses", "locations", "contracts", "contract_items", "equipments",
-        "product_items", "products", "shipment_items", "volume_items",
+        "product_items", "products", "shipment_items", "shipment_movements",
+        "volume_items",
     }
     database, lookups, fks, nullables = load_lookups(engine, tables)
 
     discard_ids, discard_tombos = load_discards(DESCARTES_DEFAULT)
-    from utils.depara_clientes import carregar_depara_duplicados
+    from utils.depara_clientes import carregar_depara_clientes
     crosswalk = Crosswalk(lookups.get("addresses", []), lookups.get("customers", []),
-                          carregar_depara_duplicados())
+                          carregar_depara_clientes())
     address_ids, customer_ids = set(), set()
     for table, table_rows in rows.items():
         for row in table_rows:

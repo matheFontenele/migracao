@@ -1,6 +1,12 @@
-"""Migra requisições de docs/REQUISIÇÃO 2026.csv.
+"""Importa as requisições de docs/requisicao2026.csv para o banco refatorado.
 
-Dry-run por padrão. Use --execute somente depois de revisar o CSV de auditoria.
+Gera `service_orders` + `service_order_items` e, para as linhas que trazem
+`Data Separação`, `movements` + `movement_items`.
+
+Este módulo é o ÚLTIMO passo da migração: depende de clientes, usuários,
+organizações, equipamentos, tipos e produtos já migrados.
+
+Dry-run é o padrão. Nada é gravado sem `--execute`.
 """
 from __future__ import annotations
 
@@ -10,6 +16,7 @@ import difflib
 import re
 import unicodedata
 from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
@@ -17,543 +24,1407 @@ import pandas as pd
 from sqlalchemy import text
 from tqdm import tqdm
 
+from utils.clientes_requisicoes import IndiceClientes
+
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-ARQUIVO_FONTE = BASE_DIR / "docs" / "REQUISIÇÃO 2026.csv"
+ARQUIVO_FONTE = BASE_DIR / "docs" / "requisicao2026.csv"
 ARQUIVO_AUDITORIA = BASE_DIR / "ajustes" / "auditoria_requisicoes_2026.csv"
+ARQUIVO_MAPA_INSUMOS = BASE_DIR / "ajustes" / "insumos_para_produtos.csv"
 DIR_LOGS = BASE_DIR / "ajustes" / "logs_requisicoes_2026"
-MARCADOR_MIGRACAO = "Migração REQUISIÇÃO 2026.csv"
+MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 
+# ---------------------------------------------------------------------------
+# De/para da planilha
+# ---------------------------------------------------------------------------
 USUARIOS = {
     "VICTOR": "victoralves",
     "BEATRIZ": "BEATRIZCARDOSO",
     "DAVI": "DAVISOUZA",
-    "EMANUEL": "EMANUEL",
-    "IMNA": "imna",
     "SANTIAGO": "SANTIAGO",
+    "IMNA": "imna",
     "ATILA": "atilacosta",
 }
+# `EMANUEL` não existe como usuário no destino; as 46 linhas dele (e as 29 sem
+# solicitante) usam o usuário administrativo e ficam registradas na auditoria.
+USUARIO_PADRAO = "admin"
+
 ORGANIZACOES = {
-    "ALUCOM": 1115,
-    "MOREIA": 1122,
-    "IP": 1311,
     "AS SISTEMAS": 1378,
+    "MOREIA": 1122,
+    "ALUCOM": 1115,
+    # ADI é o departamento/estoque da ALUCOM (orgs legadas 1351 TONER ADI e
+    # 1360 PEÇAS ADI). Trocar aqui se a decisão for criar uma organização própria.
+    "ADI": 1115,
+    "IP": 1311,
 }
+
 TRANSPORTES = {"ROTA": 1, "RETIRADA": 2, "TRANSPORTADORA": 3}
-TIPOS_MOVIMENTO = {"ALUGUEL": 1, "SUBSTITUICAO": 2, "AVULSO": 7}
+
+# (status_id, situation) por valor da coluna `Req`.
+# As nao atendidas mantem o status 1 (NAO ATENDIDA), mas entram ja aprovadas:
+# a regra de avulso do destino deixava a requisicao pendente de aprovacao.
 STATUS_REQ = {
-    "PARCIAL": (2, "pending"),
-    "SEPARADO": (1, "pending"),
-    "SOLICITADO ENVIO": (1, "pending"),
+    "PARCIAL": (2, "approved"),
+    "SEPARADO": (3, "approved"),
     "ENVIADO": (3, "approved"),
     "ATENDIDA": (3, "approved"),
+    "SOLICITADO ENVIO": (1, "approved"),
+    "SEM ESTOQUE": (1, "approved"),
+    "CANCELADA": (4, "cancelled"),
+    "": (1, "approved"),
 }
-IGNORAR_REQ = {"CANCELADA", "SEM ESTOQUE", ""}
+
+# `Separado por` -> username no destino. `Neto`, `Logística` e `Emanuel SAC BR`
+# não têm usuário inequívoco e por isso não geram movimento (vão para auditoria).
+SEPARADORES = {
+    "MARCELO": "Marcelo",
+    "ROBERTO": "Roberto",
+    "CARLOS JR": "carlosbezerra",
+    "DANILSON": "DANILSON",
+    "ELISANGELA": "elisangela",
+}
+
+TIPOS_MOVIMENTO = {"AVULSO": 7, "SUBSTITUICAO": 2}
+
+# Departamento do item em `service_order_departments`:
+# - equipamento -> EXPEDIÇÃO
+# - insumo do estoque Peças ADI -> ELISANGELA
+# - qualquer outro insumo/indefinido -> ALMOXARIFADO
+DEPARTAMENTO_PADRAO = "ALMOXARIFADO"
+DEPARTAMENTO_EQUIPAMENTO = "EXPEDIÇÃO"
+DEPARTAMENTO_PECAS_ADI = "ELISANGELA"
+
+# Palavras que identificam peças/consumíveis e equipamentos. São usadas quando o
+# catálogo não resolve o item e também para corrigir o catálogo de insumos, que
+# repete descrições de equipamento (notebook, impressora, nobreak...).
+PALAVRAS_INSUMO = (
+    "TONER", "TINTA", "CARTUCHO", "REVELADOR", "REVELACAO", "REFIL", "RIBBON",
+    "CABO", "MEMORIA", "SSD", "HD", "DISCO", "FONTE", "MOUSE", "TECLADO",
+    "ADAPTADOR", "CARREGADOR", "PLACA", "COOLER", "BATERIA", "PILHA", "FONE",
+    "PENDRIVE", "CHIP", "CILINDRO", "BOBINA", "ETIQUETA", "PAPEL", "FUSOR",
+    "PICKUP", "ROLLER", "SENSOR", "CONECTOR", "EXTENSAO", "REGUA", "FILTRO",
+    "PROCESSADOR", "GAVETA", "BANDEJA", "TAMPA", "TECLA", "MEMBRANA",
+    "PELICULA", "KIT DE TINTA", "UNIDADE DE REVELACAO",
+    # Modelos/códigos e peças recorrentes na planilha 2026.
+    "DDR", "NVME", "FOTOCONDUTOR", "CABECOTE", "MANTA TERMICA", "ROLLETE",
+    "RECIPIENTE DE RESIDUO", "ADESIVO", "MOLA", "SACHE", "DISPLAYPORT", "TK-",
+    "TK ",
+)
+PALAVRAS_EQUIPAMENTO = (
+    "MICRO", "COMPUTADOR", "NOTEBOOK", "NETBOOK", "MONITOR", "IMPRESSORA",
+    "MULTIFUNCIONAL", "SCANNER", "NOBREAK", "ESTABILIZADOR", "TRANSFORMADOR",
+    "PROJETOR", "TELA", "TV", "SERVIDOR", "SWITCH", "ROTEADOR", "THINKCENTRE",
+    "MINI PC", "ALL IN ONE", "TABLET", "CELULAR", "TELEFONE", "GELAGUA",
+    "BEBEDOURO", "VENTILADOR", "FRAGMENTADORA", "DUPLICADOR", "PLOTTER",
+    "FAX", "CAMERA", "WEBCAM", "TOTEM", "MODULO", "RACK",
+    "PONTO DE ACESSO", "SCANER", "TINY",
+)
+
+GENERICOS = {"DE", "DA", "DO", "DAS", "DOS", "E", "PARA", "P", "EM", "COM"}
+
+RE_SERIAL = re.compile(
+    r"\b(NS|N/S|S/N|SN|SERIE|PATRIMONIO)\b.*$", re.IGNORECASE
+)
+
+# ---------------------------------------------------------------------------
+# Normalização e conversões
+# ---------------------------------------------------------------------------
+def normalizar(valor: object) -> str:
+    texto = unicodedata.normalize("NFKD", str(valor or ""))
+    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
+    return re.sub(r"\s+", " ", texto).strip().upper()
 
 
-def normalizar(value: object) -> str:
-    value = unicodedata.normalize("NFKD", str(value or ""))
-    value = "".join(ch for ch in value if not unicodedata.combining(ch))
-    return re.sub(r"\s+", " ", value).strip().upper()
+def tokens_relevantes(texto: str, minimo: int = 3) -> set[str]:
+    return {t for t in normalizar(texto).split()
+            if len(t) >= minimo and t not in GENERICOS}
 
 
-def data_planilha(value: object) -> datetime | None:
-    value = str(value or "").strip()
-    if not value:
+def data_planilha(valor: object) -> datetime | None:
+    texto = str(valor or "").strip()
+    if not texto:
         return None
-    parsed = pd.to_datetime(value, dayfirst=True, errors="coerce")
-    return None if pd.isna(parsed) else parsed.to_pydatetime().replace(hour=0, minute=0, second=0, microsecond=0)
+    parsed = pd.to_datetime(texto, dayfirst=True, errors="coerce")
+    if pd.isna(parsed):
+        return None
+    return parsed.to_pydatetime().replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-def numero(value: object) -> int | None:
-    raw = str(value or "").strip()
-    if not raw:
+def numero(valor: object) -> int | None:
+    texto = str(valor or "").strip()
+    if not texto:
         return None
     try:
-        parsed = float(raw.replace(",", "."))
-        return int(parsed) if parsed > 0 and parsed.is_integer() else None
+        return int(float(texto.replace(",", ".")))
     except ValueError:
         return None
 
 
-def selecionar_organizacao(etiqueta: str) -> int | None:
+RE_PAT_COPIAS = re.compile(r"^\s*(\d+)\s*(?:[-/]\s*\d+\s*)+$")
+
+
+def numero_pat(valor: object) -> int | None:
+    """Patrimônio de um campo PAT da planilha.
+
+    Às vezes o tombo vem repetido com o sufixo das cópias (`19687-1/3`,
+    `19963-1/1`): o patrimônio continua sendo o número da frente. O restante
+    do campo é só a indicação de qual cópia do tombo está no item.
+    """
+    texto = str(valor or "").strip()
+    if not texto:
+        return None
+    direto = numero(texto)
+    if direto is not None:
+        return direto
+    achado = RE_PAT_COPIAS.match(texto)
+    return int(achado.group(1)) if achado else None
+
+
+def numeros(valor: object) -> tuple[int, ...]:
+    """Extrai todos os números de um campo (aceita listas tipo `1, 2, 3`)."""
+    return tuple(int(n) for n in re.findall(r"\d{2,}", str(valor or "")))
+
+
+def limpar_serial(texto: object) -> str:
+    """Remove número de série/patrimônio para casar o item com o catálogo."""
+    base = RE_SERIAL.sub("", str(texto or ""))
+    base = re.sub(r"\b\d{5,}\b", " ", base)
+    return re.sub(r"\s+", " ", base).strip(" ,-/")
+
+
+def selecionar_organizacao(etiqueta: object) -> int | None:
     tag = normalizar(etiqueta)
-    # Etiquetas podem conter mais de uma marca (ex.: IP/Zaploc); prioridade
-    # explícita evita escolher por substring curta antes da marca completa.
-    for key in ("AS SISTEMAS", "MOREIA", "ALUCOM", "IP"):
-        if key in tag:
-            return ORGANIZACOES[key]
+    for chave, org_id in ORGANIZACOES.items():
+        if chave in tag:
+            return org_id
     return None
 
 
-def carregar_referencias(conn):
-    customers = [dict(r) for r in conn.execute(text(
-        "SELECT id, name, alias FROM customers WHERE deleted_at IS NULL"
+def palavra_chave_tipo(texto: str) -> str | None:
+    """Classifica por palavra-chave usando a posição do termo no texto.
+
+    A descrição costuma listar a peça antes da especificação ("MEMORIA PARA
+    NOTEBOOK"), mas o equipamento vem primeiro quando é ele o pedido
+    ("NOTEBOOK I5 8GB SSD 512GB"). Por isso vence a palavra que aparece
+    primeiro, e não a ordem fixa das listas.
+    """
+    alvo = f" {normalizar(texto)} "
+
+    def primeira(palavras: tuple[str, ...]) -> int | None:
+        achados = [alvo.find(f" {p}") for p in palavras if f" {p}" in alvo]
+        return min(achados) if achados else None
+
+    equipamento = primeira(PALAVRAS_EQUIPAMENTO)
+    insumo = primeira(PALAVRAS_INSUMO)
+    if equipamento is None and insumo is None:
+        return None
+    if equipamento is None:
+        return "INSUMO"
+    if insumo is None:
+        return "EQUIPAMENTO"
+    return "EQUIPAMENTO" if equipamento <= insumo else "INSUMO"
+
+
+# ---------------------------------------------------------------------------
+# Similaridade
+# ---------------------------------------------------------------------------
+class IndiceSimilaridade:
+    """Busca por similaridade com pré-filtro por tokens.
+
+    Comparar cada nome da planilha contra todo o catálogo (milhares de linhas)
+    seria lento, então os candidatos são reduzidos por interseção de tokens.
+    """
+
+    def __init__(self, registros: list[dict], campos: tuple[str, ...] = ("name", "alias")):
+        self.registros = registros
+        self.chaves: list[list[str]] = []
+        self.indice: dict[str, set[int]] = defaultdict(set)
+        for posicao, registro in enumerate(registros):
+            chaves = [normalizar(registro.get(campo)) for campo in campos
+                      if registro.get(campo)]
+            chaves = [c for c in chaves if c]
+            self.chaves.append(chaves)
+            for token in {t for chave in chaves for t in tokens_relevantes(chave)}:
+                self.indice[token].add(posicao)
+
+    def buscar(self, texto: object, limite: float = 0.80, margem: float = 0.05,
+               topo: int = 5) -> tuple[dict | None, float, list[dict]]:
+        alvo = normalizar(texto)
+        if not alvo:
+            return None, 0.0, []
+        candidatos: set[int] = set()
+        for token in tokens_relevantes(alvo):
+            candidatos |= self.indice.get(token, set())
+        if len(candidatos) < 2:
+            candidatos = set(range(len(self.registros)))
+        pontuados: list[tuple[float, int]] = []
+        for posicao in candidatos:
+            melhor = 0.0
+            for chave in self.chaves[posicao]:
+                comparador = difflib.SequenceMatcher(None, alvo, chave)
+                if comparador.real_quick_ratio() <= melhor:
+                    continue
+                if comparador.quick_ratio() <= melhor:
+                    continue
+                melhor = max(melhor, comparador.ratio())
+            if melhor:
+                pontuados.append((melhor, posicao))
+        if not pontuados:
+            return None, 0.0, []
+        pontuados.sort(reverse=True)
+        melhor_score, melhor_posicao = pontuados[0]
+        segundo = pontuados[1][0] if len(pontuados) > 1 else 0.0
+        sugestoes = [dict(self.registros[p], _similaridade=round(s, 4))
+                     for s, p in pontuados[:topo]]
+        if melhor_score < limite or melhor_score - segundo < margem:
+            return None, melhor_score, sugestoes
+        return self.registros[melhor_posicao], melhor_score, sugestoes
+
+
+@dataclass
+class Referencias:
+    clientes: IndiceClientes
+    produtos: IndiceSimilaridade
+    produtos_insumo: IndiceSimilaridade
+    tipos: IndiceSimilaridade
+    usuarios: dict[str, int]
+    organizacoes: set[int]
+    transportes: set[int]
+    equipamentos: dict[int, list[dict]] = field(default_factory=dict)
+    produtos_por_id: dict[int, str] = field(default_factory=dict)
+    mapa_insumos: dict[str, int] = field(default_factory=dict)
+
+
+def _chave_produto(valor: object) -> str:
+    """Chave de nome de produto: ignora acento, caixa, espaço e pontuação."""
+    return re.sub(r"[^A-Z0-9]", "", normalizar(valor))
+
+
+def carregar_mapa_insumos(conn,
+                          arquivo: Path = ARQUIVO_MAPA_INSUMOS) -> dict[str, int]:
+    """De/para curado: descrição da planilha -> produto de insumo existente.
+
+    O catálogo não cobre parte das descrições (toner de modelo específico,
+    fonte, SSD). Sem `product_id`, a linha cai na lista de EQUIPAMENTOS da
+    requisição — o sistema identifica insumo pela presença do produto. Só
+    aceita produto com `is_asset = 0` para não transformar insumo em equipamento.
+
+    A coluna `produto` (nome) manda: os IDs do CSV são apenas uma pista, porque
+    o catálogo local é recriado a cada reset e os IDs andam. O nome é resolvido
+    contra os insumos ativos; o ID só desempata (e serve de recurso quando a
+    linha antiga não tem nome).
+    """
+    if not arquivo.exists():
+        return {}
+
+    catalogo = [dict(linha) for linha in conn.execute(text(
+        "SELECT id, name, is_asset FROM products WHERE deleted_at IS NULL"
     )).mappings()]
-    users = {normalizar(r.username): int(r.id) for r in conn.execute(text(
+    insumos_por_id = {
+        int(linha["id"]): str(linha.get("name") or "")
+        for linha in catalogo if not int(linha["is_asset"])
+    }
+    insumos_por_nome: dict[str, list[int]] = defaultdict(list)
+    for produto_id, nome in insumos_por_id.items():
+        chave_nome = _chave_produto(nome)
+        if chave_nome:
+            insumos_por_nome[chave_nome].append(produto_id)
+
+    mapa: dict[str, int] = {}
+    por_nome = por_id = 0
+    with arquivo.open(encoding="utf-8-sig", newline="") as arquivo_csv:
+        for linha in csv.DictReader(arquivo_csv):
+            alias = (linha.get("alias") or "").strip()
+            produto_id = numero(linha.get("produto_id"))
+            nome_produto = (linha.get("produto") or "").strip()
+            if not alias or (not produto_id and not nome_produto):
+                continue
+
+            candidatos = insumos_por_nome.get(_chave_produto(nome_produto), [])
+            if len(candidatos) == 1:
+                escolhido = candidatos[0]
+                por_nome += 1
+            elif produto_id in candidatos:
+                escolhido = produto_id
+                por_nome += 1
+            elif (candidatos and produto_id in insumos_por_id
+                  and normalizar(insumos_por_id[produto_id])
+                  == normalizar(nome_produto)):
+                escolhido = produto_id
+                por_nome += 1
+            elif candidatos:
+                # Catálogo com o mesmo insumo duplicado: escolha determinística.
+                escolhido = min(candidatos)
+                print(f"  aviso {arquivo.name}: {alias!r} -> "
+                      f"{nome_produto!r} tem candidatos {sorted(candidatos)}; "
+                      f"usando {escolhido}")
+                por_nome += 1
+            elif produto_id in insumos_por_id:
+                escolhido = produto_id
+                por_id += 1
+            else:
+                raise RuntimeError(
+                    f"{arquivo.name}: não achei insumo ativo para {alias!r} "
+                    f"(produto {produto_id}, nome {nome_produto!r})")
+
+            chave = normalizar(alias)
+            if chave in mapa and mapa[chave] != escolhido:
+                raise RuntimeError(
+                    f"{arquivo.name}: descrição repetida com produtos "
+                    f"diferentes: {alias!r}")
+            mapa[chave] = escolhido
+
+    if mapa:
+        print(f"  mapa de insumos: {len(mapa)} alias(es) "
+              f"(por nome={por_nome}, por id={por_id})")
+    return mapa
+
+
+def carregar_referencias(conn, conn_legado) -> Referencias:
+    produtos = [dict(r) for r in conn.execute(text(
+        "SELECT id, name, type_id, is_asset FROM products WHERE deleted_at IS NULL"
+    )).mappings()]
+    tipos = [dict(r) for r in conn.execute(text(
+        "SELECT id, name FROM types WHERE deleted_at IS NULL"
+    )).mappings()]
+    usuarios = {normalizar(r.username): int(r.id) for r in conn.execute(text(
         "SELECT id, username FROM users WHERE deleted_at IS NULL"
     ))}
-    orgs = {int(r.id) for r in conn.execute(text(
+    organizacoes = {int(r.id) for r in conn.execute(text(
         "SELECT id FROM organizations WHERE deleted_at IS NULL"
     ))}
-    transports = {int(r.id) for r in conn.execute(text(
+    transportes = {int(r.id) for r in conn.execute(text(
         "SELECT id FROM service_order_mode_transports WHERE deleted_at IS NULL"
     ))}
-    return customers, users, orgs, transports
+    return Referencias(
+        clientes=IndiceClientes.carregar(conn_legado, conn),
+        produtos=IndiceSimilaridade(produtos),
+        produtos_insumo=IndiceSimilaridade(
+            [p for p in produtos if not int(p["is_asset"])]),
+        tipos=IndiceSimilaridade(tipos),
+        usuarios=usuarios,
+        organizacoes=organizacoes,
+        transportes=transportes,
+        produtos_por_id={int(p["id"]): str(p["name"]) for p in produtos},
+        mapa_insumos=carregar_mapa_insumos(conn),
+    )
 
 
-def match_customer(name: str, customers: list[dict]) -> tuple[dict | None, float, list[dict]]:
-    target = normalizar(name)
-    generic = {"CLIENTE", "PREFEITURA", "MUNICIPAL", "SECRETARIA", "ESTADO", "INSTITUTO", "DE", "DA", "DO", "DOS", "DAS"}
-    target_tokens = {token for token in target.split() if len(token) > 3 and token not in generic}
-    candidates_pool = []
-    if target_tokens:
-        candidates_pool = [customer for customer in customers
-                           if any(target_tokens & {token for token in normalizar(value).split()
-                                                   if len(token) > 3 and token not in generic}
-                                  for value in (customer.get("name"), customer.get("alias")) if value)]
-    if len(candidates_pool) < 2:
-        candidates_pool = customers
-    scored = []
-    for customer in candidates_pool:
-        names = {normalizar(customer.get("name")), normalizar(customer.get("alias"))}
-        score = max((difflib.SequenceMatcher(None, target, candidate).ratio()
-                     for candidate in names if candidate), default=0)
-        scored.append((score, customer))
-    scored.sort(key=lambda item: item[0], reverse=True)
-    best = scored[0] if scored else (0, None)
-    # Limite conservador e diferença mínima para evitar matches ambíguos.
-    runner_up = scored[1][0] if len(scored) > 1 else 0
-    matches = [row for score, row in scored[:5] if score >= 0.45]
-    if best[0] < 0.72 or best[0] - runner_up < 0.04:
-        return None, best[0], matches
-    return best[1], best[0], matches
+def carregar_equipamentos(conn, numeros_necessarios: set[int]) -> dict[int, list[dict]]:
+    equipamentos: dict[int, list[dict]] = defaultdict(list)
+    if not numeros_necessarios:
+        return equipamentos
+    consulta = text("""
+        SELECT id, number, status_id, name, current_organization_id
+        FROM equipments
+        WHERE deleted_at IS NULL
+    """)
+    for linha in conn.execute(consulta).mappings():
+        try:
+            numero_equipamento = int(str(linha["number"]).strip())
+        except (TypeError, ValueError):
+            continue
+        if numero_equipamento in numeros_necessarios:
+            equipamentos[numero_equipamento].append({
+                "id": int(linha["id"]),
+                "numero": numero_equipamento,
+                "status_id": int(linha["status_id"]),
+                "nome": linha["name"],
+                "organizacao": linha["current_organization_id"],
+            })
+    return equipamentos
 
 
-def preparar(engine, arquivo: Path = ARQUIVO_FONTE) -> tuple[list[dict], list[dict]]:
+# ---------------------------------------------------------------------------
+# Classificação do item (equipamento x insumo)
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class ClassificacaoItem:
+    tipo: str                 # EQUIPAMENTO | INSUMO | INDEFINIDO
+    product_id: int | None
+    type_id: int | None
+    referencia: str
+    similaridade: float
+    metodo: str
+
+
+def classificar_item(alias: str, refs: Referencias,
+                     cache: dict[str, ClassificacaoItem]) -> ClassificacaoItem:
+    chave = normalizar(alias)
+    if chave in cache:
+        return cache[chave]
+
+    # De/para curado tem precedência: o catálogo não cobre estas descrições e
+    # sem `product_id` a linha apareceria na lista de EQUIPAMENTOS.
+    produto_mapeado = refs.mapa_insumos.get(chave)
+    if produto_mapeado:
+        classificacao = ClassificacaoItem(
+            tipo="INSUMO", product_id=produto_mapeado, type_id=None,
+            referencia=refs.produtos_por_id.get(produto_mapeado, ""),
+            similaridade=1.0, metodo="mapa insumos")
+        cache[chave] = classificacao
+        return classificacao
+
+    base = limpar_serial(alias) or alias
+    produto, score, _ = refs.produtos.buscar(base, limite=0.0, margem=0.0)
+    tipo_kw = palavra_chave_tipo(base)
+    referencia = produto["name"] if produto else ""
+    tipo = "INDEFINIDO"
+    product_id = type_id = None
+
+    if produto and score >= 0.85:
+        tipo = "EQUIPAMENTO" if int(produto["is_asset"]) else "INSUMO"
+        type_id = int(produto["type_id"]) if produto.get("type_id") else None
+        if tipo == "INSUMO" and tipo_kw == "EQUIPAMENTO":
+            # O catálogo de insumos repete descrições de equipamento
+            # ("NOTEBOOK I7...", "IMPRESSORA...", "NOBREAK..."). Nesses casos a
+            # descrição manda: é equipamento, só não veio com PAT.
+            tipo = "EQUIPAMENTO"
+            metodo = f"produto {score:.2f}/palavra-chave equipamento"
+        else:
+            product_id = int(produto["id"]) if tipo == "INSUMO" else None
+            metodo = f"produto {score:.2f}"
+    elif tipo_kw:
+        tipo = tipo_kw
+        metodo = "palavra-chave"
+    elif produto and score >= 0.70:
+        tipo = "EQUIPAMENTO" if int(produto["is_asset"]) else "INSUMO"
+        type_id = int(produto["type_id"]) if produto.get("type_id") else None
+        product_id = int(produto["id"]) if tipo == "INSUMO" else None
+        metodo = f"produto(fraco) {score:.2f}"
+    else:
+        tipo_registro, score_tipo, _ = refs.tipos.buscar(base, limite=0.85, margem=0.05)
+        if tipo_registro:
+            tipo = "EQUIPAMENTO"
+            type_id = int(tipo_registro["id"])
+            referencia = referencia or tipo_registro["name"]
+            metodo = f"tipo {score_tipo:.2f}"
+        else:
+            metodo = f"sem match ({score:.2f})"
+
+    if tipo == "INSUMO" and product_id is None:
+        achado, score_insumo, _ = refs.produtos_insumo.buscar(base, limite=0.70, margem=0.03)
+        if achado:
+            product_id = int(achado["id"])
+            type_id = type_id or (int(achado["type_id"]) if achado.get("type_id") else None)
+            referencia = referencia or achado["name"]
+            metodo = f"{metodo}/produto insumo {score_insumo:.2f}"
+
+    if tipo == "INSUMO":
+        # Convenção do sistema: insumo tem `product_id` e NÃO tem `type_id`
+        # (que é "Tipo de Equipamento"). `type_id` em insumo esconde o item
+        # da lista de INSUMOS e o empurra para a lista de EQUIPAMENTOS.
+        type_id = None
+
+    classificacao = ClassificacaoItem(
+        tipo=tipo, product_id=product_id, type_id=type_id, referencia=referencia,
+        similaridade=round(score, 4), metodo=metodo,
+    )
+    cache[chave] = classificacao
+    return classificacao
+
+
+# ---------------------------------------------------------------------------
+# Leitura da planilha
+# ---------------------------------------------------------------------------
+COLUNAS_OBRIGATORIAS = (
+    "Solicitado Por", "Data", "Previsão", "Envio", "Cliente", "Cidade",
+    "Etiquetas", "Qtd Sol", "Equipamento | Insumos", "Substituição ou Novo",
+    "PAT", "Qtd Entregue", "Data Separação", "Separado por", "Observação",
+    "Req", "Ofício",
+)
+
+
+def ler_planilha(arquivo: Path) -> pd.DataFrame:
+    df = pd.read_csv(arquivo, encoding="utf-8-sig", dtype=str).fillna("")
+    df.columns = [str(c).strip() for c in df.columns]
+    faltantes = [c for c in COLUNAS_OBRIGATORIAS if c not in df.columns]
+    if faltantes:
+        raise SystemExit(f"❌ Colunas ausentes em {arquivo}: {', '.join(faltantes)}")
+    for coluna in df.columns:
+        df[coluna] = df[coluna].astype(str).str.strip()
+    return df
+
+
+def texto_substituicao(valor: object) -> str:
+    """Texto descritivo da coluna `Substituição ou Novo` (ex.: REVISADO).
+
+    `NOVO` é o caso normal de requisição avulsa e números já viram
+    "Substituição de ...", então só os textos livres são devolvidos.
+    """
+    bruto = str(valor or "").strip()
+    if not bruto or normalizar(bruto) == "NOVO" or numeros_substituicao(bruto):
+        return ""
+    return bruto
+
+
+def numeros_substituicao(valor: object) -> tuple[int, ...]:
+    """Só aceita número único ou lista de números separados por , ; /.
+
+    Evita tratar textos como `AA061209` ou `3kg` como equipamento substituído.
+    """
+    bruto = str(valor or "").strip()
+    if not bruto:
+        return ()
+    partes = [p.strip() for p in re.split(r"[,;/]", bruto)]
+    validas = [p for p in partes if re.fullmatch(r"\d{2,}(\.0)?", p)]
+    if len(validas) != len([p for p in partes if p]):
+        return ()
+    return tuple(int(float(p)) for p in validas)
+
+
+# ---------------------------------------------------------------------------
+# Linhas e agrupamento
+# ---------------------------------------------------------------------------
+@dataclass
+class Linha:
+    planilha: int
+    cliente_id: int
+    cliente: str
+    cliente_score: float
+    cliente_metodo: str
+    cliente_legado: str
+    address_id: int | None
+    address_alias: str
+    usuario_id: int
+    solicitante: str
+    organizacao: int
+    etiqueta: str
+    envio: int
+    data: datetime
+    previsao: datetime
+    req: str
+    oficio: str
+    observacao: str
+    alias: str
+    classificacao: ClassificacaoItem
+    quantidade: int
+    entregue: int
+    categoria: str
+    antigos: tuple[int, ...]
+    antigos_ids: tuple[int, ...]
+    substituicao: str
+    pat_numero: int | None
+    pat_id: int | None
+    separado_em: datetime | None
+    separador_id: int | None
+    separador: str
+    motivo_movimento: str = ""
+
+
+@dataclass
+class Item:
+    alias: str
+    classificacao: ClassificacaoItem
+    linhas: list[Linha]
+    quantidade: int
+    entregue: int
+    is_exchange: bool
+    antigos: tuple[int, ...]
+    equipment_id: int | None
+    address_id: int | None
+
+
+@dataclass
+class Cabecalho:
+    cliente_id: int
+    usuario_id: int
+    organizacao: int
+    envio: int
+    data: datetime
+    previsao: datetime
+    status_id: int
+    situation: str
+    movement_type_id: int
+    details: str
+    itens: list[Item]
+    linhas: list[Linha]
+
+
+def status_do_cabecalho(linhas: list[Linha]) -> tuple[int, str]:
+    valores = {linha.req for linha in linhas}
+    if valores == {"CANCELADA"}:
+        return 4, "cancelled"
+    if "PARCIAL" in valores:
+        return 2, "approved"
+    if valores & {"SEM ESTOQUE", "SOLICITADO ENVIO", ""}:
+        return 1, "approved"
+    return 3, "approved"
+
+
+def detalhes_cabecalho(linhas: list[Linha]) -> str:
+    partes = [MARCADOR]
+    reqs = sorted({linha.req for linha in linhas if linha.req})
+    if reqs:
+        partes.append("Req: " + " / ".join(reqs))
+    oficios = sorted({linha.oficio for linha in linhas if linha.oficio})
+    if oficios:
+        partes.append("Ofício: " + " / ".join(oficios[:5]))
+    observacoes = []
+    for linha in linhas:
+        if linha.observacao and linha.observacao not in observacoes:
+            observacoes.append(linha.observacao)
+    if observacoes:
+        partes.append("Obs: " + " | ".join(observacoes))
+    return " | ".join(partes)[:4000]
+
+
+def agrupar(linhas: list[Linha]) -> list[Cabecalho]:
+    grupos: dict[tuple, list[Linha]] = defaultdict(list)
+    for linha in linhas:
+        grupos[(linha.cliente_id, linha.usuario_id, linha.organizacao,
+                linha.envio, linha.data, linha.previsao)].append(linha)
+
+    cabecalhos: list[Cabecalho] = []
+    for chave, membros in grupos.items():
+        cliente_id, usuario_id, organizacao, envio, data, previsao = chave
+        por_item: dict[str, list[Linha]] = defaultdict(list)
+        for linha in membros:
+            por_item[normalizar(linha.alias)].append(linha)
+
+        itens: list[Item] = []
+        for linhas_item in por_item.values():
+            somatorio = sum(l.quantidade for l in linhas_item if l.quantidade)
+            quantidade = somatorio if somatorio >= len(linhas_item) else len(linhas_item)
+            informado = sum(l.entregue for l in linhas_item if l.entregue)
+            entregue = min(informado, quantidade) if informado else 0
+            antigos = tuple(dict.fromkeys(n for l in linhas_item for n in l.antigos))
+            antigos_ids = tuple(dict.fromkeys(i for l in linhas_item for i in l.antigos_ids))
+            equipment_id = antigos_ids[0] if antigos_ids else next(
+                (l.pat_id for l in linhas_item if l.pat_id), None)
+            itens.append(Item(
+                alias=linhas_item[0].alias,
+                classificacao=linhas_item[0].classificacao,
+                linhas=linhas_item,
+                quantidade=quantidade,
+                entregue=entregue,
+                is_exchange=bool(antigos),
+                antigos=antigos,
+                equipment_id=equipment_id,
+                address_id=next(
+                    (l.address_id for l in linhas_item if l.address_id), None),
+            ))
+
+        status_id, situation = status_do_cabecalho(membros)
+        movement_type_id = (TIPOS_MOVIMENTO["SUBSTITUICAO"]
+                            if all(item.is_exchange for item in itens)
+                            else TIPOS_MOVIMENTO["AVULSO"])
+        cabecalhos.append(Cabecalho(
+            cliente_id=cliente_id, usuario_id=usuario_id, organizacao=organizacao,
+            envio=envio, data=data, previsao=previsao, status_id=status_id,
+            situation=situation, movement_type_id=movement_type_id,
+            details=detalhes_cabecalho(membros), itens=itens, linhas=membros,
+        ))
+    cabecalhos.sort(key=lambda c: (c.data or datetime.min, c.cliente_id, c.usuario_id))
+    return cabecalhos
+
+# ---------------------------------------------------------------------------
+# Validação linha a linha
+# ---------------------------------------------------------------------------
+COLUNAS_AUDITORIA = (
+    "linha", "resultado", "motivo", "cliente", "cliente_id", "similaridade_cliente",
+    "metodo_cliente", "cliente_legado", "address_id", "address_alias_endereco",
+    "etiqueta", "organizacao_id", "solicitante", "usuario_id", "item", "tipo_item",
+    "produto_id", "type_id", "similaridade_item", "metodo_item", "categoria",
+    "equipamentos_antigos", "pat", "pat_id", "separador", "separador_id",
+    "data_separacao", "req", "status_id", "situacao", "observacao",
+)
+
+
+def montar_linha(row, indice: int, refs: Referencias,
+                 cache: dict[str, ClassificacaoItem],
+                 auditoria: list[dict]) -> Linha | None:
+    planilha = indice + 2
+    auditoria_linha = {
+        "linha": planilha, "cliente": row["Cliente"], "etiqueta": row["Etiquetas"],
+        "solicitante": row["Solicitado Por"], "item": row["Equipamento | Insumos"],
+        "req": row["Req"], "pat": row["PAT"], "separador": row["Separado por"],
+        "observacao": row["Observação"],
+    }
+
+    def ignorar(motivo: str):
+        auditoria.append({**auditoria_linha, "resultado": "IGNORADA", "motivo": motivo})
+        return None
+
+    data = data_planilha(row["Data"])
+    # Algumas linhas chegam sem `Data` mas com `Data Separação` preenchida
+    # (CIRETRAN/MA-BACABAL). Nesses casos a separação serve de data da requisição.
+    if not data:
+        data = data_planilha(row["Data Separação"])
+        if not data:
+            return ignorar("Data da requisição vazia ou inválida")
+        data_origem_separacao = True
+    else:
+        data_origem_separacao = False
+
+    cliente, score_cliente, sugestoes = refs.clientes.buscar(
+        row["Cliente"], row["Cidade"])
+    if not cliente:
+        nomes = " | ".join(
+            f"{s.get('legacy_name') or '?'} -> {s.get('customer_name') or 'sem cliente'}"
+            for s in sugestoes[:3])
+        return ignorar(
+            f"Cliente sem match confiável (similaridade {score_cliente:.2f}); "
+            f"sugestões: {nomes}")
+
+    organizacao = selecionar_organizacao(row["Etiquetas"])
+    if not organizacao or organizacao not in refs.organizacoes:
+        return ignorar(f"Etiqueta sem organização reconhecida: {row['Etiquetas']}")
+
+    envio = TRANSPORTES.get(normalizar(row["Envio"]))
+    avisos: list[str] = []
+    if data_origem_separacao:
+        avisos.append("Data vazia; usada Data Separação como data da requisição")
+    if not envio:
+        if not normalizar(row["Envio"]):
+            envio = TRANSPORTES["ROTA"]
+            avisos.append("Envio vazio; assumido Rota")
+        else:
+            return ignorar(f"Transporte não mapeado: {row['Envio']}")
+    if envio not in refs.transportes:
+        return ignorar(f"Transporte {envio} não existe no destino")
+
+    username = USUARIOS.get(normalizar(row["Solicitado Por"]))
+    if not username:
+        username = USUARIO_PADRAO
+        avisos.append(f"solicitante '{row['Solicitado Por'] or 'vazio'}' sem usuário; usado {USUARIO_PADRAO}")
+    usuario_id = refs.usuarios.get(normalizar(username))
+    if not usuario_id:
+        return ignorar(f"Usuário {username} não encontrado no destino")
+
+    classificacao = classificar_item(row["Equipamento | Insumos"], refs, cache)
+    if classificacao.tipo == "INDEFINIDO":
+        avisos.append("item sem tipo/produto correspondente")
+
+    substituicao = row["Substituição ou Novo"]
+    antigos = numeros_substituicao(substituicao)
+    antigos_ids: list[int] = []
+    for numero_antigo in antigos:
+        candidatos = refs.equipamentos.get(numero_antigo, [])
+        if not candidatos:
+            avisos.append(f"equipamento substituído {numero_antigo} não encontrado")
+            continue
+        escolhido = next((c for c in candidatos if c["organizacao"] == organizacao),
+                         candidatos[0])
+        antigos_ids.append(escolhido["id"])
+
+    pat_numero = numero_pat(row["PAT"])
+    pat_id = None
+    if pat_numero:
+        candidatos = refs.equipamentos.get(pat_numero, [])
+        if candidatos:
+            escolhido = next((c for c in candidatos if c["organizacao"] == organizacao),
+                             candidatos[0])
+            pat_id = escolhido["id"]
+        else:
+            avisos.append(f"PAT {pat_numero} não encontrado em equipments")
+
+    separador_nome = row["Separado por"]
+    separador_username = SEPARADORES.get(normalizar(separador_nome)) if separador_nome else None
+    separador_id = refs.usuarios.get(normalizar(separador_username)) if separador_username else None
+
+    separado_em = data_planilha(row["Data Separação"])
+    motivo_movimento = ""
+    if separado_em:
+        if not pat_id:
+            motivo_movimento = "PAT ausente ou não encontrado"
+        elif not separador_id:
+            motivo_movimento = f"separador sem usuário: {separador_nome or 'vazio'}"
+
+    quantidade = numero(row["Qtd Sol"]) or 0
+    entregue = numero(row["Qtd Entregue"]) or 0
+
+    if not cliente.address_id:
+        avisos.append("cliente sem endereço migrado (item ficará sem address_id)")
+    if cliente.metodo == "similaridade" and score_cliente < 0.85:
+        avisos.append(f"confirmar cliente (similaridade {score_cliente:.2f})")
+
+    auditoria.append({
+        **auditoria_linha,
+        "resultado": "MOVIMENTO BLOQUEADO" if motivo_movimento else "OK",
+        "motivo": "; ".join(avisos + ([motivo_movimento] if motivo_movimento else [])),
+        "cliente_id": cliente.customer_id,
+        "similaridade_cliente": round(score_cliente, 4),
+        "metodo_cliente": cliente.metodo,
+        "cliente_legado": cliente.legacy_name,
+        "address_id": cliente.address_id,
+        "address_alias_endereco": cliente.address_alias,
+        "organizacao_id": organizacao, "usuario_id": usuario_id,
+        "tipo_item": classificacao.tipo, "produto_id": classificacao.product_id,
+        "type_id": classificacao.type_id, "similaridade_item": classificacao.similaridade,
+        "metodo_item": classificacao.metodo,
+        "categoria": "SUBSTITUICAO" if antigos else "AVULSO",
+        "equipamentos_antigos": ",".join(str(n) for n in antigos),
+        "pat_id": pat_id, "separador_id": separador_id,
+        "data_separacao": separado_em.date().isoformat() if separado_em else "",
+        "status_id": STATUS_REQ.get(normalizar(row["Req"]), (None, ""))[0],
+        "situacao": STATUS_REQ.get(normalizar(row["Req"]), (None, ""))[1],
+    })
+
+    return Linha(
+        planilha=planilha,
+        cliente_id=cliente.customer_id, cliente=cliente.customer_name,
+        cliente_score=round(score_cliente, 4),
+        cliente_metodo=cliente.metodo, cliente_legado=cliente.legacy_name,
+        address_id=cliente.address_id, address_alias=cliente.address_alias,
+        usuario_id=usuario_id, solicitante=username,
+        organizacao=organizacao, etiqueta=row["Etiquetas"], envio=envio,
+        data=data, previsao=data_planilha(row["Previsão"]) or data,
+        req=normalizar(row["Req"]), oficio=row["Ofício"],
+        observacao=row["Observação"],
+        alias=row["Equipamento | Insumos"], classificacao=classificacao,
+        quantidade=quantidade, entregue=entregue,
+        categoria="SUBSTITUICAO" if antigos else "AVULSO",
+        antigos=antigos, antigos_ids=tuple(antigos_ids),
+        substituicao=substituicao,
+        pat_numero=pat_numero, pat_id=pat_id,
+        separado_em=separado_em, separador_id=separador_id,
+        separador=separador_nome, motivo_movimento=motivo_movimento,
+    )
+
+
+def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
+             engine_legado=None) -> tuple[list[Cabecalho], list[dict]]:
     print("\n" + "=" * 72)
     print("📦 MÓDULO: MIGRAÇÃO DE REQUISIÇÕES 2026")
     print("=" * 72)
     print(f"📖 Lendo arquivo de origem: {arquivo}")
-    df = pd.read_csv(arquivo, encoding="utf-8-sig", dtype=str).fillna("")
-    df.columns = [str(c).strip() for c in df.columns]
+    df = ler_planilha(arquivo)
     print(f"   Linhas carregadas: {len(df):,}")
-    required = ["Solicitado Por", "Data", "Previsão", "Envio", "Cliente", "Etiquetas",
-                "Qtd Sol", "Equipamento | Insumos", "Substituição ou Novo", "PAT",
-                "Qtd Entregue", "Data Separação", "Separado por", "Req"]
-    missing = set(required) - set(df.columns)
-    if missing:
-        raise ValueError(f"Colunas ausentes no CSV: {', '.join(sorted(missing))}")
 
-    print("\n🔗 Carregando clientes, usuários, organizações, transportes e equipamentos...")
+    numeros_necessarios: set[int] = set()
+    for valor in df["PAT"]:
+        achado = numero_pat(valor)
+        if achado:
+            numeros_necessarios.add(achado)
+    for valor in df["Substituição ou Novo"]:
+        numeros_necessarios.update(numeros_substituicao(valor))
+
     with engine.connect() as conn:
-        customers, user_ids, org_ids, transports = carregar_referencias(conn)
-        equipment_numbers = [int(float(v)) for v in df["PAT"] if str(v).strip().isdigit()]
-        substitution_numbers = [int(float(v)) for v in df["Substituição ou Novo"] if str(v).strip().isdigit()]
-        all_numbers = sorted(set(equipment_numbers + substitution_numbers))
-        equipment = {}
-        for start in range(0, len(all_numbers), 500):
-            block = all_numbers[start:start + 500]
-            if not block:
-                continue
-            marks = ",".join(f":n{i}" for i in range(len(block)))
-            params = {f"n{i}": number for i, number in enumerate(block)}
-            rows = conn.execute(text(f"""
-                SELECT id, number, status_id, name, current_organization_id
-                FROM equipments WHERE number IN ({marks}) AND deleted_at IS NULL
-            """), params)
-            for row in rows:
-                equipment.setdefault(int(row.number), []).append(dict(
-                    id=int(row.id), number=int(row.number), status_id=int(row.status_id),
-                    name=row.name, organization_id=row.current_organization_id,
-                ))
+        with engine_legado.connect() as conn_legado:
+            refs = carregar_referencias(conn, conn_legado)
+        refs.equipamentos = carregar_equipamentos(conn, numeros_necessarios)
+
     print(
-        f"   Referências carregadas: {len(customers):,} clientes, "
-        f"{len(user_ids):,} usuários, {len(all_numbers):,} números de equipamento consultados."
+        f"   Referências: {len(refs.clientes.registros):,} clientes do legado, "
+        f"{len(refs.produtos.registros):,} produtos, "
+        f"{len(refs.tipos.registros):,} tipos, {len(refs.usuarios)} usuários, "
+        f"{len(refs.equipamentos):,} números de equipamento localizados."
     )
 
-    audit, prepared = [], []
-    customer_match_cache = {}
-    print("\n🔍 Validando linhas, equipamentos e correspondência de clientes...")
-    for index, row in tqdm(df.iterrows(), total=len(df), desc="Validando requisições", unit="linha"):
-        line = index + 2
-        req = normalizar(row["Req"])
-        reason = ""
-        if req in IGNORAR_REQ:
-            reason = f"Req ignorada: {req or 'vazio'}"
-        elif req not in STATUS_REQ:
-            reason = f"Status Req não mapeado: {req}"
+    linhas: list[Linha] = []
+    auditoria: list[dict] = []
+    cache: dict[str, ClassificacaoItem] = {}
+    for indice, row in tqdm(df.iterrows(), total=len(df),
+                            desc="Validando linhas", unit="linha"):
+        linha = montar_linha(row, indice, refs, cache, auditoria)
+        if linha:
+            linhas.append(linha)
 
-        tag_org = selecionar_organizacao(row["Etiquetas"])
-        org_id = tag_org
-        if not reason and not org_id:
-            reason = f"Etiqueta sem organização reconhecida: {row['Etiquetas']}"
-        elif org_id and org_id not in org_ids:
-            reason = f"Organização {org_id} não existe no destino"
+    print(f"\n   ✅ Linhas elegíveis: {len(linhas):,}")
+    print(f"   ⚠️ Linhas ignoradas/bloqueadas: {sum(1 for a in auditoria if a['resultado'] != 'OK'):,}")
+    return agrupar(linhas), auditoria
 
-        requester = USUARIOS.get(normalizar(row["Solicitado Por"]))
-        user_id = user_ids.get(normalizar(requester)) if requester else None
-        if not reason and not user_id:
-            reason = f"Solicitante sem usuário correspondente: {row['Solicitado Por']}"
-        request_date = data_planilha(row["Data"])
-        if not reason and not request_date:
-            reason = "Data da requisição vazia ou inválida"
-
-        customer_key = normalizar(row["Cliente"])
-        if customer_key not in customer_match_cache:
-            customer_match_cache[customer_key] = match_customer(row["Cliente"], customers)
-        customer, score, candidates = customer_match_cache[customer_key]
-        if not reason and not customer:
-            reason = f"Cliente sem match confiável (similaridade {score:.2f})"
-
-        mode = TRANSPORTES.get(normalizar(row["Envio"]))
-        if not reason and (not mode or mode not in transports):
-            reason = f"Transporte não mapeado/disponível: {row['Envio']}"
-
-        pat = numero(row["PAT"])
-        pat_matches = equipment.get(pat, []) if pat else []
-        pat_equipment = next((e for e in pat_matches if e["status_id"] == 1), None)
-        if not reason and not pat_equipment:
-            reason = f"PAT ausente/ambíguo ou equipamento não está status_id=1: {row['PAT']}"
-
-        subst_text = str(row["Substituição ou Novo"]).strip()
-        normalized_subst = normalizar(subst_text)
-        old_equipment = None
-        if normalized_subst != "NOVO":
-            subst_no = numero(subst_text)
-            if subst_no:
-                candidates_eq = equipment.get(subst_no, [])
-                old_equipment = next((e for e in candidates_eq if e["status_id"] in (2, 3)), None)
-                if not old_equipment and not reason:
-                    reason = f"Equipamento de substituição {subst_no} não está alugado/reservado"
-            elif not reason:
-                reason = f"Tipo ambíguo em Substituição ou Novo: {subst_text}"
-
-        requested = numero(row["Qtd Sol"])
-        delivered = numero(row["Qtd Entregue"])
-        separated_at = data_planilha(row["Data Separação"])
-        # Qtd Entregue/Qtd Sol são totais do grupo, não quantidades por PAT.
-        # Cada linha com PAT corresponde a uma unidade física para o movimento.
-        movement_quantity = delivered if delivered else requested
-        separator_name = str(row["Separado por"]).strip()
-        separator_id = user_ids.get(normalizar(separator_name))
-        # Usuários de separação não mapeados nunca impedem a requisição; apenas
-        # bloqueiam a criação do movimento da linha, registrando a razão.
-        create_movement = bool(separated_at and separator_id and not reason)
-
-        record = {
-            "source_line": line, "req": req, "status_id": STATUS_REQ.get(req, (None, None))[0],
-            "situation": STATUS_REQ.get(req, (None, None))[1], "user_id": user_id,
-            "requester_name": requester,
-            "customer_id": int(customer["id"]) if customer else None,
-            "customer_match": customer.get("name") if customer else "",
-            "customer_score": round(score, 4), "organization_id": org_id,
-            "mode_transport_id": mode, "created_at": request_date,
-            # deadline é NOT NULL no schema destino; quando não há Previsão,
-            # usa-se a Data da própria requisição como fallback.
-            "deadline": data_planilha(row["Previsão"]) or request_date,
-            # NOVO é aluguel avulso, sem contrato; AVULSO tem id 7 no destino.
-            "movement_type_id": 7 if normalized_subst == "NOVO" else 2,
-            "item_alias": str(row["Equipamento | Insumos"]).strip(),
-            "requested_quantity": requested, "delivered_quantity": movement_quantity,
-            "equipment_id": pat_equipment["id"] if pat_equipment else None,
-            "equipment_number": pat, "old_equipment_id": old_equipment["id"] if old_equipment else None,
-            "old_equipment_number": old_equipment["number"] if old_equipment else None,
-            "separated_at": separated_at, "separator_id": separator_id,
-            "separator_name": separator_name, "create_movement": create_movement,
-            "source_req": str(row["Req"]),
-        }
-        if reason:
-            audit.append({"linha": line, "resultado": "IGNORADA", "motivo": reason,
-                          "cliente": row["Cliente"], "cliente_sugerido": " | ".join(
-                              str(c.get("name", "")) for c in candidates), "similaridade": round(score, 4),
-                          "PAT": row["PAT"], "Req": row["Req"]})
-        else:
-            prepared.append(record)
-            if separated_at and not separator_id:
-                audit.append({"linha": line, "resultado": "REQUISIÇÃO SEM MOVIMENTO",
-                              "motivo": f"Separador sem correspondência: {separator_name}",
-                              "cliente": row["Cliente"], "cliente_sugerido": record["customer_match"],
-                              "similaridade": round(score, 4), "PAT": row["PAT"], "Req": row["Req"]})
-    print(f"\n   ✅ Linhas válidas para migração: {len(prepared):,}")
-    print(f"   ⚠️ Linhas registradas na auditoria: {len(audit):,}")
-    return prepared, audit
+# ---------------------------------------------------------------------------
+# Gravação
+# ---------------------------------------------------------------------------
+def departamento_do_item(tipo: str, produto_pecas_adi: bool) -> str:
+    """Departamento do item de requisição pela natureza do item."""
+    if str(tipo or "").upper() == "EQUIPAMENTO":
+        return DEPARTAMENTO_EQUIPAMENTO
+    if produto_pecas_adi:
+        return DEPARTAMENTO_PECAS_ADI
+    return DEPARTAMENTO_PADRAO
 
 
-def criar(engine, registros: list[dict]) -> tuple[int, int, list[dict]]:
-    # Agrupa cabeçalho por cliente/data/solicitante/transporte/organização/tipo
-    # e situação; cada alias de equipamento fica em seu próprio item.
-    headers = defaultdict(list)
-    for r in registros:
-        key = (r["customer_id"], r["user_id"], r["created_at"], r["deadline"],
-               r["organization_id"], r["mode_transport_id"], r["movement_type_id"],
-               r["status_id"], r["situation"])
-        headers[key].append(r)
-    order_count = movement_count = 0
-    created_log_rows = []
-    print(f"\n📝 Preparando gravação de {len(headers):,} requisições agrupadas...")
-    print("🔒 Abrindo transação no banco de destino...")
+def carregar_departamentos(conn) -> dict[str, int]:
+    """Nome -> id em `service_order_departments` (falha se faltar algum)."""
+    mapa = {
+        str(nome).strip().upper(): int(departamento_id)
+        for nome, departamento_id in conn.execute(text(
+            "SELECT `name`, `id` FROM `service_order_departments` "
+            "WHERE `deleted_at` IS NULL"))
+    }
+    faltando = [nome for nome in (DEPARTAMENTO_PADRAO, DEPARTAMENTO_EQUIPAMENTO,
+                                  DEPARTAMENTO_PECAS_ADI) if nome not in mapa]
+    if faltando:
+        raise RuntimeError(
+            "Departamentos ausentes em service_order_departments: "
+            + ", ".join(faltando))
+    return mapa
+
+
+def carregar_produtos_pecas_adi(conn) -> set[int]:
+    """Produtos cujo estoque a migração de insumos classificou como Peças ADI."""
+    return {int(produto_id) for produto_id in conn.execute(text(
+        "SELECT DISTINCT pi.`product_id` FROM `product_items` pi "
+        "JOIN `locations` l ON l.`id` = pi.`location_id` "
+        "WHERE l.`area` = 'Peças ADI' AND pi.`deleted_at` IS NULL "
+        "AND pi.`product_id` IS NOT NULL")).scalars()}
+
+
+def proximos_numeros(base: int, quantidade: int) -> list[int]:
+    """Protocolos contíguos acima de `base` (o número corrente do banco)."""
+    base, quantidade = int(base or 0), int(quantidade or 0)
+    if quantidade <= 0:
+        return []
+    return list(range(base + 1, base + quantidade + 1))
+
+
+def sincronizar_sequencia(conn, ultimo: int) -> None:
+    """Alinha `movement_number_sequences.last_number` com o maior protocolo.
+
+    A sequência não é truncada pelo reset e o INSERT em SQL puro não passa pelo
+    hook do Laravel, então sem esta sincronização o próximo movimento criado
+    pela tela reutilizaria um número.
+    """
+    existe = conn.execute(text(
+        "SELECT COUNT(*) FROM information_schema.TABLES "
+        "WHERE TABLE_SCHEMA = DATABASE() "
+        "AND TABLE_NAME = 'movement_number_sequences'")).scalar()
+    if not existe:
+        return
+    alterado = conn.execute(text(
+        "UPDATE `movement_number_sequences` "
+        "SET `last_number` = GREATEST(`last_number`, :ultimo) WHERE `id` = 1"),
+        {"ultimo": int(ultimo)})
+    if alterado.rowcount == 0:
+        conn.execute(text(
+            "INSERT INTO `movement_number_sequences` (`id`, `last_number`) "
+            "VALUES (1, :ultimo)"), {"ultimo": int(ultimo)})
+
+
+def numerar_movimentos_sem_protocolo(conn) -> list[tuple[int, str]]:
+    """Dá protocolo aos movimentos com `number` NULL/vazio, por ordem de id.
+
+    Regra do importador legado: nunca usar `number = id` (os ids dos movimentos
+    de requisição são menores que o maior número já emitido e colidiriam).
+    A numeração é sempre acima do MAX(number) existente e cobre também o
+    movimento avulso criado pelos ajustes.
+    """
+    ids = conn.execute(text(
+        "SELECT `id` FROM `movements` "
+        "WHERE `number` IS NULL OR `number` = '' ORDER BY `id`")).scalars().all()
+    base = int(conn.execute(text(
+        "SELECT COALESCE(MAX(CAST(`number` AS UNSIGNED)), 0) FROM `movements` "
+        "WHERE `number` IS NOT NULL AND `number` <> ''")).scalar() or 0)
+    atribuidos: list[tuple[int, str]] = []
+    for movimento_id, numero_novo in zip(ids, proximos_numeros(base, len(ids))):
+        conn.execute(text("UPDATE `movements` SET `number` = :numero WHERE `id` = :id"),
+                     {"numero": str(numero_novo), "id": movimento_id})
+        atribuidos.append((movimento_id, str(numero_novo)))
+    if atribuidos:
+        sincronizar_sequencia(conn, int(atribuidos[-1][1]))
+    return atribuidos
+
+
+def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
+    stats = defaultdict(int)
+    log_rows: list[dict] = []
+    print(f"\n📝 Gravando {len(cabecalhos):,} requisições em transação única...")
     with engine.begin() as conn:
-        for key, rows in tqdm(headers.items(), total=len(headers), desc="Gravando requisições", unit="req"):
-            customer_id, user_id, created, deadline, org_id, transport, movement_type, status_id, situation = key
-            cur = conn.execute(text("""
+        departamentos = carregar_departamentos(conn)
+        produtos_pecas_adi = carregar_produtos_pecas_adi(conn)
+        for cabecalho in tqdm(cabecalhos, desc="Gravando requisições", unit="req"):
+            ordem = conn.execute(text("""
                 INSERT INTO service_orders
                     (status_id, movement_type_id, contract_id, user_id, mode_transport_id,
                      requires_invoice, organization_id, recipient_customer_id,
-                     maintenance_created_order, deadline, situation, details, created_at, updated_at)
-                VALUES (:status_id, :movement_type_id, NULL, :user_id, :transport,
-                        0, :org_id, :customer_id, 0, :deadline, :situation,
-                        :details, :created, :created)
-            """), {"status_id": status_id, "movement_type_id": movement_type,
-                   "user_id": user_id, "transport": transport, "org_id": org_id,
-                   "customer_id": customer_id, "deadline": deadline, "situation": situation,
-                   "details": "Migração REQUISIÇÃO 2026.csv; requisição avulsa sem contrato",
-                   "created": created})
-            service_order_id = cur.lastrowid
-            order_count += 1
-            order_movement_logs = []
+                     maintenance_created_order, deadline, situation, details,
+                     created_at, updated_at)
+                VALUES
+                    (:status_id, :movement_type_id, NULL, :user_id, :envio,
+                     0, :organizacao, :cliente_id,
+                     0, :deadline, :situation, :details,
+                     :created, :created)
+            """), {
+                "status_id": cabecalho.status_id,
+                "movement_type_id": cabecalho.movement_type_id,
+                "user_id": cabecalho.usuario_id,
+                "envio": cabecalho.envio,
+                "organizacao": cabecalho.organizacao,
+                "cliente_id": cabecalho.cliente_id,
+                "deadline": cabecalho.previsao,
+                "situation": cabecalho.situation,
+                "details": cabecalho.details,
+                "created": cabecalho.data,
+            })
+            ordem_id = ordem.lastrowid
+            stats["requisicoes"] += 1
 
-            by_item = defaultdict(list)
-            for r in rows:
-                # Em substituição, equipment_id da requisição é o equipamento
-                # alugado/reservado indicado na coluna de referência.
-                item_key = (r["item_alias"], r["old_equipment_id"])
-                by_item[item_key].append(r)
-            for (alias, requested_equipment_id), item_rows in tqdm(
-                by_item.items(), total=len(by_item), desc=f"Itens da requisição {service_order_id}",
-                unit="item", leave=False,
-            ):
-                entered_quantities = [r["requested_quantity"] for r in item_rows if r["requested_quantity"]]
-                # A planilha informa Qtd Sol apenas na primeira linha do grupo;
-                # as linhas seguintes representam equipamentos dessa quantidade.
-                requested_qty = max(entered_quantities) if entered_quantities else len(item_rows)
-                fulfilled_qty = sum(1 for r in item_rows if r["create_movement"])
-                item_result = conn.execute(text("""
+            item_ids: dict[str, int] = {}
+            for item in cabecalho.itens:
+                classificacao = item.classificacao
+                departamento = departamento_do_item(
+                    classificacao.tipo,
+                    classificacao.product_id in produtos_pecas_adi)
+                insumo = classificacao.tipo == "INSUMO"
+                sem_estoque = any(l.req == "SEM ESTOQUE" for l in item.linhas)
+                partes_detalhe = [classificacao.tipo.title(), classificacao.metodo]
+                if item.antigos:
+                    partes_detalhe.append(
+                        "Substituição de " + ", ".join(str(n) for n in item.antigos))
+                textos_substituicao = sorted({
+                    texto for texto in (texto_substituicao(l.substituicao)
+                                        for l in item.linhas) if texto})
+                if textos_substituicao:
+                    partes_detalhe.append(
+                        "Substituição informada: " + ", ".join(textos_substituicao))
+                detalhe_item = " | ".join(p for p in partes_detalhe if p)
+                criado = conn.execute(text("""
                     INSERT INTO service_order_items
                         (status_id, service_order_id, department_id, movement_type_id,
-                         contract_item_id, alias, equipment_id, type_id, product_id,
-                         is_exchange, is_extra, quantity_product, fulfilled_quantity_product,
-                         quantity, fulfilled_quantity, details, created_at, updated_at)
-                    VALUES (:status_id, :order_id, NULL, :movement_type, NULL, :alias,
-                            :equipment_id, NULL, NULL, :is_exchange, 0, NULL, 0, :quantity,
-                            :fulfilled, :details, :created, :created)
-                """), {"status_id": status_id, "order_id": service_order_id,
-                       "movement_type": movement_type, "alias": alias,
-                       "equipment_id": requested_equipment_id,
-                       "is_exchange": int(movement_type == 2), "quantity": requested_qty,
-                       "fulfilled": fulfilled_qty,
-                       "details": "AVULSO - sem vínculo contratual" if movement_type == 7 else "Substituição conforme planilha",
-                       "created": created})
-                service_item_id = item_result.lastrowid
+                         contract_item_id, address_id, alias, equipment_id, type_id,
+                         product_id, is_exchange, is_extra, quantity_product,
+                         fulfilled_quantity_product, quantity, fulfilled_quantity,
+                         details, stock_status, created_at, updated_at)
+                    VALUES
+                        (:status_id, :ordem_id, :departamento, :movement_type,
+                         NULL, :address_id, :alias, :equipment_id, :type_id,
+                         :product_id, :is_exchange, 0, :qtd_produto,
+                         :entregue_produto, :quantity, :fulfilled,
+                         :details, :stock_status, :created, :created)
+                """), {
+                    "status_id": cabecalho.status_id,
+                    "ordem_id": ordem_id,
+                    "departamento": departamentos[departamento],
+                    "movement_type": cabecalho.movement_type_id,
+                    "address_id": item.address_id,
+                    "alias": item.alias[:255],
+                    "equipment_id": (item.equipment_id
+                                     if classificacao.tipo == "EQUIPAMENTO"
+                                     else None),
+                    "type_id": classificacao.type_id,
+                    "product_id": classificacao.product_id,
+                    "is_exchange": int(item.is_exchange),
+                    "qtd_produto": item.quantidade if insumo else None,
+                    "entregue_produto": item.entregue if insumo else 0,
+                    "quantity": item.quantidade,
+                    "fulfilled": item.entregue,
+                    "details": detalhe_item,
+                    "stock_status": "awaiting_purchase" if sem_estoque else "in_stock",
+                    "created": cabecalho.data,
+                })
+                item_ids[normalizar(item.alias)] = criado.lastrowid
+                stats["itens"] += 1
+                stats[f"itens_{classificacao.tipo.lower()}"] += 1
+                stats[f"itens_departamento_{departamento.lower()}"] += 1
 
-                movement_rows = [r for r in item_rows if r["create_movement"]]
-                by_movement = defaultdict(list)
-                for r in movement_rows:
-                    by_movement[(r["separated_at"], r["separator_id"])].append(r)
-                for (movement_date, separator_id), separated in tqdm(
-                    by_movement.items(), total=len(by_movement),
-                    desc=f"Movimentos da requisição {service_order_id}", unit="mov", leave=False,
-                ):
-                    mov_result = conn.execute(text("""
-                        INSERT INTO movements
-                            (number, movement_date, service_order_id, recipient_customer_id,
-                             organization_id, status_id, created_by, details,
-                             maintenance_created_movement, created_at, updated_at)
-                        VALUES (NULL, :movement_date, :order_id, :customer_id, :org_id,
-                                3, :created_by, :details, 0, :movement_date, :movement_date)
-                    """), {"movement_date": movement_date, "order_id": service_order_id,
-                           "customer_id": customer_id, "org_id": org_id,
-                           "created_by": separator_id,
-                           "details": "Migração REQUISIÇÃO 2026.csv"})
-                    movement_id = mov_result.lastrowid
-                    movement_count += 1
-                    movement_log = {
-                        "movimento_id": movement_id,
-                        "data_movimento": movement_date,
-                        "separador_id": separator_id,
-                        "separador": separated[0]["separator_name"],
-                        "itens_movimento": [],
-                    }
-                    order_movement_logs.append(movement_log)
-                    seen_equipment = set()
-                    for r in separated:
-                        equipment_id = r["equipment_id"]
-                        if equipment_id in seen_equipment:
-                            continue
-                        seen_equipment.add(equipment_id)
-                        operation = "AVULSO" if movement_type == 7 else "SUBSTITUIÇÃO"
-                        movement_item_result = conn.execute(text("""
-                            INSERT INTO movement_items
-                                (movement_id, movement_type_id, service_order_item_id,
-                                 equipment_id, status_id, alias, old_organization_id,
-                                 new_organization_id, operation_type, created_at, updated_at)
-                            VALUES (:movement_id, :movement_type, :service_item, :equipment_id,
-                                    3, :alias, NULL, :org_id, :operation, :created, :created)
-                        """), {"movement_id": movement_id, "movement_type": movement_type,
-                               "service_item": service_item_id, "equipment_id": equipment_id,
-                               "alias": r["item_alias"], "org_id": org_id,
-                               "operation": operation, "created": movement_date})
-                        movement_log["itens_movimento"].append({
-                            "movement_item_id": movement_item_result.lastrowid,
-                            "equipment_number": r["equipment_number"],
-                            "operation_type": operation,
-                        })
+            movimentos: dict[tuple, list[Linha]] = defaultdict(list)
+            for linha in cabecalho.linhas:
+                if linha.separado_em and linha.separador_id and linha.pat_id:
+                    movimentos[(linha.separado_em, linha.separador_id)].append(linha)
 
-            base_log = {
-                "requisicao_id": service_order_id,
-                "cliente_id": customer_id,
-                "cliente": rows[0]["customer_match"],
-                "solicitante_id": user_id,
-                "solicitante": rows[0]["requester_name"],
-                "data_requisicao": created,
-                "prazo": deadline,
-                "tipo": "AVULSO" if movement_type == 7 else "SUBSTITUIÇÃO",
-                "situacao": situation,
-                "status_id": status_id,
-                "linhas_origem": ";".join(str(r["source_line"]) for r in rows),
-            }
-            if order_movement_logs:
-                for movement_log in order_movement_logs:
-                    created_log_rows.append({
-                        **base_log,
-                        "movimento_id": movement_log["movimento_id"],
-                        "data_movimento": movement_log["data_movimento"],
-                        "separador_id": movement_log["separador_id"],
-                        "separador": movement_log["separador"],
-                        "itens_movimento": ";".join(
-                            f"{item['equipment_number']} (item {item['movement_item_id']}, {item['operation_type']})"
-                            for item in movement_log["itens_movimento"]
-                        ),
+            for (data_movimento, separador_id), linhas_mov in movimentos.items():
+                antigos = sorted({n for l in linhas_mov for n in l.antigos})
+                detalhe = f"{MARCADOR} | requisição {ordem_id}"
+                if antigos:
+                    detalhe += " | substituição de " + ", ".join(str(n) for n in antigos)
+                movimento = conn.execute(text("""
+                    INSERT INTO movements
+                        (number, movement_date, service_order_id, recipient_customer_id,
+                         organization_id, status_id, created_by, details,
+                         maintenance_created_movement, created_at, updated_at)
+                    VALUES
+                        (NULL, :data, :ordem_id, :cliente_id, :organizacao, 3,
+                         :created_by, :details, 0, :data, :data)
+                """), {
+                    "data": data_movimento, "ordem_id": ordem_id,
+                    "cliente_id": cabecalho.cliente_id,
+                    "organizacao": cabecalho.organizacao,
+                    "created_by": separador_id, "details": detalhe,
+                })
+                movimento_id = movimento.lastrowid
+                stats["movimentos"] += 1
+
+                vistos: set[tuple[int, int]] = set()
+                for linha in linhas_mov:
+                    item_id = item_ids.get(normalizar(linha.alias))
+                    if not item_id:
+                        continue
+                    chave = (item_id, linha.pat_id)
+                    if chave in vistos:
+                        continue
+                    vistos.add(chave)
+                    operacao = "SUBSTITUIÇÃO" if linha.antigos else "AVULSO"
+                    conn.execute(text("""
+                        INSERT INTO movement_items
+                            (movement_id, movement_type_id, service_order_item_id,
+                             equipment_id, status_id, alias, old_organization_id,
+                             new_organization_id, operation_type, created_at, updated_at)
+                        VALUES
+                            (:movimento_id, :movement_type, :item_id, :equipment_id,
+                             3, :alias, NULL, :organizacao, :operacao, :data, :data)
+                    """), {
+                        "movimento_id": movimento_id,
+                        "movement_type": cabecalho.movement_type_id,
+                        "item_id": item_id,
+                        "equipment_id": linha.pat_id,
+                        "alias": linha.alias[:255],
+                        "organizacao": cabecalho.organizacao,
+                        "operacao": operacao,
+                        "data": data_movimento,
                     })
-            else:
-                created_log_rows.append({
-                    **base_log,
-                    "movimento_id": None,
-                    "data_movimento": None,
-                    "separador_id": None,
-                    "separador": None,
-                    "itens_movimento": "",
-                })
-    print("✅ Transação concluída e confirmada no banco.")
-    return order_count, movement_count, created_log_rows
+                    stats["movimentos_itens"] += 1
 
-
-def recuperar_log_existentes(engine) -> tuple[int, int, list[dict]]:
-    """Monta um log a partir de uma execução anterior sem recriar os dados."""
-    log_rows = []
-    with engine.connect() as conn:
-        orders = conn.execute(text("""
-            SELECT so.id, so.status_id, so.situation, so.movement_type_id,
-                   so.recipient_customer_id, c.name AS customer_name,
-                   so.user_id, u.username, so.created_at, so.deadline
-            FROM service_orders so
-            LEFT JOIN customers c ON c.id = so.recipient_customer_id
-            LEFT JOIN users u ON u.id = so.user_id
-            WHERE so.details LIKE :marker AND so.deleted_at IS NULL
-            ORDER BY so.id
-        """), {"marker": f"%{MARCADOR_MIGRACAO}%"}).mappings().all()
-        movement_count = 0
-        for order in orders:
-            movements = conn.execute(text("""
-                SELECT m.id AS movement_id, m.movement_date, m.created_by,
-                       u.username AS separator_username
-                FROM movements m
-                LEFT JOIN users u ON u.id = m.created_by
-                WHERE m.service_order_id = :order_id
-                  AND m.details LIKE :marker AND m.deleted_at IS NULL
-                ORDER BY m.id
-            """), {"order_id": order["id"], "marker": f"%{MARCADOR_MIGRACAO}%"}).mappings().all()
-            if not movements:
                 log_rows.append({
-                    "requisicao_id": order["id"], "cliente_id": order["recipient_customer_id"],
-                    "cliente": order["customer_name"], "solicitante_id": order["user_id"],
-                    "solicitante": order["username"], "data_requisicao": order["created_at"],
-                    "prazo": order["deadline"],
-                    "tipo": "AVULSO" if order["movement_type_id"] == 7 else "SUBSTITUIÇÃO",
-                    "situacao": order["situation"], "status_id": order["status_id"],
-                    "linhas_origem": "Não registrada na execução anterior",
-                    "movimento_id": None, "data_movimento": None,
-                    "separador_id": None, "separador": None, "itens_movimento": "",
+                    "requisicao_id": ordem_id,
+                    "cliente_id": cabecalho.cliente_id,
+                    "cliente": cabecalho.linhas[0].cliente,
+                    "data_requisicao": cabecalho.data.date().isoformat(),
+                    "prazo": cabecalho.previsao.date().isoformat(),
+                    "org_id": cabecalho.organizacao,
+                    "solicitante_id": cabecalho.usuario_id,
+                    "movimento_id": movimento_id,
+                    "data_movimento": data_movimento.date().isoformat(),
+                    "separador_id": separador_id,
+                    "patrimonios": ",".join(str(l.pat_numero) for l in linhas_mov),
+                    "equipamentos_antigos": ",".join(str(n) for n in antigos),
                 })
-                continue
 
-            for movement in movements:
-                movement_count += 1
-                items = conn.execute(text("""
-                    SELECT mi.id, e.number, mi.operation_type
-                    FROM movement_items mi
-                    LEFT JOIN equipments e ON e.id = mi.equipment_id
-                    WHERE mi.movement_id = :movement_id AND mi.deleted_at IS NULL
-                    ORDER BY mi.id
-                """), {"movement_id": movement["movement_id"]}).mappings().all()
-                log_rows.append({
-                    "requisicao_id": order["id"], "cliente_id": order["recipient_customer_id"],
-                    "cliente": order["customer_name"], "solicitante_id": order["user_id"],
-                    "solicitante": order["username"], "data_requisicao": order["created_at"],
-                    "prazo": order["deadline"],
-                    "tipo": "AVULSO" if order["movement_type_id"] == 7 else "SUBSTITUIÇÃO",
-                    "situacao": order["situation"], "status_id": order["status_id"],
-                    "linhas_origem": "Não registrada na execução anterior",
-                    "movimento_id": movement["movement_id"],
-                    "data_movimento": movement["movement_date"],
-                    "separador_id": movement["created_by"], "separador": movement["separator_username"],
-                    "itens_movimento": ";".join(
-                        f"{item['number']} (item {item['id']}, {item['operation_type']})"
-                        for item in items
-                    ),
-                })
-    return len(orders), movement_count, log_rows
+        # Protocolo dos movimentos (o INSERT em SQL puro não passa pelo hook
+        # do Laravel, então a numeração é feita aqui, ao final da transação).
+        numerados = numerar_movimentos_sem_protocolo(conn)
+        stats["movimentos_numerados"] = len(numerados)
+        protocolos = dict(numerados)
+        for linha in log_rows:
+            protocolo = protocolos.get(linha["movimento_id"])
+            if protocolo:
+                linha["protocolo"] = protocolo
+
+    return dict(stats), salvar_log(log_rows)
+
+
+def salvar_auditoria(auditoria: list[dict], destino: Path) -> Path:
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    with destino.open("w", newline="", encoding="utf-8-sig") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=COLUNAS_AUDITORIA, extrasaction="ignore")
+        escritor.writeheader()
+        escritor.writerows(auditoria)
+    return destino
 
 
 def salvar_log(log_rows: list[dict]) -> Path:
     DIR_LOGS.mkdir(parents=True, exist_ok=True)
-    log_path = DIR_LOGS / f"requisicoes_2026_criadas_{datetime.now():%Y%m%d_%H%M%S_%f}.csv"
-    pd.DataFrame(log_rows).to_csv(log_path, index=False, encoding="utf-8-sig")
-    return log_path
+    destino = DIR_LOGS / f"requisicoes_2026_criadas_{datetime.now():%Y%m%d_%H%M%S_%f}.csv"
+    if log_rows:
+        pd.DataFrame(log_rows).to_csv(destino, index=False, encoding="utf-8-sig")
+    return destino
 
 
-def main(argv=None, engine_new=None):
-    parser = argparse.ArgumentParser(description="Migra requisições de 2026.")
-    parser.add_argument("--dry-run", action="store_true", help="Só valida e gera auditoria, sem gravar no banco.")
+# ---------------------------------------------------------------------------
+# Relatório
+# ---------------------------------------------------------------------------
+def imprimir_resumo(cabecalhos: list[Cabecalho], auditoria: list[dict]) -> None:
+    itens = [item for cab in cabecalhos for item in cab.itens]
+    por_tipo: dict[str, int] = defaultdict(int)
+    for item in itens:
+        por_tipo[item.classificacao.tipo] += 1
+
+    movimentos = 0
+    itens_movimento = 0
+    for cab in cabecalhos:
+        grupos: dict[tuple, set] = defaultdict(set)
+        for linha in cab.linhas:
+            if linha.separado_em and linha.separador_id and linha.pat_id:
+                grupos[(linha.separado_em, linha.separador_id)].add(
+                    (normalizar(linha.alias), linha.pat_id))
+        movimentos += len(grupos)
+        itens_movimento += sum(len(v) for v in grupos.values())
+
+    bloqueios = [a for a in auditoria if a["resultado"] == "MOVIMENTO BLOQUEADO"]
+    ignoradas = [a for a in auditoria if a["resultado"] == "IGNORADA"]
+    a_confirmar = [a for a in auditoria
+                   if a.get("metodo_cliente") == "similaridade"
+                   and a.get("similaridade_cliente", 1) < 0.85
+                   and a["resultado"] != "IGNORADA"]
+
+    print("\n📊 RESUMO")
+    print(f"   Requisições (cabeçalhos): {len(cabecalhos):,}")
+    print(f"   Itens: {len(itens):,}  (equipamento {por_tipo['EQUIPAMENTO']:,} | "
+          f"insumo {por_tipo['INSUMO']:,} | indefinido {por_tipo['INDEFINIDO']:,})")
+    print(f"   Movimentos previstos: {movimentos:,} ({itens_movimento:,} itens)")
+    print(f"   Linhas com separação bloqueada: {len(bloqueios):,}")
+    print(f"   Linhas ignoradas: {len(ignoradas):,}")
+    print(f"   Clientes com match < 0.85 (revisar): {len(a_confirmar):,}")
+    status = defaultdict(int)
+    for cab in cabecalhos:
+        status[f"{cab.status_id}/{cab.situation}"] += 1
+    print("   Status das requisições: " + " | ".join(
+        f"{k}: {v:,}" for k, v in sorted(status.items())))
+    motivos = defaultdict(int)
+    for registro in ignoradas + bloqueios:
+        motivos[re.sub(r"\d+", "N", registro["motivo"])[:80]] += 1
+    if motivos:
+        print("\n   Principais motivos:")
+        for motivo, total in sorted(motivos.items(), key=lambda kv: -kv[1])[:12]:
+            print(f"      {total:>5,}  {motivo}")
+
+
+def remover_execucao_anterior(engine) -> dict[str, int]:
+    """Apaga requisições/movimentos gravados por uma execução anterior.
+
+    Só remove o que tem o marcador desta migração. Antes de apagar, confere que
+    nada externo (remessas, manutenções, históricos) aponta para esses
+    registros; se houver dependentes, aborta em vez de deixar órfãos.
+    """
+    from sqlalchemy import bindparam
+
+    marcador = f"%{MARCADOR}%"
+    with engine.begin() as conn:
+        ordens = conn.execute(text(
+            "SELECT id FROM service_orders WHERE details LIKE :m"),
+            {"m": marcador}).scalars().all()
+        movimentos = conn.execute(text(
+            "SELECT id FROM movements WHERE details LIKE :m"),
+            {"m": marcador}).scalars().all()
+        itens = conn.execute(text(
+            "SELECT id FROM service_order_items WHERE service_order_id IN "
+            "(SELECT id FROM service_orders WHERE details LIKE :m)"),
+            {"m": marcador}).scalars().all()
+        itens_mov = conn.execute(text(
+            "SELECT id FROM movement_items WHERE movement_id IN "
+            "(SELECT id FROM movements WHERE details LIKE :m)"),
+            {"m": marcador}).scalars().all()
+
+        if not (ordens or movimentos):
+            return {"requisicoes": 0, "itens": 0, "movimentos": 0,
+                    "itens_movimento": 0}
+
+        def contar(sql: str, ids: list[int]) -> int:
+            if not ids:
+                return 0
+            return int(conn.execute(
+                text(sql).bindparams(bindparam("ids", expanding=True)),
+                {"ids": ids}).scalar_one())
+
+        dependentes = {
+            "equipment_history(movement_item)": contar(
+                "SELECT COUNT(*) FROM equipment_history "
+                "WHERE movement_item_id IN :ids", itens_mov),
+            "equipment_history(service_order_item)": contar(
+                "SELECT COUNT(*) FROM equipment_history "
+                "WHERE service_order_item_id IN :ids", itens),
+            "shipment_items": contar(
+                "SELECT COUNT(*) FROM shipment_items WHERE movement_item_id IN :ids",
+                itens_mov),
+            "volume_items": contar(
+                "SELECT COUNT(*) FROM volume_items WHERE movement_item_id IN :ids",
+                itens_mov),
+            "maintenance_items": contar(
+                "SELECT COUNT(*) FROM maintenance_items WHERE movement_id IN :ids",
+                movimentos),
+            "return_confirmations_items": contar(
+                "SELECT COUNT(*) FROM return_confirmations_items "
+                "WHERE movement_id IN :ids", movimentos),
+            "romaneios": contar(
+                "SELECT COUNT(*) FROM romaneios WHERE movement_id IN :ids",
+                movimentos),
+            "shipment_movements": contar(
+                "SELECT COUNT(*) FROM shipment_movements WHERE movement_id IN :ids",
+                movimentos),
+            "shipment_document_movements": contar(
+                "SELECT COUNT(*) FROM shipment_document_movements "
+                "WHERE movement_id IN :ids", movimentos),
+            "shipment_documents": contar(
+                "SELECT COUNT(*) FROM shipment_documents WHERE movement_id IN :ids",
+                movimentos),
+            "volumes": contar(
+                "SELECT COUNT(*) FROM volumes WHERE movement_id IN :ids",
+                movimentos),
+            "service_order_accessories": contar(
+                "SELECT COUNT(*) FROM service_order_accessories "
+                "WHERE service_order_item_id IN :ids", itens),
+            "service_order_item_extra_equipments": contar(
+                "SELECT COUNT(*) FROM service_order_item_extra_equipments "
+                "WHERE service_order_item_id IN :ids", itens),
+        }
+        achados = {k: v for k, v in dependentes.items() if v}
+        if achados:
+            raise RuntimeError(
+                "execução anterior tem registros dependentes: "
+                + ", ".join(f"{k}={v}" for k, v in achados.items()))
+
+        def apagar(sql: str, ids: list[int]) -> int:
+            if not ids:
+                return 0
+            return conn.execute(
+                text(sql).bindparams(bindparam("ids", expanding=True)),
+                {"ids": ids}).rowcount
+
+        removidos = {
+            "itens_movimento": apagar(
+                "DELETE FROM movement_items WHERE movement_id IN :ids", movimentos),
+            "movimentos": apagar(
+                "DELETE FROM movements WHERE id IN :ids", movimentos),
+            "itens": apagar(
+                "DELETE FROM service_order_items WHERE service_order_id IN :ids",
+                ordens),
+            "requisicoes": apagar(
+                "DELETE FROM service_orders WHERE id IN :ids", ordens),
+        }
+    return removidos
+
+
+def main(argv=None, engine_new=None, engine_legado=None):
+    parser = argparse.ArgumentParser(description="Migra as requisições de 2026.")
+    parser.add_argument("--execute", action="store_true",
+                        help="Grava no banco. Sem esta flag o script só valida (dry-run).")
+    parser.add_argument("--dry-run", action="store_true", help="Força o modo de validação.")
     parser.add_argument("--arquivo", type=Path, default=ARQUIVO_FONTE)
     parser.add_argument("--auditoria", type=Path, default=ARQUIVO_AUDITORIA)
-    args = parser.parse_args(argv)
-    if engine_new is None:
-        from config.database import obter_engines
-        engine_new, _ = obter_engines()
+    parser.add_argument("--force", action="store_true",
+                        help="Permite gravar mesmo já existindo execução anterior.")
+    parser.add_argument("--replace", action="store_true",
+                        help="Com --execute, apaga a importação anterior (mesmo "
+                             "marcador) antes de gravar de novo.")
+    argumentos = [a for a in (argv or []) if a != "--"]
+    args = parser.parse_args(argumentos)
 
-    print("\n🚀 Iniciando rotina de requisições...")
-    records, audit = preparar(engine_new, args.arquivo)
-    args.auditoria.parent.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(audit, columns=["linha", "resultado", "motivo", "cliente",
-                                 "cliente_sugerido", "similaridade", "PAT", "Req"]).to_csv(
-        args.auditoria, index=False, encoding="utf-8-sig", quoting=csv.QUOTE_MINIMAL)
-    movement_records = sum(bool(r["create_movement"]) for r in records)
-    print("\n📊 RESUMO DA VALIDAÇÃO")
-    print(f"   Requisições/linhas elegíveis: {len(records):,}")
-    print(f"   Equipamentos com separação prevista para movimento: {movement_records:,}")
-    print(f"   Ocorrências na auditoria: {len(audit):,} — {args.auditoria}")
-    if args.dry_run:
-        print("Dry-run: nenhuma gravação foi feita.")
+    if args.replace and (not args.execute or args.dry_run):
+        parser.error("--replace exige --execute (e não combina com --dry-run)")
+
+    if engine_new is None or engine_legado is None:
+        from config.database import obter_engines
+        engine_new, engine_legado = obter_engines()
+
+    cabecalhos, auditoria = preparar(engine_new, args.arquivo, engine_legado)
+    destino = salvar_auditoria(auditoria, args.auditoria)
+    print(f"\n📄 Auditoria: {destino}")
+    imprimir_resumo(cabecalhos, auditoria)
+
+    if not args.execute or args.dry_run:
+        print("\n🔒 Dry-run: nada foi gravado. Use --execute para gravar.")
         return
+
+    if args.replace:
+        removidos = remover_execucao_anterior(engine_new)
+        print("\n🧹 Execução anterior removida: " + " | ".join(
+            f"{k} {v:,}" for k, v in removidos.items()))
+
     with engine_new.connect() as conn:
-        existing_count = conn.execute(text(
-            "SELECT COUNT(*) FROM service_orders WHERE details LIKE :marker AND deleted_at IS NULL"
-        ), {"marker": f"%{MARCADOR_MIGRACAO}%"}).scalar_one()
-    if existing_count:
-        print(f"\nℹ️ Foram encontradas {existing_count} requisições anteriores desta migração.")
-        print("   A rotina não repetirá as gravações; vai apenas reconstruir o log existente.")
-        orders, movements, log_rows = recuperar_log_existentes(engine_new)
-        log_path = salvar_log(log_rows)
-        print(f"   Requisições localizadas: {orders:,} | Movimentos localizados: {movements:,}")
-        print(f"📄 Log salvo em: {log_path}")
+        existentes = conn.execute(text(
+            "SELECT COUNT(*) FROM service_orders WHERE details LIKE :marcador"
+        ), {"marcador": f"%{MARCADOR}%"}).scalar_one()
+    if existentes and not args.force:
+        print(f"\n⛔ Já existem {existentes:,} requisições desta migração. "
+              "Nada foi gravado; use --force para duplicar mesmo assim.")
         return
-    orders, movements, log_rows = criar(engine_new, records)
-    log_path = salvar_log(log_rows)
+
+    stats, log = criar(engine_new, cabecalhos)
     print("\n🏁 MIGRAÇÃO CONCLUÍDA")
-    print(f"   Requisições criadas: {orders:,}")
-    print(f"   Movimentos criados: {movements:,}")
-    print(f"📄 Log de criação salvo em: {log_path}")
+    print(f"   Requisições: {stats.get('requisicoes', 0):,}")
+    print(f"   Itens: {stats.get('itens', 0):,}")
+    print(f"   Movimentos: {stats.get('movimentos', 0):,}")
+    print(f"   Movimentos numerados: {stats.get('movimentos_numerados', 0):,}")
+    print(f"   Itens de movimento: {stats.get('movimentos_itens', 0):,}")
+    por_departamento = " | ".join(
+        f"{nome} {stats.get('itens_departamento_' + nome.lower(), 0):,}"
+        for nome in (DEPARTAMENTO_PADRAO, DEPARTAMENTO_EQUIPAMENTO,
+                     DEPARTAMENTO_PECAS_ADI))
+    print(f"   Itens por departamento: {por_departamento}")
+    print(f"📄 Log: {log}")
 
 
 if __name__ == "__main__":
