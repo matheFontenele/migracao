@@ -83,9 +83,25 @@ TERMOS_EVENT_TYPES = [
     ('APOSTILAMENTO', 7),
 ]
 TIPOS_ADITIVOS_COM_DADOS = {1, 3, 4, 5, 6}
+# Aditivos que não trazem linhas próprias na planilha e herdam os itens do
+# último aditivo anterior que tenha dados.
+TIPOS_ADITIVOS_SEM_DADOS = {2, 7}
 MAP_STATUS = {'AGUARDANDO INICIO': 1, 'EM ANDAMENTO': 2, 'ENCERRADO': 3}
 MAP_TIPO = {'LICITACAO': 1, 'PESSOA JURIDICA': 2, 'PESSOA FISICA': 3}
 MAP_ORGANIZACAO = {'ALUCOM': 1115, 'MOREIA': 1122, 'IP SERVIÇOS': 1311, 'AS SISTEMAS': 1378}
+
+
+def normalizar_alias_item(valor):
+    """Alias como é gravado: sem espaços nas pontas e dentro do tamanho da
+    coluna."""
+    return str(valor).strip()[:100]
+
+
+def chave_ocorrencia_alias(alias):
+    """Chave das linhas repetidas do mesmo apelido. Reproduz a comparação do
+    MySQL (case-insensitive e ignorando espaços à direita): 'NOBREAK' e
+    'NOBREAK ' são duas ocorrências, não um UPSERT sobre a primeira."""
+    return alias.strip().casefold()
 
 class MigracaoContratos:
 
@@ -99,6 +115,7 @@ class MigracaoContratos:
             'contratos_criados': 0, 'contratos_atualizados': 0, 'contratos_ignorados': 0,
             'eventos_criados': 0, 'eventos_ignorados': 0, 'aditivos_criados': 0,
             'itens_criados': 0, 'itens_atualizados': 0, 'jobs_criados': 0, 'jobs_atualizados': 0,
+            'aditivos_clonados': 0, 'itens_clonados': 0, 'jobs_clonados': 0, 'aditivos_sem_origem': 0,
             'infos_criadas': 0, 'infos_atualizadas': 0, 'infos_datas_ausentes': 0, 'erros': 0
         }
 
@@ -606,17 +623,11 @@ class MigracaoContratos:
                     
                     antigo_additive_id = self.ultimo_aditivo_por_contrato.get(contract_id)
                     if antigo_additive_id:
+                        # Itens/serviços NÃO são clonados aqui: neste ponto
+                        # _processar_itens/_processar_servicos ainda não
+                        # rodaram e a origem estaria vazia. O clone acontece
+                        # em _clonar_aditivos_sem_dados, depois da carga.
                         conn.execute(text("INSERT INTO contract_infos (event_additive_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, created_at, updated_at) SELECT :novo_id, start_date, end_date, max_end_date, duration, max_duration, total_amount, :now, :now FROM contract_infos WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
-                        
-                        # 🎯 LINHAGEM DO ITEM CLONADO: Usa COALESCE(root_item_id, id) para passar o gene adiante
-                        conn.execute(text("""
-                            INSERT INTO contract_items (event_additive_id, alias, description, quantity, available_quantity, price, created_at, updated_at, root_item_id) 
-                            SELECT :novo_id, alias, description, quantity, available_quantity, price, :now, :now, COALESCE(root_item_id, id) 
-                            FROM contract_items 
-                            WHERE event_additive_id = :antigo_id
-                        """), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
-                        
-                        conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) SELECT :novo_id, alias, description, quantity, price, :now, :now FROM contract_jobs WHERE event_additive_id = :antigo_id"), {"novo_id": additive_id, "antigo_id": antigo_additive_id, "now": self.now})
 
                 self.ultimo_aditivo_por_contrato[contract_id] = additive_id
                 if id_evento_planilha not in self.additive_lookup or t_id in TIPOS_ADITIVOS_COM_DADOS:
@@ -624,6 +635,10 @@ class MigracaoContratos:
 
     def _processar_itens(self, conn, df_ex_itens):
         print("\n📦 Processando Itens (UPSERT) e Rastrando a Linhagem (Root Item)...")
+        # Um mesmo apelido pode aparecer várias vezes no mesmo evento (ex.:
+        # duas faixas de preço do mesmo equipamento). A chave do UPSERT é o
+        # apelido + a ocorrência da linha, não o apelido isolado.
+        ocorrencias = {}
         for _, row in df_ex_itens.iterrows():
             if pd.isna(row['EVENTO']): continue
             aid = self.additive_lookup.get(row['EVENTO'])
@@ -633,11 +648,20 @@ class MigracaoContratos:
             contract_id = self.additive_to_contract.get(aid)
             if not contract_id: continue
 
-            alias_str = str(row['APELIDO'])[:100]
-            chave_root = f"{contract_id}|{alias_str.upper()}"
+            alias_str = normalizar_alias_item(row['APELIDO'])
+            chave_ocorrencia = (aid, chave_ocorrencia_alias(alias_str))
+            ocorrencia = ocorrencias.get(chave_ocorrencia, 0)
+            ocorrencias[chave_ocorrencia] = ocorrencia + 1
 
-            exists = conn.execute(text("SELECT id FROM contract_items WHERE event_additive_id = :aid AND alias = :alias"), 
-                                  {"aid": aid, "alias": alias_str}).fetchone()
+            chave_root = f"{contract_id}|{chave_ocorrencia[1]}|{ocorrencia}"
+
+            exists = conn.execute(text("""
+                SELECT id FROM contract_items
+                WHERE event_additive_id = :aid AND alias = :alias
+                  AND deleted_at IS NULL
+                ORDER BY id
+                LIMIT 1 OFFSET :ocorrencia
+            """), {"aid": aid, "alias": alias_str, "ocorrencia": ocorrencia}).fetchone()
 
             dados_item = {
                 'alias': alias_str,
@@ -671,8 +695,9 @@ class MigracaoContratos:
                         JOIN event_additives ea ON ci.event_additive_id = ea.id
                         JOIN contract_events ce ON ea.event_id = ce.id
                         WHERE ce.contract_id = :cid AND ci.alias = :alias
-                        ORDER BY ci.id ASC LIMIT 1
-                    """), {"cid": contract_id, "alias": alias_str}).fetchone()
+                          AND ci.deleted_at IS NULL
+                        ORDER BY ci.id ASC LIMIT 1 OFFSET :ocorrencia
+                    """), {"cid": contract_id, "alias": alias_str, "ocorrencia": ocorrencia}).fetchone()
                     
                     if root_db and root_db[0]:
                         root_id = root_db[0]
@@ -704,15 +729,27 @@ class MigracaoContratos:
 
     def _processar_servicos(self, conn, df_ex_jobs):
         print("\n🛠️ Processando Serviços (UPSERT)...")
+        ocorrencias = {}
         for _, row in df_ex_jobs.iterrows():
             if pd.isna(row['EVENTO']): continue
             aid = self.additive_lookup.get(row['EVENTO'])
             if not aid: continue
 
-            exists = conn.execute(text("SELECT id FROM contract_jobs WHERE event_additive_id = :aid AND alias = :alias"), {"aid": aid, "alias": str(row['APELIDO'])[:100]}).fetchone()
+            alias_str = normalizar_alias_item(row['APELIDO'])
+            chave_ocorrencia = (aid, chave_ocorrencia_alias(alias_str))
+            ocorrencia = ocorrencias.get(chave_ocorrencia, 0)
+            ocorrencias[chave_ocorrencia] = ocorrencia + 1
+
+            exists = conn.execute(text("""
+                SELECT id FROM contract_jobs
+                WHERE event_additive_id = :aid AND alias = :alias
+                  AND deleted_at IS NULL
+                ORDER BY id
+                LIMIT 1 OFFSET :ocorrencia
+            """), {"aid": aid, "alias": alias_str, "ocorrencia": ocorrencia}).fetchone()
 
             dados_job = {
-                'alias': str(row['APELIDO'])[:100],
+                'alias': alias_str,
                 'description': str(row['DESCRICAO'])[:500] if pd.notna(row['DESCRICAO']) else '',
                 'quantity': limpar_valor_numerico(row['QUANTIDADE']),
                 'price': limpar_valor_numerico(row['VALOR_UNITARIO']),
@@ -727,6 +764,80 @@ class MigracaoContratos:
                 dados_job['created_at'] = self.now
                 conn.execute(text("INSERT INTO contract_jobs (event_additive_id, alias, description, quantity, price, created_at, updated_at) VALUES (:event_additive_id, :alias, :description, :quantity, :price, :created_at, :updated_at)"), dados_job)
                 self.stats['jobs_criados'] += 1
+
+    def _clonar_aditivos_sem_dados(self, conn):
+        """Aditivos de prazo/apostilamento não trazem linhas próprias na
+        planilha: herdam itens e serviços do último aditivo anterior que
+        tenha dados. Roda depois de _processar_itens/_processar_servicos
+        (e da importação das planilhas 2026) para que a origem já esteja
+        populada."""
+        print("\n🧬 Clonando itens/serviços para aditivos sem dados próprios...")
+        tipos = ", ".join(str(t) for t in sorted(TIPOS_ADITIVOS_SEM_DADOS))
+        aditivos = conn.execute(text(f"""
+            SELECT ea.id, ce.contract_id
+            FROM event_additives ea
+            JOIN contract_events ce ON ce.id = ea.event_id
+            WHERE ea.contract_event_type_id IN ({tipos})
+              AND ea.deleted_at IS NULL
+            ORDER BY ce.contract_id, ea.id
+        """)).fetchall()
+
+        for additive_id, contract_id in aditivos:
+            tem_itens = conn.execute(text("""
+                SELECT 1 FROM contract_items
+                WHERE event_additive_id = :aid AND deleted_at IS NULL
+                LIMIT 1
+            """), {"aid": additive_id}).fetchone()
+            if tem_itens:
+                continue
+
+            origem = conn.execute(text("""
+                SELECT ea.id
+                FROM event_additives ea
+                JOIN contract_events ce ON ce.id = ea.event_id
+                WHERE ce.contract_id = :cid
+                  AND ea.id < :aid
+                  AND ea.deleted_at IS NULL
+                  AND EXISTS (
+                      SELECT 1 FROM contract_items ci
+                      WHERE ci.event_additive_id = ea.id
+                        AND ci.deleted_at IS NULL
+                  )
+                ORDER BY ea.id DESC
+                LIMIT 1
+            """), {"cid": contract_id, "aid": additive_id}).fetchone()
+            if not origem:
+                self.stats['aditivos_sem_origem'] += 1
+                continue
+
+            # 🎯 LINHAGEM DO ITEM CLONADO: COALESCE(root_item_id, id) leva o
+            # gene adiante quando o item original já é ele mesmo um clone.
+            itens = conn.execute(text("""
+                INSERT INTO contract_items
+                    (event_additive_id, alias, description, quantity,
+                     available_quantity, price, created_at, updated_at,
+                     root_item_id)
+                SELECT :novo_id, alias, description, quantity,
+                       available_quantity, price, :now, :now,
+                       COALESCE(root_item_id, id)
+                FROM contract_items
+                WHERE event_additive_id = :origem_id
+                  AND deleted_at IS NULL
+            """), {"novo_id": additive_id, "origem_id": origem[0], "now": self.now})
+            jobs = conn.execute(text("""
+                INSERT INTO contract_jobs
+                    (event_additive_id, alias, description, quantity, price,
+                     created_at, updated_at)
+                SELECT :novo_id, alias, description, quantity, price,
+                       :now, :now
+                FROM contract_jobs
+                WHERE event_additive_id = :origem_id
+                  AND deleted_at IS NULL
+            """), {"novo_id": additive_id, "origem_id": origem[0], "now": self.now})
+
+            self.stats['aditivos_clonados'] += 1
+            self.stats['itens_clonados'] += itens.rowcount or 0
+            self.stats['jobs_clonados'] += jobs.rowcount or 0
 
     def _processar_infos(self, conn, df_ex_infos):
         print("\n📅 Processando Vigências e Valores (UPSERT)...")
@@ -807,6 +918,7 @@ class MigracaoContratos:
                 stats_planilhas = importar_contratos(
                     conn, contratos_planilhas, self.now
                 )
+                self._clonar_aditivos_sem_dados(conn)
 
             gerar_relatorio(contratos_planilhas)
             self.stats['planilhas_contratos'] = stats_planilhas
@@ -820,6 +932,8 @@ class MigracaoContratos:
             print(f"{'ITENS:':<20} ✅ Criados: {self.stats['itens_criados']:<5} 🔄 Atualizados: {self.stats['itens_atualizados']}")
             print(f"{'SERVIÇOS:':<20} ✅ Criados: {self.stats['jobs_criados']:<5} 🔄 Atualizados: {self.stats['jobs_atualizados']}")
             print(f"{'INFORMAÇÕES:':<20} ✅ Criadas: {self.stats['infos_criadas']:<5} 🔄 Atualizadas: {self.stats['infos_atualizadas']}")
+            if self.stats['aditivos_clonados'] or self.stats['aditivos_sem_origem']:
+                print(f"{'CLONES:':<20} 🧬 Aditivos: {self.stats['aditivos_clonados']:<5} Itens: {self.stats['itens_clonados']:<5} Serviços: {self.stats['jobs_clonados']:<5} ⚠️ Sem origem: {self.stats['aditivos_sem_origem']}")
             if self.stats['infos_datas_ausentes']:
                 print(f"⚠️ Datas de vigência ainda ausentes após herdar do snapshot anterior: {self.stats['infos_datas_ausentes']} campo(s). Não foram inventadas datas sem fonte.")
             planilhas = self.stats.get('planilhas_contratos') or {}

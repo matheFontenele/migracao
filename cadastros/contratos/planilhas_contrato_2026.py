@@ -783,16 +783,24 @@ def _salvar_info(conn, additive_id, contrato, now, stats):
 
 
 def _salvar_itens(conn, additive_id, contrato, now, stats):
+    # Um mesmo nome pode aparecer mais de uma vez (faixas de preço distintas):
+    # a chave é nome + ocorrência da linha, nunca o nome isolado.
+    ocorrencias = {}
     for item in contrato.itens:
+        chave = str(item.nome).strip().casefold()
+        ocorrencia = ocorrencias.get(chave, 0)
+        ocorrencias[chave] = ocorrencia + 1
+
         existente = conn.execute(text("""
             SELECT id FROM contract_items
             WHERE event_additive_id = :additive_id
               AND alias = :alias
               AND deleted_at IS NULL
-            ORDER BY id LIMIT 1
+            ORDER BY id LIMIT 1 OFFSET :ocorrencia
         """), {
             'additive_id': additive_id,
             'alias': item.nome,
+            'ocorrencia': ocorrencia,
         }).fetchone()
 
         dados = {
