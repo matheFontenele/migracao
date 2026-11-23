@@ -27,9 +27,21 @@ from collections import Counter, defaultdict
 from datetime import date, datetime
 from pathlib import Path
 
-VERSION = "3.1.0"
+VERSION = "3.2.0"
 NEW = "NEW"
 DISCARD = "DISCARD"
+
+CONTRACT_ITEM_SQL = """
+SELECT ci.id AS id, TRIM(ci.alias) AS alias, ci.price AS price,
+       ci.quantity AS quantity, ea.id AS aditivo,
+       ea.contract_event_type_id AS tipo, ce.contract_id AS contrato,
+       DATE(ci2.start_date) AS ini, DATE(ci2.end_date) AS fim
+FROM contract_items ci
+JOIN event_additives ea ON ea.id = ci.event_additive_id
+JOIN contract_events ce ON ce.id = ea.event_id
+LEFT JOIN contract_infos ci2 ON ci2.event_additive_id = ea.id
+WHERE ci.deleted_at IS NULL
+"""
 
 CLOSURE_TABLES = {
     "addresses", "locations", "equipments", "movements", "service_orders",
@@ -125,6 +137,99 @@ def normalize_number(value):
         return str(int(float(value)))
     except (TypeError, ValueError):
         return normalize(value) or None
+
+
+def price_key(value) -> str:
+    return str(Decimal(str(0 if value is None else value)).quantize(Decimal("0.01")))
+
+
+def quantity_key(value) -> str:
+    return str(Decimal(str(0 if value is None else value)).quantize(Decimal("0.0001")))
+
+
+def contract_item_indexes(rows):
+    """Indexa contract_items locais pelas chaves naturais de reconciliacao."""
+    indexes = {"completa": defaultdict(list), "aditivo": defaultdict(list),
+               "preco": defaultdict(list)}
+    for row in rows:
+        alias = normalize(row.get("alias"))
+        if not alias:
+            continue
+        contrato = row.get("contrato")
+        indexes["completa"][(
+            contrato, alias, row.get("aditivo"), row.get("tipo"),
+            str(row.get("ini")), str(row.get("fim")))].append(int(row["id"]))
+        indexes["aditivo"][(contrato, alias, row.get("aditivo"))].append(int(row["id"]))
+        indexes["preco"][(
+            contrato, alias, price_key(row.get("price")),
+            quantity_key(row.get("quantity")))].append(int(row["id"]))
+    return indexes
+
+
+def match_contract_item(source, contrato_local, indexes):
+    """Resolve um item de producao no item local equivalente; None se ambiguo."""
+    alias = normalize(source.get("alias"))
+    if not alias or contrato_local is None:
+        return None
+    tentativas = (
+        ((contrato_local, alias, source.get("aditivo"), source.get("tipo"),
+          str(source.get("ini")), str(source.get("fim"))), "completa"),
+        ((contrato_local, alias, source.get("aditivo")), "aditivo"),
+        ((contrato_local, alias, price_key(source.get("price")),
+          quantity_key(source.get("quantity"))), "preco"),
+    )
+    for chave, nome in tentativas:
+        hits = indexes[nome].get(chave, [])
+        if len(hits) == 1:
+            return hits[0]
+        if len(hits) > 1:
+            return None
+    return None
+
+
+def build_contract_maps(engine, engine_prod, item_ids=()):
+    """Mapas prod->local de contratos (por numero) e itens (por chave natural).
+
+    Ids de contrato e de item de contrato nao alinham entre producao e banco
+    local: contratos ignorados pela planilha deixam buracos e a correcao dos
+    aditivos desloca a sequencia de itens. Copiar o id cru liga o registro ao
+    contrato errado, por isso a traducao e sempre por chave natural.
+    """
+    from sqlalchemy import text
+
+    contratos = {}
+    with engine.connect() as conn:
+        locais = [(int(i), numero) for i, numero in conn.execute(
+            text("SELECT id, number FROM contracts WHERE deleted_at IS NULL"))]
+    por_numero = defaultdict(list)
+    for local_id, numero in locais:
+        chave = normalize(numero)
+        if chave:
+            por_numero[chave].append(local_id)
+    with engine_prod.connect() as conn:
+        origem = [(int(i), numero) for i, numero in conn.execute(
+            text("SELECT id, number FROM contracts"))]
+    for prod_id, numero in origem:
+        hits = por_numero.get(normalize(numero), [])
+        if len(hits) == 1:
+            contratos[prod_id] = hits[0]
+
+    itens = {}
+    wanted = {int(v) for v in item_ids if v is not None}
+    if wanted:
+        with engine.connect() as conn:
+            indexes = contract_item_indexes(
+                [dict(row._mapping) for row in conn.execute(text(CONTRACT_ITEM_SQL))])
+        with engine_prod.connect() as conn:
+            for row in conn.execute(text(CONTRACT_ITEM_SQL)):
+                source = dict(row._mapping)
+                if int(source["id"]) not in wanted:
+                    continue
+                local = match_contract_item(
+                    source, contratos.get(source.get("contrato")), indexes)
+                if local is not None:
+                    itens[int(source["id"])] = local
+    return {"contracts": contratos, "contract_items": itens}
 
 
 def equipment_choice(source, candidates):
@@ -400,6 +505,7 @@ class Planner:
         self.crosswalk = crosswalk
         self.updates = []               # (table, local_id, {coluna: valor}, origem)
         self.index = {}
+        self.fixed_map = {}             # table -> {id_prod: id_local} por chave natural
         self.prod = None                # engine da origem (prod_14_11)
         self.tx_rows = {"transactions": [], "transaction_items": []}
 
@@ -567,6 +673,10 @@ class Planner:
         if key in self.map:
             mapped = self.map[key]
             return None if mapped in (None, DISCARD) else mapped
+        fixo = self.fixed_map.get(table, {}).get(source_id)
+        if fixo is not None:
+            self.register(table, source_id, fixo, "matched", "chave natural")
+            return fixo
         if table == "customers" and self.crosswalk is not None:
             local = self.crosswalk.customer(source_id)
             if local is not None:
@@ -587,6 +697,10 @@ class Planner:
             return self.ensure_table(table, source_id)
         if table == "equipments":
             # IDs de equipamento NAO alinham entre prod e local.
+            return None
+        if table in ("contracts", "contract_items"):
+            # IDs de contrato/item tambem nao alinham: copiar o id cru liga o
+            # registro ao contrato errado. Sem chave natural, fica sem vinculo.
             return None
         local = self.local_by_id(table, source_id)
         if local is not None:
@@ -1745,6 +1859,16 @@ def main(argv=None):
     planner.prod = engine_prod
     planner.tx_rows = load_transactions(engine)
     planner.build_indexes()
+    item_ids = set()
+    for table_rows in rows.values():
+        for row in table_rows:
+            valor = row.get("contract_item_id")
+            if valor is not None:
+                item_ids.add(int(valor))
+    planner.fixed_map = build_contract_maps(engine, engine_prod, item_ids)
+    print(f"Contratos resolvidos por numero: {len(planner.fixed_map['contracts'])} | "
+          f"itens de contrato por chave natural: "
+          f"{len(planner.fixed_map['contract_items'])}/{len(item_ids)}")
     planner.prepare_scope(select_scope(rows))
     loaded = close_scope(planner, engine_prod)
 
