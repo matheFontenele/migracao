@@ -21,7 +21,13 @@ import argparse
 from sqlalchemy import create_engine, text
 
 MARCADOR = "Migração REQUISIÇÃO 2026.csv"
-ESPERADO = {"requisicoes": 453, "itens": 1074, "movimentos": 385, "itens_movimento": 1271}
+# Contagens após a unificação das prefeituras (Tauá e Aquiraz com o cadastro
+# raiz 903 anexado). O agrupamento usa `cliente_id`: como as secretarias de
+# Aquiraz passam a ser endereços de uma raiz única, 16 grupos de cabeçalho se
+# fundem (os mesmos 16 de nível 3/approved) e 5 deles deixam de gerar
+# movimento. Itens não se alteram (1.074 / 1.271). A granularidade anterior
+# (um customer por setor legado) é reproduzida linha a linha e dá 453/385.
+ESPERADO = {"requisicoes": 437, "itens": 1074, "movimentos": 380, "itens_movimento": 1271}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:

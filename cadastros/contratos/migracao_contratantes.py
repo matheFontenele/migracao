@@ -14,11 +14,12 @@ TABELAS = [
 ]
 
 # Destinatários adicionais autorizados fora da relação contratante -> filhos
-# diretos. Regra confirmada para o contrato 2025/2208.09 de Aquiraz.
-# Manter explícito para não conceder acesso automaticamente a toda a organização.
-VINCULOS_DESTINATARIOS_ADICIONAIS = {
-    230: (2462,),  # Contrato 2025/2208.09 -> Gabinete do Prefeito de Aquiraz
-}
+# diretos. A regra antiga do contrato 2025/2208.09 apontava para o customer
+# 2462 (secretaria de Aquiraz). Depois da unificação das prefeituras 27 e 57
+# essa secretaria deixa de existir como customer (os clientes viram endereços
+# da raiz), então o vínculo não é mais aplicável. O dicionário fica vazio para
+# manter o mecanismo para futuras exceções explícitas.
+VINCULOS_DESTINATARIOS_ADICIONAIS = {}
 
 class MigracaoContratantes:
 

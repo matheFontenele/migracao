@@ -152,12 +152,32 @@ MESCLAGENS_PREFEITURA = {
     # Duas raízes de Tauá no legado: 39 (org. 1115) e 77 (org. 1122).
     # Os contratos de Tauá estão na org. 1115, então ela é a dona do cadastro
     # unificado; os 23 destinos da org. 1122 passam a ser endereços dela.
+    # A raiz 312 (IP/1311) fica fora de propósito: as planilhas 2026 da IP
+    # (docs/contratos/IP/...TAUÁ...) exigem uma raiz própria na org. 1311.
     "TAUA": {
         "ids": (39, 77),
         "id_alvo": 39,
         "nome_alvo": "PREFEITURA MUNICIPAL DE TAUA",
         "organizacao_alvo": 1115,
     },
+    # Aquiraz também aparece duplicada: 27 (ALUCOM/1115) e 57 (MOREIA/1122).
+    # Mesma regra de Tauá: a raiz da ALUCOM concentra o cadastro e os 54
+    # destinos da org. 1122 passam a ser endereços dela.
+    "AQUIRAZ": {
+        "ids": (27, 57),
+        "id_alvo": 27,
+        "nome_alvo": "PREFEITURA MUNICIPAL DE AQUIRAZ",
+        "organizacao_alvo": 1115,
+    },
+}
+
+# Clientes-raiz do legado (sem setor/departamento) que são apenas o cadastro
+# repetido de uma prefeitura existente. A linha não vira um customer próprio:
+# passa a ser um endereço da raiz, preservando o ``legacy_customer_id`` para
+# movimentos e contratos. Chave: id do cliente no legado; valor: departamento
+# que absorve o cadastro.
+CLIENTES_RAIZ_EM_PREFEITURA = {
+    903: 27,  # PREFEITURA MUNICIPAL DE AQUIRAZ -> prefeitura 27 (ALUCOM)
 }
 MAPA_REGIOS_PCPB = {
     "CAMPINA GRANDE": "CAMPINA GRANDE",
@@ -844,6 +864,42 @@ class MigracaoClientes:
         return df_modificado
 
 
+    def _anexar_clientes_raiz_a_prefeitura(
+        self, df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """Anexa cadastros-raiz repetidos à prefeitura que os absorve.
+
+        Alguns clientes do legado não têm setor/departamento, mas são o mesmo
+        órgão já existente em ``MESCLAGENS_PREFEITURA`` (ex.: cliente 903 =
+        PREFEITURA MUNICIPAL DE AQUIRAZ). Sem isso a promoção de hierarquia os
+        transforma em uma raiz sintética e o cadastro fica duplicado. Aqui a
+        linha ganha o departamento alvo e passa a ser tratada como destino
+        (endereço) da raiz, preservando ``ID_CLIENTE`` como
+        ``legacy_customer_id`` para movimentos e contratos.
+        """
+        df_modificado = df.copy()
+        if not CLIENTES_RAIZ_EM_PREFEITURA:
+            return df_modificado
+
+        for id_legado, id_prefeitura in CLIENTES_RAIZ_EM_PREFEITURA.items():
+            mask = (
+                (df_modificado['id_clean'] == int(id_legado))
+                & df_modificado['ID_PREFEITURA'].isna()
+                & df_modificado['ID_SECRETARIA'].isna()
+            )
+            if not mask.any():
+                continue
+            df_modificado.loc[mask, 'ID_PREFEITURA'] = int(id_prefeitura)
+            df_modificado.loc[mask, 'PREFEITURA'] = df_modificado.loc[
+                mask, 'CLIENTE'
+            ]
+            print(
+                f"   🏛️  cliente(s) raiz {id_legado} anexado(s) à prefeitura "
+                f"{id_prefeitura}."
+            )
+
+        return df_modificado
+
     def _unificar_prefeituras(self, df: pd.DataFrame) -> pd.DataFrame:
         """Mescla prefeituras repetidas no legado em um único cliente.
 
@@ -1175,6 +1231,7 @@ class MigracaoClientes:
         df_clean = self._regionalizar_pcpb(df_clean)
         df_clean = self._padronizar_hospitais_pb(df_clean)
         df_clean = self._unificar_sao_luis(df_clean)
+        df_clean = self._anexar_clientes_raiz_a_prefeitura(df_clean)
         df_clean = self._unificar_prefeituras(df_clean)
         df_clean = self._unificar_ministerio_relacoes(df_clean)
         df_clean = self._unificar_ministerio_transportes(df_clean)
