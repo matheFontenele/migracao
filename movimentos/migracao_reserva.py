@@ -64,9 +64,36 @@ class MigracaoReserva(BaseMigracaoMovimento):
         if frente == 1:
             filtro_where = "mov.tipo_id IN (1, 7)"
             filtro_situacao = "eq.situacao_id = 1"
+            # Frente 1 segue a regra canônica de "último movimento" do projeto
+            # (data do documento, desempate por id), a mesma usada por
+            # ``buscar_ultimo_movimento_cte``. Pelo MAX(id) um lançamento
+            # retroativo esconde a reserva vigente (ex.: equipamento 26056).
+            ult_mov = """
+                    SELECT equipamento_id, movimento_id FROM (
+                        SELECT mi.equipamento_id,
+                               m.id AS movimento_id,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY mi.equipamento_id
+                                   ORDER BY m.data DESC, m.id DESC, mi.id DESC
+                               ) AS ordem
+                        FROM aluguel_movimento_itens mi
+                        INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+                        WHERE m.deleted_at IS NULL
+                          AND mi.deleted_at IS NULL
+                    ) ranking
+                    WHERE ordem = 1
+            """
         else:
             filtro_where = "mov.tipo_id = 7"
             filtro_situacao = "eq.situacao_id IN (1, 15)"
+            ult_mov = """
+                    SELECT mi.equipamento_id, MAX(m.id) as movimento_id
+                    FROM aluguel_movimento_itens mi
+                    INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
+                    WHERE m.deleted_at IS NULL
+                      AND mi.deleted_at IS NULL
+                GROUP BY mi.equipamento_id
+            """
 
         query = f"""
             SELECT
@@ -76,14 +103,9 @@ class MigracaoReserva(BaseMigracaoMovimento):
                 mov.usuario_id, mov.updated_at, mov.deleted_at
             FROM aluguel_equipamentos eq
             INNER JOIN (
-                    SELECT mi.equipamento_id, MAX(m.id) as ultimo_movimento_id
-                    FROM aluguel_movimento_itens mi
-                    INNER JOIN aluguel_movimento m ON m.id = mi.movimento_id
-                    WHERE m.deleted_at IS NULL
-                      AND mi.deleted_at IS NULL
-                GROUP BY mi.equipamento_id
+                    {ult_mov}
             ) ult_mov ON ult_mov.equipamento_id = eq.id
-            INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.ultimo_movimento_id
+            INNER JOIN aluguel_movimento mov ON mov.id = ult_mov.movimento_id
             LEFT JOIN aluguel_clientes ac ON ac.id = mov.cliente_id
             WHERE eq.deleted_at IS NULL 
               AND ac.deleted_at IS NULL 

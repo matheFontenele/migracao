@@ -16,19 +16,39 @@ TABELAS_MANUTENCAO = [
 # DICIONÁRIOS DE MAPEAMENTO (Conforme Documentação Visual)
 # ==============================================================================
 
+# Serviço legado -> maintenance_types do refatorado
+#   1 REVISÃO_MANUTENÇÃO_OTRS  -> 8 REVISÃO_MANUTENÇÃO_OTRS
+#   2 MANUTENÇÃO_REVISÃO_OTRS  -> 8 REVISÃO_MANUTENÇÃO_OTRS
+#   3 UPGRADE                  -> 7 UPGRADE/DOWNGRADE
+#   4 MONTAGEM                 -> 1 MONTAGEM
+#   5 OTRS                     -> 6 OTRS
+#  16 MANUTENÇÃO EXTERNA       -> 5 MANUTENÇÃO
+#  17 BENCHMARK                -> 2 BENCHMARK
+#  18 VISTORIA                 -> 3 VISTORIA
+#  19 DESMONTAGEM              -> 4 DESMONTAGEM
+#  20 MANUTENÇÃO               -> 5 MANUTENÇÃO
+#  21 OTRS                     -> 6 OTRS
 MAPA_MAINTENANCE_TYPE = {
-    4: 1, 1: 1, 2: 1,
+    1: 8,
+    2: 8,
+    3: 7,
+    4: 1,
+    5: 6,
+    16: 5,
     17: 2,
     18: 3,
     19: 4,
-    20: 5, 3: 5, 16: 5,
-    21: 6
+    20: 5,
+    21: 6,
 }
 
 MAPA_TECHNICIAN_STATUS = {
     1: 1, 2: 2, 3: 3, 4: 4, 
     5: 5, 6: 6, 8: 7, 7: 8   
 }
+
+# Situações do legado cujo item é considerado concluído (regra histórica do módulo)
+SITUACOES_TECNICAS_CONCLUIDAS = (1, 2, 3, 5)
 
 class MigracaoManutencao(BaseMigracaoMovimento):
 
@@ -61,155 +81,244 @@ class MigracaoManutencao(BaseMigracaoMovimento):
         return 1115 # Fallback geral caso não encontre nas regras mapeadas
 
     # ==============================================================================
-    # 1. EXTRAÇÃO (Query Atualizada)
+    # 1. EXTRAÇÃO (Histórico completo, independente da situação atual)
     # ==============================================================================
     def _extrair(self):
-        print("📖 Extraindo dados de manutenção do legado...")
-        
-        query = """
+        print("📖 Extraindo histórico completo de manutenções do legado...")
+
+        # Cabeçalhos: uma linha por aluguel_manutencao_movimento (sem join com itens,
+        # para não multiplicar linhas). O equipamento é resolvido depois pelo id legado,
+        # que é preservado em equipments.id.
+        query_capas = """
             SELECT
-                alq.id AS id_equipamento,
-                alq.numero AS tombo,
-                alq.nome AS nome,
-                alt.id AS tipo_id,
-                alt.nome AS tipo,
-                alq.situacao_id,
-                asi.nome AS situacao,
                 alma.id AS manutencao_id,
+                alma.equipamento_id AS equipamento_id,
+                eq.numero AS tombo,
                 alma.cliente_id AS cliente,
                 cli.orgao_id AS orgao_cliente_id,
-                alq.orgao_id AS orgao_id_equip,
+                eq.orgao_id AS orgao_id_equip,
+                eq.situacao_id AS situacao_equipamento,
                 alma.usuario_id AS usuario,
-                alma.situacao_anterior_id AS situacao_anterior_id,
                 alma.manutencao_situacao_id AS technician_status,
                 alma.motivo AS descricao_manutencao,
-                almai.id AS item_manutencao_id,
-                almai.observacao AS descricao_item_manutencao,
-                almai.manutencao_servico_id AS maintenance_types,
+                alma.status AS status_legado,
                 alma.created_at AS data_de_entrada,
                 alma.updated_at,
                 alma.deleted_at
-            FROM aluguel_equipamentos alq
-            INNER JOIN aluguel_manutencao_movimento alma ON alq.id = alma.equipamento_id
-            LEFT JOIN aluguel_manutencao_movimento_itens almai ON alma.id = almai.manutencao_movimento_id
-            INNER JOIN aluguel_situacao asi ON alq.situacao_id = asi.id
-            INNER JOIN aluguel_tipos alt ON alq.tipo_id = alt.id
-            LEFT JOIN aluguel_clientes cli ON alma.cliente_id = cli.id
-            WHERE alma.deleted_at IS NULL AND asi.id = 3
+            FROM aluguel_manutencao_movimento alma
+            LEFT JOIN aluguel_equipamentos eq ON eq.id = alma.equipamento_id
+            LEFT JOIN aluguel_clientes cli ON cli.id = alma.cliente_id
+            WHERE alma.deleted_at IS NULL
+            ORDER BY alma.created_at, alma.id
         """
+
+        # Itens: uma linha por aluguel_manutencao_movimento_itens (sem duplicação).
+        query_itens = """
+            SELECT
+                almai.id AS item_manutencao_id,
+                almai.manutencao_movimento_id AS manutencao_id,
+                almai.usuario_id AS usuario,
+                almai.observacao AS descricao_item_manutencao,
+                almai.manutencao_situacao_id AS technician_status,
+                almai.manutencao_servico_id AS maintenance_types,
+                almai.created_at,
+                almai.updated_at,
+                almai.deleted_at
+            FROM aluguel_manutencao_movimento_itens almai
+            WHERE almai.deleted_at IS NULL
+            ORDER BY almai.manutencao_movimento_id, almai.id
+        """
+
         with self.engine_legado.connect() as conn:
-            return pd.read_sql(text(query), conn)
+            df_capas = pd.read_sql(text(query_capas), conn)
+            df_itens = pd.read_sql(text(query_itens), conn)
+
+        with self.engine_new.connect() as conn:
+            equipamentos_destino = {
+                int(row[0]) for row in conn.execute(text("SELECT id FROM equipments"))
+            }
+
+        return df_capas, df_itens, equipamentos_destino
 
     # ==============================================================================
     # 2. TRANSFORMAÇÃO E CARGA
     # ==============================================================================
-    def _transformar_e_carregar(self, df_bruto):
-        print(f"🧹 Transformando e mapeando {len(df_bruto)} registros de manutenção...")
-        
+    def _resolver_equipamento(self, equipamento_id, tombo, equipamentos_destino):
+        """Resolve o equipamento do destino.
+
+        O id de aluguel_equipamentos é preservado em equipments.id, então o caminho
+        principal é o vínculo direto. O tombo é apenas fallback (pode ser ambíguo).
+        """
+        if pd.notna(equipamento_id):
+            try:
+                equip_id = int(equipamento_id)
+            except (TypeError, ValueError):
+                equip_id = None
+            if equip_id is not None and equip_id in equipamentos_destino:
+                return equip_id
+
+        tombo_limpo = limpar_codigo(tombo) if tombo is not None else None
+        if not tombo_limpo:
+            return None
+
+        equip_id = self.dados['dict_equip_ref_por_number'].get(tombo_limpo)
+        if equip_id is None or pd.isna(equip_id):
+            return None
+        equip_id = int(equip_id)
+        return equip_id if equip_id in equipamentos_destino else None
+
+    def _texto(self, *valores):
+        for valor in valores:
+            if pd.notna(valor):
+                texto = str(valor).strip()
+                if texto:
+                    return texto
+        return "Migração Automática do Legado"
+
+    def _montar_batches(self, df_capas, df_itens, equipamentos_destino):
+        """Monta as capas e itens em memória (sem tocar no banco)."""
+        print(f"🧹 Transformando {len(df_capas)} manutenções e {len(df_itens)} itens...")
+
         maintenances_batch = []
         maintenance_items_batch = []
         equipamentos_para_atualizar = set()
         manutencoes_sem_equipamento = 0
-        
+        itens_sem_manutencao = 0
+
         id_maintenance_counter = 1
         id_item_counter = 1
-        manutencoes_processadas = set()
+        mapa_capas = {}
 
-        for _, row in tqdm(df_bruto.iterrows(), total=df_bruto.shape[0], desc="Processando Manutenções"):
+        # ------------------------------------------------------------------
+        # CAPAS
+        # ------------------------------------------------------------------
+        for _, row in tqdm(df_capas.iterrows(), total=df_capas.shape[0], desc="Processando Manutenções"):
             legacy_id = row['manutencao_id']
-            tombo = limpar_codigo(row['tombo'])
-            equip_id = self.dados['dict_equip_ref_por_number'].get(tombo)
+            equip_id = self._resolver_equipamento(
+                row['equipamento_id'], row.get('tombo'), equipamentos_destino
+            )
 
             # Só cria a manutenção se o equipamento correspondente existir no destino.
-            if equip_id is None or pd.isna(equip_id):
+            if equip_id is None:
                 manutencoes_sem_equipamento += 1
                 continue
-            equip_id = int(equip_id)
 
-            # Adiciona o equipamento na lista para atualizar o status no final
-            equipamentos_para_atualizar.add(equip_id)
+            # O status do equipamento só é alterado para os que estão em manutenção hoje.
+            if pd.notna(row['situacao_equipamento']) and int(row['situacao_equipamento']) == 3:
+                equipamentos_para_atualizar.add(equip_id)
 
             tech_id = row['usuario']
-            if pd.isna(tech_id) or tech_id not in self.usuarios_validos:
-                tech_id = 1  
-                
+            if pd.isna(tech_id) or int(tech_id) not in self.usuarios_validos:
+                tech_id = 1
+            tech_id = int(tech_id)
+
             dt_maintenance = row['data_de_entrada'] if pd.notna(row['data_de_entrada']) else self.now
             dt_created = dt_maintenance
             dt_updated = row['updated_at'] if pd.notna(row['updated_at']) else dt_maintenance
             dt_deleted = row['deleted_at'] if pd.notna(row['deleted_at']) else None
-            
-            motivo = str(row['descricao_manutencao']).strip() if pd.notna(row['descricao_manutencao']) else ""
-            obs = str(row['descricao_item_manutencao']).strip() if pd.notna(row['descricao_item_manutencao']) else ""
-            
-            if obs and motivo and obs != motivo:
-                details_text = f"Motivo: {motivo} | Obs: {obs}"
-            elif obs:
-                details_text = obs
-            elif motivo:
-                details_text = motivo
-            else:
-                details_text = "Migração Automática do Legado"
+
+            motivo = row['descricao_manutencao']
+            details_text = self._texto(motivo)
 
             # ------------------------------------------------------------------
             # APLICAÇÃO DA REGRA DE NEGÓCIO: ORGANIZAÇÃO (ORGAO_ID)
             # ------------------------------------------------------------------
-            org_cliente = row['orgao_cliente_id']
-            org_equip = row['orgao_id_equip']
-            organization_id = self._descobrir_id_organizacao_destino(org_cliente, org_equip)
+            organization_id = self._descobrir_id_organizacao_destino(
+                row['orgao_cliente_id'], row['orgao_id_equip']
+            )
 
-            # ------------------------------------------------------------------
-            # MONTAGEM DA CAPA
-            # ------------------------------------------------------------------
-            if legacy_id not in manutencoes_processadas:
-                maintenances_batch.append({
-                    "id": id_maintenance_counter,
-                    "maintenance_date": dt_maintenance,
-                    "created_by": tech_id,
-                    "equipment_id": equip_id,
-                    # Manutenção de equipamento não implica consumo de insumo.
-                    "product_item_id": None,
-                    "organization_id": organization_id,
-                    "product_quantity": None,
-                    "is_closed": 0,  
-                    "details": details_text,
-                    "created_at": dt_created,
-                    "updated_at": dt_updated,
-                    "deleted_at": dt_deleted
-                })
-                manutencoes_processadas.add(legacy_id)
-                current_maintenance_id = id_maintenance_counter
-                id_maintenance_counter += 1
-            else:
-                current_maintenance_id = id_maintenance_counter - 1 
+            # status legado: 1 = aberta/atual, 0 = fechada/histórica
+            is_closed = 0 if pd.notna(row['status_legado']) and int(row['status_legado']) == 1 else 1
 
-            # ------------------------------------------------------------------
-            # MONTAGEM DO ITEM
-            # ------------------------------------------------------------------
-            leg_situacao = row['technician_status']
-            leg_servico = row['maintenance_types']
-            
-            tech_status_id = MAPA_TECHNICIAN_STATUS.get(int(leg_situacao) if pd.notna(leg_situacao) else 0, 1)
-            maint_type_id = MAPA_MAINTENANCE_TYPE.get(int(leg_servico) if pd.notna(leg_servico) else 0, 5)
-
-            if tech_status_id in (1, 2, 3, 5):
-                maint_status_id = 2
-            else:
-                maint_status_id = 1
-
-            maintenance_items_batch.append({
-                "id": id_item_counter,
-                "maintenance_id": current_maintenance_id,
-                "movement_id": None,
-                "maintenance_type_id": maint_type_id,
-                "maintenance_status_id": maint_status_id,
-                "technician_status_id": tech_status_id,
-                "technician_id": tech_id,
+            maintenances_batch.append({
+                "id": id_maintenance_counter,
+                "maintenance_date": pd.Timestamp(dt_maintenance).date(),
+                "created_by": tech_id,
+                "equipment_id": equip_id,
+                # Manutenção de equipamento não implica consumo de insumo.
+                "product_item_id": None,
+                "organization_id": organization_id,
+                "product_quantity": None,
+                "is_closed": is_closed,
                 "details": details_text,
                 "created_at": dt_created,
                 "updated_at": dt_updated,
                 "deleted_at": dt_deleted
             })
+            mapa_capas[legacy_id] = id_maintenance_counter
+            id_maintenance_counter += 1
+
+        # ------------------------------------------------------------------
+        # ITENS
+        # ------------------------------------------------------------------
+        for _, row in tqdm(df_itens.iterrows(), total=df_itens.shape[0], desc="Processando Itens"):
+            legacy_mov_id = row['manutencao_id']
+            maintenance_id = mapa_capas.get(legacy_mov_id)
+            if maintenance_id is None:
+                itens_sem_manutencao += 1
+                continue
+
+            tech_id = row['usuario']
+            if pd.isna(tech_id) or int(tech_id) not in self.usuarios_validos:
+                # fallback: usuário do cabeçalho
+                tech_id = maintenances_batch[maintenance_id - 1]['created_by']
+            tech_id = int(tech_id)
+
+            leg_situacao = row['technician_status']
+            leg_servico = row['maintenance_types']
+
+            tech_status_id = MAPA_TECHNICIAN_STATUS.get(
+                int(leg_situacao) if pd.notna(leg_situacao) else 0, 1
+            )
+            maint_type_id = MAPA_MAINTENANCE_TYPE.get(
+                int(leg_servico) if pd.notna(leg_servico) else 0, 5
+            )
+
+            capa = maintenances_batch[maintenance_id - 1]
+            if capa['is_closed']:
+                # Manutenção fechada/histórica sempre concluída.
+                maint_status_id = 2
+            elif tech_status_id in SITUACOES_TECNICAS_CONCLUIDAS:
+                maint_status_id = 2
+            else:
+                maint_status_id = 1
+
+            dt_created = row['created_at'] if pd.notna(row['created_at']) else capa['created_at']
+            dt_updated = row['updated_at'] if pd.notna(row['updated_at']) else dt_created
+            dt_deleted = row['deleted_at'] if pd.notna(row['deleted_at']) else None
+
+            maintenance_items_batch.append({
+                "id": id_item_counter,
+                "maintenance_id": maintenance_id,
+                "movement_id": None,
+                "maintenance_type_id": maint_type_id,
+                "maintenance_status_id": maint_status_id,
+                "technician_status_id": tech_status_id,
+                "technician_id": tech_id,
+                "details": self._texto(row['descricao_item_manutencao'],
+                                       capa['details']),
+                "created_at": dt_created,
+                "updated_at": dt_updated,
+                "deleted_at": dt_deleted
+            })
             id_item_counter += 1
+
+        return (
+            maintenances_batch,
+            maintenance_items_batch,
+            equipamentos_para_atualizar,
+            manutencoes_sem_equipamento,
+            itens_sem_manutencao,
+        )
+
+    def _transformar_e_carregar(self, df_capas, df_itens, equipamentos_destino):
+        (
+            maintenances_batch,
+            maintenance_items_batch,
+            equipamentos_para_atualizar,
+            manutencoes_sem_equipamento,
+            itens_sem_manutencao,
+        ) = self._montar_batches(df_capas, df_itens, equipamentos_destino)
 
         # ------------------------------------------------------------------
         # PERSISTÊNCIA NO BANCO
@@ -217,18 +326,23 @@ class MigracaoManutencao(BaseMigracaoMovimento):
         print(f"\n🚀 Inserindo {len(maintenances_batch)} capas e {len(maintenance_items_batch)} itens no banco...")
         if manutencoes_sem_equipamento:
             print(
-                f"⚠️ {manutencoes_sem_equipamento} registros de manutenção foram ignorados "
-                "porque o tombo não foi encontrado entre os equipamentos do destino."
+                f"⚠️ {manutencoes_sem_equipamento} manutenções não migradas "
+                "porque o equipamento não existe no destino."
+            )
+        if itens_sem_manutencao:
+            print(
+                f"⚠️ {itens_sem_manutencao} itens ignorados porque a manutenção "
+                "correspondente não foi migrada."
             )
         with self.engine_new.begin() as conn:
             if maintenances_batch:
                 pd.DataFrame(maintenances_batch).to_sql('maintenances', con=conn, if_exists='append', index=False)
             if maintenance_items_batch:
                 pd.DataFrame(maintenance_items_batch).to_sql('maintenance_items', con=conn, if_exists='append', index=False)
-                
+
             if equipamentos_para_atualizar:
                 print(f"🔧 Modificando o status_id para 6 em {len(equipamentos_para_atualizar)} equipamentos...")
-                ids_sql = "(" + ", ".join(map(str, equipamentos_para_atualizar)) + ")"
+                ids_sql = "(" + ", ".join(map(str, sorted(equipamentos_para_atualizar))) + ")"
                 conn.execute(text(f"UPDATE equipments SET status_id = 6 WHERE id IN {ids_sql}"))
 
     # ==============================================================================
@@ -242,12 +356,13 @@ class MigracaoManutencao(BaseMigracaoMovimento):
         print("\n🧹 Limpando tabelas de manutenção no destino...")
         executar_truncate_tabelas(self.engine_new, TABELAS_MANUTENCAO)
         
-        df_bruto = self._extrair()
-        if not df_bruto.empty:
-            self._transformar_e_carregar(df_bruto)
-            print("\n✅ Migração de Manutenções Finalizada.")
-        else:
-            print("\n⚠️ Nenhum registro encontrado na origem com a situação 3 (em manutenção).")
+        df_capas, df_itens, equipamentos_destino = self._extrair()
+        if df_capas.empty:
+            print("\n⚠️ Nenhum registro de manutenção encontrado na origem.")
+            return
+
+        self._transformar_e_carregar(df_capas, df_itens, equipamentos_destino)
+        print("\n✅ Migração de Manutenções Finalizada.")
 
 # ==============================================================================
 # WRAPPER (Ponte para o orquestrador/main.py)

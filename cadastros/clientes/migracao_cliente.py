@@ -12,7 +12,7 @@ from config.config import (
     ORGANIZACOES_BLOQUEADAS,
     FALSOS_RESERVAS,
     BASES_AVULSOS, ENDERECOS_BASES, RESERVAS_BASE_AVULSA,
-    DEPARA_RESERVAS_BASE,
+    DEPARA_RESERVAS_BASE, RESERVAS_DESTINO_PREFEITURA,
     MESCLAGENS_CLIENTE,
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
@@ -169,6 +169,23 @@ MESCLAGENS_PREFEITURA = {
         "nome_alvo": "PREFEITURA MUNICIPAL DE AQUIRAZ",
         "organizacao_alvo": 1115,
     },
+    # ICÓ tem duas raízes com o mesmo órgão: 37 (ALUCOM/1115, grafia "ICO",
+    # 8 setores/21 clientes) e 292 (MOREIA/1122, grafia "ICÓ", 16 setores/45
+    # clientes). Ao contrário das anteriores, a dona do cadastro é a 292/1122:
+    # é nela que estão os contratos de ICÓ (docs/contratos_json/MOREIA) e a
+    # raiz que ``planilhas_moreia_ico.py`` procura.
+    # As secretarias NÃO são achatadas: os contratos da MOREIA apontam para os
+    # 16 setores da 292 e os da AS_SISTEMAS para os 8 setores da 37 (nomes
+    # diferentes, sem colisão de alias). Achatar qualquer um dos lados
+    # apagaria customers usados no de/para de contrato. Os setores da 37
+    # passam a ser filhos da raiz 292 e seus clientes viram endereços deles.
+    "ICO": {
+        "ids": (37, 292),
+        "id_alvo": 292,
+        "nome_alvo": "PREFEITURA MUNICIPAL DE ICÓ",
+        "organizacao_alvo": 1122,
+        "preservar_hierarquia": True,
+    },
 }
 
 # Clientes-raiz do legado (sem setor/departamento) que são apenas o cadastro
@@ -244,6 +261,37 @@ HOSPITAIS_PB_CONFIG = {
     10752: {"id_pai": 920002, "nome": "HUJB-HOSPITAL UNIVERSITÁRIO JULIO BANDEIRA-CAJAZEIRAS-PB"},
     10686: {"id_pai": 920003, "nome": "HUAC - HOSPITAL UNIVERSITÁRIO ALCIDES CARNEIRO-CAMPINA GRANDE-PB"}
 }
+
+
+def config_destino_reserva(id_legado):
+    """Endereço genérico configurado para uma reserva legada (ou ``None``).
+
+    As reservas listadas em ``RESERVAS_DESTINO_PREFEITURA`` não têm cliente
+    titular no refatorado; o endereço delas é criado sob a prefeitura
+    indicada, com alias próprio.
+    """
+    try:
+        return RESERVAS_DESTINO_PREFEITURA.get(int(id_legado))
+    except (TypeError, ValueError):
+        return None
+
+
+def ids_reserva_com_endereco_proprio():
+    """IDs de reserva que recebem endereço próprio (base ou prefeitura)."""
+    return set(RESERVAS_BASE_AVULSA) | set(RESERVAS_DESTINO_PREFEITURA)
+
+
+def hierarquia_destino(id_legado, id_prefeitura, id_secretaria):
+    """Hierarquia efetiva do endereço, aplicando o destino genérico de reserva.
+
+    Uma reserva configurada em ``RESERVAS_DESTINO_PREFEITURA`` é anexada
+    diretamente ao departamento indicado, ignorando secretaria/prefeitura do
+    legado (o cliente de reserva não tem setor).
+    """
+    config = config_destino_reserva(id_legado)
+    if config is None:
+        return id_prefeitura, id_secretaria
+    return config["departamento_legado"], None
 
 
 class MigracaoClientes:
@@ -714,9 +762,11 @@ class MigracaoClientes:
         grupos, _ = self._agrupar_duplicados(self._pares_mesclaveis(relatorio))
 
         # IDs cujo address guarda roteamento de reserva e não pode ser apagado.
-        # Inclui os clientes mapeados para endereço-base, que recebem
-        # reserved_customer_id = próprio id na carga.
-        ids_com_reserva = {int(id_legado) for id_legado in RESERVAS_BASE_AVULSA}
+        # Inclui os clientes mapeados para endereço-base e os destinos genéricos
+        # de prefeitura, que recebem reserved_customer_id = próprio id na carga.
+        ids_com_reserva = {
+            int(id_legado) for id_legado in ids_reserva_com_endereco_proprio()
+        }
         if 'reserved_customer_id' in df_enderecos_finais.columns:
             for id_cliente, reserva in zip(
                 df_enderecos_finais['ID_CLIENTE'],
@@ -905,10 +955,12 @@ class MigracaoClientes:
 
         Cada entrada de ``MESCLAGENS_PREFEITURA`` lista departamentos que são
         o mesmo órgão com cadastro repetido. Todas as secretarias e clientes
-        de destino vinculados a eles passam a pertencer ao cliente alvo. A
-        hierarquia de secretaria é achatada: o destino é anexado direto à
-        prefeitura e o nome original do cliente é preservado no alias do
-        endereço.
+        de destino vinculados a eles passam a pertencer ao cliente alvo. Por
+        padrão a hierarquia de secretaria é achatada: o destino é anexado
+        direto à prefeitura e o nome original do cliente é preservado no
+        alias do endereço. Com ``preservar_hierarquia`` os setores de origem
+        continuam existindo, apenas reparentados sob a prefeitura alvo (usado
+        quando os contratos apontam para os setores dos dois lados).
         """
         df_modificado = df.copy()
         ids_prefeitura = pd.to_numeric(
@@ -921,8 +973,9 @@ class MigracaoClientes:
                 continue
             df_modificado.loc[mask, 'ID_PREFEITURA'] = config['id_alvo']
             df_modificado.loc[mask, 'PREFEITURA'] = config['nome_alvo']
-            df_modificado.loc[mask, 'ID_SECRETARIA'] = None
-            df_modificado.loc[mask, 'SECRETARIA'] = None
+            if not config.get('preservar_hierarquia'):
+                df_modificado.loc[mask, 'ID_SECRETARIA'] = None
+                df_modificado.loc[mask, 'SECRETARIA'] = None
             organizacao_alvo = config.get('organizacao_alvo')
             if organizacao_alvo is not None:
                 df_modificado.loc[mask, 'ORGANIZACAO'] = organizacao_alvo
@@ -1318,7 +1371,9 @@ class MigracaoClientes:
         df_orfas['reserved_customer_id'] = None
         # Reservas sem titular pareado continuam precisando de um endereço de
         # reserva para que o módulo de movimentos consiga roteá-las.
-        mask_reserva_base = df_orfas['id_clean'].isin(RESERVAS_BASE_AVULSA)
+        mask_reserva_base = df_orfas['id_clean'].isin(
+            ids_reserva_com_endereco_proprio()
+        )
         df_orfas.loc[mask_reserva_base, 'reserved_customer_id'] = df_orfas.loc[
             mask_reserva_base, 'id_clean'
         ]
@@ -1329,8 +1384,14 @@ class MigracaoClientes:
         )
         for _, row in df_orfas.iterrows():
             reserva_id = int(row['id_clean'])
+            config_reserva = RESERVAS_DESTINO_PREFEITURA.get(reserva_id)
             base_reserva = RESERVAS_BASE_AVULSA.get(reserva_id)
-            if base_reserva:
+            if config_reserva:
+                resultado = (
+                    "será anexada ao destino genérico "
+                    f"'{config_reserva['alias']}'"
+                )
+            elif base_reserva:
                 resultado = f"será direcionada para o endereço-base '{base_reserva}'"
             else:
                 resultado = "sem endereço-base configurado; não foi possível atrelar"
@@ -1480,7 +1541,14 @@ class MigracaoClientes:
 
             # Netos (Endereços) - Preparação
             for id_legado, info in tqdm(destinos.items(), desc="Preparando Endereços Finais"):
-                target_id = dict_traducao_filhos.get(info["id_sec"]) or dict_traducao_pais.get(info["id_pref"])
+                # Reservas com destino genérico de prefeitura ignoram a
+                # hierarquia do legado (o cliente de reserva não tem setor) e
+                # são anexadas ao departamento configurado.
+                config_reserva = config_destino_reserva(id_legado)
+                id_pref, id_sec = hierarquia_destino(
+                    id_legado, info["id_pref"], info["id_sec"]
+                )
+                target_id = dict_traducao_filhos.get(id_sec) or dict_traducao_pais.get(id_pref)
                 if target_id:
                     c_at = info["row"]['created_at'] if pd.notna(info["row"].get('created_at')) else self.now
                     u_at = info["row"]['updated_at'] if pd.notna(info["row"].get('updated_at')) else self.now
@@ -1490,8 +1558,9 @@ class MigracaoClientes:
                     usa_endereco_base = dados_base_reserva is not None
 
                     # Por padrão, address representa o destino final do legado.
-                    # Só as exceções explicitamente mapeadas usam endereço-base.
-                    dados_endereco = dados_base_reserva or {
+                    # Só as exceções explicitamente mapeadas usam endereço-base
+                    # ou o destino genérico de reserva configurado.
+                    dados_endereco = config_reserva or dados_base_reserva or {
                         "alias": info["nome"],
                         "zip": info["row"]['CEP'],
                         "street": info["row"]['ENDERECO'],

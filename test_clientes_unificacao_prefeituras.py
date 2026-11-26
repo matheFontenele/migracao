@@ -105,6 +105,42 @@ class UnificarPrefeiturasTests(unittest.TestCase):
         self.assertEqual(resultado.iloc[0]['ID_PREFEITURA'], 57)
         self.assertEqual(resultado.iloc[0]['ID_SECRETARIA'], 474)
 
+    def test_ico_37_e_292_viram_uma_raiz_preservando_setores(self):
+        df = self._df([
+            {'ID_PREFEITURA': 37, 'PREFEITURA': 'PREFEITURA MUNICIPAL DE ICO',
+             'ID_SECRETARIA': 377, 'SECRETARIA': 'SECRETARIA DE SAUDE - ICO',
+             'ORGANIZACAO': 1115},
+            {'ID_PREFEITURA': 292, 'PREFEITURA': 'PREFEITURA MUNICIPAL DE ICÓ',
+             'ID_SECRETARIA': 1240,
+             'SECRETARIA': 'SECRETARIA MUNICIPAL DE EDUCACAO DO MUNICIPIO DE ICÓ',
+             'ORGANIZACAO': 1122},
+        ])
+
+        resultado = self.obj._unificar_prefeituras(df)
+
+        self.assertEqual(resultado['ID_PREFEITURA'].tolist(), [292, 292])
+        self.assertEqual(
+            resultado['PREFEITURA'].tolist(),
+            ['PREFEITURA MUNICIPAL DE ICÓ', 'PREFEITURA MUNICIPAL DE ICÓ'],
+        )
+        # Setores das duas organizações sobrevivem: os contratos da MOREIA
+        # apontam para os setores da 292 e os da AS_SISTEMAS para os da 37.
+        self.assertEqual(resultado['ID_SECRETARIA'].tolist(), [377, 1240])
+        self.assertEqual(
+            resultado['SECRETARIA'].tolist(),
+            ['SECRETARIA DE SAUDE - ICO',
+             'SECRETARIA MUNICIPAL DE EDUCACAO DO MUNICIPIO DE ICÓ'],
+        )
+        self.assertEqual(resultado['ORGANIZACAO'].tolist(), [1122, 1122])
+
+    def test_configuracao_ico(self):
+        config = MESCLAGENS_PREFEITURA['ICO']
+        self.assertEqual(config['ids'], (37, 292))
+        self.assertEqual(config['id_alvo'], 292)
+        self.assertEqual(config['nome_alvo'], 'PREFEITURA MUNICIPAL DE ICÓ')
+        self.assertEqual(config['organizacao_alvo'], 1122)
+        self.assertTrue(config['preservar_hierarquia'])
+
     def test_configuracao_taua(self):
         config = MESCLAGENS_PREFEITURA['TAUA']
         self.assertEqual(config['ids'], (39, 77))
