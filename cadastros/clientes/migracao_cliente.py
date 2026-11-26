@@ -18,6 +18,7 @@ from config.config import (
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
 from cadastros.clientes.endereco_uf import normalizar_uf
+from cadastros.clientes.endereco_cidade import resolver_cidade
 
 TABELAS_CLIENTES = [
     'addresses', 
@@ -1570,11 +1571,25 @@ class MigracaoClientes:
                         "state": info["row"]['ESTADO'],
                     }
 
+                    # O legado deixa a cidade das secretarias como
+                    # 'NÃO INFORMADO'; ela é a mesma da prefeitura de origem,
+                    # quando o nome dela resolve para um município único do
+                    # IBGE (ver endereco_cidade). Endereços-base e destinos
+                    # genéricos configurados não passam por essa derivação.
+                    cidade_endereco = dados_endereco.get("city")
+                    if not (config_reserva or dados_base_reserva):
+                        cidade_endereco = (
+                            resolver_cidade(
+                                cidade_endereco, info["row"].get("PREFEITURA")
+                            )
+                            or cidade_endereco
+                        )
+
                     # O legado grava estado '0' quando não conhece a UF. Antes
                     # de desistir, tenta derivar do município (ver endereco_uf);
                     # sem resolução única, fica 'NÃO INFORMADO'.
                     uf_endereco = normalizar_uf(
-                        dados_endereco.get("state"), dados_endereco.get("city")
+                        dados_endereco.get("state"), cidade_endereco
                     )
 
                     enderecos_batch.append({
@@ -1583,7 +1598,7 @@ class MigracaoClientes:
                         "zip": dados_endereco["zip"],
                         "street": dados_endereco["street"],
                         "num": dados_endereco["number"],
-                        "city": dados_endereco["city"],
+                        "city": cidade_endereco,
                         "state": uf_endereco,
                         "leg_id": info["legacy_id"],
                         "res_id": (
