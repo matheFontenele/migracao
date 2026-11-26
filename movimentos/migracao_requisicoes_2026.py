@@ -136,6 +136,15 @@ def normalizar(valor: object) -> str:
     return re.sub(r"\s+", " ", texto).strip().upper()
 
 
+# Clientes da planilha que não entram nesta migração (pedido de 24/11/2026).
+# A comparação usa `normalizar`, então grafias com/sem acento ou caixa
+# diferente continuam sendo o mesmo cliente. Não inclui as demais unidades de
+# São Luís (BASE SÃO LUÍS, SEMCAS, SEMUSC, SMTT, PGM, SEMIT).
+CLIENTES_IGNORADOS_REQUISICOES_2026 = frozenset({
+    "SECRETARIA DE SAUDE DE SÃO LUIS",
+})
+
+
 def tokens_relevantes(texto: str, minimo: int = 3) -> set[str]:
     return {t for t in normalizar(texto).split()
             if len(t) >= minimo and t not in GENERICOS}
@@ -547,6 +556,37 @@ def ler_planilha(arquivo: Path) -> pd.DataFrame:
     return df
 
 
+def filtrar_clientes_ignorados(
+        df: pd.DataFrame, auditoria: list[dict]) -> pd.DataFrame:
+    """Remove da planilha as linhas dos clientes que não devem ser migrados.
+
+    O índice original é preservado para que a numeração `linha` da auditoria
+    continue batendo com o CSV de origem. Cada linha removida vira um registro
+    IGNORADA na auditoria, para a exclusão ficar rastreável.
+    """
+    alvo = df["Cliente"].map(normalizar).isin(
+        {normalizar(nome) for nome in CLIENTES_IGNORADOS_REQUISICOES_2026})
+    total = int(alvo.sum())
+    if not total:
+        return df
+
+    for indice, row in df[alvo].iterrows():
+        auditoria.append({
+            "linha": indice + 2,
+            "resultado": "IGNORADA",
+            "motivo": f"Cliente ignorado nesta migração: {row['Cliente']}",
+            "cliente": row["Cliente"],
+            "item": row["Equipamento | Insumos"],
+            "req": row["Req"],
+        })
+
+    restantes = df[~alvo].copy()
+    nomes = ", ".join(sorted(CLIENTES_IGNORADOS_REQUISICOES_2026))
+    print(f"   Linhas ignoradas por cliente ({nomes}): {total:,} "
+          f"(restam {len(restantes):,})")
+    return restantes
+
+
 def texto_substituicao(valor: object) -> str:
     """Texto descritivo da coluna `Substituição ou Novo` (ex.: REVISADO).
 
@@ -892,6 +932,8 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
     print(f"📖 Lendo arquivo de origem: {arquivo}")
     df = ler_planilha(arquivo)
     print(f"   Linhas carregadas: {len(df):,}")
+    auditoria: list[dict] = []
+    df = filtrar_clientes_ignorados(df, auditoria)
 
     numeros_necessarios: set[int] = set()
     for valor in df["PAT"]:
@@ -914,7 +956,6 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
     )
 
     linhas: list[Linha] = []
-    auditoria: list[dict] = []
     cache: dict[str, ClassificacaoItem] = {}
     for indice, row in tqdm(df.iterrows(), total=len(df),
                             desc="Validando linhas", unit="linha"):

@@ -27,7 +27,15 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 # fundem (os mesmos 16 de nível 3/approved) e 5 deles deixam de gerar
 # movimento. Itens não se alteram (1.074 / 1.271). A granularidade anterior
 # (um customer por setor legado) é reproduzida linha a linha e dá 453/385.
-ESPERADO = {"requisicoes": 437, "itens": 1074, "movimentos": 380, "itens_movimento": 1271}
+#
+# Em 2026-11-24 a planilha de entrada foi atualizada com lançamentos até
+# 23/11 (antes ia até 12/11): +9 requisições, +18 itens, +17 movimentos e
+# +108 itens de movimento. As contagens abaixo refletem essa carga.
+#
+# Ainda em 2026-11-24 passou a ser ignorado o cliente SECRETARIA DE SAUDE DE
+# SÃO LUIS (255 linhas, todas de 23/11): -1 requisição, -7 itens, -2 movimentos
+# e -82 itens de movimento. As demais unidades de São Luís continuam migrando.
+ESPERADO = {"requisicoes": 445, "itens": 1085, "movimentos": 395, "itens_movimento": 1297}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:
