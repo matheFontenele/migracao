@@ -9,7 +9,7 @@ from datetime import datetime
 from tqdm import tqdm
 from sqlalchemy import text
 
-from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, LOCATION_ESTOQUE_EQUIPAMENTOS, CLIENTES_ESTOQUE
+from config.config import MAPPING_ALUCOM, MAPPING_AS, MAPPING_IP, MAPPING_MOREIA, MAPPING_SC, LOCATION_ESTOQUE_EQUIPAMENTOS, CLIENTES_ESTOQUE, EQUIPAMENTOS_IGNORADOS
 from config.parquet_excecoes import ids_priorizados
 from utils.sanetizador import executar_truncate_tabelas
 
@@ -331,6 +331,18 @@ class MigracaoEquipamentos:
         relatorio.to_csv(caminho, index=False, encoding='utf-8-sig')
         print(f"📄 Copias de base ignoradas salvas em '{caminho}' ({len(relatorio)} registros).")
 
+    def _salvar_relatorio_ignorados(self, registros):
+        caminho_ajustes = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            'ajustes',
+        )
+        os.makedirs(caminho_ajustes, exist_ok=True)
+        caminho = os.path.join(caminho_ajustes, 'equipamentos_ignorados.csv')
+        colunas = ['id_legado', 'tombo', 'nome', 'orgao_atual', 'orgao_original', 'motivo']
+        relatorio = pd.DataFrame(registros, columns=colunas)
+        relatorio.to_csv(caminho, index=False, encoding='utf-8-sig')
+        print(f"📄 Equipamentos ignorados por exceção salvos em '{caminho}' ({len(relatorio)} registros).")
+
     def _salvar_relatorio_fallbacks(self, registros):
         caminho_ajustes = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'ajustes')
         os.makedirs(caminho_ajustes, exist_ok=True)
@@ -449,7 +461,9 @@ class MigracaoEquipamentos:
         descartados_tombo_zero = 0
         descartados_org_nao_mapeada = 0
         descartados_tombo_base = 0
+        descartados_excecao = 0
         registros_descartados_base = []
+        registros_ignorados = []
         orgaos_nao_mapeados_amostra = set()
         
         for index, dados_db in tqdm(df_equipamentos_legado.iterrows(), total=df_equipamentos_legado.shape[0], desc="Refatorando dados"):
@@ -462,6 +476,21 @@ class MigracaoEquipamentos:
                 continue
 
             id_equipamento_legado = dados_db['id_legado']
+
+            # Exceções nominais: ids do legado que não devem virar equipamento
+            # no refatorado (mapa EQUIPAMENTOS_IGNORADOS em config/config.py).
+            id_int_legado = _id_int(id_equipamento_legado)
+            if id_int_legado in EQUIPAMENTOS_IGNORADOS:
+                descartados_excecao += 1
+                registros_ignorados.append({
+                    'id_legado': id_int_legado,
+                    'tombo': tombo_atual,
+                    'nome': dados_db['nome_legado'],
+                    'orgao_atual': dados_db['orgao_atual'],
+                    'orgao_original': dados_db['orgao_original'],
+                    'motivo': EQUIPAMENTOS_IGNORADOS[id_int_legado],
+                })
+                continue
 
             if id_equipamento_legado in ids_descartar_base:
                 descartados_tombo_base += 1
@@ -606,10 +635,12 @@ class MigracaoEquipamentos:
         print(f"   ❌ Descartados (tombo zero):  {descartados_tombo_zero}")
         print(f"   ❌ Descartados (órgão não mapeado): {descartados_org_nao_mapeada}")
         print(f"   ❌ Descartados (base com tombo repetido): {descartados_tombo_base}")
+        print(f"   ❌ Descartados (exceção EQUIPAMENTOS_IGNORADOS): {descartados_excecao}")
         print(f"   ✅ Dados limpos: {len(lista_mestre)}")
         print(f"   🔍 Amostra de órgãos não mapeados: {orgaos_nao_mapeados_amostra}")
         self._salvar_relatorio_fallbacks(registros_fallback)
         self._salvar_relatorio_descartes_base(registros_descartados_base)
+        self._salvar_relatorio_ignorados(registros_ignorados)
 
         return pd.DataFrame(lista_mestre).reset_index(drop=True)
 

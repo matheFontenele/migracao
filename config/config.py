@@ -252,6 +252,25 @@ EQUIPAMENTOS_REVISAO_MANUAL = {
     ),
 }
 
+# Equipamentos que devem ser IGNORADOS na migração, por id do LEGADO.
+# Diferente de EQUIPAMENTOS_REVISAO_MANUAL (que só suprime correções
+# automáticas), os ids daqui não entram no refatorado: não viram
+# `equipments`, não geram `equipment_history` nem bloco de estoque.
+# A chave é o id em `aluguel_legado.aluguel_equipamentos.id`; o valor é o
+# motivo (fica registrado em `ajustes/equipamentos_ignorados.csv`).
+EQUIPAMENTOS_IGNORADOS = {
+    # Triplicata do tombo 48310 — a cópia válida é o id 45007
+    # (MOREIA, org 1122).
+    57026: (
+        "Duplicata do tombo 48310: cadastrada como 'ESTABILIZADOR 300 VA' "
+        "(ALUCOM, org 1115); a cópia válida é o id 45007."
+    ),
+    80506: (
+        "Duplicata do tombo 48310: mesmo nome do id 45007 (MOREIA, org 1122); "
+        "a cópia válida é o id 45007."
+    ),
+}
+
 # Setores internos que NÃO devem virar customer (secretaria). Seus clientes
 # são anexados diretamente ao departamento pai.
 # 1187 = ALUCOM SEDE RIACHUELO (departamento 283 = ADI)
@@ -380,7 +399,6 @@ RESERVAS_BASE_AVULSA = {
     3259: "Estoque Aracati",
     4468: "Box São Luis",
     10859: "Estoque Paraíba",
-    4089: "Estoque Caucaia",
 }
 
 # DE/PARA das reservas avulsas para os clientes titulares que receberão os
@@ -392,5 +410,24 @@ DEPARA_RESERVAS_BASE = {
     3259: "PREFEITURA MUNICIPAL DE ARACATI",
     4468: "PM SÃO LUÍS",
     10859: "SECRETARIA DE ESTADO DA SAÚDE DA PARAÍBA - HEMOCENTRO",
-    4089: "P M DE CAUCAIA - RESERVA",
+}
+
+# Reservas legadas sem cliente titular no refatorado e sem base própria: o
+# endereço de reserva é criado como destino genérico sob a prefeitura
+# indicada (departamento legado). A chave é o id do cliente de reserva e o
+# endereço recebe reserved_customer_id igual a essa chave.
+RESERVAS_DESTINO_PREFEITURA = {
+    # P M DE CAUCAIA - RESERVA (cliente 4089): não tem setor no legado, então
+    # não possui customer/endereço próprio. Os 36 equipamentos reservados
+    # passam a apontar para este destino genérico da prefeitura de Caucaia.
+    4089: {
+        "departamento_legado": 2,
+        "prefeitura": "PREFEITURA MUNICIPAL DE CAUCAIA",
+        "alias": "Caucaia - Reservas",
+        "zip": None,
+        "street": None,
+        "number": "S/N",
+        "city": "CAUCAIA",
+        "state": "CE",
+    },
 }
