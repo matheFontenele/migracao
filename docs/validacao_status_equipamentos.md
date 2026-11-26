@@ -126,7 +126,7 @@ Logo, o veredito de 8 divergências é legítimo **para o instante em que foi me
 | Medida | Resultado |
 |---|---|
 | Aluguel no legado com `situacao_id=1` e último movimento Devolução/Baixado | 11 (legado inconsistente) |
-| "Só no novo" | 3.003 — 2.794 soft-deleted `status_id=9` (retombados, esperado) + 209 ativos |
+| "Só no novo" | 3.003 — 2.794 soft-deleted `status_id=9` (medido antes da regra que passou a migrar todos os baixados: só os retombados entravam) + 209 ativos |
 | "Só no legado" | 804 — situacao 1 = 489, 14 (DEVOLUÇÃO) = 212, 3 = 52, 7 = 51; efeito de `selecionar_descartes_cliente_estoque`, tombos 0 e órgãos fora de `TODOS_ORGAOS_MAPEADOS` (ex.: 1351, com 34.066 linhas) |
 | Distribuição do refatorado (ativos, 80.083) | 1→12.057, 2→60.171, 3→591, 6→5.198, 8→1.891, 9→1, 10→37, 11→58, 13→39, 4/5/7 residuais |
 | `migracao_aluguel` | gera movimento apenas para tombos existentes no Parquet (10.280 tombos) |

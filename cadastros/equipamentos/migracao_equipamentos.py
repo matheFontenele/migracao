@@ -408,19 +408,13 @@ class MigracaoEquipamentos:
             LEFT JOIN ORGAOS org ON ult_movi.novo_orgao_id = org.ORG_ID
             WHERE alq.deleted_at IS NULL
                OR (
-                    -- Baixado que foi retombado: o legado cria um equipamento
-                    -- novo com `numero_antigo` igual a este tombo. Ele entra
-                    -- como status 9 + deleted_at para receber a anotacao
-                    -- "Retombado para o tombo X" em `details`.
-                    alq.deleted_at IS NOT NULL
-                    AND alq.situacao_id = 10
-                    AND alq.numero IN (
-                        SELECT ret.numero_antigo
-                        FROM aluguel_equipamentos ret
-                        WHERE ret.numero_antigo IS NOT NULL
-                          AND ret.numero_antigo <> ''
-                          AND ret.deleted_at IS NULL
-                    )
+                    -- Baixados excluídos no legado (situação 10 + deleted_at)
+                    -- também entram, como status 9 + deleted_at, para preservar
+                    -- o histórico do tombo. Os que foram retombados recebem
+                    -- também a anotação "Retombado para o tombo X" em
+                    -- `details`.
+                    alq.situacao_id = 10
+                    AND alq.deleted_at IS NOT NULL
                );
         """
         
@@ -428,6 +422,8 @@ class MigracaoEquipamentos:
             df_equipamentos_legado = pd.read_sql(text(query_legado), conn)
 
         print(f"\n🔍 Total retornado pelo SQL: {len(df_equipamentos_legado)}")
+        baixados_incluidos = int((df_equipamentos_legado['situacao_id'] == 10).sum())
+        print(f"♻️  Baixados (situação 10) incluídos: {baixados_incluidos}")
 
         self.retombamento_destino = self._carregar_retombamentos()
         print(f"🔁 Retombamentos no legado: {len(self.retombamento_destino)} tombo(s) antigo(s)")
