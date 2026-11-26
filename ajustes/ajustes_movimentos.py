@@ -121,6 +121,25 @@ MAPA_TIPO_MOVIMENTO = {
     "UI": (7, "AVULSO"),
 }
 
+
+def parear_equipamento_retorno(itens_sa, itens_sd, equipamento_entregue):
+    """Equipamento devolvido que corresponde ao entregue num movimento SA.
+
+    O legado vincula apenas as capas em ``aluguel_substituicao`` (SD =
+    devolução, SA = envio do substituto). Os itens não têm vínculo explícito,
+    mas o próprio sistema legado grava um item de cada lado por equipamento no
+    mesmo laço, na mesma ordem — logo a posição na lista ordenada por ``id`` é
+    o pareamento. Sem par (ou fora da faixa), devolve ``None``.
+    """
+    try:
+        posicao = list(itens_sa).index(int(equipamento_entregue))
+    except (TypeError, ValueError):
+        return None
+    itens_sd = list(itens_sd)
+    if posicao >= len(itens_sd):
+        return None
+    return int(itens_sd[posicao])
+
 # Classificações usadas no CSV
 CLASSIFICACOES = {
     "OK": "Movimento/status já batem com o legado",
@@ -548,6 +567,10 @@ class AjustesMovimentos:
             self.equipamentos_parquet, self.tombos_parquet = set(), set()
         # (numero_legado, movement_type_id) -> dados da capa criada/reutilizada
         self.cache_cabecalhos = {}
+        # movimento legado -> itens (ids de equipamento na ordem de inserção)
+        self.cache_itens_legado = {}
+        # (movimento SA, equipamento entregue) -> equipamento devolvido
+        self.cache_retorno_substituicao = {}
 
     # --------------------------------------------------------------------------
     # PARQUET: equipamentos que o pipeline já tratou e não devem ser sobrescritos
@@ -1508,6 +1531,96 @@ class AjustesMovimentos:
         self.cache_cabecalhos[(int(numero_legado), int(movimento_tipo_id))] = cabecalho
         return cabecalho
 
+    def _itens_movimento_legado(self, id_movimento):
+        """Ids dos equipamentos de um movimento legado, na ordem de inserção."""
+        if not hasattr(self, "cache_itens_legado"):
+            self.cache_itens_legado = {}
+        chave = int(id_movimento)
+        if chave not in self.cache_itens_legado:
+            with self.engine_legado.connect() as conn:
+                self.cache_itens_legado[chave] = [
+                    int(linha[0])
+                    for linha in conn.execute(
+                        text(
+                            """
+                            SELECT equipamento_id
+                            FROM aluguel_movimento_itens
+                            WHERE movimento_id = :movimento_id
+                              AND deleted_at IS NULL
+                            ORDER BY id
+                            """
+                        ),
+                        {"movimento_id": chave},
+                    )
+                ]
+        return self.cache_itens_legado[chave]
+
+    def _equipamento_retorno_substituicao(self, row):
+        """Equipamento devolvido no par SD de um movimento SA do legado.
+
+        No refatorado o item da OS de uma substituição guarda o equipamento a
+        retornar, e o item do movimento guarda o equipamento entregue. Sem o
+        par SD — ou quando o devolvido não existe/no refatorado — devolve
+        ``None``, para a tela não exibir o próprio entregue como retorno.
+        """
+        if (self._tipo_legado(row)) != "SA":
+            return None
+
+        id_movimento = _int_or_none(row["id_movimento_legado"])
+        entregue = _int_or_none(row["id_equipamento"])
+        if id_movimento is None or entregue is None:
+            return None
+
+        if not hasattr(self, "cache_retorno_substituicao"):
+            self.cache_retorno_substituicao = {}
+        chave = (int(id_movimento), int(entregue))
+        if chave in self.cache_retorno_substituicao:
+            return self.cache_retorno_substituicao[chave]
+
+        with self.engine_legado.connect() as conn:
+            id_sd = conn.execute(
+                text(
+                    """
+                    SELECT substituicao_aluguel_id
+                    FROM aluguel_substituicao
+                    WHERE substituicao_devolucao_id = :id_sa
+                    ORDER BY id
+                    LIMIT 1
+                    """
+                ),
+                {"id_sa": id_movimento},
+            ).scalar()
+
+        devolvido = None
+        if id_sd is not None:
+            devolvido = parear_equipamento_retorno(
+                self._itens_movimento_legado(id_movimento),
+                self._itens_movimento_legado(id_sd),
+                entregue,
+            )
+            if devolvido is not None:
+                with self.engine_new.connect() as conn:
+                    existe = conn.execute(
+                        text(
+                            """
+                            SELECT 1
+                            FROM equipments
+                            WHERE id = :equipment_id
+                              AND deleted_at IS NULL
+                            """
+                        ),
+                        {"equipment_id": devolvido},
+                    ).fetchone()
+                if not existe:
+                    devolvido = None
+
+        self.cache_retorno_substituicao[chave] = devolvido
+        return devolvido
+
+    @staticmethod
+    def _tipo_legado(row):
+        return (_str_or_none(row["tipo_legado"]) or "A").upper()
+
     def _inserir_itens(self, conn, row, cabecalho, movimento_tipo_id):
         """Insere os itens individuais (service_order_item, movement_item,
         shipment_item) de um equipamento na capa informada.
@@ -1515,6 +1628,14 @@ class AjustesMovimentos:
         Retorna o id do movement_item criado.
         """
         id_equipamento = int(row["id_equipamento"])
+        # Na substituição o item da OS carrega o equipamento a RETORNAR; o
+        # item do movimento carrega o entregue. Para os demais tipos os dois
+        # são o mesmo equipamento.
+        equipment_id_os = (
+            self._equipamento_retorno_substituicao(row)
+            if self._tipo_legado(row) == "SA"
+            else id_equipamento
+        )
         dados = self._dados_comuns(row)
         data_mov = dados["data_mov"]
         status_shipment = 2
@@ -1548,7 +1669,7 @@ class AjustesMovimentos:
                 "service_order_id": service_order_id,
                 "movimento_tipo_id": movimento_tipo_id,
                 "alias": dados["alias"],
-                "equipment_id": id_equipamento,
+                "equipment_id": equipment_id_os,
                 "detalhe": dados["detalhe"],
                 "address_id": dados["address_id"],
                 "data_mov": data_mov,

@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 import pandas as pd
 from sqlalchemy import text
 from tqdm import tqdm
@@ -7,6 +8,132 @@ from tqdm import tqdm
 from config.config import ENDERECOS_BASES
 from config.parquet_excecoes import normalizar_tombo, tombos_priorizados
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, descobrir_id_organizacao_destino, limpar_codigo
+from movimentos.classificacao_flags import KIT, classe_por_flags, serie_booleana
+from utils.sanetizador import normalizar_para_match
+
+
+STOPWORDS_CONTRATO = {
+    "das", "dos", "com", "para", "por", "sem", "uma", "tipo", "nova", "novo",
+    "canon", "epson", "brother", "ricoh", "samsung", "lenovo", "dell", "hp",
+    "ns", "sn", "serie", "modelo",
+}
+
+
+def normalizar_numero_contrato(valor):
+    """Somente dígitos: o número do contrato aparece no endereço sem máscara."""
+    return re.sub(r"\D", "", str(valor or ""))
+
+
+def tokens_contrato(valor):
+    texto = normalizar_para_match(valor).lower()
+    return {
+        token for token in re.findall(r"[a-z0-9]+", texto)
+        if len(token) > 2 and token not in STOPWORDS_CONTRATO
+    }
+
+
+def construir_indice_contratos(df_contratos):
+    """Número (somente dígitos) -> ids de contrato, para busca no endereço."""
+    indice = {}
+    for _, row in df_contratos.iterrows():
+        numero = normalizar_numero_contrato(row["number"])
+        if len(numero) < 6:
+            continue
+        indice.setdefault(numero, set()).add(int(row["id"]))
+    return indice
+
+
+def resolver_contrato_por_endereco(alias_endereco, indice_contratos_por_numero):
+    """Resolve o contrato pelo número embutido na descrição do endereço.
+
+    O legado não guarda contrato por movimento; o endereço de entrega,
+    porém, costuma trazer o número do contrato (ex.: ``...-20252208.12``).
+    Só compara com sequências numéricas do endereço (evita casar com um
+    dígito solto) e só aceita resultado único: número ambíguo não vira vínculo.
+    """
+    tokens = re.findall(r"\d[\d./-]{4,}\d", str(alias_endereco or ""))
+    if not tokens:
+        return None
+    numeros_endereco = {normalizar_numero_contrato(token) for token in tokens}
+    encontrados = {
+        contrato_id
+        for numero, ids in indice_contratos_por_numero.items()
+        for sequencia in numeros_endereco
+        if numero in sequencia
+        for contrato_id in ids
+    }
+    return next(iter(encontrados)) if len(encontrados) == 1 else None
+
+
+def resolver_item_por_similaridade(descricao_equipamento, itens_do_contrato, minimo=0.3):
+    """Escolhe o item do contrato mais parecido com o equipamento.
+
+    Jaccard sobre tokens normalizados, exigindo melhor score isolado. Sem
+    isso o item cairia no "primeiro item do contrato", que costuma ser
+    completamente outro produto.
+    """
+    tokens_equip = tokens_contrato(descricao_equipamento)
+    if not tokens_equip or not itens_do_contrato:
+        return None
+    pontuados = []
+    for item in itens_do_contrato:
+        tokens_item = tokens_contrato(
+            f"{item.get('alias') or ''} {item.get('description') or ''}"
+        )
+        uniao = tokens_equip | tokens_item
+        if not uniao:
+            continue
+        pontuados.append((len(tokens_equip & tokens_item) / len(uniao), int(item["id"])))
+    if not pontuados:
+        return None
+    pontuados.sort(reverse=True)
+    melhor_score, melhor_id = pontuados[0]
+    if melhor_score < minimo:
+        return None
+    if len(pontuados) > 1 and pontuados[1][0] == melhor_score:
+        return None
+    return melhor_id
+
+
+def resolver_contrato_item_substituicao(
+    alias_endereco, descricao_equipamento, indice_contratos_por_numero,
+    itens_por_contrato, csv_contract_id=None, csv_item_id=None,
+    cliente_parquet_ok=False, customer_id=None, contratos_por_cliente=None,
+):
+    """Contrato e item de uma fase da substituição.
+
+    Ordem de confiança: número do contrato no endereço de entrega > Parquet
+    do MESMO cliente do movimento > sem contrato (avulso). O contrato só é
+    aceito se estiver vinculado ao cliente do movimento (dono ou
+    destinatário) — é isso que impede repetir o vínculo cruzado do bug.
+    O item só é aceito se pertencer ao contrato; caso contrário, é resolvido
+    por similaridade com o equipamento — nunca pelo "primeiro item".
+    """
+    contrato = resolver_contrato_por_endereco(alias_endereco, indice_contratos_por_numero)
+    if contrato is not None:
+        origem = "ENDERECO"
+    elif cliente_parquet_ok and csv_contract_id is not None:
+        contrato, origem = csv_contract_id, "PARQUET"
+    else:
+        contrato, origem = None, "SEM_CONTRATO"
+
+    if contrato is not None and contratos_por_cliente is not None:
+        permitidos = contratos_por_cliente.get(int(customer_id), set()) if customer_id else set()
+        if int(contrato) not in permitidos:
+            contrato, origem = None, "CONTRATO_DE_OUTRO_CLIENTE"
+
+    item = None
+    if contrato is not None:
+        itens_do_contrato = itens_por_contrato.get(contrato, [])
+        if csv_item_id is not None and any(
+            item_ref["id"] == csv_item_id for item_ref in itens_do_contrato
+        ):
+            item = csv_item_id
+        else:
+            item = resolver_item_por_similaridade(
+                descricao_equipamento, itens_do_contrato
+            )
+    return contrato, item, origem
 
 
 def deve_reconstruir_aluguel_historico(source_item_id, migrated_item_ids):
@@ -198,6 +325,9 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         df_itens["TOMBO"] = pd.to_numeric(df_itens["TOMBO"], errors="coerce")
         df_itens = df_itens.dropna(subset=["TOMBO"])
         df_itens["TOMBO"] = df_itens["TOMBO"].astype(int).astype(str)
+        for coluna_flag in ("IS_EXTRA_KIT", "IS_AVULSO"):
+            if coluna_flag in df_itens.columns:
+                df_itens[coluna_flag] = serie_booleana(df_itens[coluna_flag])
         return df_itens
 
     def _extrair_dados_substituicao(self):
@@ -323,11 +453,46 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             df_historico_origens = pd.read_sql(text(query_passado), conn)
 
         df_historico_origens.sort_values(by=['EQUIPAMENTO_ID_ANTIGO', 'DATA_REAL_ORDENACAO', 'ORIG_MOV_ID'], ascending=[True, False, False], inplace=True)
-        df_passado = df_historico_origens.groupby('EQUIPAMENTO_ID_ANTIGO').first().reset_index()
+
+        # O aluguel histórico precisa ser o aluguel VIGENTE na data da
+        # substituição. Pegar o último aluguel do equipamento sem limite de
+        # data trazia aluguéis posteriores — de outro cliente, inclusive —
+        # para dentro de um ciclo antigo.
+        colunas_origem = [
+            'ORIG_MOV_ITEM_ID', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_USR_ID',
+            'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO', 'ORIG_ORGAO_ID',
+            'DATA_REAL_ORDENACAO',
+        ]
+        df_candidatos = pd.merge(
+            df_presente,
+            df_historico_origens[['EQUIPAMENTO_ID_ANTIGO'] + colunas_origem],
+            on='EQUIPAMENTO_ID_ANTIGO',
+            how='left',
+        )
+        limite = pd.to_datetime(df_candidatos['DATA_DEVOLUCAO'], errors='coerce')
+        data_origem = pd.to_datetime(df_candidatos['ORIG_DATA'], errors='coerce')
+        df_candidatos = df_candidatos[data_origem.isna() | (data_origem <= limite)]
+        df_candidatos.sort_values(
+            by=['substituicao_id', 'seq', 'DATA_REAL_ORDENACAO', 'ORIG_MOV_ID'],
+            ascending=[True, True, False, False],
+            inplace=True,
+        )
+        df_candidatos = df_candidatos.drop_duplicates(
+            subset=['substituicao_id', 'seq'], keep='first'
+        )
 
         # A fase de aluguel histórico é opcional: devoluções de equipamentos
-        # sem aluguel de origem (tipo 1/7) no legado continuam válidas.
-        return pd.merge(df_presente, df_passado[['EQUIPAMENTO_ID_ANTIGO', 'ORIG_MOV_ITEM_ID', 'ORIG_MOV_ID', 'ORIG_CLIENTE_ID', 'ORIG_USR_ID', 'ORIG_DATA', 'ORIG_DEL', 'ORIG_TIPO_LEGADO', 'ORIG_ORGAO_ID']], on='EQUIPAMENTO_ID_ANTIGO', how='left')
+        # sem aluguel de origem (tipo 1/7) no legado continuam válidas. Por
+        # isso o ciclo é remontado a partir de df_presente — um ciclo sem
+        # origem válida fica com ORIG_* nulos em vez de desaparecer.
+        df_completo = pd.merge(
+            df_presente,
+            df_candidatos[['substituicao_id', 'seq'] + colunas_origem],
+            on=['substituicao_id', 'seq'],
+            how='left',
+        )
+
+        return df_completo.reset_index(drop=True)
 
     def executar(self):
         print("\n" + "=" * 70)
@@ -359,6 +524,51 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             dict_contract_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM contracts", conn).values.T))
             dict_customer_org = dict(zip(*pd.read_sql("SELECT id, organization_id FROM customers", conn).values.T))
             dict_equip_org = dict(zip(*pd.read_sql("SELECT id, current_organization_id FROM equipments", conn).values.T))
+
+            # O contrato do movimento não existe no legado. A referência
+            # confiável é o número do contrato escrito no endereço de entrega;
+            # o Parquet só serve quando é do MESMO cliente do movimento.
+            df_contratos_ref = pd.read_sql(
+                "SELECT id, number FROM contracts WHERE deleted_at IS NULL", conn
+            )
+            df_itens_ref = pd.read_sql(
+                """
+                SELECT ci.id, ci.alias, ci.description, ce.contract_id
+                FROM contract_items ci
+                INNER JOIN event_additives ea ON ea.id = ci.event_additive_id
+                INNER JOIN contract_events ce ON ce.id = ea.event_id
+                WHERE ci.deleted_at IS NULL
+                """,
+                conn,
+            )
+            df_alias_enderecos = pd.read_sql(
+                "SELECT id, alias FROM addresses WHERE deleted_at IS NULL", conn
+            )
+            df_contratos_clientes = pd.read_sql(
+                """
+                SELECT id AS contract_id, customer_id FROM contracts WHERE deleted_at IS NULL
+                UNION
+                SELECT contract_id, customer_id FROM contract_recipient_customers
+                """,
+                conn,
+            )
+
+        indice_contratos_por_numero = construir_indice_contratos(df_contratos_ref)
+        contratos_por_cliente = {}
+        for _, vinculo in df_contratos_clientes.iterrows():
+            contratos_por_cliente.setdefault(int(vinculo["customer_id"]), set()).add(
+                int(vinculo["contract_id"])
+            )
+        itens_por_contrato = {}
+        for _, item_ref in df_itens_ref.iterrows():
+            itens_por_contrato.setdefault(int(item_ref["contract_id"]), []).append(
+                {
+                    "id": int(item_ref["id"]),
+                    "alias": item_ref["alias"],
+                    "description": item_ref["description"],
+                }
+            )
+        dict_alias_endereco = dict(zip(df_alias_enderecos["id"], df_alias_enderecos["alias"]))
             
         df_subst = self._extrair_dados_substituicao()
         if df_subst.empty:
@@ -371,6 +581,7 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         rejeitados = 0
         historicos_sem_destino = 0
         log_nao_match = []
+        log_contrato_ajustado = []
         eqs_antigos_alterar = []
         eqs_novos_alterar = []
         map_eqs_antigos = {} 
@@ -452,10 +663,63 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             raw_item_id = row_parquet.get('CONTRACT_ITEM_ID') if row_parquet is not None else None
             csv_item_id = int(float(raw_item_id)) if pd.notna(raw_item_id) and str(raw_item_id).strip() not in ['None', 'nan', ''] else None
 
-            (contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia) = self.regras_item_contratos(
-                csv_contract_id, csv_item_id, eq_id_novo or eq_id_antigo, recipient_id, self.dict_is_kit,
-                abater_saldo=processar_envio
+            # O Parquet é indexado por tombo e pode descrever o equipamento
+            # para outro cliente/contrato. Só o usamos quando o cliente da
+            # linha é o mesmo do movimento; caso contrário, o contrato é
+            # descartado (avulso) ou recuperado pelo endereço de entrega.
+            cliente_parquet_ok = False
+            if row_parquet is not None:
+                cli_parquet = row_parquet.get('CLIENTE_ID')
+                if pd.notna(cli_parquet) and str(cli_parquet).strip() not in ['', 'None', 'nan']:
+                    cliente_parquet_ok = int(float(cli_parquet)) == cli_legado_id
+
+            contrato_resolvido, item_resolvido, origem_contrato = resolver_contrato_item_substituicao(
+                dict_alias_endereco.get(cliente_final_address),
+                row.get('NOME_ANTIGO') if pd.notna(row.get('NOME_ANTIGO')) else row.get('NOME_NOVO'),
+                indice_contratos_por_numero,
+                itens_por_contrato,
+                csv_contract_id=csv_contract_id,
+                csv_item_id=csv_item_id,
+                cliente_parquet_ok=cliente_parquet_ok,
+                customer_id=recipient_id,
+                contratos_por_cliente=contratos_por_cliente,
             )
+
+            # Flags do Parquet para o tombo desta fase. A flag IS_AVULSO não
+            # altera a substituição: o vínculo do ciclo vem do registro legado.
+            # Já o kit declarado continua atrelando o primeiro item do contrato,
+            # mesmo com permitir_fallback_item=False. Conflitos de flag já
+            # bloquearam o arquivo em geracao_parquets.py; aqui só o kit é
+            # aplicado, e apenas quando há contrato resolvido para a fase.
+            decisao = None
+            if row_parquet is not None:
+                decisao = classe_por_flags(
+                    row_parquet.get("IS_EXTRA_KIT"),
+                    row_parquet.get("IS_AVULSO"),
+                    contrato_resolvido,
+                    item_resolvido,
+                )
+            classe_forcada = (
+                KIT if decisao is not None and decisao[0] == KIT and contrato_resolvido is not None
+                else None
+            )
+
+            (contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia) = self.regras_item_contratos(
+                contrato_resolvido, item_resolvido, eq_id_novo or eq_id_antigo, recipient_id, self.dict_is_kit,
+                abater_saldo=processar_envio, permitir_fallback_item=False,
+                classe_forcada=classe_forcada,
+            )
+
+            if contrato_id_res != csv_contract_id:
+                log_contrato_ajustado.append({
+                    "SUBSTITUICAO_ID": row['substituicao_id'], "TOMBO": tombo_novo,
+                    "ID_CLIENTE_LEGADO": cli_legado_id, "ID_CLIENTE_NOVO": recipient_id,
+                    "CONTRATO_PARQUET": csv_contract_id, "CONTRATO_APLICADO": contrato_id_res,
+                    "ORIGEM": origem_contrato, "ITEM_APLICADO": item_id_res,
+                })
+
+            if contrato_id_res is not None and item_id_res is None and not motivo_divergencia:
+                motivo_divergencia = "Contrato sem item compatível; item não vinculado."
 
             if motivo_divergencia:
                 status_final_log = "AVULSO" if is_avulso else "KIT (IMUNE)" if is_kit else "EXCEDENTE" if is_excedente else "NORMAL"
@@ -468,11 +732,35 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             org_id_cascata = dict_contract_org.get(contrato_id_res) or dict_customer_org.get(recipient_id) or dict_equip_org.get(eq_id_novo or eq_id_antigo) or 1115
             org_aluguel = descobrir_id_organizacao_destino(row['ORGAO_ALUGUEL']) if pd.notna(row.get('ORGAO_ALUGUEL')) else org_id_cascata
             org_devolucao = descobrir_id_organizacao_destino(row['ORGAO_DEV']) if pd.notna(row.get('ORGAO_DEV')) else org_id_cascata
-            org_origem = descobrir_id_organizacao_destino(row['ORIG_ORGAO_ID']) if pd.notna(row.get('ORIG_ORGAO_ID')) else org_id_cascata
 
             # =========================================================
             # 🕰️ FASE 1: O PASSADO (ALUGAMOS A MÁQUINA ANTIGA)
             # =========================================================
+            contrato_hist = contrato_id_res
+            item_hist = item_id_res
+            avulso_hist = is_avulso
+            if recipient_historico_id and recipient_historico_id != recipient_id:
+                # O aluguel histórico pertence ao cliente de ORIGEM, que pode
+                # ser outro cliente. O contrato do cliente da substituição não
+                # vale para ele: resolve pelo endereço de origem.
+                contrato_hist, item_hist, _ = resolver_contrato_item_substituicao(
+                    dict_alias_endereco.get(endereco_historico),
+                    row.get('NOME_ANTIGO') if pd.notna(row.get('NOME_ANTIGO')) else row.get('NOME_NOVO'),
+                    indice_contratos_por_numero,
+                    itens_por_contrato,
+                    customer_id=recipient_historico_id,
+                    contratos_por_cliente=contratos_por_cliente,
+                )
+                avulso_hist = contrato_hist is None
+
+            org_origem = (
+                descobrir_id_organizacao_destino(row['ORIG_ORGAO_ID'])
+                if pd.notna(row.get('ORIG_ORGAO_ID'))
+                else dict_contract_org.get(contrato_hist)
+                or dict_customer_org.get(recipient_historico_id)
+                or org_id_cascata
+            )
+
             if eq_id_antigo is not None and pd.notna(row.get('ORIG_MOV_ID')):
                 if not recipient_historico_id:
                     # Origem existe no legado, mas o cliente não tem de/para.
@@ -492,11 +780,11 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                         organization_id=int(org_origem),
                         mov_date=row['ORIG_DATA'],
                         deleted_at_mov=row['ORIG_DEL'] if pd.notna(row['ORIG_DEL']) else None,
-                        contrato_id=contrato_id_res,
-                        contrato_item_id=item_id_res,
+                        contrato_id=contrato_hist,
+                        contrato_item_id=item_hist,
                         equipment_id_ref=eq_id_antigo,
                         status_shipment=2, 
-                        tipo_movimento_id=7 if is_avulso else 1,
+                        tipo_movimento_id=7 if avulso_hist else 1,
                         operation_type='ALUGUEL',
                         status_equipment_id=2,
                         history_reason='SHIPPING_CONFIRMED_SEPARATE',
@@ -580,6 +868,13 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
 
         if log_nao_match:
             pd.DataFrame(log_nao_match).to_csv("log_divergencias_substituicao.csv", index=False)
+
+        if log_contrato_ajustado:
+            pd.DataFrame(log_contrato_ajustado).to_csv("log_contratos_substituicao.csv", index=False)
+            print(
+                f"\n📄 {len(log_contrato_ajustado)} vínculo(s) de contrato ajustado(s) "
+                f"em substituições (log_contratos_substituicao.csv)."
+            )
 
         #Validação de situação de equipamentos antigos para atualizar status
         if map_eqs_antigos:
