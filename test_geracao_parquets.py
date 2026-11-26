@@ -15,6 +15,13 @@ def quadro(equipamento=1, contrato=10, item=None, incluir_item=True):
     return pd.DataFrame(dados)
 
 
+def com_flags(df, kit=None, avulso=None):
+    df = df.copy()
+    df["IS_EXTRA_KIT"] = pd.array([kit], dtype="boolean")
+    df["IS_AVULSO"] = pd.array([avulso], dtype="boolean")
+    return df
+
+
 class TestGeracaoParquets(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -56,6 +63,28 @@ class TestGeracaoParquets(unittest.TestCase):
     def test_item_contrato_nulo_aceito(self):
         self.gravar("a.parquet", quadro(item=None))
         self.assertEqual(_validar_arquivos(self.origem, {10}, set())["linhas"], 1)
+
+    def test_flags_ausentes_aceitas(self):
+        self.gravar("a.parquet", quadro(item=100))
+        self.assertEqual(_validar_arquivos(self.origem, {10}, {100})["linhas"], 1)
+
+    def test_flags_nulas_aceitas(self):
+        self.gravar("a.parquet", com_flags(quadro(item=100), kit=None, avulso=None))
+        self.assertEqual(_validar_arquivos(self.origem, {10}, {100})["linhas"], 1)
+
+    def test_kit_com_item_aceito(self):
+        self.gravar("a.parquet", com_flags(quadro(item=100), kit=True, avulso=False))
+        self.assertEqual(_validar_arquivos(self.origem, {10}, {100})["linhas"], 1)
+
+    def test_kit_com_avulso_rejeita_arquivo(self):
+        self.gravar("a.parquet", com_flags(quadro(item=None), kit=True, avulso=True))
+        with self.assertRaisesRegex(ValueError, r"CONFLITO KIT\+AVULSO"):
+            _validar_arquivos(self.origem, {10}, set())
+
+    def test_kit_sem_contrato_rejeita_arquivo(self):
+        self.gravar("a.parquet", com_flags(quadro(contrato=None, item=None), kit=True, avulso=False))
+        with self.assertRaisesRegex(ValueError, "CONFLITO KIT SEM CONTRATO"):
+            _validar_arquivos(self.origem, set(), set())
 
     def test_publica_e_preserva_snapshot_anterior(self):
         self.gravar("novo.parquet", quadro())

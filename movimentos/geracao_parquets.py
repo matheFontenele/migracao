@@ -1,4 +1,10 @@
-"""Validação e publicação dos vínculos equipamento→contrato gerados externamente."""
+"""Validação e publicação dos vínculos equipamento→contrato gerados externamente.
+
+Além das colunas obrigatórias e das FKs de contrato/item, valida as flags
+``IS_EXTRA_KIT``/``IS_AVULSO``: combinações sem interpretação defensável
+(KIT+AVULSO e KIT sem contrato) bloqueiam o arquivo inteiro, para o Parquet
+não ser publicado e arquivado sem segunda chance.
+"""
 import json
 import os
 import shutil
@@ -9,6 +15,9 @@ from pathlib import Path
 import pandas as pd
 from sqlalchemy import text
 
+from movimentos.classificacao_flags import serie_booleana
+
+
 
 PROJETO = Path(os.getenv("PARQUETS_PROJETO", "/home/matheus/Equipaments_for_contracts"))
 CONTAINER = os.getenv("PARQUETS_CONTAINER", "streamlit_automacao_contratos")
@@ -16,6 +25,47 @@ ORIGEM = Path(os.getenv("PARQUETS_ORIGEM", str(PROJETO / "locks_parquet")))
 DESTINO = Path(os.getenv("PARQUETS_DESTINO", "./docs/parquets"))
 GERAR = os.getenv("PARQUETS_GERAR", "1")
 COLUNAS_OBRIGATORIAS = {"EQUIPAMENTO_ID", "TOMBO", "CLIENTE_ID", "CONTRACT_ID"}
+
+
+def _coluna_flag(df, nome):
+    """Flag como ``boolean`` anulável; coluna ausente (arquivo antigo) vira NA."""
+    if nome not in df.columns:
+        return pd.Series(pd.NA, index=df.index, dtype="boolean")
+    return serie_booleana(df[nome])
+
+
+def _linhas_conflito(df, mascara, limite=20):
+    colunas = [c for c in ("EQUIPAMENTO_ID", "TOMBO", "CONTRACT_ID", "CONTRACT_ITEM_ID") if c in df.columns]
+    return df.loc[mascara, colunas].head(limite).to_dict("records")
+
+
+def _validar_flags(df, arquivo):
+    """Rejeita o arquivo quando as flags não têm interpretação defensável.
+
+    A publicação é tudo-ou-nada: se uma linha for rejeitada, o equipamento
+    ficaria sem movimento e o Parquet iria para ``_anterior`` sem segunda
+    chance. Por isso o conflito bloqueia o arquivo inteiro.
+    """
+    kit = _coluna_flag(df, "IS_EXTRA_KIT").fillna(False).astype(bool)
+    avulso = _coluna_flag(df, "IS_AVULSO").fillna(False).astype(bool)
+    contract_id = df["CONTRACT_ID"]
+    contrato_ausente = contract_id.isna() | contract_id.astype(str).str.strip().str.lower().isin(
+        ["", "none", "nan", "null", "<na>"]
+    )
+
+    conflito_kit_avulso = kit & avulso
+    kit_sem_contrato = kit & contrato_ausente
+
+    if conflito_kit_avulso.any():
+        raise ValueError(
+            f"{arquivo.name}: CONFLITO KIT+AVULSO nas linhas "
+            f"{_linhas_conflito(df, conflito_kit_avulso)}"
+        )
+    if kit_sem_contrato.any():
+        raise ValueError(
+            f"{arquivo.name}: CONFLITO KIT SEM CONTRATO nas linhas "
+            f"{_linhas_conflito(df, kit_sem_contrato)}"
+        )
 
 
 def _validar_arquivos(origem, contratos_validos, itens_validos):
@@ -36,14 +86,16 @@ def _validar_arquivos(origem, contratos_validos, itens_validos):
         if df["EQUIPAMENTO_ID"].duplicated().any():
             duplicados = df.loc[df["EQUIPAMENTO_ID"].duplicated(keep=False), "EQUIPAMENTO_ID"].tolist()
             raise ValueError(f"EQUIPAMENTO_ID duplicado em {arquivo.name}: {duplicados[:20]}")
+        _validar_flags(df, arquivo)
         ids = set(df["EQUIPAMENTO_ID"].dropna().tolist())
         repetidos = ids_equipamentos.intersection(ids)
         if repetidos:
             raise ValueError(f"EQUIPAMENTO_ID duplicado entre arquivos: {list(repetidos)[:20]}")
         ids_equipamentos.update(ids)
-        if df["CONTRACT_ID"].isna().any():
-            raise ValueError(f"CONTRACT_ID nulo em {arquivo.name}")
-        contratos.update(df["CONTRACT_ID"].tolist())
+        # Arquivos "SEM-CONTRATO" do gerador trazem CONTRACT_ID nulo para
+        # equipamentos ainda sem vínculo (a migração de aluguel os trata como
+        # sem item/avulso). Só os contratos preenchidos entram na validação de FK.
+        contratos.update(df["CONTRACT_ID"].dropna().tolist())
         if "CONTRACT_ITEM_ID" in df.columns:
             itens.update(df["CONTRACT_ITEM_ID"].dropna().tolist())
         if "ORGAO_ID" in df.columns:

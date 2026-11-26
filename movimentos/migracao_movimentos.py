@@ -703,11 +703,16 @@ class BaseMigracaoMovimento:
         return 0, None, contrato_item_id
 
     def regras_item_contratos(
-            self, csv_contract_id, csv_item_id, equipment_id_ref, recipient_id, dict_is_kit, abater_saldo=True
+            self, csv_contract_id, csv_item_id, equipment_id_ref, recipient_id, dict_is_kit,
+            abater_saldo=True, permitir_fallback_item=True, classe_forcada=None
         ):
             """
             Avalia Avulso, Kit e Excedente, e abate o saldo se necessário.
             Usado pelos scripts filhos (Aluguel, Substituição) para evitar duplicação de regras lógicas.
+
+            ``classe_forcada`` vem das flags explícitas do Parquet
+            (``IS_AVULSO``/``IS_EXTRA_KIT``): ``AVULSO``, ``KIT`` ou
+            ``EXTRA_FALLBACK``. ``None`` mantém o fluxo heurístico atual.
             """
             contrato_id_res = None
             item_id_res = None
@@ -716,57 +721,109 @@ class BaseMigracaoMovimento:
             is_kit = False
             teve_match_perfeito = False
             motivo_divergencia = None
-    
+
+            # 0. AVULSO declarado pela flag (contrato/item, se existirem, são ignorados)
+            if classe_forcada == "AVULSO":
+                return (
+                    None, None, True, False, False, False,
+                    "Equipamento marcado como AVULSO (flag IS_AVULSO). "
+                    "Contrato/item do Parquet ignorados.",
+                )
+
             # 1. REGRA DO AVULSO
             if csv_contract_id is None:
                 is_avulso = True
-                motivo_divergencia = "Equipamento sem contrato no Parquet. Mantido como AVULSO."
-            else:
-                contrato_id_res = csv_contract_id
-                
-                type_id_atual = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
-                eh_tipo_kit = dict_is_kit.get(type_id_atual, 0) == 1
-                
-                # 2. REGRA DO KIT
-                if eh_tipo_kit and csv_item_id is None:
+                motivo_divergencia = "Equipamento sem contrato aplicável. Mantido como AVULSO."
+                return contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia
+
+            contrato_id_res = csv_contract_id
+            type_id_atual = self.dados["dict_tipo_por_equipamento"].get(equipment_id_ref)
+            eh_tipo_kit = dict_is_kit.get(type_id_atual, 0) == 1
+
+            # 2. REGRA DO KIT (flag explícita > heurística do types.csv)
+            if classe_forcada == "KIT" or (classe_forcada is None and eh_tipo_kit and csv_item_id is None):
+                item_id_res = self.dados.get("dict_primeiro_item_por_contrato", {}).get(contrato_id_res)
+                if item_id_res is not None:
                     is_kit = True
-                    motivo_divergencia = "Equipamento é KIT e não foi atrelado a um item no Parquet. Regra de KIT aplicada (Imune)."
-                
-                # 3. REGRA NORMAL OU EXCEDENTE
+                    if classe_forcada == "KIT":
+                        motivo_divergencia = (
+                            "Equipamento marcado como KIT (flag IS_EXTRA_KIT) e atrelado "
+                            "ao primeiro item do contrato (imune a saldo)."
+                        )
+                        if csv_item_id is not None:
+                            motivo_divergencia += " Item do Parquet ignorado."
+                    else:
+                        motivo_divergencia = (
+                            "Equipamento é KIT e não foi atrelado a um item no Parquet. "
+                            "Regra de KIT aplicada (imune a saldo, atrelado ao primeiro item do contrato)."
+                        )
+                    return contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia
+                if classe_forcada == "KIT":
+                    # Flag de kit sem nenhum item vinculável: excedente forçado.
+                    return (
+                        contrato_id_res, None, False, False, True, False,
+                        "Contrato sem itens vinculáveis; KIT forçado para EXCEDENTE.",
+                    )
+                # Heurística do types.csv sem primeiro item: mantém o kit sem
+                # item, como no comportamento anterior (não cai no fallback).
+                return (
+                    contrato_id_res, None, False, True, False, False,
+                    "Equipamento é KIT, mas o contrato não tem item vinculável.",
+                )
+
+            # 3. REGRA NORMAL, EXTRA (fallback) OU EXCEDENTE
+            if classe_forcada == "EXTRA_FALLBACK":
+                item_id_res = None
+                motivo_divergencia = (
+                    "Item extra por fallback (flag IS_EXTRA_KIT=Não). "
+                    "Heurística de kit do types.csv ignorada."
+                )
+            else:
+                item_id_res = csv_item_id
+                if item_id_res is not None:
+                    teve_match_perfeito = True
+
+            if item_id_res is None and permitir_fallback_item and (
+                classe_forcada is None or classe_forcada == "EXTRA_FALLBACK"
+            ):
+                # Fallback em Cascata
+                item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_por_chave"].items() if chave[1] == contrato_id_res), None)
+                if not item_id_res:
+                    item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_aluguel_por_chave"].items() if chave[1] == contrato_id_res), None)
+                if not item_id_res:
+                    item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
+
+                if classe_forcada is None and not motivo_divergencia:
+                    motivo_divergencia = "ID do Item ausente no Parquet. Fallback aplicado para o primeiro item disponível."
+            elif item_id_res is None and classe_forcada is None and not permitir_fallback_item:
+                if not motivo_divergencia:
+                    motivo_divergencia = "Sem item de contrato compatível; item não vinculado."
+
+            if item_id_res is not None:
+                item_id_res_int = int(item_id_res)
+                saldo_atual = self.dados["saldos_por_id"].get(item_id_res_int, 0)
+
+                # Ativador da Regra do Excedente
+                if saldo_atual <= 0:
+                    is_excedente = True
+                    if not motivo_divergencia:
+                        motivo_divergencia = "Item de contrato atrelado está com saldo zerado/negativo. Regra do EXCEDENTE aplicada."
+                    elif "EXCEDENTE" not in motivo_divergencia:
+                        motivo_divergencia += " Item sem saldo: EXCEDENTE aplicado."
                 else:
-                    item_id_res = csv_item_id
-                    if item_id_res is not None:
-                        teve_match_perfeito = True
-                    else:
-                        # Fallback em Cascata
-                        item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_por_chave"].items() if chave[1] == contrato_id_res), None)
-                        if not item_id_res:
-                            item_id_res = next((info['id'] for chave, info in self.dados["dict_contrato_item_aluguel_por_chave"].items() if chave[1] == contrato_id_res), None)
-                        if not item_id_res:
-                            item_id_res = self.dados["dict_primeiro_item_por_cliente"].get(recipient_id)
-                            
-                        if not motivo_divergencia:
-                            motivo_divergencia = "ID do Item ausente no Parquet. Fallback aplicado para o primeiro item disponível."
-    
-                    if item_id_res is not None:
-                        item_id_res_int = int(item_id_res)
-                        saldo_atual = self.dados["saldos_por_id"].get(item_id_res_int, 0)
-                        
-                        # Ativador da Regra do Excedente
-                        if saldo_atual <= 0:
-                            is_excedente = True
-                            if not motivo_divergencia:
-                                motivo_divergencia = "Item de contrato atrelado está com saldo zerado/negativo. Regra do EXCEDENTE aplicada."
-                        else:
-                            # Abate o Saldo Globalmente
-                            if abater_saldo:
-                                self.dados["saldos_por_id"][item_id_res_int] = saldo_atual - 1
-                                if hasattr(self, 'saldos_modificados'):
-                                    self.saldos_modificados.add(item_id_res_int)
-                    else:
-                        is_excedente = True
-                        motivo_divergencia = "Contrato sem itens vinculáveis no banco. Forçado para EXCEDENTE."
-    
+                    # Abate o Saldo Globalmente
+                    if abater_saldo:
+                        self.dados["saldos_por_id"][item_id_res_int] = saldo_atual - 1
+                        if hasattr(self, 'saldos_modificados'):
+                            self.saldos_modificados.add(item_id_res_int)
+            else:
+                if classe_forcada == "EXTRA_FALLBACK" and permitir_fallback_item:
+                    is_excedente = True
+                    motivo_divergencia = "Contrato sem itens vinculáveis. Extra por fallback forçado para EXCEDENTE."
+                elif classe_forcada is None and permitir_fallback_item:
+                    is_excedente = True
+                    motivo_divergencia = "Contrato sem itens vinculáveis no banco. Forçado para EXCEDENTE."
+
             return contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia
 
     def registrar_movimento(

@@ -6,6 +6,9 @@ from datetime import datetime
 from tqdm import tqdm
 
 from movimentos.migracao_movimentos import carregar_dados_compartilhados, resetar_saldo_contract_items, descobrir_id_organizacao_destino
+from movimentos.classificacao_flags import (
+    AVULSO, FLAGS, REJEITAR, classe_por_flags, flag_booleana, serie_booleana,
+)
 from utils.sanetizador import executar_truncate_tabelas, normalizar_para_match
 from movimentos.migracao_movimentos import BaseMigracaoMovimento, selecionar_equipamento_por_tombo
 from config.config import CLIENTES_ESTOQUE
@@ -307,6 +310,14 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             df_csv['ITEM_DO_CONTRATO'] = df_csv['ITEM_DO_CONTRATO'].astype(str).str.strip().str.replace(r'\.0$', '', regex=True)
             df_csv = df_csv[df_csv['ITEM_DO_CONTRATO'].str.lower() != 'nan']
         df_csv['CONTRACT_ID'] = df_csv['CONTRACT_ID'].astype(str).str.replace('.0', '', regex=False)
+
+        # Flags do gerador: boolean anulável (True = marcado, False = desmarcado,
+        # None/ausente = nunca classificado). Sem fillna: o nulo tem significado.
+        for coluna_flag in FLAGS:
+            if coluna_flag in df_csv.columns:
+                df_csv[coluna_flag] = serie_booleana(df_csv[coluna_flag])
+            else:
+                df_csv[coluna_flag] = pd.Series(pd.NA, index=df_csv.index, dtype="boolean")
         
         # 🔓 Exceções ao Parquet: tombos priorizados no legado não geram aluguel
         # a partir do Parquet (o legado é quem manda para esses equipamentos).
@@ -336,6 +347,7 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             dict_equip_org = dict(zip(*pd.read_sql("SELECT id, current_organization_id FROM equipments", conn).values.T))
 
         log_nao_match = []
+        rejeicoes = []
         rejeitados = 0
         clientes_sem_contrato = {}
 
@@ -407,12 +419,57 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             # abaixo classifica o movimento como AVULSO (tipo 7).
 
             # ==================================================================
-            # 1. APLICA AS REGRAS USANDO O CÉREBRO DA CLASSE PAI
-            # ==================================================================      
+            # 1. CLASSIFICAÇÃO PELAS FLAGS DO PARQUET (precedência sobre a heurística)
+            # ==================================================================
             raw_contract_id = row_csv.get('CONTRACT_ID')
             csv_contract_id = int(float(raw_contract_id)) if pd.notna(raw_contract_id) and str(raw_contract_id).strip() not in ['None', 'nan', ''] else None
 
-            if csv_contract_id is not None and csv_contract_id not in contratos_validos:
+            raw_item_id = row_csv.get('CONTRACT_ITEM_ID')
+            csv_item_id = int(float(raw_item_id)) if pd.notna(raw_item_id) and str(raw_item_id).strip() not in ['None', 'nan', ''] else None
+            item_id_original = csv_item_id
+
+            decisao = classe_por_flags(
+                row_csv.get('IS_EXTRA_KIT'),
+                row_csv.get('IS_AVULSO'),
+                csv_contract_id,
+                csv_item_id,
+            )
+            classe_forcada = decisao[0] if decisao else None
+            origem_classificacao = decisao[2] if decisao else None
+            flag_kit_log = flag_booleana(row_csv.get('IS_EXTRA_KIT'))
+            flag_avulso_log = flag_booleana(row_csv.get('IS_AVULSO'))
+
+            if classe_forcada == REJEITAR:
+                # Só existem dois conflitos sem interpretação defensável; o
+                # arquivo deveria ter sido barrado em geracao_parquets.py.
+                rejeicoes.append({
+                    "TOMBO": tombo,
+                    "EQUIPAMENTO_ID": row_csv.get('EQUIPAMENTO_ID'),
+                    "CONTRACT_ID": csv_contract_id,
+                    "CONTRACT_ITEM_ID": csv_item_id,
+                    "IS_EXTRA_KIT": flag_kit_log,
+                    "IS_AVULSO": flag_avulso_log,
+                    "MOTIVO": decisao[1],
+                })
+                log_nao_match.append({
+                    "TOMBO": tombo, "EQUIPAMENTO_CSV": row_csv.get('EQUIPAMENTO_NOME', 'NÃO INFORMADO'),
+                    "ID_CLIENTE_LEGADO": cli_legado_id, "ID_CLIENTE_NOVO": recipient_id,
+                    "CONTRACT_ID_CSV": csv_contract_id if csv_contract_id else "VAZIO",
+                    "CONTRATO_RESOLVIDO": "REJEITADO",
+                    "ITEM_CSV": row_csv.get('ITEM_DO_CONTRATO', 'VAZIO'),
+                    "DESC_ITEM_CSV": row_csv.get('DESCRICAO_ITEM', 'VAZIO'),
+                    "ITEM_RESOLVIDO_ID": csv_item_id if csv_item_id else "NENHUM",
+                    "STATUS_FINAL": "REJEITADO",
+                    "MOTIVO_EXATO": decisao[1],
+                    "IS_EXTRA_KIT": flag_kit_log,
+                    "IS_AVULSO": flag_avulso_log,
+                    "ORIGEM_CLASSIFICACAO": "FLAG",
+                })
+                continue
+
+            # Contrato inexistente no destino invalida a linha — exceto quando a
+            # flag IS_AVULSO manda ignorar contrato/item.
+            if classe_forcada != AVULSO and csv_contract_id is not None and csv_contract_id not in contratos_validos:
                 registrar_cliente_sem_contrato(
                     row_csv, cli_legado_id, recipient_id,
                     'CONTRACT_ID_DO_PARQUET_AUSENTE_NO_REFATORADO',
@@ -420,20 +477,34 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 rejeitados += 1
                 continue
 
-            raw_item_id = row_csv.get('CONTRACT_ITEM_ID')
-            csv_item_id = int(float(raw_item_id)) if pd.notna(raw_item_id) and str(raw_item_id).strip() not in ['None', 'nan', ''] else None
-            item_id_original = csv_item_id
-            csv_item_id, item_remapeado = self._resolver_item_parquet(
-                csv_item_id,
-                row_csv.get('ITEM_DO_CONTRATO'),
-                row_csv.get('DESCRICAO_ITEM'),
-                cli_legado_id,
-                csv_contract_id,
-            )
-            
+            # Remapeamento por alias só vale para Normal/Excedente (linha sem
+            # classe forçada). Kit usa o primeiro item e Extra usa a cascata.
+            item_remapeado = False
+            if classe_forcada is None:
+                csv_item_id, item_remapeado = self._resolver_item_parquet(
+                    csv_item_id,
+                    row_csv.get('ITEM_DO_CONTRATO'),
+                    row_csv.get('DESCRICAO_ITEM'),
+                    cli_legado_id,
+                    csv_contract_id,
+                )
+
             (contrato_id_res, item_id_res, is_avulso, is_kit, is_excedente, teve_match_perfeito, motivo_divergencia) = self.regras_item_contratos(
-                csv_contract_id, csv_item_id, equipment_id_ref, recipient_id, self.dict_is_kit, abater_saldo=True
+                csv_contract_id, csv_item_id, equipment_id_ref, recipient_id, self.dict_is_kit,
+                abater_saldo=True, classe_forcada=classe_forcada,
             )
+            if decisao is not None and decisao[2] in ("FLAG_AVULSO", "FLAG_KIT"):
+                motivo_divergencia = decisao[1]
+
+            if origem_classificacao is None:
+                if is_avulso:
+                    origem_classificacao = "SEM_CONTRATO"
+                elif is_kit:
+                    origem_classificacao = "HEURISTICA_TYPES"
+                elif not teve_match_perfeito:
+                    origem_classificacao = "FALLBACK"
+                else:
+                    origem_classificacao = "MATCH"
 
             # Logs de Auditoria
             if motivo_divergencia:
@@ -443,7 +514,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     "ID_CLIENTE_LEGADO": cli_legado_id, "ID_CLIENTE_NOVO": recipient_id,
                     "CONTRACT_ID_CSV": csv_contract_id if csv_contract_id else "VAZIO", "CONTRATO_RESOLVIDO": contrato_id_res if contrato_id_res else "NENHUM (AVULSO)",
                     "ITEM_CSV": row_csv.get('ITEM_DO_CONTRATO', 'VAZIO'), "DESC_ITEM_CSV": row_csv.get('DESCRICAO_ITEM', 'VAZIO'),
-                    "ITEM_RESOLVIDO_ID": item_id_res if item_id_res else "NENHUM", "STATUS_FINAL": status_final_log, "MOTIVO_EXATO": motivo_divergencia
+                    "ITEM_RESOLVIDO_ID": item_id_res if item_id_res else "NENHUM", "STATUS_FINAL": status_final_log, "MOTIVO_EXATO": motivo_divergencia,
+                    "IS_EXTRA_KIT": flag_kit_log, "IS_AVULSO": flag_avulso_log,
+                    "ORIGEM_CLASSIFICACAO": origem_classificacao,
                 })
             elif item_remapeado:
                 log_nao_match.append({
@@ -458,12 +531,14 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                     "ITEM_RESOLVIDO_ID": item_id_res,
                     "STATUS_FINAL": "ITEM REMAPEADO POR ALIAS",
                     "MOTIVO_EXATO": "ID do item do Parquet não existe no contrato atual; remapeado pelo alias do item.",
+                    "IS_EXTRA_KIT": flag_kit_log, "IS_AVULSO": flag_avulso_log,
+                    "ORIGEM_CLASSIFICACAO": origem_classificacao,
                 })
 
             usr_id = int(row_mov['usuario_id']) if pd.notna(row_mov['usuario_id']) and row_mov['usuario_id'] != 0 else 1
             dt_mov = row_mov['data_movimento'] if pd.notna(row_mov['data_movimento']) else self.now
 
-            detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)" if is_avulso else "Equipamento Kit (Imune a saldo, sem item vinculado)" if is_kit else "Equipamento Excedente (Contrato sem saldo)" if is_excedente else "Item Extra Oficial (Fallback de Contrato/Item)" if not teve_match_perfeito else None
+            detalhes_item = "Movimento Avulso (Cliente sem contrato ativo)" if is_avulso else "Equipamento Kit (Imune a saldo, atrelado ao primeiro item do contrato)" if is_kit else "Equipamento Excedente (Contrato sem saldo)" if is_excedente else "Item Extra Oficial (Fallback de Contrato/Item)" if not teve_match_perfeito else None
 
             # A organização do próprio movimento prevalece; demais cadastros são fallback.
             org_id_resolvida = (
@@ -505,6 +580,13 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             print(f"📝 {len(log_nao_match)} regras comerciais processadas. Salvando log...")
             pd.DataFrame(log_nao_match).to_csv("log_divergencias_aluguel.csv", index=False, encoding="utf-8")
             print("   📄 Log salvo em 'log_divergencias_aluguel.csv'")
+
+        if rejeicoes:
+            raise RuntimeError(
+                f"{len(rejeicoes)} linha(s) rejeitada(s) por flags incoerentes no Parquet: "
+                f"{rejeicoes[:5]}. O arquivo não deveria ter sido publicado; "
+                "corrija as flags no gerador e republique."
+            )
 
         self._salvar_relatorio_clientes_sem_contrato(clientes_sem_contrato)
             
