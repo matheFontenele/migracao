@@ -35,7 +35,10 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 # Ainda em 2026-11-24 passou a ser ignorado o cliente SECRETARIA DE SAUDE DE
 # SÃO LUIS (255 linhas, todas de 23/11): -1 requisição, -7 itens, -2 movimentos
 # e -82 itens de movimento. As demais unidades de São Luís continuam migrando.
-ESPERADO = {"requisicoes": 445, "itens": 1085, "movimentos": 395, "itens_movimento": 1297}
+# Em 2026-11-26 a planilha foi atualizada pela operação com os envios até
+# 26/11 (2.711 linhas, 109 novas): +26 requisições, +62 itens, +34 movimentos
+# e +51 itens de movimento em relação à carga de 24/11.
+ESPERADO = {"requisicoes": 471, "itens": 1147, "movimentos": 429, "itens_movimento": 1348}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:
