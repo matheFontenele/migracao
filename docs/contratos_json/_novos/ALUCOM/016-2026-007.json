@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|016/2026-007|SECRETARIA DE CULTURA MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "source_contract_id": null,
+    "number": "016/2026-007",
+    "name": "SECRETARIA DE CULTURA MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENÇÃO - CE",
+    "recipient_aliases": [
+      "SECRETARIA DE CULTURA MUNICIPIO DE REDENÇÃO - 016/2026-002 PE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é o REGISTRO DE PREÇO PARA CONTRATAÇÃO DE EMPRESAS ESPECIALIZADAS NA LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS E MÁQUINAS COPIADORAS PARA ATENDER AS NECESSIDADES DAS DIVERSAS SECRETARIAS DO MUNICIPIO DE REDENÇÃO/CE.",
+    "original_start_date": "2026-07-15",
+    "created_at": "2026-07-15T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Alucom/PLANILHA (AL) - CULTURA.xlsx",
+        "sheet": "OUT26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-07-15",
+              "end_date": "2027-11-15",
+              "duration": 16,
+              "max_duration": 120,
+              "max_end_date": "2036-07-14",
+              "total_amount": 5010.12,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA",
+                "description": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. ESPECIFICAÇÃO: LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. QUE IMPRIME, COPIA E DIGITALIZA/ WI FI DIRECT. CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS. COM ÚNICO SISTEMA TANQUE D TINTA 100% SEM CARTUCHO, IMPRIME ATE 7.500 PÁGINAS EM CORES OU 4.500 PÁGINAS EM PRETO COM MAIOR RESOLUÇÃO DE IMPRESSÃO DA CATEGORIA. 6.000 IMPRESSOES/MÊS",
+                "quantity": 1,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressora-multifuncional-colorida#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - CULTURA.xlsx",
+                  "sheet": "OUT26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS. ESPECIFICAÇÃO: LOCAÇÃO DE IMPRESSORAS MULTIFUNCION AIS COM VELOCIDADE DE COPIAS E IMPRESÃO DE 40 PÁGINAS POR MINUTOS/RESOLUÇÃO DE IMPRESSÃO ATÉ 1200X1200 DPI RESOLUÇÃO DE AMPLIAÇÃO 25% 400%/ CICLO MENSAL DE 50.000 PAGINAS/MÊS COM CONEXÃO EM REDE /CAPACIDADE DE ALIMENTAÇÃO.250 FOLHAS /DUPLEX AUTOMATICA FR ENTE E VERSO /DIGITALIZAÇÃO FRENTE E VERSO/ MULTIFUNCIONAL A LASER. 16.000 PAGINAS/MÊS",
+                "quantity": 1,
+                "price": 238.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-com#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - CULTURA.xlsx",
+                  "sheet": "OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

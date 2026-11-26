@@ -94,9 +94,13 @@ def iniciar_clientes(eng_novo, eng_legado):
     migrador = MigracaoClientes(eng_novo, eng_legado)
     migrador.executar()
 
-def iniciar_contratos(eng_novo, eng_legado):
+def iniciar_contratos(eng_novo, eng_legado, argumentos_cli=None):
     from cadastros.contratos import migracao_contratos
-    migracao_contratos.executar(eng_novo, eng_legado)
+    migracao_contratos.executar(eng_novo, eng_legado, argumentos_cli)
+
+def iniciar_exportar_contratos(eng_novo, eng_legado):
+    from cadastros.contratos import exportar_contratos_json
+    exportar_contratos_json.executar(eng_novo, eng_legado)
 
 def iniciar_contratantes(eng_novo, eng_legado):
     from cadastros.contratos import migracao_contratantes
@@ -237,6 +241,7 @@ TAREFAS = {
     "reset_banco": iniciar_reset_banco,
     "clientes": iniciar_clientes,
     "contratos": iniciar_contratos,
+    "exportar_contratos": iniciar_exportar_contratos,
     "contratantes": iniciar_contratantes,
     "equipamentos": iniciar_equipamentos,
     "insumos": iniciar_insumos,
@@ -266,7 +271,9 @@ def despachar_tarefa(nome_tarefa, eng_novo, eng_legado, argumentos_cli=None):
 
     print(f"\n🚀 EXECUTANDO: {nome_tarefa.upper()}...")
     try:
-        if nome_tarefa in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao", "ajustes_movimentos"}:
+        if nome_tarefa in {"backfill_delivery_date", "requisicoes",
+                           "atualizacoes_producao", "ajustes_movimentos",
+                           "contratos"}:
             funcao_alvo(eng_novo, eng_legado, argumentos_cli)
         else:
             funcao_alvo(eng_novo, eng_legado)
@@ -290,13 +297,19 @@ def main():
     parser.add_argument(
         "argumentos_extra",
         nargs=argparse.REMAINDER,
-        help="Argumentos específicos de backfill_delivery_date, requisicoes, atualizacoes_producao ou ajustes_movimentos.",
+        help="Argumentos específicos de backfill_delivery_date, requisicoes, "
+             "atualizacoes_producao, ajustes_movimentos, contratos ou todos "
+             "(--incluir-novos, --permitir-reducao, --ignorar-pendentes).",
     )
 
     args = parser.parse_args()
     alvo = args.alvo.lower().strip()
-    if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes", "atualizacoes_producao", "ajustes_movimentos"}:
-        parser.error("argumentos extras só são aceitos com backfill_delivery_date, requisicoes, atualizacoes_producao ou ajustes_movimentos")
+    if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes",
+                                             "atualizacoes_producao", "ajustes_movimentos",
+                                             "contratos", "todos"}:
+        parser.error("argumentos extras só são aceitos com backfill_delivery_date, "
+                     "requisicoes, atualizacoes_producao, ajustes_movimentos, "
+                     "contratos ou todos")
 
     adquirir_lock_execucao()
 
@@ -318,7 +331,10 @@ def main():
         print(f"⚡ Disparando migração em lote: {alvo.upper()}...")
         
         for etapa in lista_execucao:
-            despachar_tarefa(etapa, eng_novo, eng_legado)
+            # Em lote, os argumentos extras valem só para contratos
+            # (ex.: --ignorar-pendentes), que é quem os entende.
+            extras = args.argumentos_extra if etapa == "contratos" else None
+            despachar_tarefa(etapa, eng_novo, eng_legado, extras)
             
         print(f"\n🏆 LOTE '{alvo.upper()}' FINALIZADO COM 100% DE INTEGRIDADE!")
         

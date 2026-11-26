@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|39/2025|id=59",
+    "source_contract_id": 59,
+    "number": "39/2025",
+    "name": "PREFEITURA MUNICIPAL DE MOCOCA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE MOCOCA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE MOCOCA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Contratação de Empresa Especializada na Locação de Computadores e Notebooks, para atender as necessidades das diversas Secretarias Municipais, conforme especificações, condições e quantidades s estabelecidas no Termo de Referência do processo de licitação acima mencionado (Anexo I do edital) e tabela.",
+    "original_start_date": "2025-05-22",
+    "created_at": "2025-05-29T14:09:15",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=59"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-05-22",
+              "end_date": "2028-05-21",
+              "duration": 36,
+              "max_duration": 120,
+              "max_end_date": "2035-05-21",
+              "total_amount": 247968,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "DELL Inspiron 3030 Small Desktop + Teclado e Mouse DELL + Item 1 - AOC 24B35HM2 (i3 - 12 Ger, 8gb RAM, SSD 240gb)",
+                "quantity": 168,
+                "price": 123.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

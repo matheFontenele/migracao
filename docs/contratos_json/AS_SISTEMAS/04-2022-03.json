@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "63320667000191",
+    "alias": "AS_SISTEMAS"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "AS_SISTEMAS|04/2022-03|id=231",
+    "source_contract_id": 231,
+    "number": "04/2022-03",
+    "name": "PREFEITURA MUNICIPAL DE ICÓ - SECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ICO",
+    "recipient_aliases": [
+      "CONTROLADORIA - ICO",
+      "GABINETE DO PREFEITO - ICO",
+      "P M ICO/ SECRETARIA DE AÇÃO SOCIAL",
+      "PREFEITURA MUNICIPAL DE ICO",
+      "SAAE - ICO",
+      "SEC. DE ADMINISTRACAO - ICO",
+      "SEC. DE INFRAESTRUTURA - ICO",
+      "SECRETARIA DE SAUDE - ICO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LICENÇA DE USO DE SOFTWARES DIVERSOS PARA GESTÃO LOGÍSTICA, ARRECADAÇÃO E FOLHA DE PAGAMENTO, COM VISTA À QUALIFICAÇÃO DO CONTROLE INTERNO, INCLUINDO IMPLANTAÇÃO, TREINAMENTO DE PESSOAL, MANUTENÇÃO, SUPORTE TÉCNICO, ACOMPANHAMENTO E SERVIÇOS ESPECIALIZADOS DE CONSULTORIA, JUNTO À SECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL DO MUNICÍPIO DE ICÓ-CE",
+    "original_start_date": "2022-05-03",
+    "created_at": "2022-05-03T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=231"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-05-03",
+              "end_date": "2023-05-02",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-05-02",
+              "total_amount": 42360,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 3530.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-05-04",
+              "end_date": "2024-05-03",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-05-02",
+              "total_amount": 42360,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 3530.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-05-03",
+              "end_date": "2025-05-03",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-05-02",
+              "total_amount": 42360,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 3530.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-05-03",
+              "end_date": "2026-05-03",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-03-02",
+              "total_amount": 42360,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 3530.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

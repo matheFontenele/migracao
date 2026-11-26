@@ -1,0 +1,933 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2022.04.13.018|id=57",
+    "source_contract_id": 57,
+    "number": "2022.04.13.018",
+    "name": "PREF. MUNICIPAL DE ARACATI - SEGURANÇA CIDADÃ - 018-2022",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACATI",
+    "recipient_aliases": [
+      "CONTROLADORIA/OUVIDORIA DO MUNICÍPIO DE ARACATI",
+      "DESENVOLVIMENO ECONOMICO DO MUNICIPIO DE ARACATI",
+      "DESENVOLVIMENTO AGRARIO DO MUNICIPIO DE ARACATI",
+      "GABINETE DO PREFEITO DO MUNICÍPIO DE ARACATI",
+      "INST. DE QUALIDADE DO MEIO AMBIENTE DO MUNICIPIO DO ARACATI- IQUAMA",
+      "PREFEITURA MUNICIPAL DE ARACATI",
+      "PROCURADORIA DO MUNICÍPIO DE ARACATI",
+      "RESERVA - ARACATI",
+      "SECREATARIA DE EDUCACAO DO MUNICÍPIO DE ARACATI",
+      "SECREATARIA DE FINANCAS DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DA CASA CIVIL DO MUNICÍPIO DE ARACATI-CE",
+      "SECRETARIA DE ADMINISTRAÇÃO DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DE CIDADANIA E DESENV SOCIAL DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DE CULTURA DA PREFEITURA DE ARACATI",
+      "SECRETARIA DE INFRAESTRUTURA DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE SAUDE DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE SEGURANCA PUBLICA DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE TURISMO DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DO ESPORTE DO MUNICÍPIO DE ARACATI",
+      "SEGURANCA CIDADA E ORDEM PUBLICA - ARACATI"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS.",
+    "original_start_date": "2022-04-13",
+    "created_at": "2022-04-13T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=57"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-04-13",
+              "end_date": "2023-04-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 44345,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-04-13",
+              "end_date": "2024-04-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 44345,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-04-14",
+              "end_date": "2024-12-31",
+              "duration": 9,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 33259,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 9,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 9,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-01-01",
+              "end_date": "2025-06-30",
+              "duration": 6,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 22172,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-07-01",
+              "end_date": "2025-10-31",
+              "duration": 4,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 14782,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-11-01",
+              "end_date": "2026-01-31",
+              "duration": 3,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 11086,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 3,
+                "price": 221.78,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 3,
+                "price": 173.93,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 234.7,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "No break 700 VA.",
+                "description": "",
+                "quantity": 1,
+                "price": 41.95,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "no-break-700-va#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 7000,
+                "price": 0.0,
+                "months": 3,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SEM FRANQUIA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 3,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

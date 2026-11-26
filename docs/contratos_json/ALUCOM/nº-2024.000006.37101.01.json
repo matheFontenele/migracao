@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|nº 2024.000006.37101.01|id=46",
+    "source_contract_id": 46,
+    "number": "nº 2024.000006.37101.01",
+    "name": "SETUR",
+    "customer_alias": "SECRETARIA DE ESTADO DO TURISMO DO ESPÍRITO SANTO - SETUR",
+    "recipient_aliases": [
+      "SECRETARIA DE ESTADO DO TURISMO DO ESPÍRITO SANTO - SETUR"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O presente Contrato tem por objeto a prestação de serviços de serviço de outsourcing de impressão, compreendendo disponibilização de equipamento(s) reprográfic (s)multifuncional(is) monocromático(s), assistência técnica, fornecimento de peças e demais insumos consumíveis",
+    "original_start_date": "2024-02-02",
+    "created_at": "2024-03-06T14:35:06",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=46"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-02-02",
+              "end_date": "2028-02-02",
+              "duration": 48,
+              "max_duration": 48,
+              "max_end_date": "2028-02-02",
+              "total_amount": 92000,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A3",
+                "description": "KYOCERA TASKALFA MZ3200i + OCR + DP-7140",
+                "quantity": 1,
+                "price": 958.33,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A3",
+                "description": "KYOCERA TASKALFA MZ3200i + OCR + DP-7140",
+                "quantity": 1,
+                "price": 958.33,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "impressora-monocromatico-paginas-a3#1"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 3500,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 3500,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "impressora-monocromatico-paginas-a3#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

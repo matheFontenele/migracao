@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|025/2025.|id=201",
+    "source_contract_id": 201,
+    "number": "025/2025.",
+    "name": "CONEXAO CONSTRUTORA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "customer_alias": "CONEXAO CONSTRUTORA EMPREENDIMENTOS E SOLUCOES LTDA",
+    "recipient_aliases": [
+      "CONEXAO CONSTRUTORA EMPREENDIMENTOS E SOLUCOES LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2025-12-25",
+    "created_at": "2025-12-23T08:28:59",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=201"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-12-25",
+              "end_date": "2026-12-25",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 9276,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I5 - Intel® CoreTM i5",
+                "description": "- 8GB SSD 120GB - SSD -",
+                "quantity": 3,
+                "price": 199.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5-intel-coretm-i5#0"
+              },
+              {
+                "alias": "Multifuncional – Marca Kyocera – Modelo M 2040):",
+                "description": "Tecnologia impressão a Laser - 40 PPM - ADF - DUPLEX",
+                "quantity": 1,
+                "price": 176.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-marca-kyocera-modelo-m-2040#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Notebook i5 - intel Core T",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5-intel-core-t#0"
+              },
+              {
+                "alias": "MULTIFUNCIONAL LASER A4 MONO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1600,
+                "price": 0.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-a4-mono#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2026-01-13",
+              "end_date": "2027-01-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 2388,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I5 - Intel® CoreTM i5",
+                "description": "8 GB SSD 120GB - SSD",
+                "quantity": 1,
+                "price": 199.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5-intel-coretm-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Notebook i5 - intel Core T",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5-intel-core-t#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

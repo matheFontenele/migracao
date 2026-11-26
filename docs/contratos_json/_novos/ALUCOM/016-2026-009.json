@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|016/2026-009|P. M. DE REDENÇÃO - SECRETARIA DE SAÚDE",
+    "source_contract_id": null,
+    "number": "016/2026-009",
+    "name": "P. M. DE REDENÇÃO - SECRETARIA DE SAÚDE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENÇÃO - CE",
+    "recipient_aliases": [
+      "P. M. DE REDENÇÃO - SECRETARIA DE SAÚDE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é o REGISTRO DE PREÇO PARA CONTRATAÇÃO DE EMPRESAS ESPECIALIZADAS NA LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS E MÁQUINAS COPIADORAS PARA ATENDER AS NECESSIDADES DAS DIVERSAS SECRETARIAS DO MUNICIPIO DE REDENÇÃO/CE.",
+    "original_start_date": "2026-07-30",
+    "created_at": "2026-07-30T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Alucom/PLANILHA (AL) - SAÚDE.xlsx",
+        "sheet": "OUT26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-07-30",
+              "end_date": "2027-11-30",
+              "duration": 16,
+              "max_duration": 120,
+              "max_end_date": "2036-07-29",
+              "total_amount": 8844.24,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA",
+                "description": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. ESPECIFICAÇÃO: LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. QUE IMPRIME, COPIA E DIGITALIZA/ WI-FI DIRECT. CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS. COM ÚNICO SISTEMA TANQUE D TINTA 100% SEM CARTUCHO, IMPRIME ATE 7.500 PÁGINAS EM CORES OU 4.500 PÁGINAS EM PRETO COM MAIOR RESOLUÇÃO DE IMPRESSÃO DA CATEGORIA. 6.000 IMPRESSOES/MÊS",
+                "quantity": 2,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressora-multifuncional-colorida#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - SAÚDE.xlsx",
+                  "sheet": "OUT26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS. ESPECIFICAÇÃOES: LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM MANUTENÇÃO PREVENTIVA E CORRETIVA COM REPOSIÇÃO DE PEÇAS E RECARGAS DE TINTAS, CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS COLORIDA COM ECO TANK, WIFI INTEGRADO, PRONTO PARA A REDE WIRELESS E COM FUNÇÃO SCANER, SEM LIMITE DE IMPRESSÕES. 6.000 IMPRESSOES/MÊS",
+                "quantity": 2,
+                "price": 189.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - SAÚDE.xlsx",
+                  "sheet": "OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

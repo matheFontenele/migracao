@@ -1,0 +1,6 @@
+arquivo,local,texto_original,acao_esperada,severidade
+Moreia/REDENÇÃO - PLANILHA ESPORTE-  ATA  142024001 (DR).xlsx,"aba ESPORTE OUT26, colunas CONT. Nº 014/2024-004 e -009",Duas colunas de contrato na mesma ficha.,Confirmar o rateio de quantidades entre 014/2024-004 e 014/2024-009 conforme as colunas C e D.,revisar
+Moreia/REDENÇÃO - PLANILHA INFRAESTRUTURA - ATA  142024001 (DR).xlsx,"aba INFRAESTRUTURA OUT26, colunas CONT. Nº 014/2024-003 e -006",Duas colunas de contrato na mesma ficha.,Confirmar o rateio de quantidades entre 014/2024-003 e 014/2024-006 conforme as colunas C e D.,revisar
+_novos/ (20 arquivos),contract.source_contract_id,null,Contratos ainda não existem em contracts_snapshot.csv; a carga criará novos ids. Nenhuma ação se o objetivo é cadastrar.,informativa
+"_novos/ALUCOM (016/2026-001, -004, -006, -008)",items[].alias / occurrence,LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS,O mesmo alias cobre dois produtos (preços 290.54 e 189.51); a distinção usa occurrence 0/1. Confirmar que a ordem da planilha é estável entre competências.,revisar
+_novos/ALUCOM/016-2026-009.json,contract.customer_alias,P. M. DE REDENÇÃO - SECRETARIA DE SAÚDE,Alias não possui parent_alias em customers.csv; o cliente raiz PREFEITURA MUNICIPAL DE REDENÇÃO - CE foi usado por ser o alias da própria organização. Confirmar vínculo.,revisar

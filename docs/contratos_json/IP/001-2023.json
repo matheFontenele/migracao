@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|001-2023|id=158",
+    "source_contract_id": 158,
+    "number": "001-2023",
+    "name": "ESCOLA PREPARATORIA DE CADETES DO EXERCITO",
+    "customer_alias": "ESCOLA PREPARATORIA DE CADETES DO EXERCITO",
+    "recipient_aliases": [
+      "ESCOLA PREPARATORIA DE CADETES DO EXERCITO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O OBJETO DO PRESENTE INSTRUMENTO É A CONTRATAÇÃO DE SERVIÇOS DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO DE OUTSOURCING DE IMPRESSÃO E CÓPIA, COMPREENDENDO A CESSÃO DE DIREITO DE USO DE EQUIPAMENTOS FUNCIONAIS, COM O FORNECIMENTO DE INSUMOS DIRETOS E INDIRETOS PARA A IMPRESSÃO, CÓPIA (EXCETO PAPEL), DIGITALIZAÇÃO DE DOCUMENTOS, GERENCIAMENTO DO AMBIENTE DE IMPRESSÃO, FORNECIMENTO DE RELATÓRIO DE CONTABILIZAÇÃO, ALÉM DE MANUTENÇÃO E SUPORTE TÉCNICO, COM EXECUÇÃO MEDIANTE O REGIME DE EMPREITADA POR ",
+    "original_start_date": "2023-04-18",
+    "created_at": "2023-04-18T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=158"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-04-18",
+              "end_date": "2024-04-16",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 31160,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 8000,
+                "price": 0.52,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 300000,
+                "price": 0.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "",
+                "quantity": 2,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 8000,
+                "price": 0.52,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 300000,
+                "price": 0.09,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2024-04-17",
+              "end_date": "2025-04-16",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 31320,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 8000,
+                "price": 0.54,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 300000,
+                "price": 0.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "",
+                "quantity": 2,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 8000,
+                "price": 0.54,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 300000,
+                "price": 0.09,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-04-17",
+              "end_date": "2026-04-16",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 31560,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 8000,
+                "price": 0.57,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "SERVIÇO DE IMPRESSÃO CORPORATIVA OU OUTSOURCING DE IMPRESSÃO, COM O FORNECIMENTO DE EQUIPAMENTOS ",
+                "quantity": 300000,
+                "price": 0.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

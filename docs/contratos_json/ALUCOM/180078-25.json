@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|180078-25|id=154",
+    "source_contract_id": 154,
+    "number": "180078-25",
+    "name": "ISG - HGWA",
+    "customer_alias": "ISGH - INSTITUTO DE SAUDE E GESTAO HOSPITALAR",
+    "recipient_aliases": [
+      "ISGH - HOSPITAL UNIVERSITÁRIO DO CEARÁ - HUC",
+      "ISGH - INSTITUTO DE SAUDE E GESTAO HOSPITALAR",
+      "UNIDADE CARIRI - ISGH",
+      "UNIDADE FORTALEZA - ISGH",
+      "UNIDADE SOBRAL-ISGH"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2025-11-10",
+    "created_at": "2025-11-10T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=154"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-11-10",
+              "end_date": "2026-11-09",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2030-11-10",
+              "total_amount": 6984,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA TÉRMICA DE ETIQUETA MONOCROMÁTICA",
+                "description": "ZEBRA ZD220",
+                "quantity": 6,
+                "price": 97.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-etiqueta-monocromatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|067/GAPDF-CINDACTA I/2023|id=162",
+    "source_contract_id": 162,
+    "number": "067/GAPDF-CINDACTA I/2023",
+    "name": "PRIMEIRO CENTRO INTEGRADO DE DEFESA AÉREA E CONTROLE DE TRÁFEGO AÉREO - CINDACT 1",
+    "customer_alias": "MINISTÉRIO DA DEFESA  - CINDACTA I -  GRUPAMENTO DE APOIO - DF",
+    "recipient_aliases": [
+      "MINISTÉRIO DA DEFESA  - CINDACTA I -  GRUPAMENTO DE APOIO - DF"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação serviço de outsourcing de impressão, na modalidade de Franquia com excedente de páginas, com fornecimento de multifuncionais digitais para impressões e cópias monocromáticas, fornecimento de insumos, exceto papel, além de assistência técnica especializada, reposição de peças originais e sistema de gerenciamento de impressão, para suprir a demanda dos destacamentos subordinados ao CINDACTA I: Destacamento de Controle do Espaço Aéreo de Barra do Gar",
+    "original_start_date": "2024-01-29",
+    "created_at": "2024-01-29T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=162"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-01-29",
+              "end_date": "2028-01-28",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2029-01-28",
+              "total_amount": 77246,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional P&B - Tipo I",
+                "description": "KYOCERA ECOSYS M3145idn ",
+                "quantity": 7,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-p-b-tipo-i#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 720,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "kyocera-ecosys-m3145idn#0"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 480,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "kyocera-ecosys-m3145idn#1"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 780,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 2,
+                "lineage_key": "kyocera-ecosys-m3145idn#2"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 520,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 3,
+                "lineage_key": "kyocera-ecosys-m3145idn#3"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 600,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 4,
+                "lineage_key": "kyocera-ecosys-m3145idn#4"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 400,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 5,
+                "lineage_key": "kyocera-ecosys-m3145idn#5"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 720,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 6,
+                "lineage_key": "kyocera-ecosys-m3145idn#6"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 480,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 7,
+                "lineage_key": "kyocera-ecosys-m3145idn#7"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 540,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 8,
+                "lineage_key": "kyocera-ecosys-m3145idn#8"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 360,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 9,
+                "lineage_key": "kyocera-ecosys-m3145idn#9"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 120,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 10,
+                "lineage_key": "kyocera-ecosys-m3145idn#10"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 80,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 11,
+                "lineage_key": "kyocera-ecosys-m3145idn#11"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 150,
+                "price": 0.29,
+                "months": 48,
+                "occurrence": 12,
+                "lineage_key": "kyocera-ecosys-m3145idn#12"
+              },
+              {
+                "alias": "KYOCERA ECOSYS M3145idn",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 100,
+                "price": 0.23,
+                "months": 48,
+                "occurrence": 13,
+                "lineage_key": "kyocera-ecosys-m3145idn#13"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

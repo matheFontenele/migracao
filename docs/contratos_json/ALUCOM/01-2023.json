@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|01-2023|id=35",
+    "source_contract_id": 35,
+    "number": "01-2023",
+    "name": "COLEGIO MILITAR DE SÃO PAULO",
+    "customer_alias": "CENTRO DE PREP DE OFICIAIS DA RESERVA E COLEGIO MILITAR DE SAO PAULO",
+    "recipient_aliases": [
+      "CENTRO DE PREP DE OFICIAIS DA RESERVA E COLEGIO MILITAR DE SAO PAULO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "0 objeto do presente instrumento é a contrataçao de serviços de outsourcing de impressao,que serao prestados nas condiçoes estabelecidas no Termo de Referencia, anexo do Edital.",
+    "original_start_date": "2023-04-18",
+    "created_at": "2023-04-25T11:20:22",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=35"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-04-18",
+              "end_date": "2024-04-18",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 37080,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2040dn",
+                "quantity": 3,
+                "price": 390.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "XEROX VERSALINK C505",
+                "quantity": 2,
+                "price": 960.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 72000,
+                "price": 0.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 24000,
+                "price": 0.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2040dn",
+                "quantity": 3,
+                "price": 390.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "XEROX VERSALINK C505",
+                "quantity": 2,
+                "price": 960.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 72000,
+                "price": 0.06,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 24000,
+                "price": 0.3,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2024-05-15",
+              "end_date": "2025-05-14",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 37980,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2040dn",
+                "quantity": 3,
+                "price": 399.668,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "XEROX VERSALINK C505",
+                "quantity": 2,
+                "price": 983.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 72000,
+                "price": 0.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 24000,
+                "price": 0.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-05-15",
+              "end_date": "2026-05-14",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 37980,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2040dn",
+                "quantity": 3,
+                "price": 399.668,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "XEROX VERSALINK C505",
+                "quantity": 2,
+                "price": 983.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 72000,
+                "price": 0.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 24000,
+                "price": 0.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "APOSTILAMENTO",
+            "info": {
+              "start_date": "2025-09-03",
+              "end_date": "2026-05-14",
+              "duration": 9,
+              "max_duration": 60,
+              "max_end_date": "2028-04-18",
+              "total_amount": 40624,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2040dn",
+                "quantity": 3,
+                "price": 427.5,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "XEROX VERSALINK C505",
+                "quantity": 2,
+                "price": 1051.4,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 72000,
+                "price": 0.0642,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 24000,
+                "price": 0.3209,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|018/2025.|id=205",
+    "source_contract_id": 205,
+    "number": "018/2025.",
+    "name": "FUNDAÇÃO EDSON QUEIROZ",
+    "customer_alias": "FUNDAÇÃO EDSON QUEIROZ",
+    "recipient_aliases": [
+      "FUNDAÇÃO EDSON QUEIROZ"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "ENCERRADO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE, os Serviços de locação de equipamentos de informática, incluindo instalação, suporte técnico e manutenção preventiva e corretiva, visando atender de forma satisfatória ao Fundação Edson Queiroz, na quantidade e especificação descritas abaixo, em boas condições",
+    "original_start_date": "2025-11-10",
+    "created_at": "2025-11-10T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=205"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-11-10",
+              "end_date": "2025-11-21",
+              "duration": 1,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 1200,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "Notebook I7",
+                "quantity": 10,
+                "price": 120.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Notebbok i7",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "notebbok-i7#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|04/2024|id=8",
+    "source_contract_id": 8,
+    "number": "04/2024",
+    "name": "IFCE CAMOCIM",
+    "customer_alias": "INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO CEARÁ - IFCE",
+    "recipient_aliases": [
+      "INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO CEARÁ - IFCE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação de solução de tecnologia da informação e comunicação de serviço de outsourcing de impressão, com fornecimento de suprimentos, peças de reposição e manutenção, para equipamentos alocados no Instituto Federal de Educação, Ciência e Tecnologia do Ceará - campus Camocim, que serão prestados nas condições estabelecidas no Termo de Referência, anexo do Edital.",
+    "original_start_date": "2024-03-01",
+    "created_at": "2024-02-26T16:46:05",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=8"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-03-01",
+              "end_date": "2025-03-01",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2029-03-01",
+              "total_amount": 12612,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYSMA5500ifx + OCR",
+                "quantity": 3,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "KYOCERA ECOSYS MA3500cix + OCR",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 6000,
+                "price": 0.049,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 3000,
+                "price": 0.04,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 300,
+                "price": 0.19,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYSMA5500ifx + OCR",
+                "quantity": 3,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "KYOCERA ECOSYS MA3500cix + OCR",
+                "quantity": 1,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 6000,
+                "price": 0.049,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 3000,
+                "price": 0.04,
+                "months": null,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.29,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 300,
+                "price": 0.19,
+                "months": null,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-03-01",
+              "end_date": "2026-03-01",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2029-03-01",
+              "total_amount": 13176,
+              "services_total_amount": 0.0
+            },
+            "items": [],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 6000,
+                "price": 0.052,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 3000,
+                "price": 0.042,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 300,
+                "price": 0.2,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

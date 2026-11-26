@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2023.01.03.01-IP|id=192",
+    "source_contract_id": 192,
+    "number": "2023.01.03.01-IP",
+    "name": "ROZANA DUARTE DA SILVA-ME",
+    "customer_alias": "ROZANA DUARTE DA SILVA-ME",
+    "recipient_aliases": [
+      "ROZANA DUARTE DA SILVA-ME"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, A CONTRATADA fornece ao CONTRATANTE, os serviços de: SERVIÇOS DE LOCAÇAO DE EQUIPAMENTOS DE INFORMÁTICA, VISANDO ATENDER DE FORMA SATISFATÓRIA A DEMANDA ROZANA DUARTE DA SILVA-ME (REFIGERAÇAO DUARTE), na quantidade e especificaçao descritas abaixo, em boas condiçoes de uso e conservaçao, incluindo entrega, suporte técnico e manutençao preventiva e corretiva, no endereço abaixo indicado:",
+    "original_start_date": "2023-01-03",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=192"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-01-03",
+              "end_date": "2024-01-02",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2027-01-02",
+              "total_amount": 3480,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "1 KIT INFORMATICA",
+                "description": "Intel Core i5, 4GB RAM, HD 500GB, Tela 15,6\", Teclado/Mouse USB e Windows 10. <br>Multifuncional: Jato de Tinta com Bulk Ink (Tanque de Tinta).",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "1-kit-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-01-01",
+              "end_date": "2024-06-30",
+              "duration": 6,
+              "max_duration": 48,
+              "max_end_date": "2027-01-02",
+              "total_amount": 1740,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "1 KIT INFORMATICA",
+                "description": "Intel Core i5, 4GB RAM, HD 500GB, Tela 15,6\", Teclado/Mouse USB e Windows 10. <br>Multifuncional: Jato de Tinta com Bulk Ink (Tanque de Tinta).",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "1-kit-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-07-01",
+              "end_date": "2024-12-30",
+              "duration": 6,
+              "max_duration": 48,
+              "max_end_date": "2027-01-02",
+              "total_amount": 1740,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "1 KIT INFORMATICA",
+                "description": "Intel Core i5, 4GB RAM, HD 500GB, Tela 15,6\", Teclado/Mouse USB e Windows 10. <br>Multifuncional: Jato de Tinta com Bulk Ink (Tanque de Tinta).",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "1-kit-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-12-30",
+              "end_date": "2025-06-30",
+              "duration": 6,
+              "max_duration": 48,
+              "max_end_date": "2027-01-02",
+              "total_amount": 1740,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "1 KIT INFORMATICA",
+                "description": "Intel Core i5, 4GB RAM, HD 500GB, Tela 15,6\", Teclado/Mouse USB e Windows 10. <br>Multifuncional: Jato de Tinta com Bulk Ink (Tanque de Tinta).",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "1-kit-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-06-30",
+              "end_date": "2025-12-30",
+              "duration": 6,
+              "max_duration": 48,
+              "max_end_date": "2027-01-02",
+              "total_amount": 1740,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "1 KIT INFORMATICA",
+                "description": "Intel Core i5, 4GB RAM, HD 500GB, Tela 15,6\", Teclado/Mouse USB e Windows 10. <br>Multifuncional: Jato de Tinta com Bulk Ink (Tanque de Tinta).",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "1-kit-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente 'ROZANA DUARTE DA SILVA-ME' não existe em customers (criar customer ou definir de/para)"
+    ]
+  }
+}

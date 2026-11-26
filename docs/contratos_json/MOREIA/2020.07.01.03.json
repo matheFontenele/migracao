@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2020.07.01.03|SECRETARIA DE ASSISTÊNCIA SOCIAL",
+    "source_contract_id": null,
+    "number": "2020.07.01.03",
+    "name": "SECRETARIA DE ASSISTÊNCIA SOCIAL",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE ASSISTÊNCIA SOCIAL"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇAO DEMICROCOMPUTADORES E TABLET´S DESTINADOS A SUPRIR AS NECESSIDDAES DA UNIDADE BÁSICA DE SÁUDE JUNTO A : SECRETARIA DE ASSISTÊNCIA SOCIAL DE ARACOIABA/CE.",
+    "original_start_date": "2023-12-29",
+    "created_at": "2023-12-29T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+        "sheet": "ASSIST SOCIAL - DR DEZ24",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-12-29",
+              "end_date": "2024-06-28",
+              "duration": 6,
+              "max_duration": 6,
+              "max_end_date": "2024-06-28",
+              "total_amount": 8511.6,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "MICROCOMPUTADOR – Especificação Mínima: Processador com tecnologia Core I5, com frequência de operação 32hz, cache I36mb, gabinete tipo torre com fonte 400w, placa mãe on-board com som/vídeo/rede, memória ram 4gb ddr3 13333mhz, hd 500gb, monitor 18.5 LCD/LED, teclado USB, mouse USB, sistema operacional Windows 10 em portugês,(fornecimento de estabilizador de tensão 300va) Inclui manutensão on-site e reposição de peças, com substituição imediata do equipamento em caso de defeito sem ônus adicional para a contratante. Todos os casos devem ter atualização de hardware (aumento de capacidade da velocidade de processamento, armazenamento, memória e tamanho do monitor e vídeo) para atender as necessidades dos software da contratante sem ônus adicional.",
+                "quantity": 10,
+                "price": 141.86,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": "ASSIST SOCIAL - DR DEZ24",
+                  "row": 10
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

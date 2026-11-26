@@ -61,6 +61,10 @@ class PlanilhasReaisTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # As planilhas reais saíram do repositório: a extração agora é
+        # externa. O teste continua válido para quem tiver os arquivos.
+        if not _pastas_reais_tem_xlsx():
+            raise unittest.SkipTest('docs/contratos sem planilhas reais')
         cls.contratos = carregar_planilhas()
         cls.por_numero = {c.numero: c for c in cls.contratos}
 
@@ -127,6 +131,17 @@ class PlanilhasReaisTests(unittest.TestCase):
         self.assertTrue(self.por_numero['20.08.002/2026'].cnpj_divergente)
 
 
+def _pastas_reais_tem_xlsx():
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        'docs', 'contratos')
+    for pasta in ('IP', 'ALUCOM', 'MOREIA', 'AS'):
+        diretorio = os.path.join(base, pasta)
+        if os.path.isdir(diretorio):
+            if any(nome.lower().endswith('.xlsx') for nome in os.listdir(diretorio)):
+                return True
+    return False
+
+
 class EstruturaPorOrganizacaoTests(unittest.TestCase):
     """Valida a inferência de organização pela pasta e a busca recursiva."""
 
@@ -145,6 +160,8 @@ class EstruturaPorOrganizacaoTests(unittest.TestCase):
         origem = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), 'docs', 'contratos', 'IP'
         )
+        if not _pastas_reais_tem_xlsx():
+            self.skipTest('docs/contratos sem planilhas reais')
         with tempfile.TemporaryDirectory() as tmp:
             pasta_ip = os.path.join(tmp, 'IP')
             os.makedirs(pasta_ip)

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2022.04.05.002-07|id=102",
+    "source_contract_id": 102,
+    "number": "2022.04.05.002-07",
+    "name": "PREFEITURA MUNICIPAL DE CAMOCIM - CULTURA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAMOCIM",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAMOCIM",
+      "SECRETARIA DE DESENVOLVIMENTO SOCIAL DO MUNICIPIO DE CAMOCIM",
+      "SECRETARIA DE SAÚDE MUNICIPIO DE CAMOCIM"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O presente contrato tem por objeto a REGISTRO DE PREÇOS VISANDO FUTURAS E EVENTUAIS CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL - BIBLIOTECA DE INFRAESTRUTURA DE TECNOLOGIA, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DAS DIVERSAS",
+    "original_start_date": "2022-06-01",
+    "created_at": "2015-06-17T14:42:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=102"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-06-01",
+              "end_date": "2022-12-31",
+              "duration": 7,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 21916,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-06-01",
+              "end_date": "2024-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 37570,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-06-01",
+              "end_date": "2025-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 37570,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

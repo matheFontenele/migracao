@@ -1,0 +1,21 @@
+{
+  "contract_type": [
+    "LICITACAO",
+    "PESSOA_JURIDICA",
+    "PESSOA_FISICA"
+  ],
+  "contract_status": [
+    "AGUARDANDO_INICIO",
+    "EM_ANDAMENTO",
+    "ENCERRADO"
+  ],
+  "event_type": [
+    "CADASTRO",
+    "ADITIVO_DE_PRAZO",
+    "ADITIVO_DE_QUANTIDADE",
+    "ADITIVO_DE_REAJUSTE",
+    "ADITIVO_DE_SUPRESSAO",
+    "ADITIVO_MODIFICACAO_DE_ITEM",
+    "APOSTILAMENTO"
+  ]
+}

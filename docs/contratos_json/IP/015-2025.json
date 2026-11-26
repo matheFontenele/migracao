@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|015/2025|id=185",
+    "source_contract_id": 185,
+    "number": "015/2025",
+    "name": "CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA - UNIDADE SERRA DO MEL",
+    "customer_alias": "CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA",
+    "recipient_aliases": [
+      "CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA - FORTALEZA",
+      "CELERE TECNOLOGIA E ASSESSORIA EM SAUDE PUBLICA E PRIVADA LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Po resta avença, a CONTRATADAfornece ao CONTRATANTEo serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda daCELERE TECNOLOGIA E ASSESSORIA EM SAÚDE PÚBLICA.",
+    "original_start_date": "2025-09-25",
+    "created_at": "2025-09-25T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=185"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-09-25",
+              "end_date": "2027-09-24",
+              "duration": 24,
+              "max_duration": 48,
+              "max_end_date": "2029-09-24",
+              "total_amount": 138240,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Micro I5",
+                "description": "Intel® Core™ i5 (6ª geração), 8GB RAM, SSD 128GB, Windows 10, Monitor 19",
+                "quantity": 64,
+                "price": 90.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "micro-i5#0"
+              },
+              {
+                "alias": "Micro I5 - BACKUP",
+                "description": "Intel® Core™ i5 (6ª geração), 8GB RAM, SSD 128GB, Windows 10, Monitor 19",
+                "quantity": 6,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "micro-i5-backup#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

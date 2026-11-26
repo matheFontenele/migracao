@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2024.2008.01|id=255",
+    "source_contract_id": 255,
+    "number": "2024.2008.01",
+    "name": "ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA,",
+    "customer_alias": "ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA",
+    "recipient_aliases": [
+      "ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da ACG CONSTRUÇÕES E CONSERVAÇÃO AMBIENTAL LTDA, no Município de Jijoca de Jericoacoara/CE, na quantidade e especificações descritas abaixo, em boas condições de uso e",
+    "original_start_date": "2024-08-20",
+    "created_at": "2024-08-29T15:30:58",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=255"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-08-20",
+              "end_date": "2025-08-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 1032,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook - Intel® CoreTM i3",
+                "description": "8GB de Memória, SSD 120GB,",
+                "quantity": 2,
+                "price": 210.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-coretm-i3#0"
+              },
+              {
+                "alias": "Notebook - Intel® CoreTM i5",
+                "description": "8GB de Memória, SSD 256GB,",
+                "quantity": 1,
+                "price": 250.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-coretm-i5#0"
+              },
+              {
+                "alias": "Monitor",
+                "description": "Monitor 23”",
+                "quantity": 2,
+                "price": 51.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor#0"
+              },
+              {
+                "alias": "Tablet Samsung Galaxy S8",
+                "description": "5G, 128GB com S Pen, tela led 12,4\",",
+                "quantity": 1,
+                "price": 130.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-samsung-galaxy-s8#0"
+              },
+              {
+                "alias": "Tablet Samsung A9",
+                "description": "4G,   64GB, WiFi, tela 8,7\"",
+                "quantity": 2,
+                "price": 115.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-samsung-a9#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "8GB de Memória, SSD 120GB,",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "8gb-de-memoria-ssd-120gb#0"
+              },
+              {
+                "alias": "8GB de Memória, SSD 256GB,",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "8gb-de-memoria-ssd-256gb#0"
+              },
+              {
+                "alias": "Monitor 23”",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-23#0"
+              },
+              {
+                "alias": "5G, 128GB com S Pen, tela led 12,4\",",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "5g-128gb-com-s-pen-tela-led-12-4#0"
+              },
+              {
+                "alias": "4G,   64GB, WiFi, tela 8,7\"",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "4g-64gb-wifi-tela-8-7#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

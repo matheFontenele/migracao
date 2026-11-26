@@ -62,6 +62,13 @@ _ORGANIZACOES_POR_PASTA_NORMALIZADO = {
     for pasta, organizacao in ORGANIZACOES_POR_PASTA.items()
 }
 
+# Pastas cujas planilhas têm layout próprio e são lidas por outro módulo
+# (ver ``carregar_todas_planilhas``). Não entram no relatório de ignoradas.
+PASTAS_OUTROS_LAYOUTS = ('MOREIA',)
+_PASTAS_OUTROS_LAYOUTS_NORMALIZADAS = {
+    ultra_normalizar(pasta) for pasta in PASTAS_OUTROS_LAYOUTS
+}
+
 PASTA_PADRAO = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     'docs', 'contratos',
@@ -173,6 +180,10 @@ class ContratoPlanilha:
     destinatario_id: int | None = None
     existente_id: int | None = None
     situacao: str = ''
+    # Fichas ICÓ/MOREIA informam a vigência original e o prazo máximo da ATA
+    # ("TOTAL 60 MESES") separadamente; nas fichas de Tauá os dois coincidem.
+    max_fim: date | None = None
+    max_duracao_meses: int | None = None
 
     @property
     def contrato_nome(self):
@@ -290,11 +301,16 @@ def _localizar_arquivos(pasta=PASTA_PADRAO):
         )
         pares.append((config, caminho, organizacao_id))
 
-    ignorados = [
-        os.path.relpath(caminho, pasta)
-        for caminho in arquivos
-        if caminho not in usados
-    ]
+    ignorados = []
+    for caminho in arquivos:
+        if caminho in usados:
+            continue
+        relativo = os.path.relpath(caminho, pasta)
+        if ultra_normalizar(relativo.split(os.sep)[0]) in (
+            _PASTAS_OUTROS_LAYOUTS_NORMALIZADAS
+        ):
+            continue
+        ignorados.append(relativo)
     if ignorados:
         print(f'⚠️ Planilhas ignoradas (sem configuração): {ignorados}')
     return pares
@@ -520,6 +536,27 @@ def carregar_planilhas(pasta=PASTA_PADRAO):
                 f'     ⚠️ CNPJ da planilha {contrato.cnpj} diverge do esperado '
                 f'{CNPJ_ESPERADO}; o vínculo usa o destinatário configurado.'
             )
+    return contratos
+
+
+def carregar_todas_planilhas(pasta=PASTA_PADRAO):
+    """Lê as fichas de Tauá (IP) e as fichas ICÓ/MOREIA, sem tocar no banco."""
+    from cadastros.contratos.planilhas_moreia_ico import (
+        carregar_planilhas_moreia,
+    )
+
+    contratos = list(carregar_planilhas(pasta))
+    contratos.extend(carregar_planilhas_moreia(pasta))
+
+    chaves = [
+        (contrato.organizacao_id, contrato.numero) for contrato in contratos
+    ]
+    duplicados = sorted({chave for chave in chaves if chaves.count(chave) > 1})
+    if duplicados:
+        raise PlanilhaContratoInvalida(
+            f'Contratos repetidos (organização, número) nas planilhas: '
+            f'{duplicados}'
+        )
     return contratos
 
 
@@ -753,9 +790,9 @@ def _salvar_info(conn, additive_id, contrato, now, stats):
         'additive_id': additive_id,
         'start_date': contrato.inicio,
         'end_date': contrato.fim,
-        'max_end_date': contrato.fim,
+        'max_end_date': contrato.max_fim or contrato.fim,
         'duration': contrato.duracao_meses,
-        'max_duration': contrato.duracao_meses,
+        'max_duration': contrato.max_duracao_meses or contrato.duracao_meses,
         'total_amount': int(round(contrato.total_calculado)),
         'now': now,
     }

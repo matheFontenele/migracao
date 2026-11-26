@@ -1,0 +1,1122 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2021.08.02.01-01|id=92",
+    "source_contract_id": 92,
+    "number": "2021.08.02.01-01",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - ADMINISTRAÇÃO E RECURSOS HUMANOS",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL-INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA MUNICIPAL DE TURISMO E CULTURA DO MUNICÍPIO DE CAUCAIA-CE",
+    "original_start_date": "2021-09-20",
+    "created_at": "2014-07-25T23:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=92"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-09-20",
+              "end_date": "2022-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-19",
+              "total_amount": 275497,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 2,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 6,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 4,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 15,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 20,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 9,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "description": "",
+                "quantity": 8,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SCANNER DE MESA",
+                "description": "",
+                "quantity": 1,
+                "price": 358.33,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa#0"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 2,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS",
+                "description": "",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "REPETIDOR WI-FI",
+                "description": "",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "repetidor-wi-fi#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 4,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "STORAGE NAS",
+                "description": "",
+                "quantity": 1,
+                "price": 182.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "storage-nas#0"
+              },
+              {
+                "alias": "HD EXTERNO PORTÁTIL 2TB",
+                "description": "",
+                "quantity": 2,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 4,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-09-19",
+              "end_date": "2023-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-19",
+              "total_amount": 275497,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 2,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 6,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 4,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 15,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 20,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 9,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "description": "",
+                "quantity": 8,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SCANNER DE MESA",
+                "description": "",
+                "quantity": 1,
+                "price": 358.33,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa#0"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 2,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS",
+                "description": "",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "REPETIDOR WI-FI",
+                "description": "",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "repetidor-wi-fi#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 4,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "STORAGE NAS",
+                "description": "",
+                "quantity": 1,
+                "price": 182.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "storage-nas#0"
+              },
+              {
+                "alias": "HD EXTERNO PORTÁTIL 2TB",
+                "description": "",
+                "quantity": 2,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 4,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-09-20",
+              "end_date": "2024-09-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-19",
+              "total_amount": 275497,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 2,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 6,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 4,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 15,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 20,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 9,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "description": "",
+                "quantity": 8,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SCANNER DE MESA",
+                "description": "",
+                "quantity": 1,
+                "price": 358.33,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa#0"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 2,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS",
+                "description": "",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "REPETIDOR WI-FI",
+                "description": "",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "repetidor-wi-fi#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 4,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "STORAGE NAS",
+                "description": "",
+                "quantity": 1,
+                "price": 182.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "storage-nas#0"
+              },
+              {
+                "alias": "HD EXTERNO PORTÁTIL 2TB",
+                "description": "",
+                "quantity": 2,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 4,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-09-21",
+              "end_date": "2025-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-19",
+              "total_amount": 275497,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 2,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 6,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 4,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 15,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 20,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 9,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "description": "",
+                "quantity": 8,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SCANNER DE MESA",
+                "description": "",
+                "quantity": 1,
+                "price": 358.33,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa#0"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 2,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS",
+                "description": "",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "REPETIDOR WI-FI",
+                "description": "",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "repetidor-wi-fi#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 4,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "STORAGE NAS",
+                "description": "",
+                "quantity": 1,
+                "price": 182.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "storage-nas#0"
+              },
+              {
+                "alias": "HD EXTERNO PORTÁTIL 2TB",
+                "description": "",
+                "quantity": 2,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 4,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-21",
+              "end_date": "2026-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-19",
+              "total_amount": 275497,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 2,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 6,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 4,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 15,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 20,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 9,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "description": "",
+                "quantity": 8,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SCANNER DE MESA",
+                "description": "",
+                "quantity": 1,
+                "price": 358.33,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa#0"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 2,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS",
+                "description": "",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "REPETIDOR WI-FI",
+                "description": "",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "repetidor-wi-fi#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 4,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "STORAGE NAS",
+                "description": "",
+                "quantity": 1,
+                "price": 182.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "storage-nas#0"
+              },
+              {
+                "alias": "HD EXTERNO PORTÁTIL 2TB",
+                "description": "",
+                "quantity": 2,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 4,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,597 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|11/2022-15|SECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL DO MUNICIPIO DE ICÓ/CE",
+    "source_contract_id": null,
+    "number": "11/2022-15",
+    "name": "SECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL DO MUNICIPIO DE ICÓ/CE",
+    "customer_alias": "MUNICÍPIO DE ICO",
+    "recipient_aliases": [
+      "SECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL DO MUNICIPIO DE ICÓ/CE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "REGISTRO DE PREÇOS PARA FUTURAS E EVENTUAIS CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, COM MANUNTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, JUNTO ASECRETARIA DO TRABALHO E ASSISTÊNCIA SOCIAL DO MUNICIPIO DE ICÓ/CE.",
+    "original_start_date": "2023-01-01",
+    "created_at": "2023-01-01T00:00:00",
+    "source": [
+      {
+        "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+        "sheet": "ASSIST SOCIAL-NOV26",
+        "row": 9
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-01-01",
+              "end_date": "2023-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 307857.36,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 1,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 20,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO III",
+                "description": "MICROCOMPUTADOR TIPO III - ESPECIFICAÇÕES MÍNIMAS: Desktop I3 ou AMD Ryzen3, Memória 4GB, HD 500GB ou 120 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 43,
+                "price": 192.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK TIPO III - ESPECIFICAÇÕES MÍNIMAS: Notebook I3 ou AMD Ryzen3, memória 4GB, HD 500GB, Tela 14”, Windows 10 ou superior.",
+                "quantity": 12,
+                "price": 290.03,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 22
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 11,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 23
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO I",
+                "description": "COMPONENTE TIPO I – ESPECIFICAÇÕES MÍNIMAS: No break 3000 VA",
+                "quantity": 4,
+                "price": 213.4,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 37
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "COMPONENTE TIPO II – ESPECIFICAÇÕES MÍNIMAS: No break 2000 VA",
+                "quantity": 4,
+                "price": 115.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 38
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 14,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 39
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "COMPONENTE TIPO IV – ESPECIFICAÇÕES MÍNIMAS: No break 700 VA",
+                "quantity": 42,
+                "price": 45.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 40
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 12,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 41
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 46
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 47
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-01-01",
+              "end_date": "2024-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 307857.36,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 1,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 20,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO III",
+                "description": "MICROCOMPUTADOR TIPO III - ESPECIFICAÇÕES MÍNIMAS: Desktop I3 ou AMD Ryzen3, Memória 4GB, HD 500GB ou 120 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 43,
+                "price": 192.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK TIPO III - ESPECIFICAÇÕES MÍNIMAS: Notebook I3 ou AMD Ryzen3, memória 4GB, HD 500GB, Tela 14”, Windows 10 ou superior.",
+                "quantity": 12,
+                "price": 290.03,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 22
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 11,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 23
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO I",
+                "description": "COMPONENTE TIPO I – ESPECIFICAÇÕES MÍNIMAS: No break 3000 VA",
+                "quantity": 4,
+                "price": 213.4,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 37
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "COMPONENTE TIPO II – ESPECIFICAÇÕES MÍNIMAS: No break 2000 VA",
+                "quantity": 4,
+                "price": 115.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 38
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 14,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 39
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "COMPONENTE TIPO IV – ESPECIFICAÇÕES MÍNIMAS: No break 700 VA",
+                "quantity": 42,
+                "price": 45.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 40
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 12,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 41
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 46
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 47
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-01-01",
+              "end_date": "2025-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 307857.36,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 1,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 20,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO III",
+                "description": "MICROCOMPUTADOR TIPO III - ESPECIFICAÇÕES MÍNIMAS: Desktop I3 ou AMD Ryzen3, Memória 4GB, HD 500GB ou 120 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 43,
+                "price": 192.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK TIPO III - ESPECIFICAÇÕES MÍNIMAS: Notebook I3 ou AMD Ryzen3, memória 4GB, HD 500GB, Tela 14”, Windows 10 ou superior.",
+                "quantity": 12,
+                "price": 290.03,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 22
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 11,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 23
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO I",
+                "description": "COMPONENTE TIPO I – ESPECIFICAÇÕES MÍNIMAS: No break 3000 VA",
+                "quantity": 4,
+                "price": 213.4,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 37
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "COMPONENTE TIPO II – ESPECIFICAÇÕES MÍNIMAS: No break 2000 VA",
+                "quantity": 4,
+                "price": 115.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 38
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 14,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 39
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "COMPONENTE TIPO IV – ESPECIFICAÇÕES MÍNIMAS: No break 700 VA",
+                "quantity": 42,
+                "price": 45.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 40
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 12,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 41
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 46
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICO - (DR) - ASSIST. SOCIAL.xls.xlsx",
+                  "sheet": "ASSIST SOCIAL-NOV26",
+                  "row": 47
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

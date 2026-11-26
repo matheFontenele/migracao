@@ -1,0 +1,1625 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-25T09:36:30",
+  "sources": [
+    {
+      "path": "bootstrap:controle-interno",
+      "detail": "export do banco refatorado"
+    }
+  ],
+  "files": [
+    {
+      "path": "ALUCOM/0005-2024-PCPB.json",
+      "sha256": "8c2f57235ae77ff91a6f0f654c165ec5c36aa5469170a166a81c26bde5cf3e53",
+      "stable_key": "ALUCOM|0005/2024/PCPB|id=45",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/0014-2022.json",
+      "sha256": "ab39ecd0cf2a36cbc591cec6fa778525096d894f10326cfa5fb517e93af03e71",
+      "stable_key": "ALUCOM|0014/2022|id=40",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/002-2024.json",
+      "sha256": "2a0cbcc112cd773f62464089c8fd406a71f4cced25ab0ea2c40c62ee23d53115",
+      "stable_key": "ALUCOM|002/2024|id=4",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/0025-2024.json",
+      "sha256": "ade319a5c1363515c910e9dd441718bfbe9d0ca2f7ce9128fe4d3cddc3220fef",
+      "stable_key": "ALUCOM|0025/2024|id=44",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/004-2022-SEGOV.json",
+      "sha256": "dc0529a6c440e22e296283e73247dae447a9127a09dd34519243099f136fa0f6",
+      "stable_key": "ALUCOM|004/2022-SEGOV|id=135",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/005-2022.json",
+      "sha256": "82f517dde5fdbff5ca5e968809c3ef65c2c33c897c1fb6f5a6a44931bc3d08bb",
+      "stable_key": "ALUCOM|005/2022|id=47",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/005-GAP-BR-2024.json",
+      "sha256": "6626fcd8fb4c5f519d5e957bb8a027d35dfe0128f8b604db3d113ff3f26dd4fe",
+      "stable_key": "ALUCOM|005/GAP-BR/2024|id=29",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/006-2023-SALC-CMF.json",
+      "sha256": "4fe95dc8eaff2dcfbe59ab97375da4286c29fe69acbc83731e85475303378a22",
+      "stable_key": "ALUCOM|006/2023-SALC/CMF|id=5",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/007-2022.json",
+      "sha256": "576bde6751ca7d7aca9e02ee888f9dafa93d66ec329b5913e053ac2d3dc7b9c8",
+      "stable_key": "ALUCOM|007-2022|id=49",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/0096-2024.json",
+      "sha256": "940fc09066e6bad7a4f2055b488b65b9274fe7707288f80c33d35cb24884c512",
+      "stable_key": "ALUCOM|0096-2024|id=42",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/01-2023.json",
+      "sha256": "f098082eeb9762231d592076aaaf71e89fd86c2fab3b103555d1db0fa6136338",
+      "stable_key": "ALUCOM|01-2023|id=35",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/01-2024-GAB-SEMIT.json",
+      "sha256": "a279dc0ce3279847f3a67707e125ff20917c2d221f0533c70048a6018d59f9e2",
+      "stable_key": "ALUCOM|01/2024 GAB/SEMIT|id=100",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/01-2026.json",
+      "sha256": "6424f3988e15aa4ea740c49c1d74974db7bcc3e285978dde26c3e83e7f0d6e71",
+      "stable_key": "ALUCOM|01-2026|id=30",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/015-2025-SMS.json",
+      "sha256": "42e71b87a53560b37db9ae8a403145a467ee974aaeffb3f4450942de0542103d",
+      "stable_key": "ALUCOM|015/2025-SMS|id=65",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/016-2025.json",
+      "sha256": "bc078ae822284b99308bcca555641fc0f4f1e03b776547942795e6b4bb4cb3bf",
+      "stable_key": "ALUCOM|016/2025|id=74",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/017-2022.json",
+      "sha256": "4d71b8dcc17ce0425c618d3bbd37185a4a33af0421ae809cb7fef7029a5d7b7c",
+      "stable_key": "ALUCOM|017-2022|id=52",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/019-2022.json",
+      "sha256": "8b9f3bbb98a3532afd2573ad56a8e9fa2fbc3c90cc1c547845fb56f177958766",
+      "stable_key": "ALUCOM|019-2022|id=53",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/02-2024__id11.json",
+      "sha256": "e5e6e017eaed56b50034b512ecbf771bec90fab32e523bbb88230edb490fea2a",
+      "stable_key": "ALUCOM|02/2024|id=11",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/02-2024__id31.json",
+      "sha256": "4ba1bb7e9c2c65fe82eebaabfd69e5bd3e6ab032bb57fd0253133ae54d761ba9",
+      "stable_key": "ALUCOM|02/2024|id=31",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/02.25.06.02.001.json",
+      "sha256": "c854c80bc229c8a2ca438e58febb3de5c48e71fe637549e2ce5afe32f4e2b85c",
+      "stable_key": "ALUCOM|02.25.06.02.001|id=58",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/026-2022-SEGER.json",
+      "sha256": "350a1831778284d10b1fd348a802e4a2d11fe4679b11a6615decc49bc5de545c",
+      "stable_key": "ALUCOM|026-2022 - SEGER|id=37",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/03-2024__id20.json",
+      "sha256": "0831e41fc4a220c5f10aa8ff5f85c653d24bf1baaab8c06f236166d7ba6d0d09",
+      "stable_key": "ALUCOM|03-2024|id=20",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/03-2024__id9.json",
+      "sha256": "a24e9312d5d47fb59b9129019727abf055e6a4c2e23b27662a170249adcc8972",
+      "stable_key": "ALUCOM|03-2024|id=9",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/03.25.02.03.002.json",
+      "sha256": "bc1090c0a1049cd0afa80ee3ea7d3eaf5c7e672d30c36ccbc4a27cb5f061e397",
+      "stable_key": "ALUCOM|03.25.02.03.002|id=63",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/04-2024__id10.json",
+      "sha256": "2d182490053f5e1160dfa0ef62963b0ea174b9879692f7356b1f60441f304e6a",
+      "stable_key": "ALUCOM|04/2024|id=10",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/04-2024__id8.json",
+      "sha256": "7545d4c82a7a993d70504741e27fcab873b4065f828cb69f38659661d68efb6a",
+      "stable_key": "ALUCOM|04/2024|id=8",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/04-2025.json",
+      "sha256": "03685a135354e573f79589c9213b0b75f90f3f183e207646a99d6c57dc1cc3ec",
+      "stable_key": "ALUCOM|04-2025|id=22",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/04.25.03.03.001.json",
+      "sha256": "06b2ac7b0a3debfed3fff6745c47d7fb9a8c8ce33b6cd09c75a8a6627ac5cc8a",
+      "stable_key": "ALUCOM|04.25.03.03.001|id=88",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/042-2022.json",
+      "sha256": "b34640873ef28873fe987949aa85d47bf8acc9641026e5b13b233d894a15f74e",
+      "stable_key": "ALUCOM|042/2022|id=89",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/05-2024.json",
+      "sha256": "8d9a1e64b3bf7f014d77d57ff8e28fb48ac8a06500cf0d276a252d7a412fe3fe",
+      "stable_key": "ALUCOM|05/2024|id=12",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/05-2025__id23.json",
+      "sha256": "04dbfa044744e94237719e83369fa159c6a9e767be111606dbb7212e6011f279",
+      "stable_key": "ALUCOM|05-2025|id=23",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/05-2025__id26.json",
+      "sha256": "0d88e6392edcfd5266b8a98d94d52ec896b39bc604a3875cf9302e606a783948",
+      "stable_key": "ALUCOM|05-2025|id=26",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/05.25.03.03.001.json",
+      "sha256": "8da31eee67a364556337de3091176a0c2b9ac5361b7136be5b78d8ddf6878387",
+      "stable_key": "ALUCOM|05.25.03.03.001|id=62",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/06-2024-DETRAN-MA.json",
+      "sha256": "8c87efb52751ab6352583aa6ff05746a63d837033cf7e6c44a7466bf3c67f2e6",
+      "stable_key": "ALUCOM|06/2024-DETRAN/MA|id=39",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/06-2024.json",
+      "sha256": "5ee999f0a03b041f9af54ecdb226f41c78a993bc1132770e40c3ede729badbcf",
+      "stable_key": "ALUCOM|06-2024|id=28",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/07-2024__id17.json",
+      "sha256": "287df9305201f41379142f1e2fccb76b0481dc9a0a12298035b274df84ef98ac",
+      "stable_key": "ALUCOM|07-2024|id=17",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/07-2024__id33.json",
+      "sha256": "959d101136e9d46db11e348ff6093481c6a335ac7b797051741a079add61cafc",
+      "stable_key": "ALUCOM|07/2024|id=33",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/07.25.03.03.001.json",
+      "sha256": "90a25e30d36f8ead3c73100d12c87170a74db7d3180de0db88118ed3b160788d",
+      "stable_key": "ALUCOM|07.25.03.03.001|id=68",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/07.25.04.02.001.json",
+      "sha256": "bd8ab5647f5dda162c0132c004e1ca5d772930a091749f548cd249bdb66ee111",
+      "stable_key": "ALUCOM|07.25.04.02.001|id=69",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/08-2024.json",
+      "sha256": "57e5412a80a4b3c0114b5bdb97634338457db1c949931e264bfcddc58fe29208",
+      "stable_key": "ALUCOM|08-2024|id=7",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/09.25.03.03.001.json",
+      "sha256": "72395de47e2830433fd632b3f8a77415f01f1c9528084cd0595596d2f5d9ac35",
+      "stable_key": "ALUCOM|09.25.03.03.001|id=86",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/1-2025.json",
+      "sha256": "ea0ba01a4314455a2c59fdee52beecaf20b964feaa016e3efa58672d6f7d5053",
+      "stable_key": "ALUCOM|1-2025|id=24",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/10-2024.json",
+      "sha256": "59a794a1a31c18e03777f31fbfb40aa43ffeff4290577420259df62b7ed72a11",
+      "stable_key": "ALUCOM|10/2024|id=13",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/1004202401SESA.json",
+      "sha256": "f5a0a828faf4e6d62ee714175e52cf40c586712a527c4f40d790b9f81104e02d",
+      "stable_key": "ALUCOM|1004202401SESA|id=61",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/101-2024-PROAD-IFRN.json",
+      "sha256": "47427197e32ffc30815bc7a92aaca3e91c58d03ccf3cc17fdb865b47f0e06e98",
+      "stable_key": "ALUCOM|101/2024 -PROAD/IFRN|id=15",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/102150-21.json",
+      "sha256": "b2cf709e5612faa5f79a59b8f934e9398c96fa5a2dd53b58dea19a0f605082f3",
+      "stable_key": "ALUCOM|102150-21|id=153",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/106951-21.json",
+      "sha256": "b5a4e20a260ce7d2395243c626b761a88eef8479098d95d9a42e93e3a88fe2eb",
+      "stable_key": "ALUCOM|106951-21|id=134",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/106967-21.json",
+      "sha256": "1125973bb1d974f23be649e4bfbbc7db25e2532cd23f51abc99ee89476ae361b",
+      "stable_key": "ALUCOM|106967-21|id=136",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/11-2025.json",
+      "sha256": "c5a222321d34f3bcf4ccc3799d67c49eef66be75897b2502cb933d5759baad6f",
+      "stable_key": "ALUCOM|11/2025|id=41",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/11.079-2023.json",
+      "sha256": "488dcd5c3472dc4acda38a3c6fdc4ac2e14b5d10baa453dc769688fe70989430",
+      "stable_key": "ALUCOM|11.079-2023|id=51",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/11.25.03.03.001.json",
+      "sha256": "721f431b861c48b0c362a2f0a2e3758806f4ae55b90e77bed848eaeee4b35f15",
+      "stable_key": "ALUCOM|11.25.03.03.001|id=87",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/12.01.001-2026-SSC.json",
+      "sha256": "fea049cb4c45d4cb4b5c67b91e1620d95e434bdcd5fda38657c6c1cb2c905c33",
+      "stable_key": "ALUCOM|12.01.001/2026-SSC|id=177",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/12.12.015-2025-SDHCD.json",
+      "sha256": "824d8a566dfb032435e458726b22c72cf9cd1ba0bda7772c39d8c10fa3481048",
+      "stable_key": "ALUCOM|12.12.015/2025-SDHCD|id=167",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/1201001-2026-SEDERHI.json",
+      "sha256": "f6d13ecc2445a0fdf98bf4bc7462c40f688d47a311574ccd2840f06f999b7a33",
+      "stable_key": "ALUCOM|1201001/2026-SEDERHI|id=215",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/13.25.03.03.001.json",
+      "sha256": "89378497ef3c1592a079a7e31fa183afdb9733e7c8e3fb03d6aa5c1ea3554bd5",
+      "stable_key": "ALUCOM|13.25.03.03.001|id=67",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/1301001-2026-–-SEGOV.json",
+      "sha256": "79c6135c6ec590fef8760b5858c62c0ef777b760f3dff1e4fe36a42842c612d9",
+      "stable_key": "ALUCOM|1301001/2026 – SEGOV|id=208",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/17-2024.json",
+      "sha256": "c0d053ad64d94c67fd2b06e566e7c9807b08b4be64843c4759882eb74d259b6a",
+      "stable_key": "ALUCOM|17/2024|id=48",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/180078-25.json",
+      "sha256": "b14ee3e5abe422aba96b9c9898908dacd66e986f670d056a520358bcfe03507c",
+      "stable_key": "ALUCOM|180078-25|id=154",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-01.json",
+      "sha256": "cad496f8096e8353afea9734ff7785012a1ddb4704e3ff559d98ae55825a3488",
+      "stable_key": "ALUCOM|2021.08.02.01-01|id=92",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-02.json",
+      "sha256": "ed7f9bd7ffd9aceee156268bcd04aaa2a39972e49805bb39fdf73ac27f97ab24",
+      "stable_key": "ALUCOM|2021.08.02.01-02|id=116",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-03.json",
+      "sha256": "50a7bf8799ba1e6c2acc44d2d2f463064b24030a0196aa7e766f2113228858b3",
+      "stable_key": "ALUCOM|2021.08.02.01-03|id=147",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-04.json",
+      "sha256": "a3a2e61d48f59952c7779aa7b3a131acf5ce0c2bbb6fd36cf890122036c662bd",
+      "stable_key": "ALUCOM|2021.08.02.01-04|id=146",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-05.json",
+      "sha256": "c7867a97049a344517b4ddb3adca56d331929195c04da51a0fb84d872357f1e5",
+      "stable_key": "ALUCOM|2021.08.02.01-05|id=145",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-06.json",
+      "sha256": "5360827544341b211b3aec1471a6090446f3d36302ca8912676b987bc98662e7",
+      "stable_key": "ALUCOM|2021.08.02.01-06|id=144",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-07.json",
+      "sha256": "c098b3b136a3ecef281628f9d403d9f65d018617ec7b0e4cd4967682ad5bfe54",
+      "stable_key": "ALUCOM|2021.08.02.01-07|id=142",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-08.json",
+      "sha256": "9a7a43c7369bb34e556755cf5caec4ac894560276433f968f3cf36a9fc37a8bc",
+      "stable_key": "ALUCOM|2021.08.02.01-08|id=114",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-10.json",
+      "sha256": "a308652bb039a5425cf97353c17ecddd35fdd4cf0330326224a1e9208223331d",
+      "stable_key": "ALUCOM|2021.08.02.01-10|id=140",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-11.json",
+      "sha256": "e924ada15dde0b28da0a56ae4397a78652e4b9dc6d49c0b15cbb0e1f8e48cca7",
+      "stable_key": "ALUCOM|2021.08.02.01-11|id=91",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-12.json",
+      "sha256": "71228df5cfcb55d70ec2c04f329a1aa35c3db93099b73f9469edd79b81977076",
+      "stable_key": "ALUCOM|2021.08.02.01-12|id=113",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-16.json",
+      "sha256": "b3e00229d13edbf99b65f48b912801681bf4ef62cdace60ebe6de09efe225919",
+      "stable_key": "ALUCOM|2021.08.02.01-16|id=148",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-17.json",
+      "sha256": "4f757fbdd230c3dfa6adafa03a8f91ff895eaf0b2a9305fa5d1341335d5397d4",
+      "stable_key": "ALUCOM|2021.08.02.01-17|id=141",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01-19.json",
+      "sha256": "3d8c67f0db9598d31577da36b04ffaffc7f71a4fd4c03931ca6ca081320076ad",
+      "stable_key": "ALUCOM|2021.08.02.01-19|id=94",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.08.02.01.json",
+      "sha256": "429afe1292a791097754f0dee0dcd5f1a33942b34a2a1760fd6576bcb5468180",
+      "stable_key": "ALUCOM|2021.08.02.01|id=143",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2021.11.12.01.json",
+      "sha256": "fbe564c5241f0ba07223e1825519e890270a4c84833b4ab9cf5603f10f9ff434",
+      "stable_key": "ALUCOM|2021.11.12.01|id=157",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.03.01.01.json",
+      "sha256": "3ae5d4064f999410edf9daf516624a6f6291aa694fe3f3562ad1afc51e22fadc",
+      "stable_key": "ALUCOM|2022.03.01.01|id=155",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-01.json",
+      "sha256": "facc40f33a82ebe9a90afdb9674fcf6853c038c8dee28be61aa05a29b4e81c44",
+      "stable_key": "ALUCOM|2022.04.05.002-01|id=107",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-02.json",
+      "sha256": "e73c7ee932a2a8639e93304b385fc8559692bfeac0e52043de3986e2cbe51281",
+      "stable_key": "ALUCOM|2022.04.05.002-02|id=111",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-03.json",
+      "sha256": "6675fb42bf0775abaeaf3c7855adb90d32f6ffeb62c05a017c232ca12dba65f0",
+      "stable_key": "ALUCOM|2022.04.05.002-03|id=101",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-04.json",
+      "sha256": "5e853ee025918b9c6e235119154c99433fe6960d70bca4f182d75597d9118b1b",
+      "stable_key": "ALUCOM|2022.04.05.002-04|id=112",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-05.json",
+      "sha256": "b2c769b21702e0df2cfbcabf16d7408940b23c90fcbbcd4598378f16c67ad73f",
+      "stable_key": "ALUCOM|2022.04.05.002-05|id=103",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-06.json",
+      "sha256": "587195544e9fb6af3746d63ef6eb25aedb0d9d653d669fc5a960deab39f2a635",
+      "stable_key": "ALUCOM|2022.04.05.002-06|id=104",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-07.json",
+      "sha256": "fccae1e0751d294763610a0b4eca075d22137cf78df5883efdc6b25da904c7e2",
+      "stable_key": "ALUCOM|2022.04.05.002-07|id=102",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-08.json",
+      "sha256": "9cc490494fe5a1140a37d726ed4e79d99a9b21c81823fc462239edffdee1c7bc",
+      "stable_key": "ALUCOM|2022.04.05.002-08|id=106",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-09.json",
+      "sha256": "f82af1e4b12d988a83bd61d89bed39c632531292eb91cfc5afcf026b3bf17216",
+      "stable_key": "ALUCOM|2022.04.05.002-09|id=110",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-10.json",
+      "sha256": "2c021e2f3e7155643120048e486d846cfef04ddb16a4b2601ef0c7ec5dc879a1",
+      "stable_key": "ALUCOM|2022.04.05.002-10|id=105",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-11.json",
+      "sha256": "b28c2abd48451e8552fb70b4ca9f31f0aac6ad39db5f1432fc04ca81d750701c",
+      "stable_key": "ALUCOM|2022.04.05.002-11|id=109",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-12.json",
+      "sha256": "ec443cec2fb1374b6895557776069859bbe3ea49eab6fde04b6b54dc1779df30",
+      "stable_key": "ALUCOM|2022.04.05.002-12|id=108",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.05.002-13.json",
+      "sha256": "dc8f3a4469cffd2799dd45ed348d18e4e2332b276b20a089dea8ceaec8b76193",
+      "stable_key": "ALUCOM|2022.04.05.002-13|id=115",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.13-008.json",
+      "sha256": "2df87724654e45942590519dbb4172ea6847c8223f8a906064ef6e4f88553b0c",
+      "stable_key": "ALUCOM|2022.04.13-008|id=54",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.13-012.json",
+      "sha256": "8110f7037d313e73fd176a4829d9afc214d3a1a6eb77d1bba19ffcc22b92b515",
+      "stable_key": "ALUCOM|2022.04.13-012|id=64",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.13-017.json",
+      "sha256": "4d3f598da6b8836e6dc7eb82b61cda11e26e6d94831a285b96ab281749f012c8",
+      "stable_key": "ALUCOM|2022.04.13-017|id=56",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022.04.13.018.json",
+      "sha256": "bc3cd559a11f0dbadfc0bef2cbe6fcd51014ab639e7f1d35fee321046f4ed6b6",
+      "stable_key": "ALUCOM|2022.04.13.018|id=57",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413001.json",
+      "sha256": "2c43f9052d3884459f24481d0778ddf1468dc6ccd1c64639f58a8eb591b4522a",
+      "stable_key": "ALUCOM|20220413001|id=117",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413004.json",
+      "sha256": "4965195bce4eb9af89f28c8cd54494e2450578d5e60f55841eaf124ed76e6584",
+      "stable_key": "ALUCOM|20220413004|id=97",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413005.json",
+      "sha256": "cabf2dd7613cce51b55722b4822b78668279f341ec8fa3bf0216dbbb1fe66443",
+      "stable_key": "ALUCOM|20220413005|id=96",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413006.json",
+      "sha256": "fe51d10257b525ccf2d10fc6cc28ef837fcb698764770cb35e95141dd95bcb59",
+      "stable_key": "ALUCOM|20220413006|id=118",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413007.json",
+      "sha256": "4df743a901753b44f8885f3c7b6ea93aa10ca686fa5abe339b2e9d5d3f7f196e",
+      "stable_key": "ALUCOM|20220413007|id=99",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413009.json",
+      "sha256": "9971fd6a1ad71d68081297fc7d125045b082dbf9c43cbfeb93177adbfe15f295",
+      "stable_key": "ALUCOM|20220413009|id=98",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413010.json",
+      "sha256": "eac33ed52db248669a795b790f1c06ac6947a29aa30132be62385eee57fc7940",
+      "stable_key": "ALUCOM|20220413010|id=83",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413011.json",
+      "sha256": "440ccc1ab4279c5cc22215dec480820787449ed53ad620204ba920ed2e05de52",
+      "stable_key": "ALUCOM|20220413011|id=131",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413013.json",
+      "sha256": "eaf4a2ef5742a0acbb20decfb5f579ffb9d6d7bf14d424694e77e0efe364bb2e",
+      "stable_key": "ALUCOM|20220413013|id=120",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413014.json",
+      "sha256": "a8b2d283f699c7c3ee421edbb7eafbd3d7136905e5ce042ad40871fa2919873b",
+      "stable_key": "ALUCOM|20220413014|id=119",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413015.json",
+      "sha256": "29978070e6f39e7ce868be7ca2d199f276a65c371bc0b2005ae9c45597f3bbd4",
+      "stable_key": "ALUCOM|20220413015|id=132",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413016.json",
+      "sha256": "74e38df22f02a69d7ba00b2be67d60a96b5fc915926d6c973fdaaf8a4044f7e7",
+      "stable_key": "ALUCOM|20220413016|id=130",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413019.json",
+      "sha256": "1e13f06fa37a3cf5d891d6735393478716d10f4ab45b00f640b8810be3a3d641",
+      "stable_key": "ALUCOM|20220413019|id=93",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413020.json",
+      "sha256": "ff8067c77870bc0270e566c938e9d656a565b28863c778808af71345731cefab",
+      "stable_key": "ALUCOM|20220413020|id=133",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20220413021.json",
+      "sha256": "3dad4778f16253a8b6e24330426e2d883a04132f0fe1e9dda71b96c6f0178225",
+      "stable_key": "ALUCOM|20220413021|id=60",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2022041303.json",
+      "sha256": "4fbf3b4d1ed63f585329fb6675ff10c9bfc907e8270cdc088d09962502fbaaeb",
+      "stable_key": "ALUCOM|2022041303|id=90",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929001.json",
+      "sha256": "56624020150a2163dfc56bb5e62606ec93ce2931d6df82e4ee1f7f564c60d7c6",
+      "stable_key": "ALUCOM|20230929001|id=128",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929002.json",
+      "sha256": "3992077d145b523a99c307962655affb16e3008a9394a42fe9cf5d919bcd315d",
+      "stable_key": "ALUCOM|20230929002|id=126",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929003.json",
+      "sha256": "87e84df033da322105e79ed58b87551934ac01e2482449b772754729966e83c9",
+      "stable_key": "ALUCOM|20230929003|id=121",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929004.json",
+      "sha256": "fa03025b8dc800058fdb816b2526e7bb5238cc6a9b99572edaf6e05a9d2fa14f",
+      "stable_key": "ALUCOM|20230929004|id=127",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929008.json",
+      "sha256": "9e3c603fc698b91331a45302b62a7fb08f6d79545e8d85de386f2a2c39fa01de",
+      "stable_key": "ALUCOM|20230929008|id=129",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929009.json",
+      "sha256": "c1cbf77caa9b7ba1e151a688b7fad16c601bd97b5d99c30beb7baf9c9c922cfe",
+      "stable_key": "ALUCOM|20230929009|id=125",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929010.json",
+      "sha256": "9ef8cc842f01c1eadf0aebe9e3a30974995844af95ea6ee4b49e781e79a0c95d",
+      "stable_key": "ALUCOM|20230929010|id=123",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929011.json",
+      "sha256": "c59cbca2ddf17adc0762e9543059bd260556fe31c26993644296874620a1c272",
+      "stable_key": "ALUCOM|20230929011|id=122",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929012__id55.json",
+      "sha256": "6fc22a08849f4fa390ebd39b6a95fcfe58c3e3b498351e4a8e3bb12a2d355248",
+      "stable_key": "ALUCOM|20230929012|id=55",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929012__id95.json",
+      "sha256": "39b5e0bb6690a50ffc2f544ffd47d6c31468ee1260decc9a516f442d1aba0f41",
+      "stable_key": "ALUCOM|20230929012|id=95",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20230929013.json",
+      "sha256": "9d8fb34515a0521574c8ec1622ad2360c226b5876f943f83289e75a5dd057b99",
+      "stable_key": "ALUCOM|20230929013|id=124",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2024.01.05.01.json",
+      "sha256": "e9b2f96fc26371f1c0c31767f6475ec02a7ecc8eaec9dcec07e8b83a67259c41",
+      "stable_key": "ALUCOM|2024.01.05.01|id=71",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2024.01.05.02.json",
+      "sha256": "63b4a6947a161b8e82b037587c6174de075d2d355f859b64dc5c3a9b2b698964",
+      "stable_key": "ALUCOM|2024.01.05.02|id=70",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2024.01.05.03.json",
+      "sha256": "45bce47124ba97758e209df24ee69b9bbcd240e063ca4e4ebc7340922e66d55a",
+      "stable_key": "ALUCOM|2024.01.05.03|id=72",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2024.01.05.04.json",
+      "sha256": "9c8356f13ea54a909f7f7963fdaa83410b29570f085aec7d7af1a2a5a0d99db1",
+      "stable_key": "ALUCOM|2024.01.05.04|id=73",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2024.01.05.05.json",
+      "sha256": "7ee95aa90f0ef0c2dd5a3acf9dc9232bff2f3bce8013be722b53501cac2d2f5e",
+      "stable_key": "ALUCOM|2024.01.05.05|id=66",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.02__id217.json",
+      "sha256": "f476178175fd2db5e269456c7f886b86bf9126ba95111665060dcccb15d3a139",
+      "stable_key": "ALUCOM|2025/2208.02|id=217",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.02__id245.json",
+      "sha256": "73bf1177361072b92784e5420843e3e7716f5e47b85d536718da17eecf4ade0c",
+      "stable_key": "ALUCOM|2025/2208.02|id=245",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.03.json",
+      "sha256": "b9b72558eb1e08e65ed554cb88add92a55d4652260af89d1f846e3575f4c2f68",
+      "stable_key": "ALUCOM|2025/2208.03|id=218",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.04.json",
+      "sha256": "acf8a2f9e0703098aabbe55c601ffeabebf1a4e17b2cb6169dff6e4a2b428db1",
+      "stable_key": "ALUCOM|2025/2208.04|id=220",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.05.json",
+      "sha256": "ea29ee81f0c70647a8fa0f76c0a85709a77a2faec80abcd5c7da10f4a7bcd3a2",
+      "stable_key": "ALUCOM|2025/2208.05|id=222",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.06.json",
+      "sha256": "a85314de87186476a5a209a4ac2aedb77322153b7255164da5d909f4862c8958",
+      "stable_key": "ALUCOM|2025/2208.06|id=223",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.07.json",
+      "sha256": "64d68a154208baf9d143248cfed677e4657fe2ab7deffcdbc99940689eda13f6",
+      "stable_key": "ALUCOM|2025/2208.07|id=225",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.08.json",
+      "sha256": "b055130b375812d21011028fbf3ce3a0eaafd4762ac8789c78658c442df02294",
+      "stable_key": "ALUCOM|2025/2208.08|id=227",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.09.json",
+      "sha256": "c63024535cf82dffc1a43914c64e1763c7d03dfd46d19ed80e02ba1607d1298e",
+      "stable_key": "ALUCOM|2025/2208.09|id=230",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.10.json",
+      "sha256": "e8b18b52e148b61e14aee832a87feef56af8e551185210f1f50dfe0a189e0bfe",
+      "stable_key": "ALUCOM|2025/2208.10|id=229",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.11.json",
+      "sha256": "559a425db4dedb0e9a1851733fc6de374755923ff97cc6d6edcb7e84005babc1",
+      "stable_key": "ALUCOM|2025/2208.11|id=232",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.12.json",
+      "sha256": "a5e115c8fb14dc28cea38e0bcd8b7c86530578de3be274e329ac540edff5a9f0",
+      "stable_key": "ALUCOM|2025/2208.12|id=240",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.13.json",
+      "sha256": "1aeb617c31080ea764209fb0e03a54035f27fba7aab227535fa0e1316340a2c9",
+      "stable_key": "ALUCOM|2025/2208.13|id=233",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.14.json",
+      "sha256": "11cdade3464aa5cd7cb999572308a02c1570eba27de5bb9dc6783f25664ecb3d",
+      "stable_key": "ALUCOM|2025/2208.14|id=242",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.15.json",
+      "sha256": "4df1a64e7a3bac8b54d5e352d80052edeefb4e5a529a5f51791163e548d3e25b",
+      "stable_key": "ALUCOM|2025/2208.15|id=247",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.16.json",
+      "sha256": "f9fa0c2b2ee4d2943b48125df7ea8e1854d5b02e65f492f4c73b5b1715bee203",
+      "stable_key": "ALUCOM|2025/2208.16|id=248",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.17.json",
+      "sha256": "b5c1226a35983c4a5b4288ecf4593f473f35c7bbb9455643828e31b53f87dada",
+      "stable_key": "ALUCOM|2025/2208.17|id=235",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025-2208.18.json",
+      "sha256": "81989a88be2a19f87338f50766a552638c3f65cef80d47727ce99d8fe105346b",
+      "stable_key": "ALUCOM|2025/2208.18|id=226",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/2025.10.08.001.json",
+      "sha256": "6c8cabbdb5843661c4fac38be93e84bfbc7eb9e9d7c8551e2b7222ee99ddfed9",
+      "stable_key": "ALUCOM|2025.10.08.001|id=249",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813001.json",
+      "sha256": "c26967a0788d8443077af203318a40619e33d173f184b66e095dd2e0388f7eac",
+      "stable_key": "ALUCOM|20250813001|id=78",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813002.json",
+      "sha256": "a6482d8a5316c815588f133844918c3115a0f7d313bba9594b60254e4370d781",
+      "stable_key": "ALUCOM|20250813002|id=82",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813003.json",
+      "sha256": "d6593123fc20f3c463af1e9d772f5a52a329e26a17defba3cd65c905a1a5e70b",
+      "stable_key": "ALUCOM|20250813003|id=85",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813004.json",
+      "sha256": "d10d93c838a187d74cc50e7a51bffe29ee012b878a8ae95200684fee1859271e",
+      "stable_key": "ALUCOM|20250813004|id=76",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813005.json",
+      "sha256": "9a42ca123e3814dc727754767085772c9ad5bb4f50bc10e6225eb32d7ca6b0a1",
+      "stable_key": "ALUCOM|20250813005|id=84",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813006.json",
+      "sha256": "e7551aa61df3bf8eb6ab6484f058bc29d54484dab0978308cbd69e7fa61334a0",
+      "stable_key": "ALUCOM|20250813006|id=80",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813007.json",
+      "sha256": "baa2355a04975b20bd1158b11031728ed2d965c4e7816b5ee54eb2249a91278c",
+      "stable_key": "ALUCOM|20250813007|id=79",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813008.json",
+      "sha256": "cc56b47fbcd18fa5e6b311021544496ddfb0b73ad57985f23acbde0db11c9dcc",
+      "stable_key": "ALUCOM|20250813008|id=77",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/20250813009.json",
+      "sha256": "bbae0ec6a0b2be91fdd69e5c0e89e688a3efe8f1e7174be3a0cb01e1316b21d9",
+      "stable_key": "ALUCOM|20250813009|id=75",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/22-2023.json",
+      "sha256": "86c7cc77f46c62b92f80a419250d09c36b2fc7663ecb2c24fe504c3499e942c4",
+      "stable_key": "ALUCOM|22/2023|id=32",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/27-2023.json",
+      "sha256": "104fd790c3367fb84a3d0f735409480d442dac80764d274b2c9bf4866a0c125b",
+      "stable_key": "ALUCOM|27/2023|id=34",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/287-2024-PROAD-IFRN.json",
+      "sha256": "3d9aceeef646d50ef10f599b3f43353a2fc63d20249e77cba72e69325a3ced5b",
+      "stable_key": "ALUCOM|287/2024 - PROAD/IFRN|id=16",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/29-2023.json",
+      "sha256": "2e105557940b9385f7d20f1784fe02dcbb08bec275e99fd24412aa38466b9349",
+      "stable_key": "ALUCOM|29-2023|id=50",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/39-2025.json",
+      "sha256": "f7e0d694fbc1828751ebcb28a4120c1b124b779be8251fdf4663523c83cfa651",
+      "stable_key": "ALUCOM|39/2025|id=59",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/4-2025.json",
+      "sha256": "a05a014feeeb511d49465d3f7b4adcaef0a61e5c5f4046b509b042735f8eb30f",
+      "stable_key": "ALUCOM|4-2025|id=25",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/45-2024.json",
+      "sha256": "31fc51b66ba4b47488c389c703d73982ad81692624bdbd246a4adba6d61a4003",
+      "stable_key": "ALUCOM|45/2024|id=21",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/49-2023.json",
+      "sha256": "ffcf770ab02d838a021eb3d251d886971ca6e83743c241e235cbff2791684aa8",
+      "stable_key": "ALUCOM|49/2023|id=43",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/52-2024.json",
+      "sha256": "0a9d31ad323d4ad9a6514e5008d4d1177936986bbe225cc1f49fdb6be595eb49",
+      "stable_key": "ALUCOM|52-2024|id=27",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/63187.000016-2025-68.json",
+      "sha256": "59bc0e19d0b0719e3d0662b3c2f4b3c9b23bdecaf905b66c888828f9658b1d72",
+      "stable_key": "ALUCOM|63187.000016/2025-68|id=18",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/63467.006334-2024-13.json",
+      "sha256": "53da0f333b02b57537af3484014b7870ed562922e5feb18da93a8942fabdfc5b",
+      "stable_key": "ALUCOM|63467.006334/2024-13|id=19",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/82320-202461-00.json",
+      "sha256": "74457bbcb3ab3453584568172dd6a6a5130f67e421b7ae531de0411d22aeb0ab",
+      "stable_key": "ALUCOM|82320/202461/00|id=14",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/83601-2024-007-00.json",
+      "sha256": "adfbef3b0bdd25148d06f4b129814d88ab16969e880b52610debbf4275042dfd",
+      "stable_key": "ALUCOM|83601/2024-007/00|id=6",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/892-2024.json",
+      "sha256": "a3e6568837cd4038e64368d802ccdc98b11557c313fbec06fc3b93652683c258",
+      "stable_key": "ALUCOM|892/2024|id=36",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/95592-20.json",
+      "sha256": "1feacc9329015b5d9f1138532e61ee11df35336036ef75ed07f3e8d3bdb43b7e",
+      "stable_key": "ALUCOM|95592-20|id=138",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/96210-20.json",
+      "sha256": "e68a5bf272a30f923809b4ff8078e05d848528c1588f91897b05ac15aff7582d",
+      "stable_key": "ALUCOM|96210-20|id=139",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/97-2025.json",
+      "sha256": "cb15ffab6120917019bcc7ee37d68083492fcd716c0c653424b5a01571f5f025",
+      "stable_key": "ALUCOM|97-2025|id=3",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/99627-21.json",
+      "sha256": "e5a2ddc5074d4b5f0855826f331fa46e6469a500db18eac2ed06010cd5b82b7e",
+      "stable_key": "ALUCOM|99627-21|id=137",
+      "status": "OK"
+    },
+    {
+      "path": "ALUCOM/nº-2024.000006.37101.01.json",
+      "sha256": "c7d11433ffce041a100afd3245349ba01a0f52ca648b978f9445ff6ae9a7a6c6",
+      "stable_key": "ALUCOM|nº 2024.000006.37101.01|id=46",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/01-2025__id221.json",
+      "sha256": "8f50bfc6cce232d350bb0990c482d6ac6296ce8b3c41240d575df45389a1b81a",
+      "stable_key": "AS_SISTEMAS|01/2025|id=221",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/01-2025__id256.json",
+      "sha256": "4dd5bb2095ba1fed4945720034218023943c02d25123ff46a493de379e57a1ce",
+      "stable_key": "AS_SISTEMAS|01/2025|id=256",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/04-2022-01.json",
+      "sha256": "aa6615b21960a0cee57ece2fec93d7e7bb2a3b24d369fb51f14e57e295f58729",
+      "stable_key": "AS_SISTEMAS|04/2022-01|id=234",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/04-2022-02.json",
+      "sha256": "84f18b969a540bf8fc8c64c7b985f4df09b00406d3ee82df7b757fe262704d53",
+      "stable_key": "AS_SISTEMAS|04/2022-02|id=238",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/04-2022-03.json",
+      "sha256": "bdba905a1de5b893ec3183af2a3156d8e852eeebb6488e4dcf7b505074f58964",
+      "stable_key": "AS_SISTEMAS|04/2022-03|id=231",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/04-2022-04.json",
+      "sha256": "fd5fb27ac68117a965a72f76727aa91129113050b69a55c64450959c5e8e4320",
+      "stable_key": "AS_SISTEMAS|04/2022-04|id=236",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/04-2022-05.json",
+      "sha256": "fc3faa56e647a10143f88f3c31aad151e943158151d1df2f738d93dfcd57283c",
+      "stable_key": "AS_SISTEMAS|04/2022-05|id=237",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202404120003.json",
+      "sha256": "fbfff34c70923a3194edce3d42249f7068954de09e2676070d01626615379932",
+      "stable_key": "AS_SISTEMAS|202404120003|id=239",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202405240002.json",
+      "sha256": "557835254ac21bdd8439286871da87daaf9c809ddfe513c34bdd2790cce6d29d",
+      "stable_key": "AS_SISTEMAS|202405240002|id=219",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202507220001.json",
+      "sha256": "c2fb2052fb5aa9739d4ab50b867e1c3a425f2afc259c460c61fe15d8ee0c7143",
+      "stable_key": "AS_SISTEMAS|202507220001|id=259",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202507220002.json",
+      "sha256": "238eab4c647c38df401f3ba490a12235ec6455a8a15bf3090165c8b6a70f9a6c",
+      "stable_key": "AS_SISTEMAS|202507220002|id=260",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202507220003.json",
+      "sha256": "5ca44419c58f10600d7cdc185c3082b979693cf581a98eae8337018445f3e678",
+      "stable_key": "AS_SISTEMAS|202507220003|id=261",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202507220004.json",
+      "sha256": "a9b56c37c4c0ce358587995f77376ded473523d27cfb594dd710ba739ddb556f",
+      "stable_key": "AS_SISTEMAS|202507220004|id=258",
+      "status": "OK"
+    },
+    {
+      "path": "AS_SISTEMAS/202507220005.json",
+      "sha256": "f84225ad55f14944b9eedf3047f24d7d7da9ea9be7557ebbae8bdc81c1d8743d",
+      "stable_key": "AS_SISTEMAS|202507220005|id=257",
+      "status": "OK"
+    },
+    {
+      "path": "IP/001-2023.json",
+      "sha256": "a65418df7aacb4e4a88841e91b9dddd3346e3c2c51c4f65204df0b455b01e3d0",
+      "stable_key": "IP|001-2023|id=158",
+      "status": "OK"
+    },
+    {
+      "path": "IP/002-2023.json",
+      "sha256": "94bea58048c21c670b7667d6ed45e05109b009ffe7f50ad9d5d4baa813fd7bab",
+      "stable_key": "IP|002-2023|id=159",
+      "status": "OK"
+    },
+    {
+      "path": "IP/002-2025.json",
+      "sha256": "7af08f6e2632a3494ad2e601586e5153165982cc86d9cfa17a55bd1625105010",
+      "stable_key": "IP|002-2025|id=189",
+      "status": "OK"
+    },
+    {
+      "path": "IP/002-2026-IP__id202.json",
+      "sha256": "f08100c9943efcfaa08cf054d195c0c26c5cc049a9d3696396e6cd203057b849",
+      "stable_key": "IP|002/2026 - IP|id=202",
+      "status": "OK"
+    },
+    {
+      "path": "IP/002-2026-IP__id213.json",
+      "sha256": "63c1c9a14b51909bae56b0d9de67d3b5ee6a8543d8982b1ad12225f90b3c536b",
+      "stable_key": "IP|002-2026 - IP|id=213",
+      "status": "OK"
+    },
+    {
+      "path": "IP/003-2024.json",
+      "sha256": "64fa8224745ef4bf9abc5c853a655fedff138f8c34e3d30bbeba358cf627ea54",
+      "stable_key": "IP|003-2024|id=160",
+      "status": "OK"
+    },
+    {
+      "path": "IP/003-2025.json",
+      "sha256": "10b51e71a686f0b25af1868c3b5e1f3a822b4724ced924445485726183d4e58e",
+      "stable_key": "IP|003/2025|id=196",
+      "status": "OK"
+    },
+    {
+      "path": "IP/004-2025.json",
+      "sha256": "c3fa143a8d5eced3672239eead4a056708cab0f8b51be0cd6bbf111069b47009",
+      "stable_key": "IP|004/2025|id=183",
+      "status": "OK"
+    },
+    {
+      "path": "IP/005-CLA-2024.json",
+      "sha256": "3e1b918f27cd0ad16c23946be33fdf0c6df0824bdb9718dbd0bef8907e15cb65",
+      "stable_key": "IP|005/CLA/2024|id=164",
+      "status": "OK"
+    },
+    {
+      "path": "IP/006-2023.json",
+      "sha256": "8d299cbe3dd46dac21d855f31c32a58876746cd58d0a2680d9c9b5782b84ed53",
+      "stable_key": "IP|006-2023|id=161",
+      "status": "OK"
+    },
+    {
+      "path": "IP/006-2025.json",
+      "sha256": "8c3a441cb7aef7e20fb53ce4885826a97ad83b14249fef1f37d0db745796e5d5",
+      "stable_key": "IP|006/2025|id=246",
+      "status": "OK"
+    },
+    {
+      "path": "IP/007-2024.json",
+      "sha256": "a855d31328284241481111de207936d84a776b3322b2779e32d3281e21b9c996",
+      "stable_key": "IP|007/2024|id=174",
+      "status": "OK"
+    },
+    {
+      "path": "IP/009-2025.json",
+      "sha256": "2c6ab940a62628194c7a03a301affe7d662eb06b011b1b3dff378291976d2f59",
+      "stable_key": "IP|009/2025|id=184",
+      "status": "OK"
+    },
+    {
+      "path": "IP/01-2026-–-SECEL.json",
+      "sha256": "f6b2b6758c99702fd599153566871092a18b3ff7b1ce0a1c9cfcb261585409a0",
+      "stable_key": "IP|01/2026 – SECEL|id=266",
+      "status": "OK"
+    },
+    {
+      "path": "IP/01.09.001-2025__id263.json",
+      "sha256": "b9eaf15b51126bf247b2d207a3669f639b8d29f0125e511ab0ccd353e8384908",
+      "stable_key": "IP|01.09.001/2025|id=263",
+      "status": "OK"
+    },
+    {
+      "path": "IP/01.09.001-2025__id264.json",
+      "sha256": "7f0d5664e84d8d2908f2e7c0f659c15d761371511f2917afd2ec575ee8042181",
+      "stable_key": "IP|01.09.001/2025|id=264",
+      "status": "OK"
+    },
+    {
+      "path": "IP/010-2025.json",
+      "sha256": "4433dfe42b6e8b36678b5d3b6f3f2c6b4c05f7acd74ce4aa9016c7b3d267aaa9",
+      "stable_key": "IP|010-2025|id=190",
+      "status": "OK"
+    },
+    {
+      "path": "IP/0103-2025.json",
+      "sha256": "21d0bb513cb8a3a51c01562c9372204665169d7e79daa4161f97cf6c8253ae29",
+      "stable_key": "IP|0103-2025|id=186",
+      "status": "OK"
+    },
+    {
+      "path": "IP/012-2025.json",
+      "sha256": "e1245d750508acae3d97cde2c11c65a78e27648f9ff953917598d8e08a5f12ca",
+      "stable_key": "IP|012/2025|id=187",
+      "status": "OK"
+    },
+    {
+      "path": "IP/013-2025.json",
+      "sha256": "ff76679c72b410ba580e86a0c699fb934787c7e327a30eaf3fa18f834bd742b6",
+      "stable_key": "IP|013/2025|id=182",
+      "status": "OK"
+    },
+    {
+      "path": "IP/015-2025.json",
+      "sha256": "f9d0420d241c56b8074867538c94e86fb62798a2f4e788c517e0bb8956654a94",
+      "stable_key": "IP|015/2025|id=185",
+      "status": "OK"
+    },
+    {
+      "path": "IP/018-2025.json",
+      "sha256": "6f90a39a75763306ea38cd50962d2b361ebfea486297f40e5446b93cef237620",
+      "stable_key": "IP|018/2025.|id=205",
+      "status": "OK"
+    },
+    {
+      "path": "IP/02-2025.json",
+      "sha256": "0ac7cbbd997ed5c1c6623bf82137b93758674eba2c3ac4ea45c868c32282ed97",
+      "stable_key": "IP|02 / 2025|id=169",
+      "status": "OK"
+    },
+    {
+      "path": "IP/020-2025-IP.json",
+      "sha256": "0463250fe5a2db12c7b0cc6d2e6f7df6abe64b6501b35842c52f1b09e6172988",
+      "stable_key": "IP|020-2025-IP|id=206",
+      "status": "OK"
+    },
+    {
+      "path": "IP/022-2025.json",
+      "sha256": "a233bf4870e9d5caa306da2f43ba60a01aa734a8846c242db57801e2f501d4ca",
+      "stable_key": "IP|022/2025.|id=210",
+      "status": "OK"
+    },
+    {
+      "path": "IP/023-2025.json",
+      "sha256": "4b21aa8cb8f28d52c5d6d957643f5ac882c9438c88d543cefc581b0d47fa7e54",
+      "stable_key": "IP|023/2025|id=211",
+      "status": "OK"
+    },
+    {
+      "path": "IP/024-2025.json",
+      "sha256": "d59be7d903b0a8ac3dd9e2386e78855f7c2ed88230f67e37e0ec011ab5c1c85b",
+      "stable_key": "IP|024/2025.|id=203",
+      "status": "OK"
+    },
+    {
+      "path": "IP/025-2025.json",
+      "sha256": "7f7b812898c63b405bc26aa3cbdf2111c4926f72230fa38461c609af117d6e83",
+      "stable_key": "IP|025/2025.|id=201",
+      "status": "OK"
+    },
+    {
+      "path": "IP/026-2025.json",
+      "sha256": "41f2a6e04ca3ec8cd9a1ef9d8943efa8e3d8621dcbb7e8b4fcd9b0fed6b827d1",
+      "stable_key": "IP|026/2025|id=212",
+      "status": "OK"
+    },
+    {
+      "path": "IP/027-2025.json",
+      "sha256": "05bde9009b5228a62d10458363f8173521d881112baa5358ae2aca34d4d2fc73",
+      "stable_key": "IP|027-2025|id=204",
+      "status": "OK"
+    },
+    {
+      "path": "IP/0302-2025.json",
+      "sha256": "5d6426ff8c7929c9292627eca5aba885931799f78a98bb863c80a9236f7f9a15",
+      "stable_key": "IP|0302-2025|id=253",
+      "status": "OK"
+    },
+    {
+      "path": "IP/041-2024.json",
+      "sha256": "7e418b8a038981af645d69c5d506081a6529efd929425a24b5d541ec9ecb5a16",
+      "stable_key": "IP|041-2024|id=166",
+      "status": "OK"
+    },
+    {
+      "path": "IP/041-2025.json",
+      "sha256": "e922987fdf8e5d11a2a5adf87dc877b06d57fd27d00f66cc6a1c3d74c92ad2f6",
+      "stable_key": "IP|041/2025|id=172",
+      "status": "OK"
+    },
+    {
+      "path": "IP/048-2024-SEMUSC.json",
+      "sha256": "c0da35bf0c25ab9b56d5eb6278941982469a0f73b8c1c248a33f8a4c1f85f16b",
+      "stable_key": "IP|048/2024/SEMUSC|id=176",
+      "status": "OK"
+    },
+    {
+      "path": "IP/05-2025.json",
+      "sha256": "91c06d5eb92f606d8c7871186dfb4dd14a351d7260f59d5ec6c401f3646c5a3c",
+      "stable_key": "IP|05/2025|id=265",
+      "status": "OK"
+    },
+    {
+      "path": "IP/052-2024-GAVIC.json",
+      "sha256": "34cd68cc2db79f3cc93e1b4199d14752e6addf2707313bf6d22abfba1692dc53",
+      "stable_key": "IP|052/2024/GAVIC|id=173",
+      "status": "OK"
+    },
+    {
+      "path": "IP/06-2024.json",
+      "sha256": "93be516d4dec4b29a0e9c758c30e3b047ff5b143a7fd5b97f228f7a0cdd801ae",
+      "stable_key": "IP|06-2024|id=163",
+      "status": "OK"
+    },
+    {
+      "path": "IP/0603.01-2024-IP.json",
+      "sha256": "45d4cb44e7bbc68bdda3bf79875745b0736eb052f337d69e3efb401456e1bc5c",
+      "stable_key": "IP|0603.01-2024 IP|id=199",
+      "status": "OK"
+    },
+    {
+      "path": "IP/067-GAPDF-CINDACTA-I-2023.json",
+      "sha256": "22483471bf930049b0815f12bccbbff9ec9aa9d507f8405c6840ea91d689f364",
+      "stable_key": "IP|067/GAPDF-CINDACTA I/2023|id=162",
+      "status": "OK"
+    },
+    {
+      "path": "IP/11-2025.json",
+      "sha256": "62ebe9b2292db2574f0ee7eeb149b165948c4282f2ad6dd2567eae5903f5f620",
+      "stable_key": "IP|11/2025|id=197",
+      "status": "OK"
+    },
+    {
+      "path": "IP/14.09.001-2026-SEDERHI.json",
+      "sha256": "916da474fe09b520063ed8de8abe2bf0a82f0af328a51e09419ef9eed1220f13",
+      "stable_key": "IP|14.09.001/2026-SEDERHI|id=270",
+      "status": "OK"
+    },
+    {
+      "path": "IP/15-2023-MAPA.json",
+      "sha256": "c31835c5d6f9bfbbb9f39943ae4ca229600a6413321dd48cd15d6b226ef295f8",
+      "stable_key": "IP|15/2023/MAPA|id=171",
+      "status": "OK"
+    },
+    {
+      "path": "IP/1504-2025.1.json",
+      "sha256": "f130d11e119bad06cad5e8c8e9be1056ff9ce4c3112150f34a54d55be196467f",
+      "stable_key": "IP|1504/2025.1|id=175",
+      "status": "OK"
+    },
+    {
+      "path": "IP/18-2024.json",
+      "sha256": "8d23b0cb36f9ba8575d3bd07dbd191e279965beca2242f766f6da6aa57f42b7b",
+      "stable_key": "IP|18-2024|id=165",
+      "status": "OK"
+    },
+    {
+      "path": "IP/20.08.001-2026-GABP.json",
+      "sha256": "c6ce7236a26d1c162854df96becf4ee27846328e4ea5cbd3a54aa41f87423899",
+      "stable_key": "IP|20.08.001/2026-GABP|id=271",
+      "status": "OK"
+    },
+    {
+      "path": "IP/20.08.002-2026.json",
+      "sha256": "2ba7f21f6538a7e0adf38a8f059acb1dec5bf3e52be2696da320a64683ae28c2",
+      "stable_key": "IP|20.08.002/2026|id=269",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2023.01.18.2.json",
+      "sha256": "cc65ad4aee0723ea5947ab74e60d621a4d9170aa0209f1e8fe8ddf2eed4b2156",
+      "stable_key": "IP|2023.01.18.2|id=180",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2023.08.24-IP.json",
+      "sha256": "918935d8a9ea63c97b189263935bd064767bdcb00be3d01c509c4be23a209792",
+      "stable_key": "IP|2023.08.24-IP.|id=250",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2023.1412.01-ip.json",
+      "sha256": "2ffd81b6673c04171488cb4eb125b90d7ae6d96fdf90248d10192cc85007491d",
+      "stable_key": "IP|2023.1412.01-ip|id=188",
+      "status": "OK"
+    },
+    {
+      "path": "IP/20230717.001.json",
+      "sha256": "1fdc5a3bc1ccf208e34e01899d64f455548e4c05727eb78bd55c83e430f850ac",
+      "stable_key": "IP|20230717.001|id=191",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0110.01-IP.json",
+      "sha256": "e572f3d50272dc654b63eeddfe5ed8f0599b333b2d7f662cccc31bc83c613b4c",
+      "stable_key": "IP|2024.0110.01-IP|id=209",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0111.01-IP.json",
+      "sha256": "a2c1fcb659ce3d00e3077234412f021c762fd145d68ad96b2d54b4d19c7364a2",
+      "stable_key": "IP|2024.0111.01-IP|id=194",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.03.21.01-IP.json",
+      "sha256": "bbff6db10f0ade830535b981ec9d8dcebbea786386e01517e2db5b1bb6385c0b",
+      "stable_key": "IP|2024.03.21.01-IP.|id=254",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0411.01-IP.json",
+      "sha256": "92d6002d1f3b90119b08c08efece0fa64c0ff8d58adb61bf14ca89d75ccaa4fb",
+      "stable_key": "IP|2024.0411.01-IP|id=267",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0515.02.json",
+      "sha256": "3c4a12a345da1a21f1fd07abde0f52f5c697511897c6d745c96c9ceab47072e7",
+      "stable_key": "IP|2024.0515.02|id=252",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0801.01-IP.json",
+      "sha256": "23d15da78b35ddefbaa7371b2c88d56b5b7506173cc9521271a2f586be35bef2",
+      "stable_key": "IP|2024.0801.01-IP.|id=214",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0808.04.json",
+      "sha256": "2494382d06c79bf74db3fa2858d97e439bd8656d38ef4dc00c943c3605a112b0",
+      "stable_key": "IP|2024.0808.04|id=193",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.0903.01-IP.json",
+      "sha256": "4d64130a0888516cf38d6e3f548a7b28f83e017da7968a99a73cc0974b63b01c",
+      "stable_key": "IP|2024.0903.01-IP|id=200",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2024.2008.01.json",
+      "sha256": "ab9a34618e41c4bb5cc1cd5c4b97a3bb4f774d2cd6f080a729a3f48f7dbbdf3d",
+      "stable_key": "IP|2024.2008.01|id=255",
+      "status": "OK"
+    },
+    {
+      "path": "IP/20249002.json",
+      "sha256": "e1530baa45dce7174781fa21b345549936949ac26625aa0edf4a9301d24f6b24",
+      "stable_key": "IP|20249002|id=181",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2025.06.03.01.json",
+      "sha256": "a4920d793403bd624ac411583094dd6cfe565b521bf2ef33b773feaaa24e1bc9",
+      "stable_key": "IP|2025.06.03.01|id=179",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2025.2401.01-IP.json",
+      "sha256": "1ba2c95cee950a80a7ca5cfed28f17db3beeb74183deba1d2b66f4a401acf8f6",
+      "stable_key": "IP|2025.2401.01-IP|id=198",
+      "status": "OK"
+    },
+    {
+      "path": "IP/20250423001.json",
+      "sha256": "c29e84525df3388e957b7327724a0bba01b9561a7b0306d377da47c4d9e10006",
+      "stable_key": "IP|20250423001|id=178",
+      "status": "OK"
+    },
+    {
+      "path": "IP/21.08.001-2026.json",
+      "sha256": "da1eda4988aa7e2c31c0687234454d702177064f98f0c5f92f736cc413d8228d",
+      "stable_key": "IP|21.08.001/2026|id=272",
+      "status": "OK"
+    },
+    {
+      "path": "IP/2301-2025.json",
+      "sha256": "01ec546f36613be3b14ce30b1cae907ed83f3dd3bfed31e0264266d0994918d9",
+      "stable_key": "IP|2301-2025|id=251",
+      "status": "OK"
+    },
+    {
+      "path": "IP/26-A-2025.json",
+      "sha256": "7f06d3d3730c4d9440fa24ed8937d0990ec23a69bccef3153a25e451298abb4f",
+      "stable_key": "IP|26-A/2025|id=195",
+      "status": "OK"
+    },
+    {
+      "path": "IP/3-2024.json",
+      "sha256": "13d69512e9376fe0256a799c76f90834b0cfdbd0642f9152a83d536c27f293cf",
+      "stable_key": "IP|3/2024|id=170",
+      "status": "OK"
+    },
+    {
+      "path": "IP/49-2024.json",
+      "sha256": "2dbb5ff1a6cb799c221b4ca7003f6ad845bbf208774c0a9a31fd1efcf80c8bbb",
+      "stable_key": "IP|49/2024|id=268",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-01.json",
+      "sha256": "94f4d933471dd02e7bc2e79a00a91b1a66af8c81b326266b6927714fd5d2ba37",
+      "stable_key": "MOREIA|11/2022-01|id=276",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-02.json",
+      "sha256": "f5d8a0c0372e4dc0b86444192b25a3e78b4541f634a61f1fb00a737a0c1d12b4",
+      "stable_key": "MOREIA|11/2022-02|id=285",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-03.json",
+      "sha256": "b269e7abf7fcc7d27d7905c55e2aed22db223e67d4b6f5f99dbce198befaa366",
+      "stable_key": "MOREIA|11/2022-03|id=286",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-04.json",
+      "sha256": "6c7d54c142abbe902fa2c4df48faf9b91491d5061f6cba55a6458b3cb306b3a7",
+      "stable_key": "MOREIA|11/2022-04|id=274",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-05.json",
+      "sha256": "53782077b16192a16fa55d956c036b83ba24aba564736b83f3bcaeff12f3bc75",
+      "stable_key": "MOREIA|11/2022-05|id=281",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-06.json",
+      "sha256": "e96fd1a244415f7044e6109549c1df78ad04b7ee58538de83062d93a45a416cd",
+      "stable_key": "MOREIA|11/2022-06|id=278",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-08.json",
+      "sha256": "3f46826f0b1fe53eaec056d0d02d9d730534cc0a3ab3741f44926c7209657084",
+      "stable_key": "MOREIA|11/2022-08|id=284",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-09.json",
+      "sha256": "4251211c077e052301c80dd230b72ee74e93f9419365d0aa630073d72b5b6373",
+      "stable_key": "MOREIA|11/2022-09|id=277",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-10.json",
+      "sha256": "2650cf24ca53d3c2a7f81322211d85a1055e1cd710d360e83851ac837f8b6cd5",
+      "stable_key": "MOREIA|11/2022-10|id=283",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-11.json",
+      "sha256": "175349af19cdb005e582189b4925d61aa6239fd93e4d67f7fb1ce92794e18d2f",
+      "stable_key": "MOREIA|11/2022-11|id=275",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-12.json",
+      "sha256": "5c413f83635977c5abec747d57a90a592fc7ef106e36aaec6ef5687017175c2c",
+      "stable_key": "MOREIA|11/2022-12|id=280",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-13.json",
+      "sha256": "d8fe4b7cecfe72ec9a6a9a8ca5cd6d22d553c015d112ae8214572db5e4a1c568",
+      "stable_key": "MOREIA|11/2022-13|id=279",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-14.json",
+      "sha256": "ab6cd07bfabc89c94cdde39b47e273adf33520b1bc17d0c29bad52c436e80471",
+      "stable_key": "MOREIA|11/2022-14|id=282",
+      "status": "OK"
+    },
+    {
+      "path": "MOREIA/11-2022-15.json",
+      "sha256": "d2ef069950b05738e9ff1e6fc81ffcaa1a80c172d93777fd19744a77fb029c6a",
+      "stable_key": "MOREIA|11/2022-15|id=273",
+      "status": "OK"
+    }
+  ],
+  "totals": {
+    "contracts": 267,
+    "events": 703,
+    "additives": 743,
+    "infos": 690,
+    "items": 4928,
+    "services": 759,
+    "recipients": 1449
+  },
+  "pendentes": 0,
+  "novos": 20
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|20210125001|PRFEITURA MUNICIPAL DE ARACATI - SECRETARIA DE SAÚDE 2 (2021) - TESTE",
+    "source_contract_id": null,
+    "number": "20210125001",
+    "name": "PRFEITURA MUNICIPAL DE ARACATI - SECRETARIA DE SAÚDE 2 (2021) - TESTE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACATI",
+    "recipient_aliases": [
+      "PRFEITURA MUNICIPAL DE ARACATI - SECRETARIA DE SAÚDE 2 (2021) - TESTE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO INSTALAÇÃO, SUPORTE TÉCNICO E MANUTENÇÃO PREVENTIVA E CORRETIVA ON SITE, TROCA DE PEÇAS E COMPONENTES NECESSÁRIOS A MANUTENÇÃO, BEM COMO O FORNECIMENTO DE INSUMOS NECESSÁRIOS A NÃO INTERRUPÇÃO DOS SERVIÇOS (EXCETO PAPEL E GRAMPO), VISANDO ATENDER DE FORMA SATISFATÓRIA A DEMANDA NECESSÁRIA DA SECRETARIA DA SAÚDE DO MUNICÍPIO DE ARACATI - CEARÁ.",
+    "original_start_date": "2021-01-25",
+    "created_at": "2021-01-25T00:00:00",
+    "source": [
+      {
+        "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+        "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-01-25",
+              "end_date": "2022-02-25",
+              "duration": 13,
+              "max_duration": 13,
+              "max_end_date": "2022-02-25",
+              "total_amount": 669648.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "Tablet- Especificação Mínima",
+                "description": "Tablet- Especificação Mínima: Sistema operacional Android; Processador Quad-Core 1.3GHz; tipo de tela lcd tft; display 7\"; resolução 1280x800; conexão wi-fi; memória interna 8gb; expansivo microsd até 32gb; memória ram 1.5gb; câmera traseira 5mp; câmera frontal 2mp; localizaçao via gps; conexão bluetooth v4; conexão usb versão 2.0",
+                "quantity": 200,
+                "price": 99.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-especificacao-minima#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 10
+                }
+              },
+              {
+                "alias": "Microcomputador- Especificação Mínima",
+                "description": "Microcomputador- Especificação Mínima: Processador com Tecnologia Core 15, com adaptador para rede Wi-Fi, memória Ram 4gb, HD 500gb, placa mãe on-board som/vídeo/rede, monitor 18,5\" LCD/LED, teclado USB/PS2, mouse USB/PS2; sistema operacional Windows 10 ou versão superior em português. (Fornecimento de estabilizador de tensão 300va)",
+                "quantity": 149,
+                "price": 169.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-especificacao-minima#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "Notebook",
+                "description": "Notebook - No mínimo com processador com tecnologia Core I3, 3.2ghz, Memória 4gb ddr3 1333mhz, HD 500gb Sata III, 5.400rpm, Tela LCD 14\" com tecnologia LED, Leitorde cartoes SD, SDHC e SDXC, Drive DVD, Rede: 10/100 mbps, Conectividade: rede sem fio ieee 802.11b/g/ntm, rj45, Teclado portugues abnt, Mouse touchpad, Bateria: li-ion, 3 células, 2200mah integrada",
+                "quantity": 15,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "Impressora Não Fiscal Especificação Mínima",
+                "description": "Impressora Não Fiscal Especificação Mínima: Método de impressão: térmica, velocidade de impressão 250mm/segundos para texto e para gráfico, serial RS232 modular e opcional, ethernet modular e opcional, tabela de caracteres: code 437, code 850, code 858, code 860, code 862,code 864, code 866, drivers e software: Windows 95/98/ME/NT 4.0/2000/XP/Vista/7/JAVAPOS/OPOS /DLL (Windows)/ (Linux)/Driver de Spooler, acionamento de gaveta: 1 conector com capacidade para duas gavetas, vida útil 2 milhões de cortes, diâmetro externo de bobina máx. 102 mm",
+                "quantity": 3,
+                "price": 79.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-nao-fiscal-especificacao-minima#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "Impressora Multifuncional Monocromática- Especificação Mínima",
+                "description": "Impressora Multifuncional Monocromática- Especificação Mínima: Tecnologia laser, função impressão, cópia, scanner e fax, velocidade de impressão 34 páginas por minuto, resolução de impressão: 1200xl200dpi, 1200x600dpi, 600x600dpi, duplex padrão, alimentador recirculador automático de originais (ardf), capacidade padrão de papel bandeja de 250 folhas + bandeja de alimentação manual de 50 folhas, gramatura do papel bandeja padrão 52 a 162g/m2, duplex 60 a 105g/m2, conexão Ethernet 100BASE-TX/10BASE-T, USB 2.0 Tipo B, escalas de zoom 25 a 400% em incrementos de 1%, pelo (ardf) ou pelo vidro. Franquia Mensal: 5.000 impressões por equipamento",
+                "quantity": 6,
+                "price": 249.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-especificacao-minima#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "Impressora Laser Monocromática",
+                "description": "Impressora Laser Monocromática - Especificação Mínima: Tecnologia laser, função impressão, impressão eletrofotográfica feixe de laser, velocidade de impressão 34 páginas por minuto, resolução de impressão: 1200xl200dpi, 1200x600dpi, 600x600dpi, vidro de exposição 600x600dpi, capacidade padrão de papel bandeja de 250 folhas + bandeja de alimentação manual de 50 folhas, gramatura do papel bandeja padrão 52 a 162g/m2, duplex 60 a 105g/m2, conexão Ethernet 100BASE-TX/10BASE-T, USB 2.0 Tipo B, escalas de zoom 25 a 400% em incrementos de 1%, pelo (ardf) ou pelo vidro. Franquia Mensal: 3.000 impressões por equipamento",
+                "quantity": 35,
+                "price": 149.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "Painel",
+                "description": "Painel - Especificação Mínima: TV LCD com tela retro iluminada por LED - Smart TV, Processador Duo Core, no mínimo 42 polegadas, interface de vídeo, Brilho 224 cd/m2, 3 Portas HDMI, leitor de mídia 1 porta USB, resolução do visor 1920x1080, formato do visor 1080p (Full HD), conectividade Wi-fi-Lan, 2 alto falantes, sintonizador de TV Digital ISDB-T",
+                "quantity": 8,
+                "price": 149.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel#0",
+                "source": {
+                  "file": "Alucom/PLANILHA PM ARACOIABA - SAÚDE ( AL ).xls",
+                  "sheet": "SAÚDE 2 (2021) -PLANILHA TESTE",
+                  "row": 16
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

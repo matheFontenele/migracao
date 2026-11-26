@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|020-2025-IP|id=206",
+    "source_contract_id": 206,
+    "number": "020-2025-IP",
+    "name": "TORRES ASSESSORIA EM LICITAÇÕES E GESTÃO PUBLICA LTDA,",
+    "customer_alias": "TORRES ASSESSORIA EM LICITAÇÕES E GESTAO",
+    "recipient_aliases": [
+      "TORRES ASSESSORIA EM LICITAÇÕES E GESTAO"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da empresa TORRES ASSESSORIA EM LICITAÇÕES E GESTÃO PUBLICA LTDA, na quantidade e especificações descritas abaixo,",
+    "original_start_date": "2025-10-28",
+    "created_at": "2025-10-28T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=206"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-10-28",
+              "end_date": "2026-04-28",
+              "duration": 6,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 954,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Escâner de mesa da Marca Brother",
+                "description": "Escâner de mesa da Marca Brother",
+                "quantity": 1,
+                "price": 159.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "escaner-de-mesa-da-marca-brother#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Escâner de Mesa",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "escaner-de-mesa#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

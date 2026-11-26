@@ -1,0 +1,7 @@
+org,contrato,codigo,detalhe
+ALUCOM,016/2026-001,ALIAS_REUTILIZADO_COM_PRECO_DIFERENTE,"'LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS': preços distintos [189.51, 290.54] em ocorrências separadas (occurrence)."
+ALUCOM,016/2026-004,ALIAS_REUTILIZADO_COM_PRECO_DIFERENTE,"'LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS': preços distintos [189.51, 290.54] em ocorrências separadas (occurrence)."
+ALUCOM,016/2026-006,ALIAS_REUTILIZADO_COM_PRECO_DIFERENTE,"'LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS': preços distintos [189.51, 290.54] em ocorrências separadas (occurrence)."
+ALUCOM,016/2026-008,ALIAS_REUTILIZADO_COM_PRECO_DIFERENTE,"'LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS': preços distintos [189.51, 290.54] em ocorrências separadas (occurrence)."
+MOREIA,006/2022-001-AD,ADITIVO_CLONADO,5 eventos; o aditivo de prazo replica os itens do cadastro com lineage_key preservada e months ajustado ao ciclo.
+MOREIA,014/2024-002,ADITIVO_CLONADO,2 eventos; o aditivo de prazo replica os itens do cadastro com lineage_key preservada e months ajustado ao ciclo.

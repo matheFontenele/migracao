@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2023.1412.01-ip|id=188",
+    "source_contract_id": 188,
+    "number": "2023.1412.01-ip",
+    "name": "CARTÓRIO DO 2º OFÍCIO DE TAUÁ",
+    "customer_alias": "CARTORIO DO 2 OFICIO DE TAUÁ",
+    "recipient_aliases": [
+      "CARTORIO DO 2 OFICIO DE TAUÁ"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE, os serviços de: SERVIÇO DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2023-12-08",
+    "created_at": "2023-12-08T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=188"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-12-08",
+              "end_date": "2024-12-17",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2027-12-17",
+              "total_amount": 9563,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional 40ppm",
+                "description": "Laser monocromática, alimentador de papel, min. 40ppm. Franquia: 5.000 págs.",
+                "quantity": 1,
+                "price": 236.88,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-40ppm#0"
+              },
+              {
+                "alias": "Multifuncional 55ppm",
+                "description": "Laser monocromática, alimentador de papel, 55ppm. Franquia: 5.000 págs.",
+                "quantity": 2,
+                "price": 280.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-55ppm#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "Multifuncional 40ppm",
+                "description": "Laser monocromática, alimentador de papel, min. 40ppm. Franquia: 5.000 págs.",
+                "quantity": 1,
+                "price": 236.88,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-40ppm#0"
+              },
+              {
+                "alias": "Multifuncional 55ppm",
+                "description": "Laser monocromática, alimentador de papel, 55ppm. Franquia: 5.000 págs.",
+                "quantity": 2,
+                "price": 280.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-55ppm#0"
+              }
+            ],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2024-12-18",
+              "end_date": "2025-12-17",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2027-12-17",
+              "total_amount": 6720,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional 55ppm",
+                "description": "Laser monocromática, alimentador de papel, 55ppm. Franquia: 5.000 págs.",
+                "quantity": 2,
+                "price": 280.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-55ppm#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "Multifuncional 55ppm",
+                "description": "Laser monocromática, alimentador de papel, 55ppm. Franquia: 5.000 págs.",
+                "quantity": 2,
+                "price": 280.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-55ppm#0"
+              }
+            ],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-12-18",
+              "end_date": "2026-12-17",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2027-12-17",
+              "total_amount": 3360,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional 55ppm",
+                "description": "Laser monocromática, alimentador de papel, 55ppm. Franquia: 5.000 págs.",
+                "quantity": 1,
+                "price": 280.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-55ppm#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

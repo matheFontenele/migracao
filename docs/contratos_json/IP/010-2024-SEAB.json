@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|010/2024-SEAB|id=168",
+    "source_contract_id": 168,
+    "number": "010/2024-SEAB",
+    "name": "SECRETARIA EXTRAORDINÁRIA DE REPRESENTAÇÃO DO GOVERNO DO ESTADO DO AMAPÁ EM BRASÍLIA – SEAB",
+    "customer_alias": "GOV. ESTAD. AMAPÁ - SEC. EXTRAOR. REPRESENTAÇÃO DO GOV. DO ESTADO DO AMAPÁ",
+    "recipient_aliases": [
+      "GOV. ESTAD. AMAPÁ - SEC. EXTRAOR. REPRESENTAÇÃO DO GOV. DO ESTADO DO AMAPÁ"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "contratação de empresa especializada para a prestação de serviços de Outsourcing incluindo fornecimento de equipamentos de impressão, monocromáticas e policromáticas, cópias, digitalização, com fornecimento de assistência técnica para a manutenção corretiva e preventiva, incluindo substituição de peças, insumos, suprimentos e materiais de consumo, como cartuchos de tonner, revelador e cilindro, para atender as necessidades da Secretaria Extraordinária de Representação do Governo do Estado do Ama",
+    "original_start_date": "2024-12-19",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=168"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-12-19",
+              "end_date": "2025-12-18",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-12-18",
+              "total_amount": 10344,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS MA4500IX",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON WF-C5890",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.1419,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.08,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 400,
+                "price": 0.15,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 200,
+                "price": 0.0658,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.5,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.13,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-06-12",
+              "end_date": "2025-12-18",
+              "duration": 6,
+              "max_duration": 120,
+              "max_end_date": "2034-12-18",
+              "total_amount": 12929,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS MA4500IX",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON WF-C5890",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.1855,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.1046,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 400,
+                "price": 0.1961,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 200,
+                "price": 0.086,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.6535,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.1699,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS MA4500IX",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON WF-C5890",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.1855,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.1046,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 400,
+                "price": 0.1961,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 200,
+                "price": 0.086,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.6535,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.1699,
+                "months": 6,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#1"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-12-12",
+              "end_date": "2026-12-11",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-12-11",
+              "total_amount": 13048,
+              "services_total_amount": 0.0
+            },
+            "items": [],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.179,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.1009,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 400,
+                "price": 0.1892,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - PRETO E BRANCO",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 200,
+                "price": 0.083,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-preto-e-branco#1"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.6307,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4 - COLOR",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 700,
+                "price": 0.164,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4-color#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente ajustado por de/para: 'SECRETARIA EXTRAORDINÁRIA DE REPRESENTAÇÃO DO GOVERNO DO ESTADO DO AMAPÁ EM BRASÍLIA – SEAB' -> 'GOV. ESTAD. AMAPÁ - SEC. EXTRAOR. REPRESENTAÇÃO DO GOV. DO ESTADO DO AMAPÁ'",
+      "total_amount arredondado de 10343.52 para 10344 (coluna INT)",
+      "total_amount arredondado de 12929.40 para 12929 (coluna INT)",
+      "total_amount arredondado de 13047.88 para 13048 (coluna INT)"
+    ]
+  }
+}

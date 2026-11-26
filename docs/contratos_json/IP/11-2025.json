@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|11/2025|id=197",
+    "source_contract_id": 197,
+    "number": "11/2025",
+    "name": "G&T CONTROLLER LTDA ME - 11/2025",
+    "customer_alias": "G&T CONTROLLER LTDA ME",
+    "recipient_aliases": [
+      "G&T CONTROLLER LTDA ME"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "serviços de Serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da G&T CONTROLLER LTDA LTDA no Município Fortaleza/CE, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-08-08",
+    "created_at": "2025-08-08T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=197"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-08",
+              "end_date": "2026-08-07",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 4560,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL COLOR",
+                "description": "Epson WF 5890",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-color#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO MONO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 4000,
+                "price": 0.065,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-mono-em-impressora-multifuncional-color-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO COLOR EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.15,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-color-em-impressora-multifuncional-color-a4#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

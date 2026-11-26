@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2021.08.02.01-15|id=149",
+    "source_contract_id": 149,
+    "number": "2021.08.02.01-15",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE 2021.08.02.01-15",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "  CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL – INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY®, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE DO MUNICÍPIO DE CAUCAIA-CE",
+    "original_start_date": "2021-09-23",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=149"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-09-23",
+              "end_date": "2022-09-22",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-22",
+              "total_amount": 11751,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Painel de LED P10 (TV Tipo IV)",
+                "description": "Painel de LED P10 para uso externo (4m x 3m)",
+                "quantity": 1,
+                "price": 979.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel-de-led-p10-tv-tipo-iv#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-09-19",
+              "end_date": "2023-09-18",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-22",
+              "total_amount": 11751,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Painel de LED P10 (TV Tipo IV)",
+                "description": "Painel de LED P10 para uso externo (4m x 3m)",
+                "quantity": 1,
+                "price": 979.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel-de-led-p10-tv-tipo-iv#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-09-20",
+              "end_date": "2024-09-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-22",
+              "total_amount": 11751,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Painel de LED P10 (TV Tipo IV)",
+                "description": "Painel de LED P10 para uso externo (4m x 3m)",
+                "quantity": 1,
+                "price": 979.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel-de-led-p10-tv-tipo-iv#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-09-21",
+              "end_date": "2025-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-22",
+              "total_amount": 11751,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Painel de LED P10 (TV Tipo IV)",
+                "description": "Painel de LED P10 para uso externo (4m x 3m)",
+                "quantity": 1,
+                "price": 979.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel-de-led-p10-tv-tipo-iv#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-22",
+              "end_date": "2026-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-22",
+              "total_amount": 11751,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Painel de LED P10 (TV Tipo IV)",
+                "description": "Painel de LED P10 para uso externo (4m x 3m)",
+                "quantity": 1,
+                "price": 979.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "painel-de-led-p10-tv-tipo-iv#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente ajustado por de/para: 'PREFEITURA MUNICIPAL DE CAUCAIA - SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE' -> 'PREFEITURA MUNICIPAL DE CAUCAIA'",
+      "pareamento por ordem de evento (duas cadeias CADASTRO sem vínculo com o número do contrato)",
+      "total_amount arredondado de 11751.36 para 11751 (coluna INT)"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|12.12.015/2025-SDHCD|id=167",
+    "source_contract_id": 167,
+    "number": "12.12.015/2025-SDHCD",
+    "name": "PREFEITURA MUNICIPAL DE TAUÁ - SECRETARIA DE DIREITOS HUMANOS, CIDADANIA E DIVERSIDADE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE TAUÁ",
+    "recipient_aliases": [
+      "DEPARTAMENTO DE CONTROLADORIA E OUVIDORIA DO MUNICIPIO DO TAUA",
+      "GABINETE DO PREFEITO DO MUNICIPIO DE TAUA",
+      "PREFEITURA MUNICIPAL DE TAUÁ",
+      "SECRETARIA DE DESENVOLVIMENTO RURAL E RECURSOS HÍDRICOS DA PREFEITURA DE TAUA",
+      "SUPERINTENDENCIA DO MEIO AMBIENTE DA PREFEITURA DE TAUA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "REGISTRO DE PREÇO PARA FUTURAS E EVENTUAIS SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA INLOCO para atender as necessidades da Secretaria de Direitos Humanos, Cidadania e Diversidade do Município de Tauá-CE",
+    "original_start_date": "2026-01-13",
+    "created_at": "2026-03-16T10:59:16",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=167"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-01-13",
+              "end_date": "2027-01-12",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2036-01-12",
+              "total_amount": 16296,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "KYOCERA",
+                "quantity": 2,
+                "price": 265.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "CANON",
+                "quantity": 4,
+                "price": 207.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

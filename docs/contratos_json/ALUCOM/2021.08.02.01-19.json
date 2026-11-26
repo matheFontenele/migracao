@@ -1,0 +1,746 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2021.08.02.01-19|id=94",
+    "source_contract_id": 94,
+    "number": "2021.08.02.01-19",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - AUTARQUIA MUNICIPAL DE TRÂNSITO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL-INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA MUNICIPAL DE TURISMO E CULTURA DO MUNICÍPIO DE CAUCAIA-CE",
+    "original_start_date": "2021-10-04",
+    "created_at": "2013-06-24T23:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=94"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-10-04",
+              "end_date": "2022-10-04",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-10-04",
+              "total_amount": 90168,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2022-08-10",
+              "end_date": "2022-10-03",
+              "duration": 2,
+              "max_duration": 60,
+              "max_end_date": "2026-10-03",
+              "total_amount": 109418,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 2,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-10-04",
+              "end_date": "2023-10-04",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-10-04",
+              "total_amount": 109418,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-10-05",
+              "end_date": "2024-10-05",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-10-05",
+              "total_amount": 109418,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-10-06",
+              "end_date": "2025-10-06",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-10-06",
+              "total_amount": 109418,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-10-06",
+              "end_date": "2026-10-06",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-10-06",
+              "total_amount": 109418,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 10,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 2,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 4,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "ACCESS POINT INDOOR",
+                "description": "",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indoor#0"
+              },
+              {
+                "alias": "NOBREAK 1200VA",
+                "description": "",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

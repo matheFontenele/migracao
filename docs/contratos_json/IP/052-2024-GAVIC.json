@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|052/2024/GAVIC|id=173",
+    "source_contract_id": 173,
+    "number": "052/2024/GAVIC",
+    "name": "VICE-PREFEITURA DE SÃO LUIS - GAVIC",
+    "customer_alias": "PREF. SÃO LUIS - GABINETE DA VICE-PREFEITURA - GAVIC - MA",
+    "recipient_aliases": [
+      "PREF. SÃO LUIS - GABINETE DA VICE-PREFEITURA - GAVIC - MA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Locação de impressoras, suporte e manutenção, para atender as demandas do Gabinete da Vice-Prefeitura - GAVIC",
+    "original_start_date": "2024-10-11",
+    "created_at": "2024-10-15T11:01:56",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=173"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-10-11",
+              "end_date": "2025-10-10",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2029-10-10",
+              "total_amount": 17900,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 300.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 1191.66,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 3000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 300.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 1191.66,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL MONO A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 3000,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-mono-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color#0"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-10-11",
+              "end_date": "2026-10-10",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2029-10-10",
+              "total_amount": 18405,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 308.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 1225.26,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

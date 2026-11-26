@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|Nº 26/2022 - SEGER – SUB-ROGADO CEGOR|id=38",
+    "source_contract_id": 38,
+    "number": "Nº 26/2022 - SEGER – SUB-ROGADO CEGOR",
+    "name": "CEGOR",
+    "customer_alias": "COORDENADORIA ESPECIAL DE APOIO À GOVERNANÇA DAS REGIONAIS – CEGOR",
+    "recipient_aliases": [
+      "COORDENADORIA ESPECIAL DE APOIO À GOVERNANÇA DAS REGIONAIS – CEGOR"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O presente contrato tem como fundamento a adesão ao Edital do Pregão Eletrônico tombado sob o n° 2021.08.02.01 em conformidade com a Lei Federal N° 8.666/93 - Lei das Licitações Públicas, c/c os termos da Lei Federal n° 10.520, de 17/07/2002., os preceitos do direito público, com suas alterações e, ainda, outras leis especiais necessárias ao cumprimento de seu objeto. ",
+    "original_start_date": "2025-09-20",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=38"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-20",
+              "end_date": "2026-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-19",
+              "total_amount": 687721,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II - CORE I5",
+                "description": "",
+                "quantity": 26,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii-core-i5#0"
+              },
+              {
+                "alias": "MICRO TIPO II - CORE I5",
+                "description": "",
+                "quantity": 200,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii-core-i5#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO VI - PLOTTER - COM FORNECIMENTO DE PAPEL",
+                "description": "",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi-plotter-com-fornecimento-de-papel#0"
+              },
+              {
+                "alias": "TV TIPO III - 40 POLEGADAS",
+                "description": "",
+                "quantity": 25,
+                "price": 105.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-tipo-iii-40-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "total_amount arredondado de 687721.32 para 687721 (coluna INT)",
+      "cliente 'COORDENADORIA ESPECIAL DE APOIO À GOVERNANÇA DAS REGIONAIS – CEGOR' não existe em customers (criar customer ou definir de/para)",
+      "sem evento CADASTRO; original_start_date veio do aditivo mais antigo"
+    ]
+  }
+}

@@ -1,0 +1,987 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2021.08.02.01-10|id=140",
+    "source_contract_id": 140,
+    "number": "2021.08.02.01-10",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA -  SECRETARIA MUNICIPAL DE PLANEJAMENTO URBANO E AMBIENTAL",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇOES DE SERVIÇOS DE LOCAÇOES DE,EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTENCIA TÉCNICA E MANUTENÇAO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇAO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL - INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY®, CUJOS SERVIÇOS SERAO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA DE PLANEJAMENTO URBANO E AMBIENTALDO MUNICÍPIO DE CAUCAIA-CE",
+    "original_start_date": "2021-09-20",
+    "created_at": "2021-09-20T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=140"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-09-20",
+              "end_date": "2022-09-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 553097,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 10,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 17,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 29,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 34,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4",
+                "quantity": 12,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo II",
+                "description": "Impressora laser monocromática A4",
+                "quantity": 9,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo V",
+                "description": "Multifuncional Laser A3 colorida",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-v#0"
+              },
+              {
+                "alias": "Impressora Tipo VI",
+                "description": "Plotter colorido 24 polegadas.",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi#0"
+              },
+              {
+                "alias": "Tablet Tipo II",
+                "description": "Tablet 10 polegadas, 256GB, Wi-Fi.",
+                "quantity": 15,
+                "price": 119.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-tipo-ii#0"
+              },
+              {
+                "alias": "Datashow Tipo I",
+                "description": "Datashow mínimo 2500 lumens.",
+                "quantity": 2,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo I",
+                "description": "Switch 48 portas gerenciável.",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo IV",
+                "description": "Switch 8 portas.",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "Componente Tipo V",
+                "description": "Repetidor Wi-Fi Amplificador de Sinal.",
+                "quantity": 1,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "Componente Tipo VI",
+                "description": "Access Point indoor banda dupla, mín. 1750 Mbps.",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "Componente Tipo IX",
+                "description": "HD Externo portátil 2TB.",
+                "quantity": 1,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0"
+              },
+              {
+                "alias": "Componente Tipo XI",
+                "description": "Nobreak 1200 VA.",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "Componente Tipo XII",
+                "description": "Nobreak 700 VA.",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-09-19",
+              "end_date": "2023-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 553097,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 10,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 17,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 29,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 34,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4",
+                "quantity": 12,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo II",
+                "description": "Impressora laser monocromática A4",
+                "quantity": 9,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo V",
+                "description": "Multifuncional Laser A3 colorida",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-v#0"
+              },
+              {
+                "alias": "Impressora Tipo VI",
+                "description": "Plotter colorido 24 polegadas.",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi#0"
+              },
+              {
+                "alias": "Tablet Tipo II",
+                "description": "Tablet 10 polegadas, 256GB, Wi-Fi.",
+                "quantity": 15,
+                "price": 119.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-tipo-ii#0"
+              },
+              {
+                "alias": "Datashow Tipo I",
+                "description": "Datashow mínimo 2500 lumens.",
+                "quantity": 2,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo I",
+                "description": "Switch 48 portas gerenciável.",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo IV",
+                "description": "Switch 8 portas.",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "Componente Tipo V",
+                "description": "Repetidor Wi-Fi Amplificador de Sinal.",
+                "quantity": 1,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "Componente Tipo VI",
+                "description": "Access Point indoor banda dupla, mín. 1750 Mbps.",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "Componente Tipo IX",
+                "description": "HD Externo portátil 2TB.",
+                "quantity": 1,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0"
+              },
+              {
+                "alias": "Componente Tipo XI",
+                "description": "Nobreak 1200 VA.",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "Componente Tipo XII",
+                "description": "Nobreak 700 VA.",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-09-20",
+              "end_date": "2024-09-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 553097,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 10,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 17,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 29,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 34,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4",
+                "quantity": 12,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo II",
+                "description": "Impressora laser monocromática A4",
+                "quantity": 9,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo V",
+                "description": "Multifuncional Laser A3 colorida",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-v#0"
+              },
+              {
+                "alias": "Impressora Tipo VI",
+                "description": "Plotter colorido 24 polegadas.",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi#0"
+              },
+              {
+                "alias": "Tablet Tipo II",
+                "description": "Tablet 10 polegadas, 256GB, Wi-Fi.",
+                "quantity": 15,
+                "price": 119.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-tipo-ii#0"
+              },
+              {
+                "alias": "Datashow Tipo I",
+                "description": "Datashow mínimo 2500 lumens.",
+                "quantity": 2,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo I",
+                "description": "Switch 48 portas gerenciável.",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo IV",
+                "description": "Switch 8 portas.",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "Componente Tipo V",
+                "description": "Repetidor Wi-Fi Amplificador de Sinal.",
+                "quantity": 1,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "Componente Tipo VI",
+                "description": "Access Point indoor banda dupla, mín. 1750 Mbps.",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "Componente Tipo IX",
+                "description": "HD Externo portátil 2TB.",
+                "quantity": 1,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0"
+              },
+              {
+                "alias": "Componente Tipo XI",
+                "description": "Nobreak 1200 VA.",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "Componente Tipo XII",
+                "description": "Nobreak 700 VA.",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-09-21",
+              "end_date": "2025-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 553097,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 10,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 17,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 29,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 34,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4",
+                "quantity": 12,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo II",
+                "description": "Impressora laser monocromática A4",
+                "quantity": 9,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo V",
+                "description": "Multifuncional Laser A3 colorida",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-v#0"
+              },
+              {
+                "alias": "Impressora Tipo VI",
+                "description": "Plotter colorido 24 polegadas.",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi#0"
+              },
+              {
+                "alias": "Tablet Tipo II",
+                "description": "Tablet 10 polegadas, 256GB, Wi-Fi.",
+                "quantity": 15,
+                "price": 119.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-tipo-ii#0"
+              },
+              {
+                "alias": "Datashow Tipo I",
+                "description": "Datashow mínimo 2500 lumens.",
+                "quantity": 2,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo I",
+                "description": "Switch 48 portas gerenciável.",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo IV",
+                "description": "Switch 8 portas.",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "Componente Tipo V",
+                "description": "Repetidor Wi-Fi Amplificador de Sinal.",
+                "quantity": 1,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "Componente Tipo VI",
+                "description": "Access Point indoor banda dupla, mín. 1750 Mbps.",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "Componente Tipo IX",
+                "description": "HD Externo portátil 2TB.",
+                "quantity": 1,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0"
+              },
+              {
+                "alias": "Componente Tipo XI",
+                "description": "Nobreak 1200 VA.",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "Componente Tipo XII",
+                "description": "Nobreak 700 VA.",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-22",
+              "end_date": "2026-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 553097,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 10,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 17,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 29,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 34,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4",
+                "quantity": 12,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo II",
+                "description": "Impressora laser monocromática A4",
+                "quantity": 9,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo V",
+                "description": "Multifuncional Laser A3 colorida",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-v#0"
+              },
+              {
+                "alias": "Impressora Tipo VI",
+                "description": "Plotter colorido 24 polegadas.",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-vi#0"
+              },
+              {
+                "alias": "Tablet Tipo II",
+                "description": "Tablet 10 polegadas, 256GB, Wi-Fi.",
+                "quantity": 15,
+                "price": 119.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet-tipo-ii#0"
+              },
+              {
+                "alias": "Datashow Tipo I",
+                "description": "Datashow mínimo 2500 lumens.",
+                "quantity": 2,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo I",
+                "description": "Switch 48 portas gerenciável.",
+                "quantity": 1,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-i#0"
+              },
+              {
+                "alias": "Componente Tipo IV",
+                "description": "Switch 8 portas.",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "Componente Tipo V",
+                "description": "Repetidor Wi-Fi Amplificador de Sinal.",
+                "quantity": 1,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "Componente Tipo VI",
+                "description": "Access Point indoor banda dupla, mín. 1750 Mbps.",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "Componente Tipo IX",
+                "description": "HD Externo portátil 2TB.",
+                "quantity": 1,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0"
+              },
+              {
+                "alias": "Componente Tipo XI",
+                "description": "Nobreak 1200 VA.",
+                "quantity": 2,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "Componente Tipo XII",
+                "description": "Nobreak 700 VA.",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

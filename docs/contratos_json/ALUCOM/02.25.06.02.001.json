@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|02.25.06.02.001|id=58",
+    "source_contract_id": 58,
+    "number": "02.25.06.02.001",
+    "name": "PREFEITURA MUNICIPAL DE MARANGUAPE - GABINETE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE MARANGUAPE",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE MARANGUAPE",
+      "SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS DO MUNICIPIO DE MARANGUAPE",
+      "SECRETARIA DE SAUDE DO MUNICIPIO DE MARANGUAPE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva in-loco para o Gabinete do Prefeito do Município de Maranguape-CE",
+    "original_start_date": "2025-06-02",
+    "created_at": "2025-06-02T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=58"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-06-02",
+              "end_date": "2026-06-01",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-06-01",
+              "total_amount": 76642,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "Notebook I5 ou AMD Ryzen 5",
+                "quantity": 10,
+                "price": 15877.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "Micro Desktop 17 ou AMO Ryzen 7",
+                "quantity": 5,
+                "price": 9976.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "Micro Desktop 15 ou AMO Ryzen 5",
+                "quantity": 40,
+                "price": 50788.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

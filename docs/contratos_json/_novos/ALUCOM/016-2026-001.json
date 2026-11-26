@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|016/2026-001|SECRETARIA DE ASSISTÊNCIA SOCIAL E DIREITOS HUMANOS DO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "source_contract_id": null,
+    "number": "016/2026-001",
+    "name": "SECRETARIA DE ASSISTÊNCIA SOCIAL E DIREITOS HUMANOS DO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENÇÃO - CE",
+    "recipient_aliases": [
+      "SECRETARIA DE ASSISTÊNCIA SOCIAL E DIREITOS HUMANOS DO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é o REGISTRO DE PREÇO PARA CONTRATAÇÃO DE EMPRESAS ESPECIALIZADAS NA LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS E MÁQUINAS COPIADORAS PARA ATENDER AS NECESSIDADES DAS DIVERSAS SECRETARIAS DO MUNICIPIO DE REDENÇÃO/CE.",
+    "original_start_date": "2026-06-30",
+    "created_at": "2026-06-30T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Alucom/PLANILHA (AL) - ASSISTÊNCIA SOCIAL E HABITAÇÃO.xlsx",
+        "sheet": "OUT26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-06-30",
+              "end_date": "2027-06-30",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2036-06-29",
+              "total_amount": 49286.52,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA",
+                "description": "LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. ESPECIFICAÇÃO: LOCAÇÃO DE IMPRESSORA MULTIFUNCIONAL COLORIDA. QUE IMPRIME, COPIA E DIGITALIZA/ WI FI DIRECT. CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS. COM ÚNICO SISTEMA TANQUE D TINTA 100% SEM CARTUCHO, IMPRIME ATE 7.500 PÁGINAS EM CORES OU 4.500 PÁGINAS EM PRETO COM MAIOR RESOLUÇÃO DE IMPRESSÃO DA CATEGORIA. 6.000 IMPRESSOES/MÊS",
+                "quantity": 8,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressora-multifuncional-colorida#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - ASSISTÊNCIA SOCIAL E HABITAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS. ESPECIFICAÇÃO: LOCAÇÃO DE IMPRESSORAS MULTIFUNCION AIS COM VELOCIDADE DE COPIAS E IMPRESÃO DE 40 PÁGINAS POR MINUTOS/RESOLUÇÃO DE IMPRESSÃO ATÉ 1200X1200 DPI RESOLUÇÃO DE AMPLIAÇÃO 25% 400%/ CICLO MENSAL DE 50.000 PAGINAS/MÊS COM CONEXÃO EM REDE /CAPACIDADE DE ALIMENTAÇÃO.250 FOLHAS /DUPLEX AUTOMATICA FR ENTE E VERSO /DIGITALIZAÇÃO FRENTE E VERSO/ MULTIFUNCIONAL A LASER. 16.000 PAGINAS/MÊS",
+                "quantity": 2,
+                "price": 238.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-com#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - ASSISTÊNCIA SOCIAL E HABITAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS – COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS – COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS. ESPECIFICAÇÃO: IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA, IMPRESSÃO, CÓPIA, DIGITALIZAÇÃO, ENVIO, FAX; PAINEL COLORIDO 5\"; ATÉ 43PPM(A4); RESOLUÇÃO: 600X600DPI (ATÉ 1200 DPI OTIMIZADO); EMULAÇÃO: UFR II LT, PCL 5E/6 ADOBE PS 3; RESOLUÇÃO DA CÓPIA; ATÉ 600X600 DPI; CÓPIA DUPLEX: AUTOMATICA; RESOLUÇÃO ÓTICA: 600X600 DPI; CAPACIDADE DE ENTRADA: 550 FOLHAS BANDEJA PADRÃO; BANDEJA MULTIUSO: 100 FOLHAS; CAPACIDADE DE SAÍDA 150 FOLHAS;CICLO MENSAL MAXIMO 150.000 IMPRESSOES; PROCESSADOR: DUPLO 800MHZ; MIDIA DE MEMORIA: PADRÃO USB; CONEXÃO 1000BASE-T/100 BASE-TX/10-BASE-T, WIRELESS LAN, NFC, WI-FI DIRECT CONNECTION; MEMÓRIA: 1,0GB RAM; 16.000 PAGINAS/MÊS",
+                "quantity": 3,
+                "price": 290.54,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - ASSISTÊNCIA SOCIAL E HABITAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS. ESPECIFICAÇÃOES: LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM MANUTENÇÃO PREVENTIVA E CORRETIVA COM REPOSIÇÃO DE PEÇAS E RECARGAS DE TINTAS, CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS COLORIDA COM ECO TANK, WIFI INTEGRADO, PRONTO PARA A REDE WIRELESS E COM FUNÇÃO SCANER, SEM LIMITE DE IMPRESSÕES. 6.000 IMPRESSOES/MÊS",
+                "quantity": 7,
+                "price": 189.51,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-impressoras-multifuncionais#1",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - ASSISTÊNCIA SOCIAL E HABITAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 14
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

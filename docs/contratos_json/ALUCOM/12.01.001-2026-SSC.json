@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|12.01.001/2026-SSC|id=177",
+    "source_contract_id": 177,
+    "number": "12.01.001/2026-SSC",
+    "name": "PREFEITURA MUNICIPAL DE TAUÁ - SECRETARIA DE SEGURANÇA CIDADÃ",
+    "customer_alias": "PREFEITURA MUNICIPAL DE TAUÁ",
+    "recipient_aliases": [
+      "DEPARTAMENTO DE CONTROLADORIA E OUVIDORIA DO MUNICIPIO DO TAUA",
+      "GABINETE DO PREFEITO DO MUNICIPIO DE TAUA",
+      "PREFEITURA MUNICIPAL DE TAUÁ",
+      "SECRETARIA DE DESENVOLVIMENTO RURAL E RECURSOS HÍDRICOS DA PREFEITURA DE TAUA",
+      "SUPERINTENDENCIA DO MEIO AMBIENTE DA PREFEITURA DE TAUA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "REGISTRO DE PREÇO PARA FUTURAS E EVENTUAIS SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO para atender as necessidades da Secretaria da Segurança Cidadã do Município de Tauá-CE, nas condições estabelecidas no Termo de Referência.",
+    "original_start_date": "2026-01-16",
+    "created_at": "2026-01-16T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=177"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-01-16",
+              "end_date": "2027-01-15",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2036-01-15",
+              "total_amount": 81288,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "DELL",
+                "quantity": 3,
+                "price": 420.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "DESKTOP",
+                "description": "ADI",
+                "quantity": 8,
+                "price": 352.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "desktop#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MULTIFUNCIONAL MONOCROMÁTICA A4",
+                "description": "KYOCERA",
+                "quantity": 1,
+                "price": 265.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-multifuncional-monocromatica-a4#0"
+              },
+              {
+                "alias": "NOBREAK 1200 VA",
+                "description": "SMS",
+                "quantity": 8,
+                "price": 123.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200-va#0"
+              },
+              {
+                "alias": "MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "CANON",
+                "quantity": 7,
+                "price": 207.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_SUPRESSAO",
+            "info": {
+              "start_date": "2026-01-16",
+              "end_date": "2027-01-15",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2036-01-15",
+              "total_amount": 60966,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "DELL",
+                "quantity": 3,
+                "price": 315.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "DESKTOP",
+                "description": "ADI",
+                "quantity": 8,
+                "price": 264.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "desktop#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MULTIFUNCIONAL MONOCROMÁTICA A4",
+                "description": "KYOCERA",
+                "quantity": 1,
+                "price": 198.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-multifuncional-monocromatica-a4#0"
+              },
+              {
+                "alias": "NOBREAK 1200 VA",
+                "description": "SMS",
+                "quantity": 8,
+                "price": 92.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-1200-va#0"
+              },
+              {
+                "alias": "MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "CANON",
+                "quantity": 7,
+                "price": 155.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|1004202401SESA|id=61",
+    "source_contract_id": 61,
+    "number": "1004202401SESA",
+    "name": "PREFEITURA MUNICIPAL DE TIANGUA - SAUDE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE TIANGUÁ",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE TIANGUÁ",
+      "SECRETARIA DE SAÚDE MUNICIPIO DE TIANGUÁ"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇO DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA\nITIL – INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY®, CUJOS SERVIÇOSSERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA DE SAÚDE DO MUNICÍPIO DE TIANGUÁ-CE",
+    "original_start_date": "2024-04-10",
+    "created_at": "2024-10-16T18:09:45",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=61"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-04-10",
+              "end_date": "2025-04-10",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-04-10",
+              "total_amount": 1297991,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "MICRODESKTOP ADI I5",
+                "quantity": 91,
+                "price": 223.59,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "MICRODESKTOP ADI I7",
+                "quantity": 91,
+                "price": 357.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "TABLET",
+                "description": "GALAXY TAB A9 PLUS",
+                "quantity": 155,
+                "price": 146.31,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "ILTELBRAS SF 800 Q+",
+                "quantity": 20,
+                "price": 14.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "TP-LINK TL-SG1016D",
+                "quantity": 15,
+                "price": 50.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 24 PORTAS",
+                "description": "TP-LINK TL-SG1024D",
+                "quantity": 15,
+                "price": 105.92,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-24-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "ILTELBRAS S2050G-A",
+                "quantity": 15,
+                "price": 314.22,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA COLORIDA",
+                "description": "EPSON ECOTANK L3250",
+                "quantity": 100,
+                "price": 182.48,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-colorida#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONO",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 10,
+                "price": 296.57,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-mono#0"
+              },
+              {
+                "alias": "DUPLICADOR",
+                "description": "RICOH DX-2330",
+                "quantity": 2,
+                "price": 2033.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2024-08-29",
+              "end_date": "2025-04-10",
+              "duration": 8,
+              "max_duration": 120,
+              "max_end_date": "2034-04-10",
+              "total_amount": 1622489,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "MICRODESKTOP ADI I5",
+                "quantity": 113,
+                "price": 223.59,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "MICRODESKTOP ADI I7",
+                "quantity": 113,
+                "price": 357.29,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "TABLET",
+                "description": "GALAXY TAB A9 PLUS",
+                "quantity": 193,
+                "price": 146.31,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "tablet#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "ILTELBRAS SF 800 Q+",
+                "quantity": 25,
+                "price": 14.25,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "TP-LINK TL-SG1016D",
+                "quantity": 18,
+                "price": 50.7,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 24 PORTAS",
+                "description": "TP-LINK TL-SG1024D",
+                "quantity": 18,
+                "price": 105.92,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "switch-24-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "ILTELBRAS S2050G-A",
+                "quantity": 18,
+                "price": 314.22,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA COLORIDA",
+                "description": "EPSON ECOTANK L3250",
+                "quantity": 125,
+                "price": 182.48,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-colorida#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONO",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 12,
+                "price": 296.57,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-mono#0"
+              },
+              {
+                "alias": "DUPLICADOR",
+                "description": "RICOH DX-2330",
+                "quantity": 2,
+                "price": 2033.25,
+                "months": 8,
+                "occurrence": 0,
+                "lineage_key": "duplicador#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-01-02",
+              "end_date": "2025-04-10",
+              "duration": 3,
+              "max_duration": 120,
+              "max_end_date": "2034-04-10",
+              "total_amount": 1587012,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "MICRODESKTOP ADI I5",
+                "quantity": 113,
+                "price": 223.59,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "MICRODESKTOP ADI I7",
+                "quantity": 113,
+                "price": 357.29,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "TABLET",
+                "description": "GALAXY TAB A9 PLUS",
+                "quantity": 173,
+                "price": 146.31,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "tablet#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "ILTELBRAS SF 800 Q+",
+                "quantity": 25,
+                "price": 14.25,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "TP-LINK TL-SG1016D",
+                "quantity": 18,
+                "price": 50.7,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 24 PORTAS",
+                "description": "TP-LINK TL-SG1024D",
+                "quantity": 18,
+                "price": 105.92,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-24-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "ILTELBRAS S2050G-A",
+                "quantity": 18,
+                "price": 314.22,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA COLORIDA",
+                "description": "EPSON ECOTANK L3250",
+                "quantity": 125,
+                "price": 182.48,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-colorida#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONO",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 12,
+                "price": 296.57,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-mono#0"
+              },
+              {
+                "alias": "DUPLICADOR",
+                "description": "RICOH DX-2330",
+                "quantity": 3,
+                "price": 2033.25,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "duplicador#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-04-10",
+              "end_date": "2026-04-10",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-04-10",
+              "total_amount": 1587012,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "MICRODESKTOP ADI I5",
+                "quantity": 113,
+                "price": 223.59,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "MICRODESKTOP ADI I7",
+                "quantity": 113,
+                "price": 357.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "TABLET",
+                "description": "GALAXY TAB A9 PLUS",
+                "quantity": 173,
+                "price": 146.31,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tablet#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "ILTELBRAS SF 800 Q+",
+                "quantity": 25,
+                "price": 14.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "TP-LINK TL-SG1016D",
+                "quantity": 18,
+                "price": 50.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 24 PORTAS",
+                "description": "TP-LINK TL-SG1024D",
+                "quantity": 18,
+                "price": 105.92,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-24-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "ILTELBRAS S2050G-A",
+                "quantity": 18,
+                "price": 314.22,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA COLORIDA",
+                "description": "EPSON ECOTANK L3250",
+                "quantity": 125,
+                "price": 182.48,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-colorida#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONO",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 12,
+                "price": 296.57,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-mono#0"
+              },
+              {
+                "alias": "DUPLICADOR",
+                "description": "RICOH DX-2330",
+                "quantity": 3,
+                "price": 2033.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

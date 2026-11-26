@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|49/2024|id=268",
+    "source_contract_id": 268,
+    "number": "49/2024",
+    "name": "SUPERINTENDÊNCIA DE OBRAS DO PLANO DE DESENVOLVIMENTO DO ESTADO - SUPLAN",
+    "customer_alias": "SUPLAN",
+    "recipient_aliases": [
+      "SUPLAN"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2024-05-28",
+    "created_at": "2024-08-07T11:03:17",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=268"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-05-28",
+              "end_date": "2026-05-28",
+              "duration": 36,
+              "max_duration": 48,
+              "max_end_date": "2027-05-28",
+              "total_amount": 7164,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SCANNER",
+                "description": "BROTHER ADS4900W",
+                "quantity": 1,
+                "price": 199.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "scanner#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

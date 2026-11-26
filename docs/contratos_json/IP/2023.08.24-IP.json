@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2023.08.24-IP.|id=250",
+    "source_contract_id": 250,
+    "number": "2023.08.24-IP.",
+    "name": "CLAREAR COMÉRCIO E SERVIÇOS DE MÃO DE OBRA LTDA,",
+    "customer_alias": "CLAREAR COMERCIO E SERVIÇOS DE MÃO DE OBRA LTDA",
+    "recipient_aliases": [
+      "CLAREAR COMERCIO E SERVIÇOS DE MÃO DE OBRA LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "A CONTRATADA fornece ao CONTRATANTE, os serviços de: LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, VISANDO ATENDER DE FORMA SATISFATÓRIA AS DEMANDAS DA CLAREAR COMERCIO E SERVICOS DE MAO DE OBRA LTDA, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação, incluindo entrega, suporte técnico e manutenção preventiva e corretiva.",
+    "original_start_date": "2023-09-01",
+    "created_at": "2023-09-11T16:59:42",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=250"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-09-01",
+              "end_date": "2025-09-01",
+              "duration": 24,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 14976,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL –",
+                "description": "Multifuncional Jato de Tinta",
+                "quantity": 1,
+                "price": 170.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional#0"
+              },
+              {
+                "alias": "MICRO I5",
+                "description": "8 GB, SSD 240, Monitor 19,",
+                "quantity": 2,
+                "price": 227.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "micro-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Multifuncional Jato de tinta",
+                "description": "INCLUSO 1 RECARGA DE TINTA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta#0"
+              },
+              {
+                "alias": "8 GB, SSD 240, Monitor 19,",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "8-gb-ssd-240-monitor-19#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": null,
+            "items": [],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_SUPRESSAO",
+            "info": {
+              "start_date": "2023-10-31",
+              "end_date": "2025-09-01",
+              "duration": 24,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 16284,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional Jato de Tinta - SUPRIMIDA DO CONTRATO",
+                "description": "Multifuncional Jato de Tinta",
+                "quantity": 1,
+                "price": 170.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta-suprimida-do-contrato#0"
+              },
+              {
+                "alias": "Multifuncional Laser - ACRESCIDA  AO CONTRATO",
+                "description": "Multifuncional Laser Mono",
+                "quantity": 1,
+                "price": 254.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-acrescida-ao-contrato#0"
+              },
+              {
+                "alias": "MICRO I5 - PERMANECEU NO CONTRATO",
+                "description": "8 GB, SSD 240, Monitor 19,",
+                "quantity": 2,
+                "price": 227.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "micro-i5-permaneceu-no-contrato#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "8 GB, SSD 240, Monitor 19",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "8-gb-ssd-240-monitor-19#0"
+              },
+              {
+                "alias": "Multifuncional Jato de tinta",
+                "description": "INCLUSO 1 RECARGA DE TINTA",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta#0"
+              },
+              {
+                "alias": "Multifuncional Laser Mono",
+                "description": "DENTRO DA DEMANDA SEM PAEPEL",
+                "quantity": 5000,
+                "price": 0.05,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-mono#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-10",
+              "end_date": "2027-09-10",
+              "duration": 24,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 16992,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional Laser -",
+                "description": "Multifuncional Laser Mono",
+                "quantity": 1,
+                "price": 254.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser#0"
+              },
+              {
+                "alias": "MICRO I5",
+                "description": "8 GB, SSD 240, Monitor 19,",
+                "quantity": 2,
+                "price": 227.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "micro-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Multifuncional Laser Mono",
+                "description": "DENTRO DA DEMANDA SEM PAEPEL",
+                "quantity": 5000,
+                "price": 0.05,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-mono#0"
+              },
+              {
+                "alias": "8 GB, SSD 240, Monitor 19",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "8-gb-ssd-240-monitor-19#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

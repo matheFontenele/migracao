@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|016/2026-008|SECRETARIA DE EDUCAÇÃO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "source_contract_id": null,
+    "number": "016/2026-008",
+    "name": "SECRETARIA DE EDUCAÇÃO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENÇÃO - CE",
+    "recipient_aliases": [
+      "SECRETARIA DE EDUCAÇÃO MUNICIPIO DE REDENÇÃO - 016/2026-002 PE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é o REGISTRO DE PREÇO PARA CONTRATAÇÃO DE EMPRESAS ESPECIALIZADAS NA LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS E MÁQUINAS COPIADORAS PARA ATENDER AS NECESSIDADES DAS DIVERSAS SECRETARIAS DO MUNICIPIO DE REDENÇÃO/CE.",
+    "original_start_date": "2026-07-24",
+    "created_at": "2026-07-24T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Alucom/PLANILHA (AL) - EDUCAÇÃO.xlsx",
+        "sheet": "OUT26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-07-24",
+              "end_date": "2027-11-24",
+              "duration": 16,
+              "max_duration": 120,
+              "max_end_date": "2036-07-23",
+              "total_amount": 175092.12,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS – COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS – COM MANUTENÇÃO PREVENTIVA E CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGAS DE CARTUCHOS. ESPECIFICAÇÃO: IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA, IMPRESSÃO, CÓPIA, DIGITALIZAÇÃO, ENVIO, FAX; PAINEL COLORIDO 5\"; ATÉ 43PPM(A4); RESOLUÇÃO: 600X600DPI (ATÉ 1200 DPI OTIMIZADO); EMULAÇÃO: UFR II LT, PCL 5E/6 ADOBE PS 3; RESOLUÇÃO DA CÓPIA; ATÉ 600X600 DPI; CÓPIA DUPLEX: AUTOMATICA; RESOLUÇÃO ÓTICA: 600X600 DPI; CAPACIDADE DE ENTRADA: 550 FOLHAS BANDEJA PADRÃO; BANDEJA MULTIUSO: 100 FOLHAS; CAPACIDADE DE SAÍDA 150 FOLHAS;CICLO MENSAL MAXIMO 150.000 IMPRESSOES; PROCESSADOR: DUPLO 800MHZ; MIDIA DE MEMORIA: PADRÃO USB; CONEXÃO 1000BASE-T/100 BASE-TX/10-BASE-T, WIRELESS LAN, NFC, WI-FI DIRECT CONNECTION; MEMÓRIA: 1,0GB RAM; 16.000 PAGINAS/MÊS",
+                "quantity": 30,
+                "price": 290.54,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais#0",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - EDUCAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS",
+                "description": "LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS. ESPECIFICAÇÃOES: LOCAÇÃO DE IMPRESSORAS MULTIFUNCIONAIS COM MANUTENÇÃO PREVENTIVA E CORRETIVA COM REPOSIÇÃO DE PEÇAS E RECARGAS DE TINTAS, CICLO MENSAL MAXIMO 30.000 IMPRESSÕES/MÊS COLORIDA COM ECO TANK, WIFI INTEGRADO, PRONTO PARA A REDE WIRELESS E COM FUNÇÃO SCANER, SEM LIMITE DE IMPRESSÕES. 6.000 IMPRESSOES/MÊS",
+                "quantity": 31,
+                "price": 189.51,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-impressoras-multifuncionais#1",
+                "source": {
+                  "file": "contratos_tratamento/Alucom/PLANILHA (AL) - EDUCAÇÃO.xlsx",
+                  "sheet": "OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

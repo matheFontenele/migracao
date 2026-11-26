@@ -1,0 +1,597 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|11/2022-08|SECRETARIA DE DESENV. ECONÔMICO, CULTURA E TURISMO DO MUNICIPIO DE ICÓ/CE",
+    "source_contract_id": null,
+    "number": "11/2022-08",
+    "name": "SECRETARIA DE DESENV. ECONÔMICO, CULTURA E TURISMO DO MUNICIPIO DE ICÓ/CE",
+    "customer_alias": "MUNICÍPIO DE ICÓ",
+    "recipient_aliases": [
+      "SECRETARIA DE DESENV. ECONÔMICO, CULTURA E TURISMO DO MUNICIPIO DE ICÓ/CE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "REGISTRO DE PREÇOS PARA FUTURAS E EVENTUAIS CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, COM MANUNTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, JUNTO A SECRETARIA DE DESENV. ECONÔMICO, CULTURA E TURISMO DO MUNICIPIO DE ICÓ/CE",
+    "original_start_date": "2023-01-01",
+    "created_at": "2023-01-01T00:00:00",
+    "source": [
+      {
+        "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+        "sheet": "CULTURA- NOV26",
+        "row": 9
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-01-01",
+              "end_date": "2023-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 127161.48,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 2,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 15,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK TIPO I - ESPECIFICAÇÕES MÍNIMAS: Notebook I7 ou AMD Ryzen7, memória 8GB, HD 1TB, Tela 15”, Windows 10 ou superior.",
+                "quantity": 3,
+                "price": 562.6,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 7,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 17
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "IMPRESSORA TIPO III – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) jato de tinta A4 com Bulk Ink, resolução 4800x1200dpi, WiFi - Franquia de duas recargas de tinta/mês por equipamento.",
+                "quantity": 2,
+                "price": 166.84,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 18
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 1,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 24
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 15,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 25
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO VIII",
+                "description": "COMPONENTE TIPO VIII - ESPECIFICAÇÕES MÍNIMAS: Switch 16 portas gerenciável.",
+                "quantity": 2,
+                "price": 58.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-viii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 26
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IX",
+                "description": "COMPONENTE TIPO IX - ESPECIFICAÇÕES MÍNIMAS: Switch 8 portas.",
+                "quantity": 1,
+                "price": 16.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 27
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 28
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 29
+                }
+              },
+              {
+                "alias": "PROJETOR TIPO I",
+                "description": "PROJETOR TIPO I – ESPECIFICAÇÕES MÍNIMAS: Projetor Multimídia 2.500 lumens.",
+                "quantity": 4,
+                "price": 214.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "projetor-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 30
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-01-01",
+              "end_date": "2024-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 127161.48,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 2,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 15,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK TIPO I - ESPECIFICAÇÕES MÍNIMAS: Notebook I7 ou AMD Ryzen7, memória 8GB, HD 1TB, Tela 15”, Windows 10 ou superior.",
+                "quantity": 3,
+                "price": 562.6,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 7,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 17
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "IMPRESSORA TIPO III – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) jato de tinta A4 com Bulk Ink, resolução 4800x1200dpi, WiFi - Franquia de duas recargas de tinta/mês por equipamento.",
+                "quantity": 2,
+                "price": 166.84,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 18
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 1,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 24
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 15,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 25
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO VIII",
+                "description": "COMPONENTE TIPO VIII - ESPECIFICAÇÕES MÍNIMAS: Switch 16 portas gerenciável.",
+                "quantity": 2,
+                "price": 58.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-viii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 26
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IX",
+                "description": "COMPONENTE TIPO IX - ESPECIFICAÇÕES MÍNIMAS: Switch 8 portas.",
+                "quantity": 1,
+                "price": 16.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 27
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 28
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 29
+                }
+              },
+              {
+                "alias": "PROJETOR TIPO I",
+                "description": "PROJETOR TIPO I – ESPECIFICAÇÕES MÍNIMAS: Projetor Multimídia 2.500 lumens.",
+                "quantity": 4,
+                "price": 214.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "projetor-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 30
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-01-01",
+              "end_date": "2025-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-12-31",
+              "total_amount": 127161.48,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR TIPO I",
+                "description": "MICROCOMPUTADOR TIPO I - ESPECIFICAÇÕES MÍNIMAS: Desktop I7 ou AMD Ryzen7, Memória 8GB, HD 1TB ou 480GB SSD, monitor 18,5\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2.",
+                "quantity": 2,
+                "price": 423.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR TIPO II",
+                "description": "MICROCOMPUTADOR TIPO II - ESPECIFICAÇÕES MÍNIMAS: Desktop I5 ou AMD Ryzen5, Memória 4GB, HD 500GB ou 240 SSD, monitor 17\", Windows 10 ou superior, Teclado USB/PS2, Mouse USB/PS2",
+                "quantity": 15,
+                "price": 245.41,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-tipo-ii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK TIPO I - ESPECIFICAÇÕES MÍNIMAS: Notebook I7 ou AMD Ryzen7, memória 8GB, HD 1TB, Tela 15”, Windows 10 ou superior.",
+                "quantity": 3,
+                "price": 562.6,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "IMPRESSORA TIPO I – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) Laser Monocromática, tamanho A4, velocidade 30ppm, resolução 600x600dpi. Franquia de impressão ou cópia de 5000 páginas/mês por equipamento. Incluindo o abastecimento de tonner.",
+                "quantity": 7,
+                "price": 362.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 17
+                }
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "IMPRESSORA TIPO III – ESPECIFICAÇÕES MÍNIMAS: Multifuncional (impressão, cópia e digitalização) jato de tinta A4 com Bulk Ink, resolução 4800x1200dpi, WiFi - Franquia de duas recargas de tinta/mês por equipamento.",
+                "quantity": 2,
+                "price": 166.84,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 18
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "COMPONENTE TIPO III – ESPECIFICAÇÕES MÍNIMAS: No break 1200 VA",
+                "quantity": 1,
+                "price": 71.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 24
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "COMPONENTE TIPO V – ESPECIFICAÇÕES MÍNIMAS: Estabilizador potência 300va, 4 saídas, entrada bivolt 110/220v, saída 110v.",
+                "quantity": 15,
+                "price": 20.37,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 25
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO VIII",
+                "description": "COMPONENTE TIPO VIII - ESPECIFICAÇÕES MÍNIMAS: Switch 16 portas gerenciável.",
+                "quantity": 2,
+                "price": 58.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-viii#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 26
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO IX",
+                "description": "COMPONENTE TIPO IX - ESPECIFICAÇÕES MÍNIMAS: Switch 8 portas.",
+                "quantity": 1,
+                "price": 16.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ix#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 27
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "COMPONENTE TIPO X - ESPECIFICAÇÕES MÍNIMAS: Access point indoor banda dupla mínimo 1750 Mbps,",
+                "quantity": 1,
+                "price": 101.85,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 28
+                }
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "COMPONENTE TIPO XI - ESPECIFICAÇÕES MÍNIMAS: Repetidor Wifi Amplificador De Sinal mínimo 2800m.",
+                "quantity": 1,
+                "price": 41.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 29
+                }
+              },
+              {
+                "alias": "PROJETOR TIPO I",
+                "description": "PROJETOR TIPO I – ESPECIFICAÇÕES MÍNIMAS: Projetor Multimídia 2.500 lumens.",
+                "quantity": 4,
+                "price": 214.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "projetor-tipo-i#0",
+                "source": {
+                  "file": "ICO/PLANILHA - ICÓ - (DR) -  DES. ECON. CULTURA E TUR.xls.xlsx",
+                  "sheet": "CULTURA- NOV26",
+                  "row": 30
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

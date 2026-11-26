@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|20250813006|id=80",
+    "source_contract_id": 80,
+    "number": "20250813006",
+    "name": "PREFEITURA MUNICIPAL DE PALMACIA - CULTURA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE PALMACIA",
+    "recipient_aliases": [
+      "CONTROLADORIA DO MUNICIPIO DE PALMACIA",
+      "GABINETE DO PREFEITO DO MUNICIPIO DE PALMACIA",
+      "PREFEITURA MUNICIPAL DE PALMACIA",
+      "SECRETARIA DE ACAO SOCIAL DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE ADMINISTRACAO DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE AGRICULTURA DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE ASSISTENCIA SOCIAL DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE COMPRAS - PALMACIA",
+      "SECRETARIA DE CONSELHO TUTELAR DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE CULTURA DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE EDUCACAO DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE FINANCAS DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE LICITAÇÃO - PALMACIA",
+      "SECRETARIA DE OBRAS DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE PREVIDENCIA SOCIAL DO MUNICIPIO DE PALMACIA",
+      "SECRETARIA DE SAÚDE DO MUNICIPIO DE PALMACIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "REGISTRO DE PREÇO PARA FUTURAS E EVENTUAIS SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, PARA ATENDER AS NECESSIDADES DAS DIVERSAS SECRETARIAS DO MUNICÍPIO DE PALMÁCIA-CEARÁ., nas condições estabelecidas no Termo de Referência.",
+    "original_start_date": "2025-08-13",
+    "created_at": "2025-02-27T09:13:23",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=80"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-13",
+              "end_date": "2026-08-12",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-08-12",
+              "total_amount": 12444,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "DELL",
+                "quantity": 1,
+                "price": 420.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICRODESKTOP",
+                "description": "ADI",
+                "quantity": 1,
+                "price": 352.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "KYOCERA",
+                "quantity": 1,
+                "price": 265.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

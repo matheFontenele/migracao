@@ -1,0 +1,496 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2021.08.02.01-09|id=150",
+    "source_contract_id": 150,
+    "number": "2021.08.02.01-09",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA - SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE 2021.08.02.01-09",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL – INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY®, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DA SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE DO MUNICÍPIO DE CAUCAIA-CE",
+    "original_start_date": "2021-09-20",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=150"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-09-20",
+              "end_date": "2022-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 89308,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7 ",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 6,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Micro TIPO III",
+                "description": "Micro Desktop I3 ",
+                "quantity": 6,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4, mín. 30ppm.",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-09-20",
+              "end_date": "2023-09-19",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 89308,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7 ",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 6,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Micro TIPO III",
+                "description": "Micro Desktop I3 ",
+                "quantity": 6,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4, mín. 30ppm.",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-09-20",
+              "end_date": "2024-09-20",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 89308,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7 ",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 6,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Micro TIPO III",
+                "description": "Micro Desktop I3 ",
+                "quantity": 6,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4, mín. 30ppm.",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-09-21",
+              "end_date": "2025-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-20",
+              "total_amount": 89308,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7 ",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 6,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Micro TIPO III",
+                "description": "Micro Desktop I3 ",
+                "quantity": 6,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4, mín. 30ppm.",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-22",
+              "end_date": "2026-09-21",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-09-21",
+              "total_amount": 89308,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook TIPO I",
+                "description": "Notebook I7 ",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "Notebook TIPO II",
+                "description": "Notebook I5 ",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "Notebook TIPO III",
+                "description": "Notebook I3 ",
+                "quantity": 2,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "Micro TIPO I",
+                "description": "Micro Desktop I7 ",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "Micro TIPO II",
+                "description": "Micro Desktop I5",
+                "quantity": 6,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "Micro TIPO III",
+                "description": "Micro Desktop I3 ",
+                "quantity": 6,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "Impressora Tipo I",
+                "description": "Multifuncional laser monocromática A4, mín. 30ppm.",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "Impressora Tipo III",
+                "description": "Multifuncional jato de tinta A4 com Bulk Ink.",
+                "quantity": 4,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente ajustado por de/para: 'PREFEITURA MUNICIPAL DE CAUCAIA - SECRETARIA MUNICIPAL DE ESPORTE E JUVENTUDE' -> 'PREFEITURA MUNICIPAL DE CAUCAIA'",
+      "pareamento por ordem de evento (duas cadeias CADASTRO sem vínculo com o número do contrato)",
+      "total_amount arredondado de 89308.40 para 89308 (coluna INT)"
+    ]
+  }
+}

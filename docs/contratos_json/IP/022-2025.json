@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|022/2025.|id=210",
+    "source_contract_id": 210,
+    "number": "022/2025.",
+    "name": "FACULDADE CENTRO SUL LTDA",
+    "customer_alias": "FACULDADE CENTRO SUL LTDA",
+    "recipient_aliases": [
+      "FACULDADE CENTRO SUL LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "ENCERRADO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE, os Serviços de locação de equipamentos de informática, incluindo instalação, suporte técnico e manutenção preventiva e corretiva, visando atender de forma satisfatória ao Fundação Edson Queiroz, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-11-16",
+    "created_at": "2025-11-16T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=210"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-11-16",
+              "end_date": "2025-11-21",
+              "duration": 1,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 6250,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook i3",
+                "description": "- 8GB SSD 120GB - SSD -Windows 10.",
+                "quantity": 25,
+                "price": 250.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Notebook i3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

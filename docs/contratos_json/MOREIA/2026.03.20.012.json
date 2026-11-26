@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2026.03.20.012|SECRETARIA DE POLITICAS PUBLICAS PARA AS MULHERES",
+    "source_contract_id": null,
+    "number": "2026.03.20.012",
+    "name": "SECRETARIA DE POLITICAS PUBLICAS PARA AS MULHERES",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE POLITICAS PUBLICAS PARA AS MULHERES"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO INSTALAÇÃO, SUPORTE TÉCNICO E MANUTENÇÃO PREVENTIVA E CORRETIVA ON SITE, TROCA DE PEÇAS E COMPONENTES NECESSÁRIOS A MANUTENÇÃO, BEM COMO O FORNECIMENTO DE INSUMOS NECESSÁRIOS A NÃO INTERRUPÇÃO DOS SERVIÇOS (EXCETO PAPEL E GRAMPO), VISANDO ATENDER DE FORMA SATISFATÓRIA A DEMANDA NECESSÁRIA DA SECRETARIA DE POLITICAS PUBLICAS PARA AS MULHERES DE ARACOIABA - CE.",
+    "original_start_date": "2026-03-20",
+    "created_at": "2026-03-20T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - POLITICAS PUBLICAS PARA AS MULHERES Nº 2026.03.20.012 - DR.xlsx",
+        "sheet": "ABR26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-03-20",
+              "end_date": "2027-03-20",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2027-03-20",
+              "total_amount": 2760.48,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "NOTEBOOK, I5 OU AMD RY-ZEN5, MEMÓRIA 8GB, SSD 240G, MONITOR 15. WIN-DOWS 10 OU SUPERIOR",
+                "quantity": 1,
+                "price": 230.04,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - POLITICAS PUBLICAS PARA AS MULHERES Nº 2026.03.20.012 - DR.xlsx",
+                  "sheet": "ABR26",
+                  "row": 11
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

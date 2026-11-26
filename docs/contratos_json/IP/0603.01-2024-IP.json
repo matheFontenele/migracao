@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|0603.01-2024 IP|id=199",
+    "source_contract_id": 199,
+    "number": "0603.01-2024 IP",
+    "name": "G&T CONTROLLER LTDA ME - 0603.01",
+    "customer_alias": "G&T CONTROLLER LTDA ME",
+    "recipient_aliases": [
+      "G&T CONTROLLER LTDA ME"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "serviços de Serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da G&T CONTROLLER LTDA LTDA no Município Fortaleza/CE, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2024-06-03",
+    "created_at": "2025-01-23T11:13:19",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=199"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-06-03",
+              "end_date": "2025-06-03",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 4200,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "DESKTOP I3",
+                "description": "Processador Core I3, memória RAM 4gb, HD 500gb, monitor LED 17”, teclado, mouse e estabilizador 300va.",
+                "quantity": 1,
+                "price": 170.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "desktop-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MULTIFUNCIONAL MONOCROMÁTICA A4",
+                "description": "Multifuncional laser monocromática (imprime, cópia e digitaliza), velocidade de impressão: 43ppm.",
+                "quantity": 1,
+                "price": 180.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-multifuncional-monocromatica-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO MONO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 5000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-mono-em-impressora-multifuncional-color-a4#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

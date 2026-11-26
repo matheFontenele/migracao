@@ -1,0 +1,558 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|005/2022|id=47",
+    "source_contract_id": 47,
+    "number": "005/2022",
+    "name": "CITINOVA",
+    "customer_alias": "FUNDACAO DE CIENCIA,TECNOLOGIA  E INOVACAO DE FORTALEZA - CITINOVA",
+    "recipient_aliases": [
+      "FUNDACAO DE CIENCIA,TECNOLOGIA  E INOVACAO DE FORTALEZA - CITINOVA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "locações de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva in-loco, bem como atuação nos processos de gerenciamento de serviços, com base em melhores práticas definidas pela ITIL – Information Technology Infrastructure Library®, cujos serviços serão avaliados através de acordos de nível de serviço, para atender às necessidades administrativas da Fundação de Ciência, Tecnologia e Inovação – CITINOVA",
+    "original_start_date": "2022-09-16",
+    "created_at": "2022-09-20T17:55:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=47"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-09-16",
+              "end_date": "2023-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 278475,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 24,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 20,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 283.89,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 6,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 29.23,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 199.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 264.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 24,
+                "price": 534.71,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 20,
+                "price": 387.36,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 13.42,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 283.89,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 6,
+                "price": 91.18,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 29.23,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 199.46,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 264.11,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2023-09-16",
+              "end_date": "2024-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 316736,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 30,
+                "price": 496.21,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 25,
+                "price": 359.47,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 12.45,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 263.45,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 7,
+                "price": 84.62,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 27.13,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 185.1,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 245.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 30,
+                "price": 496.21,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 25,
+                "price": 359.47,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 12.45,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 263.45,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 7,
+                "price": 84.62,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 27.13,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 185.1,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 245.09,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2024-09-16",
+              "end_date": "2025-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 328835,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 30,
+                "price": 515.1652,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 25,
+                "price": 373.2018,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 12.9256,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 273.5138,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 7,
+                "price": 87.8525,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 28.1664,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 192.1708,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 254.4524,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-16",
+              "end_date": "2026-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 328835,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook I7",
+                "description": "otebook I7 ou AMD Ryzen7 no mínimo 8ª geração, memória 8GB HD 1TB monitor 15”, Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, qualidade filtros de linha, extensões de energia sem ônus para o contratanteredes/intranet/ínternet incluindo cabos (de rede ou fibra ótica) e conectores, impressoras,acessórios, estabilizador, placas, Instalação/desinstalação de antivírus e softwares do contratante ou de terceiros, instalação e",
+                "quantity": 30,
+                "price": 515.1652,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "Micro Desktoop I7",
+                "description": "Micro Desktop I7 ou AMD Ryzen7 mínimo 3° geração, Memória 8GB HD 1TB monitor 19\", Windows 10 ou superior. Aumento da capacidade do processamento (geração do processador), monitor, memória, HD ou tipo de HD, inclusão de Webcam sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Serviços integrados na locação do equipamento: Instalação/desinstalação de antivírus e softwares do contratante ou ",
+                "quantity": 25,
+                "price": 373.2018,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktoop-i7#0"
+              },
+              {
+                "alias": "Switch 8 Portas",
+                "description": "Switch 8 Portas. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (auatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante.",
+                "quantity": 10,
+                "price": 12.9256,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS GERENCIAVEL",
+                "description": "SWITCH 48 PORTAS GERENCIÁVEL. INSTALAÇÃO, DESINSTALAÇÃO, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA CAPACIDADE, VELOCIDADE E CONECTIVIDADE SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS, 7 (SETE) DIAS POR SEMANA 24 (VI",
+                "quantity": 4,
+                "price": 273.5138,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas-gerenciavel#0"
+              },
+              {
+                "alias": "Access point indor",
+                "description": "Access point indoor banda dupla mínimo 1750 Mbps. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 7,
+                "price": 87.8525,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "access-point-indor#0"
+              },
+              {
+                "alias": "HD Externo portátil 2TB",
+                "description": "HD Externo portátil 2TB. Instalação, desinstalação, estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Aumento da capacidade, velocidade e conectividade sem ônus para o contratante",
+                "quantity": 5,
+                "price": 28.1664,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "hd-externo-portatil-2tb#0"
+              },
+              {
+                "alias": "No break 3000 VA",
+                "description": "No break 3000 VA. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. O CONTRATANTE definirá o tipo de entrada e saída de acordo com sua necessidade. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas, 7 (sete) dias por semana 24 (vinte e quatro) horas por dia. Instalação, desinstala",
+                "quantity": 2,
+                "price": 192.1708,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "no-break-3000-va#0"
+              },
+              {
+                "alias": "TV 65 polegadas",
+                "description": "TV 65 polegadas smart ou superior. Atenção: o CONTRATADO deverá dispor de equipamento de backup em estoque para troca em caso de pane em no máximo 4 (quatro) horas. Instalação, desinstalação, suportes, extensões, no break e estabilizador de energia quando necessário, cabeamento de rede incluindo fibra ótica, configuração (em máquinas do contratado, de terceiros ou de propriedade da contratante) sem ônus para o contratante",
+                "quantity": 1,
+                "price": 254.4524,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-65-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

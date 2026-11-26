@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|10/2024|id=13",
+    "source_contract_id": 13,
+    "number": "10/2024",
+    "name": "MINISTÉRIO DA AGRICULTURA E PECUÁRIA/SUPERINTENDÊNCIA FEDERAL DE AGRICULTURA E PECUÁRIA NO PARANÁ (SFA-PR/MAPA)",
+    "customer_alias": "MINISTÉRIO DA AGRICULTURA E PECUÁRIA/SUPERINTENDÊNCIA FEDERAL DE AGRICULTURA E PECUÁRIA NO PARANÁ (SFA-PR/MAPA)",
+    "recipient_aliases": [
+      "MINISTÉRIO DA AGRICULTURA E PECUÁRIA/SUPERINTENDÊNCIA FEDERAL DE AGRICULTURA E PECUÁRIA NO PARANÁ (SFA-PR/MAPA)"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a Contratação de solução de tecnologia da informação e comunicação de outsourcing de impressão e digitalizaçãona modalidade franquia de página mais excedente, com fornecimento de equipamentos, soware de gerenciamento de impressão efe vamente realizadas,manutenção preven va e corre va dos equipamentos com subs tuição de peças, componentes e materiais u lizados na manutenção e fornecimento de insumosoriginais, exceto papel, para atender as necessidades de impress",
+    "original_start_date": "2025-02-05",
+    "created_at": "2025-01-12T17:07:15",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=13"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-02-05",
+              "end_date": "2029-02-05",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2030-02-05",
+              "total_amount": 68287,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " Epson WorkForce Pro WF-M5899 + OCR ",
+                "quantity": 11,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 2000,
+                "price": 0.1538,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 2000,
+                "price": 0.1329,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 5.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 35000,
+                "price": 0.1538,
+                "months": 12,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 5.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 35000,
+                "price": 0.1329,
+                "months": 12,
+                "occurrence": 3,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#3"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

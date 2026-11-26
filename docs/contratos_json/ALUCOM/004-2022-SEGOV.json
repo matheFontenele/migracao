@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|004/2022-SEGOV|id=135",
+    "source_contract_id": 135,
+    "number": "004/2022-SEGOV",
+    "name": "PREFEITURA MUNICIPAL DE CAUCAIA -  SECRETARIA DE GESTÃO E GOVERNO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL – INFORMATION TECHNOLOGY INFRASTRUCTURE LIBRARY®, cujos serviços serão avaliados através de Acordos de Nível de Serviço, para atender as necessidades da Secretaria Municipal de Governo do Município de Caucaia-CE",
+    "original_start_date": "2022-02-07",
+    "created_at": "2022-02-07T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=135"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-02-07",
+              "end_date": "2023-02-06",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-02-06",
+              "total_amount": 78734,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 15,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER – PÁGINAS A4",
+                "description": "MULTIFUNCIONAL ",
+                "quantity": 2,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL - PÁGINAS A4",
+                "description": " JATO DE TINTA",
+                "quantity": 6,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-paginas-a4#0"
+              },
+              {
+                "alias": "DATASHOW TIPO I",
+                "description": "2500 LUMENS",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI ",
+                "quantity": 4,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2022-02-07",
+              "end_date": "2024-02-07",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-02-07",
+              "total_amount": 78734,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 15,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER – PÁGINAS A4",
+                "description": "MULTIFUNCIONAL ",
+                "quantity": 2,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL - PÁGINAS A4",
+                "description": " JATO DE TINTA",
+                "quantity": 6,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-paginas-a4#0"
+              },
+              {
+                "alias": "DATASHOW TIPO I",
+                "description": "2500 LUMENS",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI ",
+                "quantity": 4,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-02-08",
+              "end_date": "2025-02-08",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-02-07",
+              "total_amount": 78734,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 15,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER – PÁGINAS A4",
+                "description": "MULTIFUNCIONAL ",
+                "quantity": 2,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL - PÁGINAS A4",
+                "description": " JATO DE TINTA",
+                "quantity": 6,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-paginas-a4#0"
+              },
+              {
+                "alias": "DATASHOW TIPO I",
+                "description": "2500 LUMENS",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI ",
+                "quantity": 4,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-02-09",
+              "end_date": "2026-02-09",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-02-07",
+              "total_amount": 78734,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 8,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 15,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER – PÁGINAS A4",
+                "description": "MULTIFUNCIONAL ",
+                "quantity": 2,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL - PÁGINAS A4",
+                "description": " JATO DE TINTA",
+                "quantity": 6,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-paginas-a4#0"
+              },
+              {
+                "alias": "DATASHOW TIPO I",
+                "description": "2500 LUMENS",
+                "quantity": 1,
+                "price": 181.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-tipo-i#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI ",
+                "quantity": 4,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2026.01.28.001|SECRETARIA DE FINANÇAS, PLANEJAMENTO E GESTÃO",
+    "source_contract_id": null,
+    "number": "2026.01.28.001",
+    "name": "SECRETARIA DE FINANÇAS, PLANEJAMENTO E GESTÃO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE FINANÇAS, PLANEJAMENTO E GESTÃO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO INSTALAÇÃO, SUPORTE TÉCNICO E MANUTENÇÃO PREVENTIVA E CORRETIVA ON SITE, TROCA DE PEÇAS E COMPONENTES NECESSÁRIOS A MANUTENÇÃO, BEM COMO O FORNECIMENTO DE INSUMOS NECESSÁRIOS A NÃO INTERRUPÇÃO DOS SERVIÇOS (EXCETO PAPEL E GRAMPO), VISANDO ATENDER DE FORMA SATISFATÓRIA A DEMANDA NECESSÁRIA DA SECRETARIA DE FINANÇAS, PLANEJAMENTO E GESTÃO DE ARACOIABA - CE.",
+    "original_start_date": "2026-01-28",
+    "created_at": "2026-01-28T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - FINANÇAS, PLANEJAMENTO E GESTÃO Nº 2026.01.28.001 - DR.xlsx",
+        "sheet": "FEV26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-01-28",
+              "end_date": "2027-01-27",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2027-01-27",
+              "total_amount": 14659.44,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "NOBREAK 700VA",
+                "quantity": 5,
+                "price": 19.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - FINANÇAS, PLANEJAMENTO E GESTÃO Nº 2026.01.28.001 - DR.xlsx",
+                  "sheet": "FEV26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MICRO DESKTOP I5 OU AMD RY-ZEN5 MEMÓRIA 8GB",
+                "description": "MICRO DESKTOP I5 OU AMD RY-ZEN5 MEMÓRIA 8GB, SSF 480GB. MONITOR 21 PO-LEGADAS. WINDOWS 11. TECLADO E MOUSE SEM FIO, WIFI",
+                "quantity": 9,
+                "price": 117.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktop-i5-ou-amd-ry-zen5-memoria-8gb#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - FINANÇAS, PLANEJAMENTO E GESTÃO Nº 2026.01.28.001 - DR.xlsx",
+                  "sheet": "FEV26",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "MODULO ISOLADOR ESTABILIZADO 500W SEM ATERRAMENTO",
+                "description": "MODULO ISOLADOR ESTABILIZADO 500W SEM ATERRAMENTO",
+                "quantity": 6,
+                "price": 12.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "modulo-isolador-estabilizado-500w-sem-aterramento#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - FINANÇAS, PLANEJAMENTO E GESTÃO Nº 2026.01.28.001 - DR.xlsx",
+                  "sheet": "FEV26",
+                  "row": 13
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

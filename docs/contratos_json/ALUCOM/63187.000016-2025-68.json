@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|63187.000016/2025-68|id=18",
+    "source_contract_id": 18,
+    "number": "63187.000016/2025-68",
+    "name": "DELEGACIA DA CAPITANIA DE SÃO FRANCISCO DO SUL",
+    "customer_alias": "DELEGACIA DA CAPITANIA DOS PORTOS",
+    "recipient_aliases": [
+      "DELEGACIA DA CAPITANIA DOS PORTOS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação de solução de tecnologia da informação e comunicação de outsourcing de impressão e digitalização na modalidade franquia de página mais excedente, com fornecimento de equipamentos, software de gerenciamento de impressões efetivamente realizadas, manutenção preventiva e corretiva dos equipamentos, com substituição de peças, componentes e materiais utilizados na manutenção e fornecimento de insumos originais, exceto papel, para atender as necessidade",
+    "original_start_date": "2025-01-20",
+    "created_at": "2025-01-30T14:27:01",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=18"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-01-20",
+              "end_date": "2027-01-19",
+              "duration": 24,
+              "max_duration": 60,
+              "max_end_date": "2030-01-19",
+              "total_amount": 28430,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "Epson WorkForce Pro WF- M5899",
+                "quantity": 4,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "KYOCERA ECOSYS MA3500cix",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 48000,
+                "price": 0.1538,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 48000,
+                "price": 0.1329,
+                "months": 24,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 12000,
+                "price": 0.7668,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 12000,
+                "price": 0.4556,
+                "months": 24,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

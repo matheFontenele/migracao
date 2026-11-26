@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|003.102.301|SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA",
+    "source_contract_id": null,
+    "number": "003.102.301",
+    "name": "SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE EUSÉBIO",
+    "recipient_aliases": [
+      "SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇÃO COM MANUTENÇÃO, REPOSIÇÃO DE PEÇAS E RECARGA DE MULTIFUNCIONAIS, JUNTO A SECRETARIA DE EGURANÇA PUBLICA E CIDADANIA DO MUNICÍPIO DE EUSÉBIO-CE",
+    "original_start_date": "2023-02-03",
+    "created_at": "2023-02-03T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+        "sheet": "SEG PUBLICA ",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-02-03",
+              "end_date": "2024-03-02",
+              "duration": 13,
+              "max_duration": 13,
+              "max_end_date": "2024-03-02",
+              "total_amount": 15840.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •MULTIFUNCIONAL LASER MONOCROMÁTICA ESPECIFICAÇÕES: TAMANHO MÁXIMO DO PAPEL: OFÍCIO (21.6 X 35,6 CM); VELOCIDADE DE IMPRESSÃO MÍNIMO 30PPM (PÁGINA POR MINUTO);RESOLUÇÃO: MÍNIMO 1 200 X 1.200 DPI DE RESOLUÇÃO;CAPACIDADE DE IMPRESSÃO DUPLEX: AUTOMÁTICO;BANDEJA DE ENTRADA DE PAPEL 250 FOLHAS; BANDEJA DE SAÍDA DE PAPEL MÍNIMO: 50 FOLHAS; ALIMENTADOR AUTOMÁTICO DE DOCUMENTOS (ARDF): MÍNIMO 50 FOLHAS; INTERFACE PADRÃO USB 2.0;RESOLUÇÃO DE CÓPIA MÍNIMO ATÉ 600 X 600 DPI DE RESOLUÇÃO DO SCANNER MÍNIMO: ATÉ 600 X 600 DPI;COMPATIBILIDADE WINDOWS; COM O FORNECIMENTO DE INSUMOS E CONSUMÍVEIS EXCETO PAPEL. ESTIMATIVA DE PAGINAS IMPRESSAS POR MÊS POR IMPRESSORA: DE 01 (UM) A 6.000 (SEIS MIL); (ATUALIZACAO DO AUMENTO DA CAPACIDADE DE IMPRESSAO OU QUALIDADE DE IMPRESSAO SEM ONUS PARA O CONTRATANTE).",
+                "quantity": 7,
+                "price": 165.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": "SEG PUBLICA ",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO",
+                "description": "MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO: •MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO: TAMANHO MÁXIMO DO PAPEL: OFÍCIO (21.6 X 35,6 CM);RESOLUÇÃO DA IMPRESSÃO MÍNIMO: 4800 X 1200 DPI; VELOCIDADE DE IMPRESSÃO MINIMO 8IPM;BANDEJA DE ENTRADA DE PAPEL MÍNIMO 50 FOLHAS; INTERFACE PADRÃO: USB E WIFI; COMPATIBILIDADE WINDOWS;EQUIPADA COM SISTEMA DE ALIMENTAÇÃO CONTINUA DE TINTA BULKINK ORIGINAL DO FABRICANTE COM CAPACIDADE PARA ARMAZENAMENTO MINIMO DE 100ML PARA CADA COR COM FORNECIMENTO DE UMA RECARGA COMPLETA POR MÊS; (ATUALIZACAO DO AUMENTO DA CAPACIDADE DE IMPRESSAO OU QUALIDADE DE IMPRESSAO SEM ONUS PARA O CONTRATANTE).",
+                "quantity": 1,
+                "price": 165.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta-colorida-especificacao#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": "SEG PUBLICA ",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

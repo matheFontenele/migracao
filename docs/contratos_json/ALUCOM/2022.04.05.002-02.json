@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|2022.04.05.002-02|id=111",
+    "source_contract_id": 111,
+    "number": "2022.04.05.002-02",
+    "name": "PREFEITURA MUNICIPAL DE CAMOCIM - SAÚDE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE CAMOCIM",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE CAMOCIM",
+      "SECRETARIA DE DESENVOLVIMENTO SOCIAL DO MUNICIPIO DE CAMOCIM",
+      "SECRETARIA DE SAÚDE MUNICIPIO DE CAMOCIM"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O presente contrato tem por objeto a REGISTRO DE PREÇOS VISANDO FUTURAS E EVENTUAIS CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS, COM BASE EM MELHORES PRÁTICAS DEFINIDAS PELA ITIL - BIBLIOTECA DE INFRAESTRUTURA DE TECNOLOGIA, CUJOS SERVIÇOS SERÃO AVALIADOS ATRAVÉS DE ACORDOS DE NÍVEL DE SERVIÇO, PARA ATENDER AS NECESSIDADES DAS DIVERSAS",
+    "original_start_date": "2022-06-01",
+    "created_at": "2018-05-10T16:05:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=111"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-06-01",
+              "end_date": "2022-12-31",
+              "duration": 7,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 251490,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 5,
+                "price": 270.39,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRO DESKTOP I7",
+                "quantity": 6,
+                "price": 387.36,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRO DESKTOP I5",
+                "quantity": 50,
+                "price": 221.78,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRO DESKTOP I3",
+                "quantity": 17,
+                "price": 173.93,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "MULTIFUNCIONAL LASER MONOCROMÁTICA A4",
+                "quantity": 26,
+                "price": 286.34,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO II",
+                "description": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "quantity": 21,
+                "price": 234.7,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "SWITCH 48 PORTAS",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "SWITCH 16 PORTAS",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "SWITCH 8 PORTAS",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI AMPLIFICADOR DE SINAL MÍNIMO 2800M.",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO VI",
+                "description": "ACCESS POINT INDOOR BANDA DUPLA MÍNIMO 1750 MBPS",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XII",
+                "description": "NO BREAK 700 VA",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              },
+              {
+                "alias": "TV TIPO III",
+                "description": "TV 40 POLEGADAS SMART OU SUPERIOR",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "tv-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "quantity": 10,
+                "price": 148.11,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "SCANNER TIPO II",
+                "description": "SCANNER DE MESA A4 MÍNIMO 40PPM DUPLEX",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "scanner-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "NO BREAK 3000 VA",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "NO BREAK 1200 VA",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO VIII",
+                "description": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "quantity": 2,
+                "price": 294.69,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-viii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO IX",
+                "description": "IMPRESSORA TÉRMICA DE ETIQUETA MONOCROMÁTICA ADESIVA",
+                "quantity": 4,
+                "price": 80.51,
+                "months": 7,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ix#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-06-01",
+              "end_date": "2024-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 431126,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 5,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRO DESKTOP I7",
+                "quantity": 6,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRO DESKTOP I5",
+                "quantity": 50,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRO DESKTOP I3",
+                "quantity": 17,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "MULTIFUNCIONAL LASER MONOCROMÁTICA A4",
+                "quantity": 26,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO II",
+                "description": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "quantity": 21,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "SWITCH 48 PORTAS",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "SWITCH 16 PORTAS",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "SWITCH 8 PORTAS",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI AMPLIFICADOR DE SINAL MÍNIMO 2800M.",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO VI",
+                "description": "ACCESS POINT INDOOR BANDA DUPLA MÍNIMO 1750 MBPS",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XII",
+                "description": "NO BREAK 700 VA",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              },
+              {
+                "alias": "TV TIPO III",
+                "description": "TV 40 POLEGADAS SMART OU SUPERIOR",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "quantity": 10,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "SCANNER TIPO II",
+                "description": "SCANNER DE MESA A4 MÍNIMO 40PPM DUPLEX",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "NO BREAK 3000 VA",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "NO BREAK 1200 VA",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO VIII",
+                "description": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "quantity": 2,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-viii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO IX",
+                "description": "IMPRESSORA TÉRMICA DE ETIQUETA MONOCROMÁTICA ADESIVA",
+                "quantity": 4,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ix#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-06-01",
+              "end_date": "2025-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2026-12-31",
+              "total_amount": 431126,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 5,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 5,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRO DESKTOP I7",
+                "quantity": 6,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRO DESKTOP I5",
+                "quantity": 50,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRO DESKTOP I3",
+                "quantity": 17,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO I",
+                "description": "MULTIFUNCIONAL LASER MONOCROMÁTICA A4",
+                "quantity": 26,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-i#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO II",
+                "description": "IMPRESSORA LASER MONOCROMÁTICA A4",
+                "quantity": 21,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO II",
+                "description": "SWITCH 48 PORTAS",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO III",
+                "description": "SWITCH 16 PORTAS",
+                "quantity": 1,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO IV",
+                "description": "SWITCH 8 PORTAS",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-iv#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO V",
+                "description": "REPETIDOR WIFI AMPLIFICADOR DE SINAL MÍNIMO 2800M.",
+                "quantity": 2,
+                "price": 36.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-v#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO VI",
+                "description": "ACCESS POINT INDOOR BANDA DUPLA MÍNIMO 1750 MBPS",
+                "quantity": 1,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-vi#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XII",
+                "description": "NO BREAK 700 VA",
+                "quantity": 2,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xii#0"
+              },
+              {
+                "alias": "TV TIPO III",
+                "description": "TV 40 POLEGADAS SMART OU SUPERIOR",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO III",
+                "description": "MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "quantity": 10,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-iii#0"
+              },
+              {
+                "alias": "SCANNER TIPO II",
+                "description": "SCANNER DE MESA A4 MÍNIMO 40PPM DUPLEX",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-tipo-ii#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO X",
+                "description": "NO BREAK 3000 VA",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-x#0"
+              },
+              {
+                "alias": "COMPONENTE TIPO XI",
+                "description": "NO BREAK 1200 VA",
+                "quantity": 1,
+                "price": 63.8,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "componente-tipo-xi#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO VIII",
+                "description": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "quantity": 2,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-viii#0"
+              },
+              {
+                "alias": "IMPRESSORA TIPO IX",
+                "description": "IMPRESSORA TÉRMICA DE ETIQUETA MONOCROMÁTICA ADESIVA",
+                "quantity": 4,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-tipo-ix#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

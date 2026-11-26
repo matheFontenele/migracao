@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|05/2025|id=265",
+    "source_contract_id": 265,
+    "number": "05/2025",
+    "name": "CONSELHO REGIONAL DE CONTABILIDADE DO CEARÁ,",
+    "customer_alias": "CRCCE - CONSELHO REGIONAL DE CONTABILIDADE DO CEARÁ - 2015",
+    "recipient_aliases": [
+      "CRCCE - CONSELHO REGIONAL DE CONTABILIDADE DO CEARÁ - 2015"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação da solução de Reprografia e Fornecimento de Impressoras, scanners, bem como um Sistema de Gestão e Controle de impressões e cópias, compreendendo a gestão e monitoração das páginas impressas e copiadas, por meio do Sistema de Contabilização (bilhetagem)",
+    "original_start_date": "2025-10-02",
+    "created_at": "2015-06-25T14:15:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=265"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-10-02",
+              "end_date": "2026-10-01",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-10-02",
+              "total_amount": 24382,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Locação de impressoras multifuncionais laser policromática",
+                "description": "VELOCIDADE 30 PPM A4",
+                "quantity": 1,
+                "price": 189.99,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-laser-policromatica#0"
+              },
+              {
+                "alias": "Locação de impressoras multifuncionais laser monocromática",
+                "description": "VELOCIDADE 40 PPM A4",
+                "quantity": 8,
+                "price": 110.25,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-laser-monocromatica#0"
+              },
+              {
+                "alias": "Impressora matricial",
+                "description": "EPSON LX 350",
+                "quantity": 3,
+                "price": 136.5,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial#0"
+              },
+              {
+                "alias": "Scanner de mesa duplex",
+                "description": "Canon C240",
+                "quantity": 4,
+                "price": 137.83,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-duplex#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Locação de impressoras multifuncionais laser policromática",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 300,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-laser-policromatica#0"
+              },
+              {
+                "alias": "Locação de impressoras multifuncionais laser monocromática",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 8000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-impressoras-multifuncionais-laser-monocromatica#0"
+              },
+              {
+                "alias": "Impressora matricial",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial#0"
+              },
+              {
+                "alias": "Scanner de mesa duplex",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-duplex#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|014/2024-005|GABINETE DO PREFEITO DO MUNICIPIO DE REDENCAO",
+    "source_contract_id": null,
+    "number": "014/2024-005",
+    "name": "GABINETE DO PREFEITO DO MUNICIPIO DE REDENCAO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENCAO",
+    "recipient_aliases": [
+      "GABINETE DO PREFEITO DO MUNICIPIO DE REDENCAO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇÃO DE MATERIAL E EQUIPAMENTOS DE INFORMÁTICA NECESSÁRIOS PARA ATENDER AS DEMANDAS DO GABINETE DO PREFEITO DO MUNICÍPIO DE REDENÇÃO-CE.",
+    "original_start_date": "2025-01-20",
+    "created_at": "2025-01-20T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA GABINETE - ATA  142024001 (DR).xlsx",
+        "sheet": "GABINETE OUT26",
+        "row": 5
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-01-20",
+              "end_date": "2026-01-20",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-01-19",
+              "total_amount": 3242.88,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO",
+                "description": "MICROCOMPUTADOR ESTAÇÃO, COM AS SEGUINTES ESCPECIFICAÇÕES MÍNIMAS: • COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMORIA 8GB; • HD 500GB OU SSD 120GB (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VIDRO INTEGRADA; • PLACA DE SOM INTEGRADA • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; MONITOR MÍNIMO 18,5”; • TECLADO PORTUGUÊS – BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; COR DO GABINETE. MONITOR, MOUSE E TECLADO PRETO; • MICROSOFT OFFICE HOME & BUSINESS 2019 OU SUPERIOR; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMNETO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VÍDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 2,
+                "price": 135.12,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA GABINETE - ATA  142024001 (DR).xlsx",
+                  "sheet": "GABINETE OUT26",
+                  "row": 9
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

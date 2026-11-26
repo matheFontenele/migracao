@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|026/2025|id=212",
+    "source_contract_id": 212,
+    "number": "026/2025",
+    "name": "CEE - CENTRO DE EDUCACÃO ELIT LTDA",
+    "customer_alias": "CENTRO DE EDUCAÇÃO ELITE LTDA - CEE",
+    "recipient_aliases": [
+      "CEE - JUAZEIRO DO NORTE - 020/2026",
+      "CENTRO DE EDUCAÇÃO ELITE LTDA - CEE",
+      "CENTRO DE EDUCAÇÃO ELITE LTDA - CEE JUAZEIRO DO NORTE/CE",
+      "CENTRO DE EDUCAÇÃO ELITE LTDA - CEE MOSSORO/RN"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da CEE – CENTRO DE EDUCAÇÃO ELIT, no Município do Crato, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-12-23",
+    "created_at": "2026-04-05T15:59:23",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=212"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-12-23",
+              "end_date": "2026-01-23",
+              "duration": 1,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 15500,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Computador: Core i5,",
+                "description": "16GB - 120 SSD",
+                "quantity": 50,
+                "price": 135.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "computador-core-i5#0"
+              },
+              {
+                "alias": "Computador Core i5",
+                "description": "8GB - 120 SSD",
+                "quantity": 70,
+                "price": 125.0,
+                "months": 1,
+                "occurrence": 1,
+                "lineage_key": "computador-core-i5#1"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Computador 16 GB - 120 SSD",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "computador-16-gb-120-ssd#0"
+              },
+              {
+                "alias": "Computador 8 GB - 120 - SSD",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 1,
+                "occurrence": 0,
+                "lineage_key": "computador-8-gb-120-ssd#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

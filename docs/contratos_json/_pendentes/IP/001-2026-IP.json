@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|001-2026 - IP|id=207",
+    "source_contract_id": 207,
+    "number": "001-2026 - IP",
+    "name": "COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM",
+    "customer_alias": "COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM",
+    "recipient_aliases": [
+      "COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da empresa COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA, na quantidade e especificações descritas abaixo, em boas",
+    "original_start_date": "2026-01-01",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=207"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-01-01",
+              "end_date": "2026-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 1440,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional laser mono LASER A4",
+                "description": "Multifuncioal mono laser A4",
+                "quantity": 1,
+                "price": 120.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-mono-laser-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "MULTIFUNCIONAL LASER A4 MONO",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1000,
+                "price": 0.12,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-a4-mono#0"
+              },
+              {
+                "alias": "MULTIFUNCIONAL LASER A4 MONO",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "multifuncional-laser-a4-mono#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "evento 626/serviços 'MULTIFUNCIONAL LASER A4 MONO': quantidade 0.1 arredondada para 0 (coluna INT)",
+      "cliente 'COMERCIAL DE MEDICAMENTOS CAVALCANTE LTDA - FARMÁCIA PREMIUM' não existe em customers (criar customer ou definir de/para)"
+    ]
+  }
+}

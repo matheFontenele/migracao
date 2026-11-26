@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|003/2025|id=196",
+    "source_contract_id": 196,
+    "number": "003/2025",
+    "name": "FAMA SOLUCOES EM RECUPERACAO DE CREDITO LTDA - 003/2025",
+    "customer_alias": "FAMA SOLUCOES EM RECUPERACAO DE CREDITO LTDA",
+    "recipient_aliases": [
+      "FAMA SOLUCOES EM RECUPERACAO DE CREDITO LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente demanda da FAMA SOLUÇÕES, no Município de Fortaleza/CE, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-05-26",
+    "created_at": "2025-05-29T13:27:57",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=196"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-05-26",
+              "end_date": "2028-05-26",
+              "duration": 36,
+              "max_duration": 36,
+              "max_end_date": "2028-05-26",
+              "total_amount": 142000,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "DESKTOP - I3",
+                "description": "Computador - I3a geração - 8GB de Memória, SSD 120GB,",
+                "quantity": 50,
+                "price": 79.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "desktop-i3#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Computador - Intel® CoreTM i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-coretm-i5#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-07-30",
+              "end_date": "2028-07-30",
+              "duration": 36,
+              "max_duration": 36,
+              "max_end_date": "2028-07-30",
+              "total_amount": 8532,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "COMPUTADOR INTEL CORE I5",
+                "description": "8GB de Memória, SSD 120GB, monitor de 19”.\n",
+                "quantity": 3,
+                "price": 79.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-core-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Computador - Intel® CoreTM i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-coretm-i5#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-09-30",
+              "end_date": "2028-09-30",
+              "duration": 36,
+              "max_duration": 36,
+              "max_end_date": "2028-09-30",
+              "total_amount": 39816,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "COMPUTADOR INTEL CORE I5",
+                "description": "8GB de Memória, SSD 120GB, monitor de 19”.",
+                "quantity": 14,
+                "price": 79.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-core-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Computador - Intel® CoreTM i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-coretm-i5#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2025-11-12",
+              "end_date": "2028-11-12",
+              "duration": 36,
+              "max_duration": 36,
+              "max_end_date": "2028-11-12",
+              "total_amount": 11336,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "COMPUTADOR INTEL CORE I5",
+                "description": "8GB de Memória, SSD 120GB, monitor de 19”.",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-core-i5#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Computador - Intel® CoreTM i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 36,
+                "occurrence": 0,
+                "lineage_key": "computador-intel-coretm-i5#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

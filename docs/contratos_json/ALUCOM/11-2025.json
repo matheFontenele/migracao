@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|11/2025|id=41",
+    "source_contract_id": 41,
+    "number": "11/2025",
+    "name": "PCDF",
+    "customer_alias": "POLICIA CIVIL DISTRITO FEDERAL - DF",
+    "recipient_aliases": [
+      "POLICIA CIVIL DISTRITO FEDERAL - DF",
+      "POLICIA CIVIL DO ESTADO DE BRASILIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação de solução de tecnologia da informação e comunicação por meio da prestação continuada de serviços de impressão, cópia e digitalização para a PCDF, na modalidade Outsourcing de Impressão, pelo prazo de 60 meses, nas condições estabelecidas no Termo de Referência.",
+    "original_start_date": "2025-03-07",
+    "created_at": "2025-03-07T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=41"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-03-07",
+              "end_date": "2030-03-06",
+              "duration": 60,
+              "max_duration": 120,
+              "max_end_date": "2035-03-06",
+              "total_amount": 10433984,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS MA5500IF",
+                "quantity": 140,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "Xerox® VersaLink® C415 + Wifi + Bandeja",
+                "quantity": 350,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONO - POLI–  PÁGINAS – A3",
+                "description": "Xerox AltaLink C8245F\n",
+                "quantity": 10,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-mono-poli-paginas-a3#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 21600000,
+                "price": 0.2088,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 15000000,
+                "price": 0.146,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 18000000,
+                "price": 0.1023,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 12000000,
+                "price": 0.0351,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS  A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2160000,
+                "price": 0.541,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a3#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS  A3",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 1500000,
+                "price": 0.15,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a3#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 300000,
+                "price": 0.17,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 204000,
+                "price": 0.1311,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a3#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

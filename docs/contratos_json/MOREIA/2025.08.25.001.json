@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2025.08.25.001|SECRETARIA DE DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA",
+    "source_contract_id": null,
+    "number": "2025.08.25.001",
+    "name": "SECRETARIA DE DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO INSTALAÇÃO, SUPORTE TÉCNICO E MANUTENÇÃO PREVENTIVA E CORRETIVA ON SITE, TROCA DE PEÇAS E COMPONENTES NECESSÁRIOS A MANUTENÇÃO, BEM COMO O FORNECIMENTO DE INSUMOS NECESSÁRIOS A NÃO INTERRUPÇÃO DOS SERVIÇOS (EXCETO PAPEL E GRAMPO), VISANDO ATENDER DE FORMA SATISFATÓRIA A DEMANDA NECESSÁRIA DA SECRETARIA DE DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA DE ARACOIABA - CE.",
+    "original_start_date": "2025-08-25",
+    "created_at": "2025-08-25T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA Nº 2025.08.25.001 - DR.xlsx",
+        "sheet": "SET25",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-25",
+              "end_date": "2026-08-24",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2026-08-24",
+              "total_amount": 8705.28,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "NOTEBOOK, I5 OU AMD RY-ZEN5, MEMÓRIA 8GB, SSD 240G, MONITOR 15. WIN-DOWS 10 OU SUPERIOR",
+                "quantity": 2,
+                "price": 230.04,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA Nº 2025.08.25.001 - DR.xlsx",
+                  "sheet": "SET25",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MICRO DESKTOP I5 OU AMD RY-ZEN5 MEMÓRIA 8GB",
+                "description": "MICRO DESKTOP I5 OU AMD RY-ZEN5 MEMÓRIA 8GB, SSF 480GB. MONITOR 21 PO-LEGADAS. WINDOWS 11. TECLADO E MOUSE SEM FIO, WIFI",
+                "quantity": 2,
+                "price": 117.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktop-i5-ou-amd-ry-zen5-memoria-8gb#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA Nº 2025.08.25.001 - DR.xlsx",
+                  "sheet": "SET25",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "MODULO ISOLADOR ESTABILIZADO 500W SEM ATERRA-MENTO. MODULO ISOLA-DOR ESTABILIZADO 500W SEM ATERRAMENTO",
+                "description": "MODULO ISOLADOR ESTABILIZADO 500W SEM ATERRA-MENTO. MODULO ISOLA-DOR ESTABILIZADO 500W SEM ATERRAMENTO - MO-DULO ISOLADOR ESTABI-LIZADO, COM ATERRA-MENTO ELETRÔNICO. ES-TABILIZADOR, FILTRO DE LINHA E TRANSFORMA-DOR DE TENSÃO, DEVERÁ POSSUIR POTÊNCIA NO-MINAL MÍNIMA EM RE-GIME CONTÍNUO DE 500W, DEVERÁ POSSUIR TENSÃO DE SAÍDA 115V DEVERÁ POSSUIR TENSÃO DE ENTRADA 115V/220V",
+                "quantity": 1,
+                "price": 12.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "modulo-isolador-estabilizado-500w-sem-aterra-mento-modulo-isola-dor-estabilizado-500w-sem-aterramento#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA Nº 2025.08.25.001 - DR.xlsx",
+                  "sheet": "SET25",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "01 UNIDADE NOBREAK",
+                "description": "01 UNIDADE NOBREAK",
+                "quantity": 1,
+                "price": 19.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "01-unidade-nobreak#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DESENVOLVIMENTO ECONÔMICO, TRABALHO E TECNOLOGIA Nº 2025.08.25.001 - DR.xlsx",
+                  "sheet": "SET25",
+                  "row": 14
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

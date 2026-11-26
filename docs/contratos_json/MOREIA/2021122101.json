@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2021122101|SECRETARIA DE CULTURA E TURISMO",
+    "source_contract_id": null,
+    "number": "2021122101",
+    "name": "SECRETARIA DE CULTURA E TURISMO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE EUSÉBIO",
+    "recipient_aliases": [
+      "SECRETARIA DE CULTURA E TURISMO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "CONTRATAÇÃO DE EMPRESA ESPECIALIZADA EM SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO DISTRIBUIÇÃO E INSTALAÇÃO, SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, REPOSIÇÃO DE PEÇAS E INSUMOS (EXCETO PAPEL], PARA ATENDER 0 ANDAMENTO DOS SERVIÇOS ADMINISTRATIVOS, BEM COMO A MANUTENÇÃO DAS ATIVIDADES EXERCIDAS PELOS SERVIDORES DA SECRETARIA DE CULTURA E TURISMO DO MUNICÍPIO DE EUSÉBIO-CE",
+    "original_start_date": "2021-12-31",
+    "created_at": "2021-12-31T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+        "sheet": "CULTURA E TURISMO VENCIDO",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-12-31",
+              "end_date": "2022-12-21",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2022-12-21",
+              "total_amount": 242736.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO II ESTAÇÃO",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO II ESTAÇÃO, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMÓRIA 4GB; • HD 500GB ou SSD 120GB (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; •SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; • MONITOR MÍNIMO 18,5”; • TECLADO PORTUGUÊS-BRASIL. MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE, MONITOR, MOUSE E TECLADO: PRETO. • MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO. MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 24,
+                "price": 214.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-ii-estacao#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK TIPO I, •NOTEBOOK COM PROCESSADOR INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA SGB; • HD 1TB; • LEITOR DE CARTÃO DE MEMÓRIA; • CONEXÃO HDMI; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; • TELA MÍNIMO 14.6” WIDESCREEN, TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS, BATERÍA RECARREGÁVEL, FONTE BTVOLT. (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 3,
+                "price": 366.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK TIPO II, • NOTEBOOK COM PROCESSADOR INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMÓRIA 4GB (Mínimo); • HD500GB (Mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • CONEXÃO HDMI, PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; • TELA MÍNIMO 14” WIDESCREEN; • TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS; • BATERÍA RECARREGÁVEL; • FONTE BIVOLT. • MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). 0 EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 13,
+                "price": 290.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK TIPO III, • NOTEBOOK COM PROCESSADOR INTEL CORE I3, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMÓRIA 4GB (Mínimo); • HD500GB (Mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • CONEXÃO HDMI, PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; • TELA MÍNIMO 14” WIDESCREEN; • TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS; • BATERÍA RECARREGÁVEL; • FONTE BIVOLT. • MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). 0 EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 9,
+                "price": 236.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER TIPO I COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "IMPRESSORA MULTIFUNCIONAL LASER TIPO I COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: MULTIFUNCIONAL LASER MONOCROMÁTICA ESPECIFICAÇÕES: TAMANHO MÁXIMO DO PAPEL: OFÍCIO (21.6 X 35,6 CM); VELOCIDADE DE IMPRESSÃO MÍNIMO 30PPM (PÁGINA POR MINUTO); RESOLUÇÃO DE IMPRESSÃO: MÍNIMO 1200 X 1.200 DPI CAPACIDADE DE IMPRESSÃO DUPLEX: AUTOMÁTICO; BANDEJA DE ENTRADA DE PAPEL MÍNIMO 250 FOLHAS; BANDEJA DE SAÍDA DE PAPEL MÍNIMO: 50 FOLHAS; ALIMENTADOR AUTOMÁTICO DE DOCUMENTOS (ARDF): MÍNIMO 50 FOLHAS; INTERFACE PADRÃO USB 2.0; COMPATIBILIDADE WINDOWS; COM O FORNECIMENTO DE INSUMOS E CONSUMÍVEIS EXCETO PAPEL ESTIMATIVA DE PAGINAS IMPRESSAS POR MÊS POR IMPRESSORA: 6.000 (ATUALIZACAO DO AUMENTO DA CAPACIDADE DA VELOCIDADE DE IMPRESSÃO OU QUALIDADE DE IMPRESSÃO SEM ONUS PARA O CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 7,
+                "price": 215.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-tipo-i-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "MULTIFUNCIONAL LASER A3 COLOR MÍNIMO 20PPM RESOLUÇÃO 1200X1200DPI",
+                "description": "MULTIFUNCIONAL LASER A3 COLOR MÍNIMO 20PPM RESOLUÇÃO 1200X1200DPI - FRANQUIA DE IMPRESSÃO DE 5000 PÁGINAS MÊS NO FORMATO A3. INSTALAÇÃO, DESINSTALAÇÃO, TRANSFORMADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE), RECARGA DE TONER - FUSORES - TINTA - CABEÇAS DE IMPRESSÃO - PULSEIRAS - RIBBON - ETIQUETAS ADESIVAS - REVELADORES - MASTER E DEMAIS INSUMOS EXCETO PAPEL SEM ÔNUS PARA O CONTRATANTE. O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS. AUMENTO DA VELOCIDADE DE IMPRESSÃO, TIPO DE CONEXÃO E QUALIDADE SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA VELOCIDADE DE IMPRESSÃO, CONEXÃO E QUALIDADE SEM ÔNUS PARA O CONTRATANTE.",
+                "quantity": 1,
+                "price": 1458.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-laser-a3-color-minimo-20ppm-resolucao-1200x1200dpi#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 17
+                }
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART OU SUPERIOR",
+                "description": "TV 40 POLEGADAS SMART OU SUPERIOR: O CONTRATADO DEVERÁ DISPOR DE EQUIPAMENTO DE BACKUP EM ESTOQUE PARA TROCA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS. INSTALAÇÃO, DESINSTALAÇÃO, SUPORTES, EXTENSÕES, NO BREAK E ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE INCLUINDO FIBRA ÓTICA, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) SEM ÔNUS PARA O CONTRATANTE.",
+                "quantity": 8,
+                "price": 160.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart-ou-superior#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 18
+                }
+              },
+              {
+                "alias": "DUPLICADOR MONOCROMÁTICO DIGITAL 90PPM RESOLUÇÃO 300X300DPI",
+                "description": "DUPLICADOR MONOCROMÁTICO DIGITAL 90PPM RESOLUÇÃO 300X300DPI - FRANQUIA DE IMPRESSÃO DE 200.000 PÁGINAS MÊS. INSTALAÇÃO, DESINSTALAÇÃO, TRANSFORMADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE), RECARGA DE TONER - FUSORES - TINTA - CABEÇAS DE IMPRESSÃO - PULSEIRAS - RIBBON - ETIQUETAS ADESIVAS - REVELADORES - MASTER E DEMAIS INSUMOS EXCETO PAPEL SEM ÔNUS PARA O CONTRATANTE. AUMENTO DA VELOCIDADE DE IMPRESSÃO, CONEXÃO, QUALIDADE OU INCLUSÃO DE TAMBORES COLORIDOS SEM ÔNUS PARA O CONTRATANTE.",
+                "quantity": 1,
+                "price": 1782.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador-monocromatico-digital-90ppm-resolucao-300x300dpi#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 19
+                }
+              },
+              {
+                "alias": "DATASHOW MÍNIMO 2500 LUMENS INSTALAÇÃO",
+                "description": "DATASHOW MÍNIMO 2500 LUMENS INSTALAÇÃO, DESINSTALAÇÃO, FORNECIMENTO DE TELA FIXA OU RETRÁTIL, ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE, CONFIGURAÇÃO (EM MÁQUINAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATANTE) E AUMENTO DA LUMINOSIDADE DO EQUIPAMENTO SEM ÔNUS PARA O CONTRATANTE.",
+                "quantity": 1,
+                "price": 290.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "datashow-minimo-2500-lumens-instalacao#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - CULTURA E TURISMO (DR).xls",
+                  "sheet": "CULTURA E TURISMO VENCIDO",
+                  "row": 20
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

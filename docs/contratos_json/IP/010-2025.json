@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|010-2025|id=190",
+    "source_contract_id": 190,
+    "number": "010-2025",
+    "name": "SANTANA & PAIVA SERVICOS ADMINISTRATIVOS LTDA",
+    "customer_alias": "SANTANA & PAIVA SERVICOS ADMINISTRATIVOS LTDA",
+    "recipient_aliases": [
+      "SANTANA & PAIVA SERVICOS ADMINISTRATIVOS LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da empresa SANTANA & PAIVA SERVICOS ADMINISTRATIVOS LTDA, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-08-01",
+    "created_at": "2025-08-05T11:19:49",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=190"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-01",
+              "end_date": "2026-07-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 3000,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "scâner de Mesa",
+                "description": "Locação de um Escâner de mesa, incluindo suporte, assistência técnica e manutenção preventiva e corretiva.",
+                "quantity": 1,
+                "price": 250.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scaner-de-mesa#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

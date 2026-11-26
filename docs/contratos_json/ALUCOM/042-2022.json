@@ -1,0 +1,904 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|042/2022|id=89",
+    "source_contract_id": 89,
+    "number": "042/2022",
+    "name": "CÂMARA MUNICIPAL DE CAUCAIA",
+    "customer_alias": "CAMARA MUNICIPAL DE CAUCAIA",
+    "recipient_aliases": [
+      "CAMARA MUNICIPAL DE CAUCAIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÕES DE SERVIÇOS DE LOCAÇÕES DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, JUNTO A CÂMARA MUNICIPAL DE CAUCAIA-CE, tudo conforme especificações contidas no Projeto Básico/Termo de Referência, constante do Anexo I do Edital.",
+    "original_start_date": "2022-09-16",
+    "created_at": "2022-09-16T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=89"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-09-16",
+              "end_date": "2023-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 137008,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 1,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "NOTEBOOK INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 182.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 1,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 1,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 177.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE I7",
+                "description": "",
+                "quantity": 1,
+                "price": 638.01,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-i7#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE CELERON OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 290.14,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-celeron-ou-amd#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A3 COM BULK INK",
+                "description": "",
+                "quantity": 1,
+                "price": 412.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a3-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER A3 COLOR",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-a3-color#0"
+              },
+              {
+                "alias": "PLOTTER COLORIDO",
+                "description": "",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "plotter-colorido#0"
+              },
+              {
+                "alias": "DUPLICADOR MONOCROMÁTICO",
+                "description": "",
+                "quantity": 1,
+                "price": 1499.32,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador-monocromatico#0"
+              },
+              {
+                "alias": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-de-pulseiras-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA TÉRMICA DE ETIQUETAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-etiquetas-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MATRICIAL 80 COLUNAS",
+                "description": "",
+                "quantity": 1,
+                "price": 196.72,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial-80-colunas#0"
+              },
+              {
+                "alias": "MONITOR MÍNIMO 23 POLEGADAS",
+                "description": "",
+                "quantity": 1,
+                "price": 90.38,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-minimo-23-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-09-15",
+              "end_date": "2024-09-15",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 137008,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 1,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "NOTEBOOK INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 182.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 1,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 1,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 177.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE I7",
+                "description": "",
+                "quantity": 1,
+                "price": 638.01,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-i7#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE CELERON OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 290.14,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-celeron-ou-amd#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A3 COM BULK INK",
+                "description": "",
+                "quantity": 1,
+                "price": 412.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a3-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER A3 COLOR",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-a3-color#0"
+              },
+              {
+                "alias": "PLOTTER COLORIDO",
+                "description": "",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "plotter-colorido#0"
+              },
+              {
+                "alias": "DUPLICADOR MONOCROMÁTICO",
+                "description": "",
+                "quantity": 1,
+                "price": 1499.32,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador-monocromatico#0"
+              },
+              {
+                "alias": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-de-pulseiras-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA TÉRMICA DE ETIQUETAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-etiquetas-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MATRICIAL 80 COLUNAS",
+                "description": "",
+                "quantity": 1,
+                "price": 196.72,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial-80-colunas#0"
+              },
+              {
+                "alias": "MONITOR MÍNIMO 23 POLEGADAS",
+                "description": "",
+                "quantity": 1,
+                "price": 90.38,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-minimo-23-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-09-13",
+              "end_date": "2025-09-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 137008,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 1,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "NOTEBOOK INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 182.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 1,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 1,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 177.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE I7",
+                "description": "",
+                "quantity": 1,
+                "price": 638.01,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-i7#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE CELERON OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 290.14,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-celeron-ou-amd#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A3 COM BULK INK",
+                "description": "",
+                "quantity": 1,
+                "price": 412.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a3-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER A3 COLOR",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-a3-color#0"
+              },
+              {
+                "alias": "PLOTTER COLORIDO",
+                "description": "",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "plotter-colorido#0"
+              },
+              {
+                "alias": "DUPLICADOR MONOCROMÁTICO",
+                "description": "",
+                "quantity": 1,
+                "price": 1499.32,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador-monocromatico#0"
+              },
+              {
+                "alias": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-de-pulseiras-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA TÉRMICA DE ETIQUETAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-etiquetas-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MATRICIAL 80 COLUNAS",
+                "description": "",
+                "quantity": 1,
+                "price": 196.72,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial-80-colunas#0"
+              },
+              {
+                "alias": "MONITOR MÍNIMO 23 POLEGADAS",
+                "description": "",
+                "quantity": 1,
+                "price": 90.38,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-minimo-23-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-09-12",
+              "end_date": "2026-09-12",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-09-15",
+              "total_amount": 137008,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I7",
+                "description": "",
+                "quantity": 1,
+                "price": 534.71,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7#0"
+              },
+              {
+                "alias": "NOTEBOOK I5",
+                "description": "",
+                "quantity": 1,
+                "price": 344.75,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5#0"
+              },
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "",
+                "quantity": 1,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              },
+              {
+                "alias": "NOTEBOOK INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 182.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRODESKTOP I7",
+                "description": "",
+                "quantity": 1,
+                "price": 387.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i7#0"
+              },
+              {
+                "alias": "MICRODESKTOP I5",
+                "description": "",
+                "quantity": 1,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i5#0"
+              },
+              {
+                "alias": "MICRODESKTOP I3",
+                "description": "",
+                "quantity": 1,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-i3#0"
+              },
+              {
+                "alias": "MICRODESKTOP INTEL PENTIUM OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 177.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microdesktop-intel-pentium-ou-amd#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE I7",
+                "description": "",
+                "quantity": 1,
+                "price": 638.01,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-i7#0"
+              },
+              {
+                "alias": "MICRO ALL IN ONE CELERON OU AMD",
+                "description": "",
+                "quantity": 1,
+                "price": 290.14,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-all-in-one-celeron-ou-amd#0"
+              },
+              {
+                "alias": "SERVIDOR MÍNIMO 3.7 GHZ",
+                "description": "",
+                "quantity": 1,
+                "price": 470.91,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-minimo-3-7-ghz#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA LASER A4",
+                "description": "",
+                "quantity": 1,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica-laser-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A4 COM BULK INK",
+                "description": "",
+                "quantity": 12,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a4-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA A3 COM BULK INK",
+                "description": "",
+                "quantity": 1,
+                "price": 412.43,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-a3-com-bulk-ink#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER A3 COLOR",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-a3-color#0"
+              },
+              {
+                "alias": "PLOTTER COLORIDO",
+                "description": "",
+                "quantity": 1,
+                "price": 1363.36,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "plotter-colorido#0"
+              },
+              {
+                "alias": "DUPLICADOR MONOCROMÁTICO",
+                "description": "",
+                "quantity": 1,
+                "price": 1499.32,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "duplicador-monocromatico#0"
+              },
+              {
+                "alias": "IMPRESSORA DE PULSEIRAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 294.69,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-de-pulseiras-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA TÉRMICA DE ETIQUETAS MONOCROMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 80.51,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-etiquetas-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MATRICIAL 80 COLUNAS",
+                "description": "",
+                "quantity": 1,
+                "price": 196.72,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-matricial-80-colunas#0"
+              },
+              {
+                "alias": "MONITOR MÍNIMO 23 POLEGADAS",
+                "description": "",
+                "quantity": 1,
+                "price": 90.38,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-minimo-23-polegadas#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

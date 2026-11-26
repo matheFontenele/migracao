@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|02.19.09.26.001|GABINETE DO PREFEITO",
+    "source_contract_id": null,
+    "number": "02.19.09.26.001",
+    "name": "GABINETE DO PREFEITO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE MARANGUAPE",
+    "recipient_aliases": [
+      "GABINETE DO PREFEITO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "Seleçao de melhor proposta para registro de preço visando futura e eventual contrataçao de empresa especializada em serviços de locaçao de equipamentos de informática, incluindo distribuiçao e instalaçao, suporte, assistencia técnica e manutençao preventiva e corretiva in-loco na sede e zona rural, reposiçao de peças e insumos (exceto papel) para atender o andamento dos serviços administrativos, bem como a manutençao das atividades exercidas pelos servidores de interesse do Gabinete do Prefeito ",
+    "original_start_date": "2019-09-26",
+    "created_at": "2019-09-26T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+        "sheet": "GABINETE PREFEITO (2)",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2019-09-26",
+              "end_date": "2020-09-26",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2020-09-26",
+              "total_amount": 70344.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇAO MENSAL DE MICROCOMPUTADOR CORE I5 (PROCESSADOR COM TECNOLOGIA CORE I5 COM 4GB, HD 500GB, GRAVADORA DVD, PLACA MAE ON-BOARD, MONITOR 18,5\" LCD/LED, TECLADO E MOUSE). ACOMPANHA ESTABILIZADOR",
+                "description": "LOCAÇAO MENSAL DE MICROCOMPUTADOR CORE I5 (PROCESSADOR COM TECNOLOGIA CORE I5 COM 4GB, HD 500GB, GRAVADORA DVD, PLACA MAE ON-BOARD, MONITOR 18,5\" LCD/LED, TECLADO E MOUSE). ACOMPANHA ESTABILIZADOR: POTENCIA 300VA",
+                "quantity": 12,
+                "price": 169.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-mensal-de-microcomputador-core-i5-processador-com-tecnologia-core-i5-com-4gb-hd-500gb-gravadora-dvd-placa-mae-on-board-monitor-18-5-lcd-led-teclado-e-mouse-acompanha-estabilizador#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": "GABINETE PREFEITO (2)",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇAO MENSAL DE MICROCOMPUTADOR CORE I7 (PROCESSADOR COM TECNOLOGIA CORE I7 COM 8GB, HD 1 TERÁ, GRAVADORA DVD, PLACA MAE ON-BOARD, MONITOR 18,5\" LCD/LED, TECLADO E MOUSE). ACOMPANHA ESTABILIZADOR",
+                "description": "LOCAÇAO MENSAL DE MICROCOMPUTADOR CORE I7 (PROCESSADOR COM TECNOLOGIA CORE I7 COM 8GB, HD 1 TERÁ, GRAVADORA DVD, PLACA MAE ON-BOARD, MONITOR 18,5\" LCD/LED, TECLADO E MOUSE). ACOMPANHA ESTABILIZADOR: POTENCIA 300VA",
+                "quantity": 6,
+                "price": 228.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-mensal-de-microcomputador-core-i7-processador-com-tecnologia-core-i7-com-8gb-hd-1-tera-gravadora-dvd-placa-mae-on-board-monitor-18-5-lcd-led-teclado-e-mouse-acompanha-estabilizador#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": "GABINETE PREFEITO (2)",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "LOCAÇAO MENSAL DE NOTEBOOK",
+                "description": "LOCAÇAO MENSAL DE NOTEBOOK - TIPO II- REQUISITOS TÉCNICOS MÍNIMOS: PROCESSADOR CORE I5- 4210U 3.2GHZ, CACHE L3 3MB, MEMÓRIA 8GB DDR4 133MHZ (IX8GB), 500 GB, SATA, 7MM, 5400 RPM, TELA LCD 14 COM TECNOLOGIA LED, LEITOR DE CARTOES SD, SDHC, SDXC, DRIVE DVD, REDE: 10/100/1000 MBPS, GIGABIT ETHERNET, CONECTIVIDADE: REDE SEM FIO IEEE 802.11 B/G/NTM, TECLADO PORTUGUES ABNT, MOUSE TOUCH PAD, BATERIA: LI-ION, 3 CÉLULAS, 2200MAH INTEGRADA",
+                "quantity": 6,
+                "price": 270.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-mensal-de-notebook#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": "GABINETE PREFEITO (2)",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "LOCAÇAO MENSAL DE DATA SHOW",
+                "description": "LOCAÇAO MENSAL DE DATA SHOW: ESPECIFICAÇAO MÍNIMA: BRILHO / LÚMENS 2200 ANSI LUMENS, RESOLUÇAO NAT SVGA CONTROLE REMOTO SELEÇÁO ENTRADA, POWER, ASPECTO DE IMAGEM, MODO DE COR, VOLUME, E-ZOOM, A/V MUTE, FREEZE,MENU, HELP, AUTO P.G UP / PG DOWN, ESC E ENTER, NÍVEL DE RUÍDO 35DB (ALTA LUMINOSIDADE), 28 DB (BAIXA LUMINOSIDADE), CORREÇAO DE TRAPÉZIO AUTOMÁTICA VERTICALO-II GRAUS , MANUAL VERTICAL 30 GRAUS, CONJUNTO DE CONTROLE DE CÓDIGOS TECNOLÓGICOS LCD: LÂMPADA TIP0170 W UHE. 3000 II(ALTO BRILHO), 4000 (BAIXO BRILHO), TV COMPATÍVEL NTSC/NTSC4. 43/PAL/M-PAL/N-PAL/PAL 60/ SECAM / 480i, 480P, HDTV: 720p, 1080Í. REPRODUAO DE CORES 24 BIT, 16.7 MILHOES DE CORES, CARTAO DE SOM 1 WATT, DISTÂNCIA DA PROJEÇAO 0,88 MTS A 10,49 MTS. CARACTERÍSTICAS FÍSICAS ANCHO: 24.5 EM PROFUNDIDADE 32.7CM ALTO: 9.2 CM PESO 2.8 KG. REQUERIMENTOS ELÉTRICOS VOLTAGEM: 100-127 V, FREQUENCIA: 5060Hz/ O,5Hz, CONSUMO 13.90W PADRAO Isso 10561 (CONFORME A ENERGY STAR). CONDIÇOES AMBIENTAIS: TEMPERATURA DE OPERAÇAO: SOCA350C410F950",
+                "quantity": 6,
+                "price": 141.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-mensal-de-data-show#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": "GABINETE PREFEITO (2)",
+                  "row": 14
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

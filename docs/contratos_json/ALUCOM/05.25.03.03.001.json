@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|05.25.03.03.001|id=62",
+    "source_contract_id": 62,
+    "number": "05.25.03.03.001",
+    "name": "PREFEITURA MUNICIPAL DE MARANGUAPE - SAUDE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE MARANGUAPE",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE MARANGUAPE",
+      "SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS DO MUNICIPIO DE MARANGUAPE",
+      "SECRETARIA DE SAUDE DO MUNICIPIO DE MARANGUAPE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Locações de equipamentos de informática, incluindo suporte, assistência técnica e manutenção preventiva e corretiva in-loco para a Secretaria da Saúde de Maranguape",
+    "original_start_date": "2025-03-03",
+    "created_at": "2025-03-03T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=62"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-03-03",
+              "end_date": "2026-03-02",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-03-02",
+              "total_amount": 164781,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook i7 ou AMD Ryzen 7",
+                "description": "Notebook i7 ou AMD Ryzen 7",
+                "quantity": 5,
+                "price": 184.17,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i7-ou-amd-ryzen-7#0"
+              },
+              {
+                "alias": "Notebook i5 ou AMD Ryzen 5",
+                "description": "Notebook i5 ou AMD Ryzen 5",
+                "quantity": 10,
+                "price": 132.31,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i5-ou-amd-ryzen-5#0"
+              },
+              {
+                "alias": "Micro Desktop i7 ou AMD Ryzen 7",
+                "description": "Micro Desktop i7 ou AMD Ryzen 7",
+                "quantity": 50,
+                "price": 166.27,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktop-i7-ou-amd-ryzen-7#0"
+              },
+              {
+                "alias": "Micro Desktop i5 ou AMD Ryzen 5",
+                "description": "Micro Desktop i5 ou AMD Ryzen 5",
+                "quantity": 30,
+                "price": 105.81,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-desktop-i5-ou-amd-ryzen-5#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

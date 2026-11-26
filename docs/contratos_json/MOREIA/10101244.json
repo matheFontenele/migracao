@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|10101244|SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA",
+    "source_contract_id": null,
+    "number": "10101244",
+    "name": "SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA",
+    "customer_alias": "PREFEITURA MUNICIPAL DE EUSÉBIO",
+    "recipient_aliases": [
+      "SECRETARIA DE SEGURANÇA PUBLICA E CIDADANIA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇÃO COM MANUTENÇÃO, REPOSIÇÃO DE PEÇAS E RECARGA DE MULTIFUNCIONAIS, JUNTO A SECRETARIA DE EGURANÇA PUBLICA E CIDADANIA DO MUNICÍPIO DE EUSÉBIO-CE",
+    "original_start_date": "2023-06-04",
+    "created_at": "2023-06-04T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - SEG. PÚBLICA (DR).xlsx",
+        "sheet": "SEG PUBLICA JUNHO24 ",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-06-04",
+              "end_date": "2025-06-03",
+              "duration": 24,
+              "max_duration": 24,
+              "max_end_date": "2025-06-03",
+              "total_amount": 23304.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO DE 08 (OITO) IMPRESSO-RAS MULTIFUNCIONAIS LASER MO-NOCROMÁTICA COM MANUTENÇÃO CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGA DE INSUMOS, EXCETO PAPEL, COM FUNÇÃO DE COPIADORA- IMPRES-SORA- SCANNER, FRANQUIA DE 3.000 PÁGINAS/MÊS, COM PAINEL DE CON-TROLE T",
+                "description": "LOCAÇÃO DE 08 (OITO) IMPRESSO-RAS MULTIFUNCIONAIS LASER MO-NOCROMÁTICA COM MANUTENÇÃO CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGA DE INSUMOS, EXCETO PAPEL, COM FUNÇÃO DE COPIADORA- IMPRES-SORA- SCANNER, FRANQUIA DE 3.000 PÁGINAS/MÊS, COM PAINEL DE CON-TROLE TOUCH SCREEN DE NO MÍNI-MO´ RESOLUÇÃO MÍNIMA 1.200 X 1.200 DPI (IMPRESSÃO); 600X600 DPI (DIGITALIZAÇÃO), MÍNIMO DE 40 PÁG-NAS POR MINUTO, UNIDADE DUPLEX; IMPRESSÃO FRENTE E VERSO, DIMEN-SÃO MÁXIMO DE ORIGINAL, TAMANHO A4/LEGAL, ZOOM: 25% A 400% EM PASSO DE 1%, ALIMENTADOR MULTIU-SO COM CAPACIDADE NO MÍNIMO DE 100 FOLHAS;BANDEJA DE ENTRADA DE PAPEL NO MÍNIMO 250 FOLHAS, BANDE-JA DE SAÍDA DE PAPEL NO MÍNIMO DE 50 FOLHAS, INTERFACE PADRÃO USB 2.0; COMPATIBILIDADE WINDOWS, INS-TALAÇÃO, DESINSTALAÇÃO, FORNECI-MENTO DE ESTABILIZADOR DE ENERGIA QUANDO NECESSÁRIO, CABEAMENTO DE REDE, CONFIGURAÇÃO (EM MÁQUI-NAS DO CONTRATADO, DE TERCEIROS OU DE PROPRIEDADE DA CONTRATAN-TE) E AUMENTO DA CAPACIDADE DE DIGITALIZAÇÃO SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRA-TADO DEVERÁ DISPOR DE EQUIPAMEN-TO DE BACKUP EM ESTOQUE PARA TRO-CA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS. MARCA: KYOCERA Ecosys MA4500",
+                "quantity": 8,
+                "price": 149.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-08-oito-impresso-ras-multifuncionais-laser-mo-nocromatica-com-manutencao-corretiva-reposicao-de-pecas-e-recarga-de-insumos-exceto-papel-com-funcao-de-copiadora-impres-sora-scanner-franquia-de-3-000-paginas-mes-com-painel-de-con-trole-t#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - SEG. PÚBLICA (DR).xlsx",
+                  "sheet": "SEG PUBLICA JUNHO24 ",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "LOCAÇÃO DE 04 (QUATRO) IMPRES-SORAS MULTIFUNCIONAIS COLORI-DA JATO DE TINTA COM MANUTENÇÃO CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGA DE TANQUE DE TINTA, COM TANQUE DE TINTA, COM FUNÇÃO DE COPIADORA- IMPRESSORA- SCANNER, RESOLUÇÃO DE IMPRESSÃO MÍNIMA",
+                "description": "LOCAÇÃO DE 04 (QUATRO) IMPRES-SORAS MULTIFUNCIONAIS COLORI-DA JATO DE TINTA COM MANUTENÇÃO CORRETIVA, REPOSIÇÃO DE PEÇAS E RECARGA DE TANQUE DE TINTA, COM TANQUE DE TINTA, COM FUNÇÃO DE COPIADORA- IMPRESSORA- SCANNER, RESOLUÇÃO DE IMPRESSÃO MÍNIMA: 4.800 X 1.200 DPI, UNIDADE DUPLEX, IMPRESSÃO FRENTE E VERSO, CONEC-TIVIDADE PADRÃO USB DE ALTA VELO-CIDADE E WIFI, CAPACIDADE MÍNIMA DE ENTRADA DE PAPEL 50 FOLHAS DE PAPEL A4, VELOCIDADE DE IMPRESSÃO MÍNIMA DE 15 PPM, COMPATIBILIDADE WINDOWS, EQUIPADA COM SISTEMA DE ALIMENTAÇÃO CONTÍNUA DE TINTA BULKINK ORIGINAL DO FABRICANTE, INSTALAÇÃO, DESINSTALAÇÃO, FORNE-CIMENTO DE ESTABILIZADOR DE ENER-GIA QUANDO NECESSÁRIO, CABEAMEN-TO DE REDE, CONFIGURAÇÃO (EM MÁ-QUINAS DO CONTRATADO, DE TERCEI-ROS OU DE PROPRIEDADE DA CONTRA-TANTE) E AUMENTO DA CAPACIDADE DE DIGITALIZAÇÃO SEM ÔNUS PARA O CONTRATANTE. ATENÇÃO: O CONTRA-TADO DEVERÁ DISPOR DE EQUIPAMEN-TO DE BACKUP EM ESTOQUE PARA TRO-CA EM CASO DE PANE EM NO MÁXIMO 4 (QUATRO) HORAS. MARCA: EPSON ECOTANK L4260.",
+                "quantity": 4,
+                "price": 149.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-04-quatro-impres-soras-multifuncionais-colori-da-jato-de-tinta-com-manutencao-corretiva-reposicao-de-pecas-e-recarga-de-tanque-de-tinta-com-tanque-de-tinta-com-funcao-de-copiadora-impressora-scanner-resolucao-de-impressao-minima#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - SEG. PÚBLICA (DR).xlsx",
+                  "sheet": "SEG PUBLICA JUNHO24 ",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "LOCAÇÃO 01 (UM) SCANNER TIPO ALIMENTAÇÃO VERTICAL",
+                "description": "LOCAÇÃO 01 (UM) SCANNER TIPO ALIMENTAÇÃO VERTICAL, SCANNER DUPLEX COLORIDO; RESOLUÇÃO ÓPTICA: 600 DPI, RESOLUÇÃO INTERPOLADA: 1200 DPI; ALIMENTADOR AUTOMÁTICO DE DOCUMENTOS COM CAPACIDADE MINIMA ATÉ 100 PÁGINAS; TAMANHOS DE DOCUMENTO: 200 DPI: MIN. 5,08 X 5,08 CM / MÁX. 21,59 X 609,6 CM, 300 DPI: MIN. 5,08 X 5,08 CM/ MÁX. 21,59 X 546,1 CM; CICLO DE TRABALHO DIÁRIO ATÉ 5.000 PÁGINAS/DIA; GRAMATURA DO PAPEL: 27 - 413 G/M2; MÁX. ESPESSURA DO CARTÃO EM RELEVO: 1,24 MM. CONSUMÍVEIS: A4, A5, A6, B5, CARTA, POSTAL, CARTÕES DE VISITA, CARTÕES PLÁSTICOS, LEGAL, EXECUTIVO; GERAL: ALINHAMENTO AUTOMÁTICO DE IMAGEM; MELHORA AUTOMÁTICA DE TEXTOS; SEGMENTAÇÃO AUTOMÁTICA DE ÁREAS; ELIMINAÇÃO AUTOMÁTICA DE BORDAS DA IMAGEM; DROPOUT DE CORES; AJUSTE DE ROTAÇÃO DE IMAGEM; RECONHECIMENTO AUTOMÁTICO DE CORES; AJUSTE AUTOMÁTICO DO TAMANHO DA PÁGINA; ROTAÇÃO AUTOMÁTICA DE ORIENTAÇÃO DOS DOCUMENTOS, BASEADA NO CONTEÚDO; ELIMINAÇÃO AUTOMÁTICA DE PÁGINAS EM BRANCO; RECURSOS DE EDIÇÃO E MANIPULAÇÃO DE IMAGENS .PAINEL DE DISPLAY: PAINEL TOUCH DE FÁCIL ACESSO A ATÉ 30 TRABALHOS DEFINIDOS PELO USUÁRIO; CONECTIVIDADE PADRÃO: USB 3.0 DE ALTA VELOCIDADE, ETHERNET (RJ-45, 1000BASE-T/ 10BASE-T/ 100BASE-TX, USB 2.0 (HOST PARA A AUTENTICAÇÃO REQUERIDA). MARCA: EPSON DS-780N",
+                "quantity": 1,
+                "price": 154.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-01-um-scanner-tipo-alimentacao-vertical#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - SEG. PÚBLICA (DR).xlsx",
+                  "sheet": "SEG PUBLICA JUNHO24 ",
+                  "row": 13
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

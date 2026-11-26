@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|26-A/2025|id=195",
+    "source_contract_id": 195,
+    "number": "26-A/2025",
+    "name": "IDT",
+    "customer_alias": "INSTITUTO DE DESENVOLVIMENTO DO TRABALHO - IDT",
+    "recipient_aliases": [
+      "INSTITUTO DE DESENVOLVIMENTO DO TRABALHO - IDT"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE, os serviços de Serviço de locaçao de equipamentos de informática, com suporte, assistencia técnica e manutençao preventiva e corretiva, visando atender satisfatoriamente a demanda da OTICA EVANGELISTA COMERCIO DE ARTIGOS ÓPTICOS LTDA, no Município de Fortaleza/CE, na quantidade e especificaçao descritas abaixo, em boas condiçoes de uso e conservaçao.",
+    "original_start_date": "2025-08-01",
+    "created_at": "2025-04-28T14:57:06",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=195"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-01",
+              "end_date": "2026-08-01",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2026-08-01",
+              "total_amount": 300600,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA DE CARTÕES, LEITOR NFC",
+                "description": "",
+                "quantity": 9,
+                "price": 2245.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-de-cartoes-leitor-nfc#0"
+              },
+              {
+                "alias": "Smartphone",
+                "description": "Qualcomm Snapdragon 6 Gen 3.6 GB, 8GB",
+                "quantity": 9,
+                "price": 230.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "smartphone#0"
+              },
+              {
+                "alias": "SOFTWARE PARA ELABORAÇÃO DE CARTÕES",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "software-para-elaboracao-de-cartoes#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "nan",
+                "description": "",
+                "quantity": 1,
+                "price": 2775.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nan#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

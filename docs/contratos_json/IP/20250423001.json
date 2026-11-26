@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|20250423001|id=178",
+    "source_contract_id": 178,
+    "number": "20250423001",
+    "name": "GOVERNO MUNICIPAL DE CANINDÉ - SECRETARIA DO MEIO AMBIENTE",
+    "customer_alias": "PREFEITURA DE CANINDÉ",
+    "recipient_aliases": [
+      "PREFEITURA DE CANINDÉ",
+      "SECRETARIA DO MEIO AMBIENTE DO MUNICÍPIO DE CANINDÉ - SEMA"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Constitui o objeto do presente contrato a CONTRATAÇÃO DOS SERVIÇOS DE LOCAÇÃO DE IMPRESSORA PARA ATENDER AS NECESSIDADES DA SECRETARIA DE MEIO AMBIENTE DO MUNICÍPIO DE CANINDÉ/CE",
+    "original_start_date": "2025-04-23",
+    "created_at": "2025-04-23T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=178"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-04-23",
+              "end_date": "2026-04-23",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-04-23",
+              "total_amount": 6600,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional Colorida",
+                "description": "MFC-T4500DW Ink Benefit, jato de tinta com tanque, WiFi, tela LCD 2.7",
+                "quantity": 1,
+                "price": 550.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-colorida#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

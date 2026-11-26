@@ -1,0 +1,1179 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|20220413007|id=99",
+    "source_contract_id": 99,
+    "number": "20220413007",
+    "name": "PREFEITURA MUNICIPAL DE ARACATI - GABINETE DO PREFEITO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACATI",
+    "recipient_aliases": [
+      "CONTROLADORIA/OUVIDORIA DO MUNICÍPIO DE ARACATI",
+      "DESENVOLVIMENO ECONOMICO DO MUNICIPIO DE ARACATI",
+      "DESENVOLVIMENTO AGRARIO DO MUNICIPIO DE ARACATI",
+      "GABINETE DO PREFEITO DO MUNICÍPIO DE ARACATI",
+      "INST. DE QUALIDADE DO MEIO AMBIENTE DO MUNICIPIO DO ARACATI- IQUAMA",
+      "PREFEITURA MUNICIPAL DE ARACATI",
+      "PROCURADORIA DO MUNICÍPIO DE ARACATI",
+      "RESERVA - ARACATI",
+      "SECREATARIA DE EDUCACAO DO MUNICÍPIO DE ARACATI",
+      "SECREATARIA DE FINANCAS DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DA CASA CIVIL DO MUNICÍPIO DE ARACATI-CE",
+      "SECRETARIA DE ADMINISTRAÇÃO DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DE CIDADANIA E DESENV SOCIAL DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DE CULTURA DA PREFEITURA DE ARACATI",
+      "SECRETARIA DE INFRAESTRUTURA DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE SAUDE DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE SEGURANCA PUBLICA DO MUNICIPIO DE ARACATI",
+      "SECRETARIA DE TURISMO DO MUNICÍPIO DE ARACATI",
+      "SECRETARIA DO ESPORTE DO MUNICÍPIO DE ARACATI",
+      "SEGURANCA CIDADA E ORDEM PUBLICA - ARACATI"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "CONTRATAÇÃO DE SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, COM SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN LOCO, BEM COMO ATUAÇÃO NOS PROCESSOS DE GERENCIAMENTO DE SERVIÇOS.",
+    "original_start_date": "2022-04-13",
+    "created_at": "2020-02-11T23:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=99"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-04-13",
+              "end_date": "2023-04-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 162981,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-04-13",
+              "end_date": "2024-04-13",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 162981,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-04-14",
+              "end_date": "2024-12-31",
+              "duration": 9,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 122236,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 3,
+                "price": 270.39,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 9,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 9,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-07-01",
+              "end_date": "2025-10-31",
+              "duration": 4,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 54327,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 3,
+                "price": 270.39,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-07-01",
+              "end_date": "2025-10-31",
+              "duration": 4,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 54327,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 3,
+                "price": 270.39,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-11-01",
+              "end_date": "2026-01-31",
+              "duration": 3,
+              "max_duration": 60,
+              "max_end_date": "2027-04-13",
+              "total_amount": 40745,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK TIPO I",
+                "description": "NOTEBOOK CORE I7",
+                "quantity": 4,
+                "price": 534.71,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-i#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO II",
+                "description": "NOTEBOOK CORE I5",
+                "quantity": 4,
+                "price": 344.75,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-ii#0"
+              },
+              {
+                "alias": "NOTEBOOK TIPO III",
+                "description": "NOTEBOOK CORE I3",
+                "quantity": 3,
+                "price": 270.39,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-tipo-iii#0"
+              },
+              {
+                "alias": "MICRO TIPO I",
+                "description": "MICRODESKTOP I7",
+                "quantity": 3,
+                "price": 387.36,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-i#0"
+              },
+              {
+                "alias": "MICRO TIPO II",
+                "description": "MICRODESKTOP I5",
+                "quantity": 8,
+                "price": 221.78,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-ii#0"
+              },
+              {
+                "alias": "MICRO TIPO III",
+                "description": "MICRODESKTOP I3",
+                "quantity": 8,
+                "price": 173.93,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "micro-tipo-iii#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 286.34,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO LASER –  PÁGINAS A4",
+                "description": "",
+                "quantity": 3,
+                "price": 234.7,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-laser-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA  MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "",
+                "quantity": 1,
+                "price": 1239.56,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA - PÁGINAS A4",
+                "description": "",
+                "quantity": 2,
+                "price": 148.11,
+                "months": 3,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta-paginas-a4#1"
+              },
+              {
+                "alias": "SCANNER DE MESA A4",
+                "description": "",
+                "quantity": 1,
+                "price": 201.73,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "scanner-de-mesa-a4#0"
+              },
+              {
+                "alias": "SWITCH 48 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 193.47,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-48-portas#0"
+              },
+              {
+                "alias": "SWITCH 16 PORTAS",
+                "description": "",
+                "quantity": 2,
+                "price": 50.3,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-16-portas#0"
+              },
+              {
+                "alias": "SWITCH 8 PORTAS",
+                "description": "",
+                "quantity": 1,
+                "price": 13.42,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "switch-8-portas#0"
+              },
+              {
+                "alias": "ACESS POINT",
+                "description": "",
+                "quantity": 3,
+                "price": 91.18,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "acess-point#0"
+              },
+              {
+                "alias": "NOBREAK 3000VA",
+                "description": "",
+                "quantity": 1,
+                "price": 199.46,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "nobreak-3000va#0"
+              },
+              {
+                "alias": "NOBREAK 700VA",
+                "description": "",
+                "quantity": 3,
+                "price": 41.95,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "nobreak-700va#0"
+              },
+              {
+                "alias": "TV 50 POLEGADAS SMART",
+                "description": "",
+                "quantity": 3,
+                "price": 169.29,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "tv-50-polegadas-smart#0"
+              },
+              {
+                "alias": "TV 40 POLEGADAS SMART",
+                "description": "",
+                "quantity": 2,
+                "price": 105.09,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "tv-40-polegadas-smart#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

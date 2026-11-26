@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|0014/2022|id=40",
+    "source_contract_id": 40,
+    "number": "0014/2022",
+    "name": "IPAM",
+    "customer_alias": "PREFEITURA MUNICIPAL DE SÃO LUÍS",
+    "recipient_aliases": [
+      "FUNDAÇÃO NACIONAL DO PATRIMÔNIO HISTÓRICO DE SÃO LUIS - FUMPH",
+      "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM",
+      "INSTITUTO DE PREVIDÊNCIA E ASSISTÊNCIA DO MUNICÍPIO - IPAM - CONTRATO Nº 003/2026/IPAM",
+      "PREFEITURA MUNICIPAL DE SÃO LUÍS",
+      "PROCURADORIA GERAL  DO MUNICIPIO DE SAO LUIS",
+      "PROCURADORIA GERAL DO MUNICIPIO DE SAO LUIS 2026",
+      "SECRETARIA DA FAZENDA - SEMFAZ",
+      "SECRETARIA DA FAZENDA MUNICIPIO DE SÃO LUIS - SEMFAZ 2026",
+      "SECRETARIA DE TRÂNSITO E TRANSPORTES - SMTT",
+      "SECRETARIA MUNIC DA CRIANCA E ASSIST SOCIAL  - SEMCAS",
+      "SECRETARIA MUNICIPAL DE COMUNICACAO DO MUNICIPIO DE SAO LUIS",
+      "SECRETARIA MUNICIPAL DE INFORMACAO E TECNOLOGIA - SEMIT",
+      "SECRETARIA MUNICIPAL DE INFORMACAO E TECNOLOGIA - SEMIT 2026",
+      "SECRETARIA MUNICIPAL DE INOVAÇÃO, SUSTENTABILIDADE E PROJETOS ESPECIAIS-SEMISP 2026",
+      "SECRETARIA MUNICIPAL DE MEIO AMBIENTE DE SAO LUIS - SEMMAN  2026",
+      "SECRETARIA MUNICIPAL DE MEIO AMBIENTE DO MUNICIPIO DE SAO LUIS",
+      "SECRETARIA MUNICIPAL DE SAUDE - SEMUS",
+      "SECRETARIA MUNICIPAL DE SEGURANÇA ALIMENTAR - SEMSA",
+      "SECRETARIA MUNICIPAL DE SEGURANÇA COM CIDADANIA - SEMUSC",
+      "SECRETARIA MUNICIPAL DE URBANISMO E HABITAÇÃO DO MUNICIPIO DE SAO LUIS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Contratação de empresa especializada na prestação de serviços, executados de forma contínua, de locação e manutenção preventiva e corretiva de equipamentos de informática.",
+    "original_start_date": "2022-07-04",
+    "created_at": "2011-06-05T23:59:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=40"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-07-04",
+              "end_date": "2023-07-04",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-07-04",
+              "total_amount": 95062,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 10,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "",
+                "quantity": 30,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA ",
+                "quantity": 10,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA ",
+                "quantity": 30,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 10,
+                "price": 270.39,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "",
+                "quantity": 30,
+                "price": 173.93,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA ",
+                "quantity": 10,
+                "price": 270.39,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA ",
+                "quantity": 30,
+                "price": 173.93,
+                "months": null,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": {
+              "start_date": "2023-07-04",
+              "end_date": "2024-07-04",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-07-04",
+              "total_amount": 101551,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 12,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "",
+                "quantity": 0,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA ",
+                "quantity": 12,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 30,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-07-04",
+              "end_date": "2025-07-04",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-07-04",
+              "total_amount": 101551,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 12,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "",
+                "quantity": 30,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 12,
+                "price": 270.39,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 30,
+                "price": 173.93,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 12,
+                "price": 270.39,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "",
+                "quantity": 30,
+                "price": 173.93,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 12,
+                "price": 270.39,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 30,
+                "price": 173.93,
+                "months": null,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-07-04",
+              "end_date": "2026-07-04",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2026-07-04",
+              "total_amount": 11098944,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "MICROCOMPUTADOR",
+                "quantity": 30,
+                "price": 190.08,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0"
+              },
+              {
+                "alias": "NOTEBOOK",
+                "description": "Notebook I3 ou AMD Ryzen3 mínimo 6º geração",
+                "quantity": 12,
+                "price": 295.56,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 30,
+                "price": 190.08,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "description": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA",
+                "quantity": 12,
+                "price": 295.56,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "locacao-de-equipamentos-de-informatica#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

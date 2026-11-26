@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|18-2024|id=165",
+    "source_contract_id": 165,
+    "number": "18-2024",
+    "name": "CISNORDESTE",
+    "customer_alias": "CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA - CISNORDESTE/SC",
+    "recipient_aliases": [
+      "CONSÓRCIO INTERFEDERATIVO DE SAÚDE DO NORDESTE DE SANTA CATARINA - CISNORDESTE/SC"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2024-01-29",
+    "created_at": "2024-01-28T09:52:54",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=165"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-01-29",
+              "end_date": "2024-12-31",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-01-29",
+              "total_amount": 2848,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 10000,
+                "price": 0.07,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 10000,
+                "price": 0.07,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-01-01",
+              "end_date": "2030-01-01",
+              "duration": 60,
+              "max_duration": 120,
+              "max_end_date": "2034-01-29",
+              "total_amount": 2848,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 179.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 10000,
+                "price": 0.07,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 10000,
+                "price": 0.07,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "APOSTILAMENTO",
+            "info": {
+              "start_date": "2025-01-12",
+              "end_date": "2026-01-12",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-01-29",
+              "total_amount": 2951,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "",
+                "quantity": 1,
+                "price": 187.65,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4 ",
+                "quantity": 0,
+                "price": 10000.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMATICA",
+                "description": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4 ",
+                "quantity": 0,
+                "price": 10000.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "63320667000191",
+    "alias": "AS_SISTEMAS"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "AS_SISTEMAS|2025.08.22.157|id=228",
+    "source_contract_id": 228,
+    "number": "2025.08.22.157",
+    "name": "CONSÓRCIO PÚBLICO DE SAÚDE DA MICRORREGIÃO DE CRATO – CPSMC",
+    "customer_alias": "CONSÓRCIO PÚBLICO DE SAÚDE DA MICRORREGIÃO DE CRATO – CPSMC",
+    "recipient_aliases": [
+      "CONSÓRCIO PÚBLICO DE SAÚDE DA MICRORREGIÃO DE CRATO – CPSMC"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Contratação de empresa para prestação de serviço de locação de impressoras multifuncionais destinadas as atender as atividades administrativas das unidades de saúde gerenciadas pelo Consórcio Público de Saúde da Microrregião de Crato",
+    "original_start_date": "2025-08-22",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=228"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-08-22",
+              "end_date": "2026-08-21",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-08-21",
+              "total_amount": 40980,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL  MONOCROMÁTICA",
+                "description": "",
+                "quantity": 10,
+                "price": 291.5,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "evento 656/serviços: linha sem APELIDO ignorada",
+      "cliente 'CONSÓRCIO PÚBLICO DE SAÚDE DA MICRORREGIÃO DE CRATO – CPSMC' não existe em customers (criar customer ou definir de/para)"
+    ]
+  }
+}

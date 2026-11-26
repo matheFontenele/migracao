@@ -29,7 +29,7 @@ fi
   timeout 1800 "$VENV" main.py reset_banco
 
   echo "###### 2/9 TODOS (cadastros + parquets + movimentos + ajustes) ######"
-  timeout 21600 "$VENV" main.py todos
+  timeout 21600 "$VENV" main.py todos --ignorar-pendentes --incluir-novos
 
   echo "###### 3/9 AJUSTES_MOVIMENTOS --aplicar ######"
   timeout 7200 "$VENV" main.py ajustes_movimentos --aplicar

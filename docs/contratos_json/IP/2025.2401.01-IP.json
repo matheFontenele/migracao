@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2025.2401.01-IP|id=198",
+    "source_contract_id": 198,
+    "number": "2025.2401.01-IP",
+    "name": "G&T CONTROLLER LTDA ME - 2401.01",
+    "customer_alias": "G&T CONTROLLER LTDA ME",
+    "recipient_aliases": [
+      "G&T CONTROLLER LTDA ME"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "serviços de Serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da G&T CONTROLLER LTDA LTDA no Município Fortaleza/CE, na quantidade e especificação descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-01-24",
+    "created_at": "2025-01-24T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=198"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-01-24",
+              "end_date": "2026-01-24",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 1908,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "NOTEBOOK I3",
+                "description": "Notebook core i3 4gb SSD 120 gb",
+                "quantity": 1,
+                "price": 159.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-i3#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

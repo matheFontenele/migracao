@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2301-2025|id=251",
+    "source_contract_id": 251,
+    "number": "2301-2025",
+    "name": "JOANA D ARC CLAUDIO BRASIL DODO,",
+    "customer_alias": "JOANA DARC CLAUDIO BRASIL DODO",
+    "recipient_aliases": [
+      "JOANA DARC CLAUDIO BRASIL DODO"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "ENCERRADO",
+    "object": "CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da JOANA D ARC CLAUDIO BRASIL DODO, no Município de Ocara — CE, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2025-01-24",
+    "created_at": "2025-01-24T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=251"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-01-24",
+              "end_date": "2026-01-24",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 9072,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook - Intel® CoreTM i3",
+                "description": "8a geração - 8GB de memória, SSD 128",
+                "quantity": 2,
+                "price": 179.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-coretm-i3#0"
+              },
+              {
+                "alias": "Escânner de Mesa",
+                "description": "Escânner de mesa",
+                "quantity": 2,
+                "price": 199.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "escanner-de-mesa#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "8a geração - 8GB de memória, SSD 128",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "8a-geracao-8gb-de-memoria-ssd-128#0"
+              },
+              {
+                "alias": "Escânner de mesa",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "escanner-de-mesa#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

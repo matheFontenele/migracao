@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|22/2023|id=32",
+    "source_contract_id": 32,
+    "number": "22/2023",
+    "name": "HUAC",
+    "customer_alias": "HOSPITAL UNIVERSITARIO ALCIDES CARNEIRO-HUAC-PB",
+    "recipient_aliases": [
+      "HOSPITAL UNIVERSITARIO ALCIDES CARNEIRO-HUAC-PB"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a escolha da proposta mais vantajosa para a CONTRATAÇÃO DE SERVIÇO DE OUTSOURCING DE IMPRESSÃO, conforme condições, quanyidades e exigências estabelecidas neste instrumento e especificações detalhadas na Tabela 1 - Descrição detalhada dos itens (Item 3.5. do Termo de Referência), mediante Pregão Eletrônico SRP 33/2023, de acordo com Estudo Técnico Preliminar (ETP) realizado pela Equipe de Planejamento da Contratação (EPC), para atender a demanda do Hospital Uni",
+    "original_start_date": "2023-11-10",
+    "created_at": "2023-11-26T15:58:32",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=32"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-11-10",
+              "end_date": "2027-11-09",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2028-11-09",
+              "total_amount": 454181,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS M2640 IDW + OCR",
+                "quantity": 51,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "KYOCERA ECOSYS M5526 CDW + OCR",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "TASKALFA 2554 CI + OCR",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "impressora-policromatico-paginas-a4#1"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 4339336,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 2892891,
+                "price": 0.04,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 207360,
+                "price": 0.27,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 138240,
+                "price": 0.16,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

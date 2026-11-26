@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "63320667000191",
+    "alias": "AS_SISTEMAS"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "AS_SISTEMAS|202404120005|id=244",
+    "source_contract_id": 244,
+    "number": "202404120005",
+    "name": "PREFEITURA MUNICIPAL DE ITATIRA - FUNDO MUNICIPAL DE SAUDE",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ITATIRA - FUNDO MUNICIPAL DE SAUDE",
+    "recipient_aliases": [
+      "PREFEITURA MUNICIPAL DE ITATIRA - FUNDO MUNICIPAL DE SAUDE"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "AQUISIÇÃO DE LICENÇA DE USO DE SOFTWARE PARA DIVERSAS FINALIDADES NAS UNIDADES ADMINISTRATIVAS DO MUNICÍPIO DE ITATIRA",
+    "original_start_date": "2024-04-12",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=244"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-04-12",
+              "end_date": "2025-04-12",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-04-12",
+              "total_amount": 24600,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 2050.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2026-04-13",
+              "end_date": "2026-04-12",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-04-12",
+              "total_amount": 24600,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "SISTEMA DE INFORMÁTICA",
+                "description": "",
+                "quantity": 1,
+                "price": 2050.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "sistema-de-informatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente 'PREFEITURA MUNICIPAL DE ITATIRA - FUNDO MUNICIPAL DE SAUDE' não existe em customers (criar customer ou definir de/para)"
+    ]
+  }
+}

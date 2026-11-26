@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|006-2023|id=161",
+    "source_contract_id": 161,
+    "number": "006-2023",
+    "name": "COREN DF",
+    "customer_alias": "CONSELHO REGIONAL DE ENFERMAGEM DO DISTRITO FEDERAL - COREN-DF",
+    "recipient_aliases": [
+      "CONSELHO REGIONAL DE ENFERMAGEM DO DISTRITO FEDERAL - COREN-DF"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2023-04-17",
+    "created_at": "2023-04-11T10:34:13",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=161"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-04-17",
+              "end_date": "2027-04-17",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2028-04-17",
+              "total_amount": 132480,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS M3655IDN",
+                "quantity": 6,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "KYOCERA ECOSYS M6630CIDN",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 10200,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1200,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 6800,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "APOSTILAMENTO",
+            "info": {
+              "start_date": "2024-04-17",
+              "end_date": "2027-04-17",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2028-04-17",
+              "total_amount": 133642,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS M3655IDN",
+                "quantity": 6,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "KYOCERA ECOSYS M6630CIDN",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 10200,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1200,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 6800,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "APOSTILAMENTO",
+            "info": {
+              "start_date": "2025-04-17",
+              "end_date": "2027-04-16",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2028-04-17",
+              "total_amount": 138508,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS M3655IDN",
+                "quantity": 6,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "KYOCERA ECOSYS M6630CIDN",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 10200,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1200,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 6800,
+                "price": 0.06,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 800,
+                "price": 0.87,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

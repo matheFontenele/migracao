@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2020.07.01.07|SECRETARIA DE DE GOVERNO E MOVIMENTOS SOCIAIS",
+    "source_contract_id": null,
+    "number": "2020.07.01.07",
+    "name": "SECRETARIA DE DE GOVERNO E MOVIMENTOS SOCIAIS",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE DE GOVERNO E MOVIMENTOS SOCIAIS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇAO DEMICROCOMPUTADORES E TABLET´S DESTINADOS A SUPRIR AS NECESSIDDAES DA UNIDADE BÁSICA DE SÁUDE JUNTO A : SECRETARIA DE DE GOVERNO E MOVIMENTOS SOCIAIS",
+    "original_start_date": "2023-12-29",
+    "created_at": "2023-12-29T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA PM ARACOIABA -GABINETE, GOVERNO, SEGURANÇA ( DR ).xlsx",
+        "sheet": "GOVERNO - DR DEZ24",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2023-12-29",
+              "end_date": "2024-06-28",
+              "duration": 6,
+              "max_duration": 6,
+              "max_end_date": "2024-06-28",
+              "total_amount": 1991.16,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "MICROCOMPUTADOR – Especificação Mínima: Processador com tecnologia Core I5, com frequência de operação 32hz, cache I36mb, gabinete tipo torre com fonte 400w, placa mãe on-board com som/vídeo/rede, memória ram 4gb ddr3 13333mhz, hd 500gb, monitor 18.5 LCD/LED, teclado USB, mouse USB, sistema operacional Windows 10 em portugês,(fornecimento de estabilizador de tensão 300va) Inclui manutensão on-site e reposição de peças, com substituição imediata do equipamento em caso de defeito sem ônus adicional para a contratante. Todos os casos devem ter atualização de hardware (aumento de capacidade da velocidade de processamento, armazenamento, memória e tamanho do monitor e vídeo) para atender as necessidades dos software da contratante sem ônus adicional.",
+                "quantity": 1,
+                "price": 141.86,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA -GABINETE, GOVERNO, SEGURANÇA ( DR ).xlsx",
+                  "sheet": "GOVERNO - DR DEZ24",
+                  "row": 10
+                }
+              },
+              {
+                "alias": "NOTEBOOK",
+                "description": "NOTEBOOK: Especificação mínima: Processador com tecnologia Core I5, freqência 3.2ghz , memória cache L3 3mb, memória Ram 4gb ddr3 133mgz HD 500gb, tela LCD 14 LED, leitor de cartões drive DVD, pl de rede 10/100/1 OOOmbps, conectividade rede sem fio IEEE 802.11 b/g/ntm, teclado portugês ABNT, mouse touch pad, bateria Li-ion 3 células, 2.200mah integrada. Inclui manutensão on-site e reposição de peças com substituição imediata do equipamento em caso de defeito sem ônus adicional para a contratante Todos os equipamentos devem ter atualização de hadware (aumento de capacidade da velocidade de processamento, armazenamento e memória) para atender as necessidades dos softwares da contratante sem ônus adicional.",
+                "quantity": 1,
+                "price": 190.0,
+                "months": 6,
+                "occurrence": 0,
+                "lineage_key": "notebook#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA -GABINETE, GOVERNO, SEGURANÇA ( DR ).xlsx",
+                  "sheet": "GOVERNO - DR DEZ24",
+                  "row": 11
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

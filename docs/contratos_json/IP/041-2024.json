@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|041-2024|id=166",
+    "source_contract_id": 166,
+    "number": "041-2024",
+    "name": "CREF",
+    "customer_alias": "CONSELHO REGIONAL DE EDUCAÇÃO FISICA DA 3º REGIÃO - SC",
+    "recipient_aliases": [
+      "CONSELHO REGIONAL DE EDUCAÇÃO FISICA DA 3º REGIÃO - SC"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2024-10-10",
+    "created_at": "2024-10-10T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=166"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-10-10",
+              "end_date": "2025-10-17",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2034-10-10",
+              "total_amount": 7799,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON WF C5890",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_QUANTIDADE",
+            "info": null,
+            "items": [],
+            "services": []
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-10-17",
+              "end_date": "2026-10-17",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": "2034-10-10",
+              "total_amount": 8188,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON WF C5890",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL MONOCROMÁTICA",
+                "description": "KYOCERA ECOSYS M2040DN",
+                "quantity": 2,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "EPSON EcoTank® L3110",
+                "quantity": 1,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-policromatica#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2021.05.18.001|SECRETARIA DE OBRAS E SERVIÇOS PÚBLICOS",
+    "source_contract_id": null,
+    "number": "2021.05.18.001",
+    "name": "SECRETARIA DE OBRAS E SERVIÇOS PÚBLICOS",
+    "customer_alias": "PREFEITURA MUNICIPAL DE EUSÉBIO",
+    "recipient_aliases": [
+      "SECRETARIA DE OBRAS E SERVIÇOS PÚBLICOS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "CONTRATAÇÃO DE EMPRESA ESPECIALIZADA EM SERVIÇOS DE LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA, INCLUINDO DISTRIBUIÇÃO E INSTALAÇÃO, SUPORTE, ASSISTÊNCIA TÉCNICA E MANUTENÇÃO PREVENTIVA E CORRETIVA IN-LOCO, REPOSIÇÃO DE PEÇAS E INSUMOS (EXCETO PAPEL], PARA ATENDER 0 ANDAMENTO DOS SERVIÇOS ADMINISTRATIVOS, BEM COMO A MANUTENÇÃO DAS ATIVIDADES EXERCIDAS PELOS SERVIDORES DA SECRETARIA DE OBRAS E SERVIÇOS PÚBLICOS DO MUNICÍPIO DE EUSÉBIO-CE",
+    "original_start_date": "2021-04-05",
+    "created_at": "2021-04-05T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+        "sheet": " SEC OBRAS - DR",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-04-05",
+              "end_date": "2022-04-04",
+              "duration": 12,
+              "max_duration": 12,
+              "max_end_date": "2022-04-04",
+              "total_amount": 69165.36,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO",
+                "description": "MICROCOMPUTADOR ESTAÇÃO, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MINIMO INTEL CORE I5 ou AMD FX MINIMO 3.20GHZ; MEMÓRIA 4GB; HD 500GB; LEITOR DE CARTÃO DE MEMÓRIA; PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; PLACA DE REDE WIRELESS 802.11 B/G/N; SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; MONITOR MINIMO 18,5”; TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; REGULADOR DE TENSÃO 1.000W BIVOLT;COR DO GABINETE, MONITOR, MOUSE E TECLADO: PRETO. MICROSOFT® OFFICE HOME & BUSINESS 2019; LICENCIADO EM CARÁTER PERPÉTUO;(AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMORIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE).",
+                "quantity": 2,
+                "price": 150.48,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO",
+                "description": "MICROCOMPUTADOR ESTAÇÃO, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MINIMO INTEL CORE I5 ou AMD FX MINIMO 3.20GHZ; MEMÓRIA 4GB; HD 500GB; LEITOR DE CARTÃO DE MEMÓRIA; PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; PLACA DE REDE WIRELESS 802.11 B/G/N; SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; MONITOR MINIMO 18,5”; TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; REGULADOR DE TENSÃO 1.000W BIVOLT;COR DO GABINETE, MONITOR, MOUSE E TECLADO: PRETO;(AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMORIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE).",
+                "quantity": 10,
+                "price": 150.48,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "microcomputador-estacao#1",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 12
+                }
+              },
+              {
+                "alias": "NOTEBOOK CORE™ I7, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "NOTEBOOK CORE™ I7, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • NOTEBOOK COM PROCESSADOR INTEL CORE I7 ou AMD FX MINIMO 3.40GHZ; MEMÓRIA 8GB; HD 1TB; LEITOR DE CARTÃO DE MEMÓRIA; CONEXÃO HDMI;PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; PLACA DE REDE WIRELESS 802.11 B/G/N; SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; TELA MINIMO 14,6” WIDESCREEN, TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS, BATERIA RECARREGÁVEL, FONTE BIVOLT. MICROSOFT® OFFICE HOME & BUSINESS 2019 LICENCIADO EM CARÁTER PERPÉTUO; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMORIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE).",
+                "quantity": 1,
+                "price": 310.86,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-coretm-i7-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 13
+                }
+              },
+              {
+                "alias": "NOTEBOOK CORE™ I7, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "NOTEBOOK CORE™ I7, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • NOTEBOOK COM PROCESSADOR INTEL CORE I7 ou AMD FX MINIMO 3.40GHZ; MEMÓRIA 8GB; HD 1TB; LEITOR DE CARTÃO DE MEMÓRIA; CONEXÃO HDMI; PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; PLACA DE REDE WIRELESS 802.11 B/G/N;SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS;TELA MINIMO 14,6” WIDESCREEN, TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS, BATERIA RECARREGÁVEL, FONTE BIVOLT;(AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMORIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES DA CONTRATANTE SEM ONUS PARA CONTRATANTE).",
+                "quantity": 4,
+                "price": 310.86,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "notebook-coretm-i7-com-as-seguintes-especificacoes-minimas#1",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 14
+                }
+              },
+              {
+                "alias": "NOTEBOOK CORE™ I5, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "NOTEBOOK CORE™ I5, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • NOTEBOOK COM PROCESSADOR INTEL CORE I5 ou AMD FX MINIMO 3.20GHZ; MEMÓRIA 4GB; HD 1TB; LEITOR DE CARTÃO DE MEMÓRIA;CONEXÃO HDMI, PLACA DE VÍDEO INTEGRADA; PLACA DE SOM INTEGRADA; PLACA DE REDE WIRELESS 802.11 B/G/N;SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; TELA MINIMO 14” WIDESCREEN; TECLADO PORTUGUÊS-BRASIL E TOUCHPAD INTEGRADOS; BATERIA RECARREGÁVEL; FONTE BIVOLT. AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO, ARMAZENAMENTO, MEMORIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE).",
+                "quantity": 2,
+                "price": 239.58,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-coretm-i5-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 15
+                }
+              },
+              {
+                "alias": "SWITCHES COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "SWITCHES COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •SWITCH GERENCIAVEL DE 48 PORTAS FAST ETHERNET E 2 PORTAS MINIGBIC. (ATENÇÃO: O CONTRATADO DEVERA ADEQUAR E CAPACIDADE PARA A NECESSIDADE DO CONTRATANTE SEM ÔNUS PARA O CONTRATANTE).",
+                "quantity": 2,
+                "price": 253.44,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "switches-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 16
+                }
+              },
+              {
+                "alias": "MONITOR COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • MONITOR LCD COM RETROILUMINAÇÃO LED",
+                "description": "MONITOR COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • MONITOR LCD COM RETROILUMINAÇÃO LED - 24\"; TIPO DE PAINEL: IPS;RESOLUÇÃO NATIVA: 1920 x 1200 a 60 Hz; AJUSTES DA POSIÇÃO DO VISOR: ALTURA, PIVÔ (ROTAÇÃO), PLATAFORMA GIRATÓRIA, INCLINAÇÃO; RESOLUÇÃO NATIVA: FULL HD (1080P) 1920 x 1080 A 60 HZ; PADRÃO PLUG AND PLAY;",
+                "quantity": 1,
+                "price": 79.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "monitor-com-as-seguintes-especificacoes-minimas-monitor-lcd-com-retroiluminacao-led#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 17
+                }
+              },
+              {
+                "alias": "NOBREAK DE 1.2 KVA COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "NOBREAK DE 1.2 KVA COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • NO-BREAK 1.200VA, ENTRADA BI-VOLT E SAÍDA 115V; AUTONOMIA MÍNIMA (COMPUTADOR) 55 (CINQÜENTA E CINCO) MINUTOS;MÍNIMO 8 TOMADAS NBR 14136 COM PROTEÇÃO DE SOBRECARGA.",
+                "quantity": 2,
+                "price": 79.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "nobreak-de-1-2-kva-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 18
+                }
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS",
+                "description": "IMPRESSORA MULTIFUNCIONAL COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •MULTIFUNCIONAL LASER MONOCROMÁTICA ESPECIFICAÇÕES: TAMANHO MÁXIMO DO PAPEL: OFÍCIO (21.6 X 35,6 CM); VELOCIDADE DE IMPRESSÃO MÍNIMO 30PPM (PÁGINA POR MINUTO);RESOLUÇÃO: MÍNIMO 1 200 X 1.200 DPI DE RESOLUÇÃO;CAPACIDADE DE IMPRESSÃO DUPLEX: AUTOMÁTICO;BANDEJA DE ENTRADA DE PAPEL 250 FOLHAS; BANDEJA DE SAÍDA DE PAPEL MÍNIMO: 50 FOLHAS; ALIMENTADOR AUTOMÁTICO DE DOCUMENTOS (ARDF): MÍNIMO 50 FOLHAS; INTERFACE PADRÃO USB 2.0;RESOLUÇÃO DE CÓPIA MÍNIMO ATÉ 600 X 600 DPI DE RESOLUÇÃO DO SCANNER MÍNIMO: ATÉ 600 X 600 DPI;COMPATIBILIDADE WINDOWS; COM O FORNECIMENTO DE INSUMOS E CONSUMÍVEIS EXCETO PAPEL. ESTIMATIVA DE PAGINAS IMPRESSAS POR MÊS POR IMPRESSORA: DE 01 (UM) A 6.000 (SEIS MIL); (ATUALIZACAO DO AUMENTO DA CAPACIDADE DE IMPRESSAO OU QUALIDADE DE IMPRESSAO SEM ONUS PARA O CONTRATANTE).",
+                "quantity": 2,
+                "price": 230.67,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-com-as-seguintes-especificacoes-minimas#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 19
+                }
+              },
+              {
+                "alias": "MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO",
+                "description": "MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO: •MULTIFUNCIONAL JATO DE TINTA COLORIDA ESPECIFICAÇÃO: TAMANHO MÁXIMO DO PAPEL: OFÍCIO (21.6 X 35,6 CM);RESOLUÇÃO DA IMPRESSÃO MÍNIMO: 4800 X 1200 DPI; VELOCIDADE DE IMPRESSÃO MINIMO 8IPM;BANDEJA DE ENTRADA DE PAPEL MÍNIMO 50 FOLHAS; INTERFACE PADRÃO: USB E WIFI; COMPATIBILIDADE WINDOWS;EQUIPADA COM SISTEMA DE ALIMENTAÇÃO CONTINUA DE TINTA BULKINK ORIGINAL DO FABRICANTE COM CAPACIDADE PARA ARMAZENAMENTO MINIMO DE 100ML PARA CADA COR COM FORNECIMENTO DE UMA RECARGA COMPLETA POR MÊS; (ATUALIZACAO DO AUMENTO DA CAPACIDADE DE IMPRESSAO OU QUALIDADE DE IMPRESSAO SEM ONUS PARA O CONTRATANTE).",
+                "quantity": 2,
+                "price": 114.84,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-jato-de-tinta-colorida-especificacao#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 20
+                }
+              },
+              {
+                "alias": "SERVIDOR SSD 1TB OU SUPERIOR •SERVIDOR TORRE",
+                "description": "SERVIDOR SSD 1TB OU SUPERIOR •SERVIDOR TORRE, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: • PROCESSADOR: INTEL XEON SERVER W-2123; 4 NÚCLEOS, 8 SEGMENTOS, CACHE DE 8,25MB; FREQUÊNCIA DO PROCESSADOR 3.60 GHZ, TECNOLOGIA INTEL® TURBO BOOST 2.0; RAM 16 GB DDR4, 2666 MHZ; SSD: 960GB OU SUPERIOR; SUPORTE PARA RAID 0,1, 10; SUPORTE PARA RAID VIRTUAL (VROC); CONEXÕES, DUAS CONEXÕES M.2 SOCKET 3; MÍNIMO DUAS CONEXÕES USB 3.1 TIPO A/C; UMA CONEXÃO U.2; • SEIS CONEXÕES SATA 6GBS PORTS;TRES CONEXÕES PCI-E GERAÇAO 3 x 16;SEIS CONEXÕES USB GERAÇAO 3.1;SEIS CONEXÕES USB GERAÇAO 2.0;MICROSOFT WINDOWS SERVER 2016 STANDARD (X64); PLACA DE VIDEO GEFORCE 8400 GS OU SUPERIOR;MÍNIMO DOIS DAPTADOR DE REDE: INTEL I210AT COPPER NETWORK ADAPTER PCI-e;PLACA DE VÍDEO NVIDIA GEFORCE 8400 GS 1GB OU SUPERIOR",
+                "quantity": 1,
+                "price": 489.06,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "servidor-ssd-1tb-ou-superior-servidor-torre#0",
+                "source": {
+                  "file": "Moreia/PLANILHA - DIVERSAS (DR).xls",
+                  "sheet": " SEC OBRAS - DR",
+                  "row": 21
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

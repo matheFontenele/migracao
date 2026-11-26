@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|01.09.001/2025|id=264",
+    "source_contract_id": 264,
+    "number": "01.09.001/2025",
+    "name": "ASSOCIACAO DE PROTECAO E ASSISTENCIA A MAT E INFANCIA - ISV - (CONTRATO 2 SUBSTITUIU O CONTRATO 1)",
+    "customer_alias": "ASSOCIACAO DE PROTECAO E ASSISTENCIA MAT E INFANCIA - ISV",
+    "recipient_aliases": [
+      "ASSOCIACAO DE PROTECAO E ASSISTENCIA MAT E INFANCIA - ISV",
+      "ISV/INSTITUTO SAO VICENTE - IGUATU"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "LOCAÇÃO DE EQUIPAMENTOS DE INFORMÁTICA para o HOSPITAL REGIONAL DR. MANOEL BATISTA DE OLIVEIRA - IGUATU-CE, - FEITO NOVO CONTRATO INCLUINDO NOVOS EQUIPAMETOS",
+    "original_start_date": "2025-09-01",
+    "created_at": "2025-09-01T00:00:00",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=264"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-09-01",
+              "end_date": "2025-12-31",
+              "duration": 4,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 34599,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO MICROCOMPUTADOR i3",
+                "description": "MEMÓRIA 4GB DDR3, HARD DISK 500GB, TELA 18,5\" LED",
+                "quantity": 21,
+                "price": 137.21,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-microcomputador-i3#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE MICROCOMPUTADOR i5",
+                "description": "MEMÓRIA 4.0GB, HD 500GB",
+                "quantity": 2,
+                "price": 169.2,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-microcomputador-i5#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE NOTEBOOK Intel CORE I3",
+                "description": "MEMÓRIA 4.0GB, HD 500GB",
+                "quantity": 4,
+                "price": 203.21,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-notebook-intel-core-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA",
+                "description": "VELOCIDADE DE IMPRESSÃO 20 PPM",
+                "quantity": 4,
+                "price": 129.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMÁTICA",
+                "description": "VELOCIDADE DE IMPRESSÃO DE 30PPM,",
+                "quantity": 12,
+                "price": 280.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA",
+                "description": "VELOCIDADE 30 PPM",
+                "quantity": 5,
+                "price": 148.11,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO MICROCOMPUTADOR i3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-microcomputador-i3#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE MICROCOMPUTADOR i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-microcomputador-i5#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE NOTEBOOK Intel CORE I3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-notebook-intel-core-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.065,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMÁTICA",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 5000,
+                "price": 56.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MLTIFUNCIONAL JATO DE TINTA",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 4,
+                "occurrence": 0,
+                "lineage_key": "impressora-mltifuncional-jato-de-tinta#0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2026-01-01",
+              "end_date": "2026-12-31",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 25949,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "LOCAÇÃO MICROCOMPUTADOR i3",
+                "description": "MEMÓRIA 4GB DDR3, HARD DISK 500GB, TELA 18,5\" LED",
+                "quantity": 21,
+                "price": 137.21,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-microcomputador-i3#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE MICROCOMPUTADOR i5",
+                "description": "MEMÓRIA 4.0GB, HD 500GB",
+                "quantity": 2,
+                "price": 169.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-microcomputador-i5#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE NOTEBOOK Intel CORE I3",
+                "description": "MEMÓRIA 4.0GB, HD 500GB",
+                "quantity": 4,
+                "price": 203.21,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-notebook-intel-core-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA",
+                "description": "VELOCIDADE DE IMPRESSÃO 20 PPM",
+                "quantity": 4,
+                "price": 129.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMÁTICA",
+                "description": "VELOCIDADE DE IMPRESSÃO DE 30PPM,",
+                "quantity": 12,
+                "price": 280.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL JATO DE TINTA",
+                "description": "VELOCIDADE 30 PPM",
+                "quantity": 5,
+                "price": 148.11,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-jato-de-tinta#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "LOCAÇÃO MICROCOMPUTADOR i3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-microcomputador-i3#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE MICROCOMPUTADOR i5",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-microcomputador-i5#0"
+              },
+              {
+                "alias": "LOCAÇÃO DE NOTEBOOK Intel CORE I3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-notebook-intel-core-i3#0"
+              },
+              {
+                "alias": "IMPRESSORA LASER MONOCROMÁTICA",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 2000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MULTIFUNCIONAL LASER MONOCROMÁTICA",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 5000,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-multifuncional-laser-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MLTIFUNCIONAL JATO DE TINTA",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-mltifuncional-jato-de-tinta#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

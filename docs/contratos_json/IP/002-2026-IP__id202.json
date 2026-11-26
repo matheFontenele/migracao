@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|002/2026 - IP|id=202",
+    "source_contract_id": 202,
+    "number": "002/2026 - IP",
+    "name": "QUEIROZ EDUCACIONAL LTDA",
+    "customer_alias": "QUEIROZ EDUCACIONAL LTDA",
+    "recipient_aliases": [
+      "QUEIROZ EDUCACIONAL LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da QUEIROZ EDUCACIONAL LTDA, no Município de Mossoró/RN, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.",
+    "original_start_date": "2026-01-10",
+    "created_at": "2026-09-17T16:02:45",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=202"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-01-10",
+              "end_date": "2026-04-10",
+              "duration": 3,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 21480,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Notebook - Intel® CoreTM i3",
+                "description": "8GB de Memória, SSD 120 GB",
+                "quantity": 40,
+                "price": 179.0,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "notebook-intel-coretm-i3#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "NOTotebook -Intel Core TM i3",
+                "description": "",
+                "quantity": 0,
+                "price": 0.0,
+                "months": 3,
+                "occurrence": 0,
+                "lineage_key": "nototebook-intel-core-tm-i3#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

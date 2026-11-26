@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|027-2025|id=204",
+    "source_contract_id": 204,
+    "number": "027-2025",
+    "name": "CASA TELES COMERCIO DE MOVEIS LTDA",
+    "customer_alias": "CASA TELES COMERCIO DE MOVEIS LTDA",
+    "recipient_aliases": [
+      "CASA TELES COMERCIO DE MOVEIS LTDA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da CASA TELES COMERCIO DE MOVEIS LTDA, na quantidade e especificações descritas abaixo, em boas condições de uso",
+    "original_start_date": "2025-12-30",
+    "created_at": "2026-01-04T10:52:36",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=204"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-12-30",
+              "end_date": "2026-12-30",
+              "duration": 12,
+              "max_duration": 60,
+              "max_end_date": null,
+              "total_amount": 2028,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Impressora Colorida A4 - Jato de Tinta",
+                "description": "Impressora Colorida A4 - Jato de Tinta",
+                "quantity": 1,
+                "price": 169.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-colorida-a4-jato-de-tinta#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "Impressora Colorida A4 - Jato de Tinta",
+                "description": "DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 1000,
+                "price": 0.169,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressora-colorida-a4-jato-de-tinta#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

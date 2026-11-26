@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|07-2024|id=17",
+    "source_contract_id": 17,
+    "number": "07-2024",
+    "name": "TRE RJ",
+    "customer_alias": "TRIBUNAL REGIONAL ELEITORAL DO RIO DE JANEIRO - TRE - RIO DE JANEIRO",
+    "recipient_aliases": [
+      "TRIBUNAL REGIONAL ELEITORAL DO RIO DE JANEIRO - TRE - RIO DE JANEIRO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Prestação de serviços de impressão (outsourcing), pelo período de 24 meses, com fornecimento de equipamentos; sistema de gerenciamento de impressões efetivamente realizadas; manutenção preventiva e corretiva dos equipamentos com substituição de peças; componentes e materiais utilizados na manutenção; e fornecimento de insumos originais, exceto papel, para atendimento das necessidades de digitalização e impressão policromática e monocromática em frente e verso das unidades da Sede e por impressão",
+    "original_start_date": "2024-03-04",
+    "created_at": "2024-03-06T10:30:58",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=17"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-03-04",
+              "end_date": "2026-03-03",
+              "duration": 24,
+              "max_duration": 60,
+              "max_end_date": "2029-03-03",
+              "total_amount": 1540816,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "MULTIFUNCIONAL POLICROMÁTICA",
+                "description": "Kyocera Ecosys MA4000cix",
+                "quantity": 60,
+                "price": 224.93,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-policromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA",
+                "description": "kyocera Ecosys P2235dn",
+                "quantity": 110,
+                "price": 203.94,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICA",
+                "description": "Kyocera TASKalfa 3554ci",
+                "quantity": 4,
+                "price": 763.6,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatica#0"
+              },
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICA (período eleitoral)",
+                "description": "kyocera Ecosys P2235dn",
+                "quantity": 40,
+                "price": 219.2,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatica-periodo-eleitoral#0"
+              },
+              {
+                "alias": "IMPRESSORA TÉRMICA DE CARTÕES",
+                "description": "Zebra zc300",
+                "quantity": 1,
+                "price": 276.42,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "impressora-termica-de-cartoes#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - MULTIFUNCIONAL POLICROMÁTICA",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 30000,
+                "price": 0.39,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-multifuncional-policromatica#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - MULTIFUNCIONAL POLICROMÁTICA",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 90000,
+                "price": 0.08,
+                "months": 24,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-multifuncional-policromatica#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - IMPRESSORA MONOCROMÁTICA",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 55000,
+                "price": 0.07,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-impressora-monocromatica#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - IMPRESSORA POLICROMÁTICA",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 600,
+                "price": 0.06,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-impressora-policromatica#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - IMPRESSORA POLICROMÁTICA",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 200,
+                "price": 0.19,
+                "months": 24,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-impressora-policromatica#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - IMPRESSORA MONOCROMÁTICA (período eleitoral)",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 19200,
+                "price": 0.05,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-impressora-monocromatica-periodo-eleitoral#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO - IMPRESSORA TÉRMICA DE CARTÕES",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 50,
+                "price": 1.8,
+                "months": 24,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-impressora-termica-de-cartoes#0"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

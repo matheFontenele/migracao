@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|015/2025|id=262",
+    "source_contract_id": 262,
+    "number": "015/2025",
+    "name": "GOVER DO ESTADO DO CEARÁ - SECRETARIA DA PROTEÇÃO ANIMAL – SEPA",
+    "customer_alias": "CE - SECRETARIA DE PROTEÇÃO ANIMAL - SEPA/COORDENADORIA DE TECNOLOGIA DA INFORMAÇÃO",
+    "recipient_aliases": [
+      "CE - SECRETARIA DE PROTEÇÃO ANIMAL - SEPA/COORDENADORIA DE TECNOLOGIA DA INFORMAÇÃO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "NÃO INFORMADO",
+    "original_start_date": "2025-10-23",
+    "created_at": null,
+    "source": [
+      {
+        "file": "docs/Contratos.xlsx",
+        "detail": "ID=262"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2025-10-23",
+              "end_date": "2026-10-23",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2035-10-23",
+              "total_amount": 39729,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Locação de Notebook Intel CORE I5",
+                "description": " Notebook Lenovo V15 - Intel Core i5-13420H, 8GB RAM, SSD 256gb ",
+                "quantity": 16,
+                "price": 184.38,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-notebook-intel-core-i5#0"
+              },
+              {
+                "alias": "Locação de Tablet, mínimo de 64GB",
+                "description": "Lenovo Tab K11 LTE 4G + Caneta + Capa protetora. (4GB RAM, 64 GB armazenamento) ",
+                "quantity": 3,
+                "price": 120.2,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "locacao-de-tablet-minimo-de-64gb#0"
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": [
+      "cliente ajustado por de/para: 'GOVER DO ESTADO DO CEARÁ - SECRETARIA DA PROTEÇÃO ANIMAL – SEPA' -> 'CE - SECRETARIA DE PROTEÇÃO ANIMAL - SEPA/COORDENADORIA DE TECNOLOGIA DA INFORMAÇÃO'",
+      "total_amount arredondado de 39729.16 para 39729 (coluna INT)"
+    ]
+  }
+}

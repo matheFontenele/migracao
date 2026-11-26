@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|007/2026-002|CONTROLADORIA GERAL DO MUNICÍPIO DE REDENÇÃO",
+    "source_contract_id": null,
+    "number": "007/2026-002",
+    "name": "CONTROLADORIA GERAL DO MUNICÍPIO DE REDENÇÃO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENÇÃO",
+    "recipient_aliases": [
+      "CONTROLADORIA GERAL DO MUNICÍPIO DE REDENÇÃO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a CONTRATAÇÃO DE EMPRESA PARA LOCAÇÃO DE COMPUTADORES E NOTEBOOKS PARA ATENDER AS NECESSIDADES DO INSTITUTO DE PREVIDÊNCIA SOCIAL E DA CONTROLADORIA GERAL DO MUNICÍPIO DE REDENÇÃO/CE, nas condições estabelecidas no Termo de Referência.",
+    "original_start_date": "2026-05-21",
+    "created_at": "2026-05-21T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/IP/PLANILHA - (IP) - PREVIDÊNCIA SOCIAL E DA CONTROLADORIA GERAL.xlsx",
+        "sheet": "NOV26",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2026-05-21",
+              "end_date": "2027-05-21",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2036-05-20",
+              "total_amount": 10197.6,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO",
+                "description": "• MICROCOMPUTADOR ESTAÇÃO, COM AS SEGUINTES ESCPECIFICAÇÕES MÍNIMAS: • COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMORIA 8GB; • HD 500GB OU SSD 120GB (NO MÍNIMO); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VIDRO INTEGRADA; • PLACA DE SOM INTEGRADA • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; • MONITOR MÍNIMO 18,5”; • TECLADO PORTUGUÊS –BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; COR DO GABINETE. MONITOR, MOUSE E TECLADO PRETO; • MICROSOFT OFFICE HOME & BUSINESS 2019 OU SUPERIOR; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMNETO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VÍDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO.",
+                "quantity": 1,
+                "price": 119.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao#0",
+                "source": {
+                  "file": "contratos_tratamento/IP/PLANILHA - (IP) - PREVIDÊNCIA SOCIAL E DA CONTROLADORIA GERAL.xlsx",
+                  "sheet": "NOV26",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "NOTEBOOK COM PROCESSADOR INTEL CORE I5",
+                "description": "NOTEBOOK COM PROCESSADOR INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ NOTEBOOK, • NOTEBOOK COM PROCESSADOR INTEL CORE I5, AMD OU SUPERIOR, MÍNIMO 3.20GHZ; • MEMÓRIA 8GB ( MÍNIMO); • HD 500GB; • LEITOR DE CARTÃO DE MEMÓRIA; • CONEXÃO HDMI; • PLACA DE VIDRO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • SISTEMA OPERACIONAL WINDOWS 10 EM PORTUGUÊS; • TELA MÍNIMO 14” WIDESCREEN; • TECLADO PORTUGUÊS – BRASIL E TOUCHPAD INTEGRADOS; • BATERIA RECARREGÁVEL; • FONTE BIVOLT; MICROSOFT OFICCE HOME & BUSINESS 2019 OU SUPERIOR (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMNETO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VÍDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO",
+                "quantity": 3,
+                "price": 243.6,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "notebook-com-processador-intel-core-i5#0",
+                "source": {
+                  "file": "contratos_tratamento/IP/PLANILHA - (IP) - PREVIDÊNCIA SOCIAL E DA CONTROLADORIA GERAL.xlsx",
+                  "sheet": "NOV26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

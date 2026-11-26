@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|006/2022-001-AD|SECRETARIA MUNICIPAL DE EDUCACAO DO MUNICIPIO DE REDENCAO",
+    "source_contract_id": null,
+    "number": "006/2022-001-AD",
+    "name": "SECRETARIA MUNICIPAL DE EDUCACAO DO MUNICIPIO DE REDENCAO",
+    "customer_alias": "PREFEITURA MUNICIPAL DE REDENCAO",
+    "recipient_aliases": [
+      "SECRETARIA MUNICIPAL DE EDUCACAO DO MUNICIPIO DE REDENCAO"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "LOCAÇÃO DE MATERIAL E EQUIPAMENTOS DE INFORMÁTICA NECESSÁRIOS PARA ATENDER AS DEMANDAS DA SECRETARIA DE EDUCAÇÃO DO MUNICÍPIO DE REDENÇÃO-CE.",
+    "original_start_date": "2022-07-28",
+    "created_at": "2022-07-28T00:00:00",
+    "source": [
+      {
+        "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+        "sheet": "EDUCAÇÃO OUT26",
+        "row": 7
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2022-07-28",
+              "end_date": "2023-07-28",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2032-07-27",
+              "total_amount": 21420.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO. MARCA: AL",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+                  "sheet": "EDUCAÇÃO OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2023-07-28",
+              "end_date": "2024-07-26",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2032-07-27",
+              "total_amount": 21420.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO. MARCA: AL",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+                  "sheet": "EDUCAÇÃO OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 3,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2024-07-26",
+              "end_date": "2025-07-25",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2032-07-27",
+              "total_amount": 21420.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO. MARCA: AL",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+                  "sheet": "EDUCAÇÃO OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2025-07-26",
+              "end_date": "2026-07-24",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2032-07-27",
+              "total_amount": 21420.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO. MARCA: AL",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+                  "sheet": "EDUCAÇÃO OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": {
+              "start_date": "2026-07-26",
+              "end_date": "2027-07-24",
+              "duration": 12,
+              "max_duration": 120,
+              "max_end_date": "2032-07-27",
+              "total_amount": 21420.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "MICROCOMPUTADOR ESTAÇÃO TIPO I",
+                "description": "MICROCOMPUTADOR ESTAÇÃO TIPO I, COM AS SEGUINTES ESPECIFICAÇÕES MÍNIMAS: •COMPUTADOR COM PROCESSADOR MÍNIMO INTEL CORE I7, AMD OU SUPERIOR, MÍNIMO 3.40GHZ; • MEMÓRIA 8GB; • HD 1TB OU 480GB SSD (No mínimo); • LEITOR DE CARTÃO DE MEMÓRIA; • PLACA DE VÍDEO INTEGRADA; • PLACA DE SOM INTEGRADA; • PLACA DE REDE WIRELESS 802.11 B/G/N; • TECLADO PORTUGUÊS-BRASIL, MOUSE ÓPTICO; • ESTABILIZADOR DE TENSÃO BIVOLT; • COR DO GABINETE. MONITOR, MOUSE E TECLADO: PRETO; • MONITOR MÍNIMO 18,5”; • WINDOWS 10 PRÓ 64 BIT - EM PORTUGUÊS (BRASIL); MICROSOFT® OFFICE HOME & BUSINESS 2019 ou superior; (AUMENTO DE CAPACIDADE DA VELOCIDADE DE PROCESSAMENTO. ARMAZENAMENTO, MEMÓRIA E TAMANHO DO MONITOR DE VIDEO) PARA ATENDER AS NECESSIDADES DOS SOFTWARES SEM ONUS PARA CONTRATANTE). O EQUIPAMENTO A SER ENTREGUE DEVERÁ SER NOVO DE PRIMEIRO USO. MARCA: AL",
+                "quantity": 7,
+                "price": 255.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "microcomputador-estacao-tipo-i#0",
+                "source": {
+                  "file": "contratos_tratamento/Moreia/REDENÇÃO - PLANILHA EDUCAÇÃO- ATA BATURITÉ  2707.012021(DR).xlsx",
+                  "sheet": "EDUCAÇÃO OUT26",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

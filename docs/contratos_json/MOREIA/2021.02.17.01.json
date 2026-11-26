@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "03420933000126",
+    "alias": "MOREIA"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "MOREIA|2021.02.17.01|SECRETARIA DE SAÚDE -FMS",
+    "source_contract_id": null,
+    "number": "2021.02.17.01",
+    "name": "SECRETARIA DE SAÚDE -FMS",
+    "customer_alias": "PREFEITURA MUNICIPAL DE ARACOIABA",
+    "recipient_aliases": [
+      "SECRETARIA DE SAÚDE -FMS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "ENCERRADO",
+    "object": "LOCAÇAO DEMICROCOMPUTADORES E TABLET´S DESTINADOS A SUPRIR AS NECESSIDDAES DA UNIDADE BÁSICA DE SÁUDE JUNTO A SECRETARIA DE SAÚDE DE ARACOIABA/CE.",
+    "original_start_date": "2021-02-17",
+    "created_at": "2021-02-17T00:00:00",
+    "source": [
+      {
+        "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+        "sheet": " SEC SAÚDE - ALUCOM MARÇO23",
+        "row": 6
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2021-02-17",
+              "end_date": "2021-12-31",
+              "duration": 10,
+              "max_duration": 10,
+              "max_end_date": "2021-12-31",
+              "total_amount": 171690.0,
+              "services_total_amount": 0
+            },
+            "items": [
+              {
+                "alias": "Tablet- Especificação Mínima",
+                "description": "Tablet- Especificação Mínima: Sistema operacional Android; Processador Quad-Core 1.3GHz; tipo de tela lcd tft; display 7\"; resolução 1280x800; conexão wi-fi; memória interna 8gb; expansivo microsd até 32gb; memória ram 1.5gb; câmera traseira 5mp; câmera frontal 2mp; localizaçao via gps; conexão bluetooth v4; conexão usb versão 2.0.",
+                "quantity": 71,
+                "price": 99.0,
+                "months": 10,
+                "occurrence": 0,
+                "lineage_key": "tablet-especificacao-minima#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": " SEC SAÚDE - ALUCOM MARÇO23",
+                  "row": 11
+                }
+              },
+              {
+                "alias": "MICROCOMPUTADOR",
+                "description": "MICROCOMPUTADOR - Requisitos Técnicos Mínimos: Processador Core I5, memória Ram 4gb, Hard Disk 500gb, placa mãe on-board (s/v//r), monitor 18,5\" lcd/led, teclado e mouse. Sistema Operacional: Os computadores serão fornecidos com o Sistema Windows 10 em português. Acompanha Estabilizador: Potência 300va. Inclui manutenção ON-SITE e reposição de peças inclusos, com substituição imediata do equipamento em caso defeito sem ônus adicional para a Contratante. Todos os equipamentos devem ter atualização de hardware (aumento de capacidade da velocidade de processamento, armazenamento, memória e tamanho do monitor de vídeo) para atender as necessidades dos softwares da contratante sem ônus adicional.",
+                "quantity": 60,
+                "price": 169.0,
+                "months": 10,
+                "occurrence": 0,
+                "lineage_key": "microcomputador#0",
+                "source": {
+                  "file": "Moreia/PLANILHA PM ARACOIABA - ASSIST. SOCIAL ( DR ).xlsx",
+                  "sheet": " SEC SAÚDE - ALUCOM MARÇO23",
+                  "row": 12
+                }
+              }
+            ],
+            "services": []
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

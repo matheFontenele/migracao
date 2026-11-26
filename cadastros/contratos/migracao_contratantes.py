@@ -32,6 +32,7 @@ class MigracaoContratantes:
             "vinculos_contratantes": 0, 
             "vinculos_filhos": 0,
             "vinculos_adicionais": 0,
+            "contratos_preservados": 0,
         }
 
     def _vincular_destinatarios(self, conn):
@@ -46,9 +47,22 @@ class MigracaoContratantes:
                 """)
             ).fetchall()
 
+            # Os destinatários vêm do JSON de contrato. Só derivamos da
+            # hierarquia os contratos que chegaram sem nenhum vínculo — é o
+            # fallback para bases antigas, não a regra.
+            com_vinculo = {
+                linha[0] for linha in conn.execute(
+                    text("SELECT DISTINCT contract_id FROM contract_recipient_customers")
+                ).fetchall()
+            }
+
             for con in tqdm(contratos, desc="Sincronizando Destinatários"):
                 contract_id = con.id
                 contratante_id = con.customer_id
+
+                if contract_id in com_vinculo:
+                    self.stats["contratos_preservados"] += 1
+                    continue
 
                 # 1. Limpar vínculos antigos (Garante Idempotência caso rode com --no-truncate)
                 conn.execute(
@@ -167,6 +181,7 @@ class MigracaoContratantes:
             print("✅ SINCRONIZAÇÃO CONCLUÍDA")
             print("=" * 50)
             print(f"📊 Contratos processados:        {self.stats['contratos']}")
+            print(f"🔒 Vínculos vindos do JSON:      {self.stats['contratos_preservados']}")
             print(f"🔗 Contratantes vinculados:      {self.stats['vinculos_contratantes']}")
             print(f"🔗 Secretarias/Filhos vinculados: {self.stats['vinculos_filhos']}")
             print(f"🔗 Vínculos adicionais:          {self.stats['vinculos_adicionais']}")

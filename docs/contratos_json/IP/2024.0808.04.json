@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "31810764000176",
+    "alias": "IP"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "IP|2024.0808.04|id=193",
+    "source_contract_id": 193,
+    "number": "2024.0808.04",
+    "name": "HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA",
+    "customer_alias": "HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA",
+    "recipient_aliases": [
+      "HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA"
+    ],
+    "contract_type": "PESSOA_JURIDICA",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "Por esta avença, a CONTRATADA fornece ao CONTRATANTE o serviço de locação de equipamentos de informática, com suporte, assistência técnica e manutenção preventiva e corretiva, visando atender satisfatoriamente a demanda da HF DA ROCHA COMÉRCIO E SERVIÇOS DE INFORMÁTICA, no Município de Fortaleza/CE, na quantidade e especificações descritas abaixo, em boas condições de uso e conservação.\n",
+    "original_start_date": "2024-07-18",
+    "created_at": "2024-08-11T10:07:21",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=193"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-07-18",
+              "end_date": "2025-07-18",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2028-07-18",
+              "total_amount": 4104,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "Multifuncional Colorida Laser",
+                "description": "",
+                "quantity": 1,
+                "price": 342.0,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-colorida-laser#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA DEM PAPEL",
+                "quantity": 1000,
+                "price": 0.28,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 0,
+                "price": 28.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sequence": 2,
+        "additives": [
+          {
+            "type": "ADITIVO_DE_PRAZO",
+            "info": null,
+            "items": [
+              {
+                "alias": "Multifuncional Colorida Laser",
+                "description": "",
+                "quantity": 1,
+                "price": 342.0,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "multifuncional-colorida-laser#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA DEM PAPEL",
+                "quantity": 1000,
+                "price": 0.28,
+                "months": null,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 0,
+                "price": 28.0,
+                "months": null,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#1"
+              }
+            ]
+          },
+          {
+            "type": "ADITIVO_DE_REAJUSTE",
+            "info": {
+              "start_date": "2025-07-18",
+              "end_date": "2026-07-18",
+              "duration": 12,
+              "max_duration": 48,
+              "max_end_date": "2028-07-18",
+              "total_amount": 4307,
+              "services_total_amount": 0.0
+            },
+            "items": [],
+            "services": [
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "DENTRO DA FRANQUIA DEM PAPEL",
+                "quantity": 1000,
+                "price": 0.29,
+                "months": 12,
+                "occurrence": 0,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#0"
+              },
+              {
+                "alias": "IMPRESSÃO EM IMPRESSORA MULTIFUNCIONAL COLOR A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 0,
+                "price": 29.0,
+                "months": 12,
+                "occurrence": 1,
+                "lineage_key": "impressao-em-impressora-multifuncional-color-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

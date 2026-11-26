@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|52-2024|id=27",
+    "source_contract_id": 27,
+    "number": "52-2024",
+    "name": "MTE",
+    "customer_alias": "MINISTÉRIO DO TRABALHO E EMPREGO - MTE",
+    "recipient_aliases": [
+      "MINISTÉRIO DO TRABALHO E EMPREGO - MTE",
+      "MINISTERIO DO TRABALHO E EMPREGO / MTE - PERNAMBUCO",
+      "MTE -  PARANA",
+      "MTE - AMAPA",
+      "MTE - AMAZONAS",
+      "MTE - BAHIA",
+      "MTE - BRASILIA",
+      "MTE - CEARA",
+      "MTE - DISTRITO FEDERAL",
+      "MTE - ESPIRITO SANTO",
+      "MTE - GOIAS",
+      "MTE - MARANHÃO",
+      "MTE - MATO GROSSO",
+      "MTE - MATO GROSSO DO SUL",
+      "MTE - MINAS GERAIS",
+      "MTE - PARÁ",
+      "MTE - PARAIBA",
+      "MTE - RIO DE JANEIRO",
+      "MTE - RIO GRANDE DO NORTE",
+      "MTE - RIO GRANDE DO SUL",
+      "MTE - RONDONIA",
+      "MTE - RORAIMA",
+      "MTE - SANTA CATARINA",
+      "MTE - SAO PAULO",
+      "MTE - TOCANTINS"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação de solução de tecnologia da informação e comunicação de solução corpora va de impressão, reprodução e digitalização de documentos (Outsourcing de Impressão) na modalidade franquia mensal de páginas mais excedente, para atendimento de necessidades do Ministério da Gestão e Inovação em Serviços Públicos (MGI), compreendendo os Ministérios demandantes nos termos da Portaria MGI nº 43, de 31 de janeiro de 2023 (Portaria MGI nº 43/2023), do Ministério ",
+    "original_start_date": "2024-11-11",
+    "created_at": "2025-01-13T15:28:19",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=27"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-11-11",
+              "end_date": "2029-11-10",
+              "duration": 60,
+              "max_duration": 120,
+              "max_end_date": "2034-11-10",
+              "total_amount": 7788312,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "KYOCERA ECOSYS MA5500IFX + SCAN  EXTENSION KIT\n",
+                "quantity": 766,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "KYOCERA ECOSYS MA3500CIX + 1X PF-5150 + SCAN EXTENSION KIT",
+                "quantity": 196,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO/ MONOCROMATICA  –  PÁGINAS – A3",
+                "description": "KYOCERA TASKALFA  3554CI + DP-7160 + SCAN EXTENSION KIT\n",
+                "quantity": 60,
+                "price": 0.0,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-monocromatica-paginas-a3#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 16556400,
+                "price": 0.12,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 11037600,
+                "price": 0.04,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 5376000,
+                "price": 0.6,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 3532800,
+                "price": 0.3,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 540000,
+                "price": 0.16,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a3#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS  A3",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 360000,
+                "price": 0.09,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a3#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS  A3",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL",
+                "quantity": 972000,
+                "price": 0.75,
+                "months": 60,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a3#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS  A3",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL",
+                "quantity": 648000,
+                "price": 0.35,
+                "months": 60,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a3#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}

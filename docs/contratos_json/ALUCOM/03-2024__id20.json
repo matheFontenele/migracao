@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "organization": {
+    "cnpj": "01628251000188",
+    "alias": "ALUCOM"
+  },
+  "contract": {
+    "status": "OK",
+    "stable_key": "ALUCOM|03-2024|id=20",
+    "source_contract_id": 20,
+    "number": "03-2024",
+    "name": "SUPERINTENDÊNCIA FEDERAL DE AGRICULTURA E PECUARIA NO ESTADO DE SANTA CATARINA - SFA-SC",
+    "customer_alias": "SUPERINTENDENCIA FEDERAL DE AGRICULTURA E PECUARIA - SC",
+    "recipient_aliases": [
+      "SUPERINTENDENCIA FEDERAL DE AGRICULTURA E PECUARIA - SC"
+    ],
+    "contract_type": "LICITACAO",
+    "contract_status": "EM_ANDAMENTO",
+    "object": "O objeto do presente instrumento é a contratação de solução de tecnologia da informação e comunicação de outsourcing de impressão e digitalização na modalidade franquia de página mais excedente, com fornecimento de equipamentos, soware de gerenciamento de impressões efe vamente realizadas, manutenção preven va e corre va dos equipamentos com subs tuição de peças, componentes e materiais u lizados na manutenção e fornecimento de insumos originais, exceto papel, para atender as necessidades de imp",
+    "original_start_date": "2024-09-01",
+    "created_at": "2024-08-27T11:46:40",
+    "source": [
+      {
+        "file": "bootstrap:controle-interno",
+        "detail": "id_origem=20"
+      }
+    ],
+    "events": [
+      {
+        "sequence": 1,
+        "additives": [
+          {
+            "type": "CADASTRO",
+            "info": {
+              "start_date": "2024-09-01",
+              "end_date": "2028-08-31",
+              "duration": 48,
+              "max_duration": 60,
+              "max_end_date": "2029-08-31",
+              "total_amount": 140517,
+              "services_total_amount": 0.0
+            },
+            "items": [
+              {
+                "alias": "IMPRESSORA MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "ECOSYS_MA5500ifx",
+                "quantity": 28,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "IMPRESSORA POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "Kyocera_ECOSYS_MA3500cix",
+                "quantity": 4,
+                "price": 0.0,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "impressora-policromatico-paginas-a4#0"
+              }
+            ],
+            "services": [
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 5.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 7200,
+                "price": 0.1748,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 5.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 4800,
+                "price": 0.1511,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#1"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 10.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 30000,
+                "price": 0.1748,
+                "months": 48,
+                "occurrence": 2,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#2"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO MONOCROMÁTICO –  PÁGINAS A4",
+                "description": "EXCEDENTE A FRANQUIA SEM PAPEL ATÉ 10.000 PG/MÊS/EQUIPAMENTO",
+                "quantity": 20000,
+                "price": 0.1511,
+                "months": 48,
+                "occurrence": 3,
+                "lineage_key": "outsourcing-de-impressao-monocromatico-paginas-a4#3"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": " DENTRO DA FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 1200,
+                "price": 0.8714,
+                "months": 48,
+                "occurrence": 0,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#0"
+              },
+              {
+                "alias": "OUTSOURCING DE IMPRESSÃO POLICROMÁTICO  –  PÁGINAS – A4",
+                "description": "EXCEDENTE A  FRANQUIA SEM PAPEL ATÉ 500 PG/MÊS/EQUIPAMENTO",
+                "quantity": 800,
+                "price": 0.5178,
+                "months": 48,
+                "occurrence": 1,
+                "lineage_key": "outsourcing-de-impressao-policromatico-paginas-a4#1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pendencias": []
+  }
+}
