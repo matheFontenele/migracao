@@ -17,6 +17,7 @@ from config.config import (
 )
 from utils.sanetizador import normalizar_para_match, executar_truncate_tabelas
 from utils.mapeador import descobrir_id_organizacao
+from cadastros.clientes.endereco_uf import normalizar_uf
 
 TABELAS_CLIENTES = [
     'addresses', 
@@ -1569,6 +1570,13 @@ class MigracaoClientes:
                         "state": info["row"]['ESTADO'],
                     }
 
+                    # O legado grava estado '0' quando não conhece a UF. Antes
+                    # de desistir, tenta derivar do município (ver endereco_uf);
+                    # sem resolução única, fica 'NÃO INFORMADO'.
+                    uf_endereco = normalizar_uf(
+                        dados_endereco.get("state"), dados_endereco.get("city")
+                    )
+
                     enderecos_batch.append({
                         "type": "customer", "id": target_id,
                         "alias": dados_endereco["alias"],
@@ -1576,7 +1584,7 @@ class MigracaoClientes:
                         "street": dados_endereco["street"],
                         "num": dados_endereco["number"],
                         "city": dados_endereco["city"],
-                        "state": dados_endereco["state"],
+                        "state": uf_endereco,
                         "leg_id": info["legacy_id"],
                         "res_id": (
                             info["res_id"]
