@@ -38,7 +38,16 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 # Em 2026-11-26 a planilha foi atualizada pela operação com os envios até
 # 26/11 (2.711 linhas, 109 novas): +26 requisições, +62 itens, +34 movimentos
 # e +51 itens de movimento em relação à carga de 24/11.
-ESPERADO = {"requisicoes": 471, "itens": 1147, "movimentos": 429, "itens_movimento": 1348}
+#
+# Em 2026-11-27 a recarga de cadastros reconstruiu `equipments` apenas a partir
+# do legado, e o delta de produção (04-12/11) não foi reaplicado: 428
+# movimentos. A diferença de 1 movimento é a entrega de 05/11 do INSTITUTO ICÓ
+# (linha 331 da planilha, PAT 106252, MULTIFUNCIONAL LASER MONO M320F RICOH).
+# Esse equipamento só existe em `prod_14_11` (id 168487, criado em 06/11/2026);
+# não há registro dele em `aluguel_legado` nem no parquet consolidado de 27/11,
+# então o PAT não resolve e a linha sai na auditoria como MOVIMENTO BLOQUEADO.
+# Quando o delta de produção for reaplicado, o valor volta a 429.
+ESPERADO = {"requisicoes": 471, "itens": 1147, "movimentos": 428, "itens_movimento": 1348}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:
