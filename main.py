@@ -298,7 +298,7 @@ def main():
         "argumentos_extra",
         nargs=argparse.REMAINDER,
         help="Argumentos específicos de backfill_delivery_date, requisicoes, "
-             "atualizacoes_producao, ajustes_movimentos, contratos ou todos "
+             "atualizacoes_producao, ajustes_movimentos, contratos, cadastros ou todos "
              "(--incluir-novos, --permitir-reducao, --ignorar-pendentes).",
     )
 
@@ -306,10 +306,10 @@ def main():
     alvo = args.alvo.lower().strip()
     if args.argumentos_extra and alvo not in {"backfill_delivery_date", "requisicoes",
                                              "atualizacoes_producao", "ajustes_movimentos",
-                                             "contratos", "todos"}:
+                                             "contratos", "todos", "cadastros"}:
         parser.error("argumentos extras só são aceitos com backfill_delivery_date, "
                      "requisicoes, atualizacoes_producao, ajustes_movimentos, "
-                     "contratos ou todos")
+                     "contratos, cadastros ou todos")
 
     adquirir_lock_execucao()
 
