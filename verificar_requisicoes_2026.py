@@ -69,6 +69,10 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 #   - departamento pelo tipo do item: 32 itens EXPEDIÇÃO / 136 ELISANGELA
 #     (antes 66/3 por causa do PAT do insumo).
 ESPERADO = {"requisicoes": 85, "itens": 168, "movimentos": 32, "itens_movimento": 281}
+# Status pelo atendimento real: 1 = NÃO ATENDIDA (nenhum movimento),
+# 2 = PARCIALMENTE ATENDIDA (algum item sem a quantidade pedida) e
+# 3 = TOTALMENTE ATENDIDA (todo item com a quantidade entregue).
+ESPERADO_STATUS = {1: 64, 2: 6, 3: 15}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:
@@ -145,6 +149,29 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
                 SELECT id FROM service_orders WHERE details LIKE :m)
             GROUP BY d.`name` ORDER BY d.`name`
         """), {"m": f"%{MARCADOR}%"}).fetchall()
+        por_status = dict(c.execute(text("""
+            SELECT status_id, COUNT(*) FROM service_orders
+            WHERE details LIKE :m GROUP BY status_id ORDER BY status_id
+        """), {"m": f"%{MARCADOR}%"}).fetchall())
+        # Coerência entre status e movimentos/quantidade entregue.
+        status1_com_movimento = c.execute(text("""
+            SELECT COUNT(*) FROM service_orders so
+            WHERE so.details LIKE :m AND so.status_id = 1
+              AND EXISTS (SELECT 1 FROM movements m WHERE m.service_order_id = so.id)
+        """), {"m": f"%{MARCADOR}%"}).scalar_one()
+        status2_sem_movimento = c.execute(text("""
+            SELECT COUNT(*) FROM service_orders so
+            WHERE so.details LIKE :m AND so.status_id = 2
+              AND NOT EXISTS (SELECT 1 FROM movements m WHERE m.service_order_id = so.id)
+        """), {"m": f"%{MARCADOR}%"}).scalar_one()
+        status3_incompleto = c.execute(text("""
+            SELECT COUNT(*) FROM service_order_items soi
+            JOIN service_orders so ON so.id = soi.service_order_id
+            WHERE so.details LIKE :m AND so.status_id = 3
+              AND LEAST(soi.quantity, (
+                    SELECT COUNT(*) FROM movement_items mi
+                    WHERE mi.service_order_item_id = soi.id)) < soi.quantity
+        """), {"m": f"%{MARCADOR}%"}).scalar_one()
 
     print("requisicoes:", {k: f"{v:,}" for k, v in total.items()})
     print("cabecalhos duplicados:", duplicados, "| itens orfaos:", orfaos,
@@ -156,6 +183,11 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
     print("itens sem departamento:", itens_sem_departamento,
           "| por departamento:",
           {nome: f"{qtd:,}" for nome, qtd in por_departamento})
+    print("status das requisicoes:", " | ".join(
+        f"{sid} {por_status.get(sid, 0):,}" for sid in (1, 2, 3, 4, 5)))
+    print("status 1 com movimento:", status1_com_movimento,
+          "| status 2 sem movimento:", status2_sem_movimento,
+          "| itens incompletos em status 3:", status3_incompleto)
 
     divergentes = []
     if contagem_fixa:
@@ -163,6 +195,10 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
     problemas = []
     if divergentes:
         problemas.append("contagens")
+    if contagem_fixa and por_status != ESPERADO_STATUS:
+        problemas.append("status")
+    if status1_com_movimento or status2_sem_movimento or status3_incompleto:
+        problemas.append("status incoerente com movimentos")
     if duplicados or orfaos or sem_item:
         problemas.append("integridade")
     if sem_protocolo:
@@ -177,7 +213,7 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
     if problemas:
         print("DIVERGENCIA em:", ", ".join(problemas))
         return 1
-    print("REQUISICOES OK (contagens, integridade, protocolos e sequencia conferem)")
+    print("REQUISICOES OK (contagens, status, integridade, protocolos e sequencia conferem)")
     return 0
 
 

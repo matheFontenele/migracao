@@ -732,15 +732,53 @@ class Cabecalho:
     linhas: list[Linha]
 
 
-def status_do_cabecalho(linhas: list[Linha]) -> tuple[int, str]:
-    valores = {linha.req for linha in linhas}
-    if valores == {"CANCELADA"}:
+def entregas_por_item(linhas: list[Linha]) -> dict[str, int]:
+    """Quantidade efetivamente entregue por item (uma por movimento criado).
+
+    Espelha o agrupamento de `criar`: cada item de movimento é o par
+    (alias, PAT) dentro de um grupo (data de separação, separador); o mesmo par
+    repetido no mesmo movimento conta uma vez. Insumo não gera movimento,
+    então nunca conta como entregue.
+    """
+    grupos: dict[tuple, set] = defaultdict(set)
+    for linha in linhas:
+        if (linha.classificacao.tipo == "EQUIPAMENTO"
+                and linha.separado_em and linha.separador_id
+                and linha.pat_id and not linha.motivo_movimento):
+            grupos[(linha.separado_em, linha.separador_id)].add(
+                (normalizar(linha.alias), linha.pat_id))
+    entregas: dict[str, int] = defaultdict(int)
+    for pares in grupos.values():
+        for alias, _patrimonio in pares:
+            entregas[alias] += 1
+    return entregas
+
+
+def status_do_cabecalho(linhas: list[Linha],
+                        itens: list[Item]) -> tuple[int, str]:
+    """Status pelo atendimento real (movimentos), não pela coluna Req.
+
+    1 = NÃO ATENDIDA (nenhum item entregue), 2 = PARCIALMENTE ATENDIDA e
+    3 = TOTALMENTE ATENDIDA (todo item com a quantidade pedida entregue).
+    Insumo não gera movimento, então conta como não entregue: uma requisição
+    só de insumos fica em 1 até que algo seja efetivamente entregue.
+    """
+    if {linha.req for linha in linhas} == {"CANCELADA"}:
         return 4, "cancelled"
-    if "PARCIAL" in valores:
-        return 2, "approved"
-    if valores & {"SEM ESTOQUE", "SOLICITADO ENVIO", ""}:
+    entregas = entregas_por_item(linhas)
+    total_entregue = 0
+    completos = 0
+    for item in itens:
+        entregue = min(entregas.get(normalizar(item.alias), 0),
+                       int(item.quantidade or 0))
+        total_entregue += entregue
+        if entregue >= int(item.quantidade or 0):
+            completos += 1
+    if total_entregue == 0:
         return 1, "approved"
-    return 3, "approved"
+    if itens and completos == len(itens):
+        return 3, "approved"
+    return 2, "approved"
 
 
 def detalhes_cabecalho(linhas: list[Linha]) -> str:
@@ -796,7 +834,7 @@ def agrupar(linhas: list[Linha]) -> list[Cabecalho]:
                     (l.address_id for l in linhas_item if l.address_id), None),
             ))
 
-        status_id, situation = status_do_cabecalho(membros)
+        status_id, situation = status_do_cabecalho(membros, itens)
         movement_type_id = (TIPOS_MOVIMENTO["SUBSTITUICAO"]
                             if all(item.is_exchange for item in itens)
                             else TIPOS_MOVIMENTO["AVULSO"])
