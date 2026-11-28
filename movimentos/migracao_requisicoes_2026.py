@@ -888,7 +888,10 @@ def montar_linha(row, indice: int, refs: Referencias,
         avisos.append("item sem tipo/produto correspondente")
 
     substituicao = row["Substituição ou Novo"]
-    antigos_brutos = numeros_substituicao(substituicao)
+    # Insumo não substitui equipamento: os números dessa coluna são códigos de
+    # produto (ex.: 19978-1/2) e não podem virar tombo/`is_exchange`.
+    antigos_brutos = (numeros_substituicao(substituicao)
+                      if classificacao.tipo == "EQUIPAMENTO" else ())
     antigos: tuple[int, ...] = ()
     antigos_ids: list[int] = []
     if antigos_brutos:
@@ -926,8 +929,10 @@ def montar_linha(row, indice: int, refs: Referencias,
             avisos.append(f"PAT {pat_numero} não encontrado em equipments")
 
     req_normalizada = normalizar(row["Req"])
-    if req_normalizada == "PARCIAL":
+    if req_normalizada == "PARCIAL" and classificacao.tipo == "EQUIPAMENTO":
         # Parcial só entra com o equipamento do PAT disponível para locação.
+        # Insumo não tem equipamento a entregar: a linha abre apenas o item da
+        # requisição (sem movimento), como nas linhas Separado.
         if not pat_id:
             return ignorar(
                 f"Parcial sem equipamento: PAT «{row['PAT']}» não localizado")
@@ -942,12 +947,24 @@ def montar_linha(row, indice: int, refs: Referencias,
 
     separado_em = data_planilha(row["Data Separação"])
     motivo_movimento = ""
-    if not separado_em:
+    if classificacao.tipo != "EQUIPAMENTO":
+        # Insumo (ou item sem classificação de equipamento) entra apenas como
+        # requisição: o PAT dessas linhas é código do produto, não tombo.
+        avisos.append("insumo/sem patrimônio: apenas requisição, sem movimento")
+    elif not separado_em:
         motivo_movimento = "Data Separação ausente"
     elif not pat_id:
         motivo_movimento = "PAT ausente ou não encontrado"
-    elif not separador_id:
-        motivo_movimento = f"separador sem usuário: {separador_nome or 'vazio'}"
+    else:
+        # Separador não mapeado (ou vazio): usa o usuário padrão (admin) em vez
+        # de bloquear o movimento.
+        if not separador_id:
+            separador_id = refs.usuarios.get(normalizar(USUARIO_PADRAO))
+            avisos.append(
+                f"separador '{separador_nome or 'vazio'}' sem usuário; "
+                f"usado {USUARIO_PADRAO}")
+        if not separador_id:
+            motivo_movimento = f"separador sem usuário: {separador_nome or 'vazio'}"
 
     quantidade = numero(row["Qtd Sol"]) or 0
     entregue = numero(row["Qtd Entregue"]) or 0
@@ -1048,14 +1065,14 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
 # ---------------------------------------------------------------------------
 # Gravação
 # ---------------------------------------------------------------------------
-def departamento_do_item(tem_patrimonio: bool) -> str:
-    """Departamento pela presença de patrimônio no item.
+def departamento_do_item(equipamento: bool) -> str:
+    """Departamento pelo tipo do item (classificado pelo nome).
 
-    Item com PAT (tombo) é separado na EXPEDIÇÃO; item sem patrimônio
-    (insumo/avulso) fica com a ELISANGELA. O ALMOXARIFADO não é usado na
-    importação de requisições.
+    Item EQUIPAMENTO é separado na EXPEDIÇÃO; insumo fica com a ELISANGELA.
+    O ALMOXARIFADO não é usado na importação de requisições. A decisão não usa
+    a presença de PAT: linha de insumo pode trazer código do produto na coluna.
     """
-    return DEPARTAMENTO_EQUIPAMENTO if tem_patrimonio else DEPARTAMENTO_PECAS_ADI
+    return DEPARTAMENTO_EQUIPAMENTO if equipamento else DEPARTAMENTO_PECAS_ADI
 
 
 def carregar_departamentos(conn) -> dict[str, int]:
@@ -1166,10 +1183,10 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
             item_ids: dict[str, int] = {}
             for item in cabecalho.itens:
                 classificacao = item.classificacao
-                # Departamento pela presença de patrimônio (PAT) na linha:
-                # com tombo -> EXPEDIÇÃO; sem tombo -> ELISANGELA.
-                tem_patrimonio = any(linha.pat_numero for linha in item.linhas)
-                departamento = departamento_do_item(tem_patrimonio)
+                # Departamento pelo tipo do item (nome), não pela presença de
+                # PAT: insumo sempre ELISANGELA, equipamento sempre EXPEDIÇÃO.
+                departamento = departamento_do_item(
+                    classificacao.tipo == "EQUIPAMENTO")
                 insumo = classificacao.tipo == "INSUMO"
                 sem_estoque = any(l.req == "SEM ESTOQUE" for l in item.linhas)
                 partes_detalhe = [classificacao.tipo.title(), classificacao.metodo]
@@ -1178,7 +1195,8 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                         "Substituição de " + ", ".join(str(n) for n in item.antigos))
                 textos_substituicao = sorted({
                     texto for texto in (texto_substituicao(l.substituicao)
-                                        for l in item.linhas) if texto})
+                                        for l in item.linhas) if texto}
+                ) if classificacao.tipo == "EQUIPAMENTO" else []
                 if textos_substituicao:
                     partes_detalhe.append(
                         "Substituição informada: " + ", ".join(textos_substituicao))
@@ -1204,6 +1222,7 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                     # "Substituição ou Novo" existe em equipments.number.
                     "movement_type": (TIPOS_MOVIMENTO["SUBSTITUICAO"]
                                       if item.is_exchange
+                                      and classificacao.tipo == "EQUIPAMENTO"
                                       else TIPOS_MOVIMENTO["AVULSO"]),
                     "address_id": item.address_id,
                     "alias": item.alias[:255],
@@ -1228,7 +1247,9 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
 
             movimentos: dict[tuple, list[Linha]] = defaultdict(list)
             for linha in cabecalho.linhas:
-                if linha.separado_em and linha.separador_id and linha.pat_id:
+                if (linha.classificacao.tipo == "EQUIPAMENTO"
+                        and linha.separado_em and linha.separador_id
+                        and linha.pat_id):
                     movimentos[(linha.separado_em, linha.separador_id)].append(linha)
 
             for (data_movimento, separador_id), linhas_mov in movimentos.items():
@@ -1378,8 +1399,9 @@ def imprimir_resumo(cabecalhos: list[Cabecalho], auditoria: list[dict]) -> None:
     for cab in cabecalhos:
         grupos: dict[tuple, set] = defaultdict(set)
         for linha in cab.linhas:
-            if (linha.separado_em and linha.separador_id and linha.pat_id
-                    and not linha.motivo_movimento):
+            if (linha.classificacao.tipo == "EQUIPAMENTO"
+                    and linha.separado_em and linha.separador_id
+                    and linha.pat_id and not linha.motivo_movimento):
                 grupos[(linha.separado_em, linha.separador_id)].add(
                     (normalizar(linha.alias), linha.pat_id))
         movimentos += len(grupos)
@@ -1400,9 +1422,9 @@ def imprimir_resumo(cabecalhos: list[Cabecalho], auditoria: list[dict]) -> None:
           f"insumo {por_tipo['INSUMO']:,} | indefinido {por_tipo['INDEFINIDO']:,})")
     por_departamento: dict[str, int] = defaultdict(int)
     for item in itens:
-        tem_patrimonio = any(linha.pat_numero for linha in item.linhas)
+        equipamento = item.classificacao.tipo == "EQUIPAMENTO"
         por_departamento[
-            DEPARTAMENTO_EQUIPAMENTO if tem_patrimonio
+            DEPARTAMENTO_EQUIPAMENTO if equipamento
             else DEPARTAMENTO_PECAS_ADI] += 1
     print("   Itens por departamento: " + " | ".join(
         f"{nome} {total:,}" for nome, total in sorted(por_departamento.items())))

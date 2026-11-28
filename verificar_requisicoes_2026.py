@@ -58,9 +58,17 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 #     PAT 98925 substituindo 67939 -> +1 movimento, +1 item de movimento;
 #   - BASE CAUCAIA - ROTA LITORAL NORTE / 27-11 / separador 9683:
 #     PAT 98879 passou a entrar no movimento já existente -> +1 item.
-# Nada mudou em requisições/itens (as linhas caíram em itens que já existiam),
-# então o resultado é 46/69/44/292.
-ESPERADO = {"requisicoes": 46, "itens": 69, "movimentos": 44, "itens_movimento": 292}
+#
+# Ainda em 2026-11-28 as regras de requisição passaram a tratar insumo por
+# NOME (não pelo PAT) e o separador ausente cai no usuário padrão (admin):
+#   - insumo abre só o item da requisição, sem movimento, inclusive nas linhas
+#     Parcial sem PAT (antes eram descartadas): +39 requisições e +99 itens;
+#   - 23 linhas de insumo com PAT resolvido deixaram de gerar movimento e as 12
+#     linhas com separador fora do de/para (Bruno/Logística) passaram a gerar:
+#     44 -> 32 movimentos e 292 -> 281 itens de movimento;
+#   - departamento pelo tipo do item: 32 itens EXPEDIÇÃO / 136 ELISANGELA
+#     (antes 66/3 por causa do PAT do insumo).
+ESPERADO = {"requisicoes": 85, "itens": 168, "movimentos": 32, "itens_movimento": 281}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:
