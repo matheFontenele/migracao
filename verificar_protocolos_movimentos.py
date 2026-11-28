@@ -28,6 +28,7 @@ PREFIXO = (
     "Migração: Devolução",
     "Devolução da Substituição",
     "Envio da Substituição",
+    "Substituição Legado",
     "Ajuste de migração individual",
     "Migração - Reserva",
     "Migração requisição",

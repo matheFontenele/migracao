@@ -861,8 +861,16 @@ class BaseMigracaoMovimento:
         consumir_saldo: bool = True,
         is_kit_override: bool = None,
         type_id_override: int = None,
-        forcar_atualizacao_parque: bool = False
+        forcar_atualizacao_parque: bool = False,
+        equipment_id_item: int = None,
+        historico_adicional: tuple = None,
     ):
+        # ``equipment_id_item`` permite separar as duas pontas da substituição:
+        # o item do movimento guarda o substituto (novo) e o item da requisição
+        # guarda o equipamento substituído (antigo), que é o que a tela chama
+        # de "Equipamento para retorno".
+        # ``historico_adicional`` = (equipment_id, status_id, reason) grava o
+        # histórico da outra ponta usando o mesmo item do movimento.
         
         # Blindagem para usuarios inexistentes
         if hasattr(self, 'usuarios_validos') and usuario_id in self.usuarios_validos:
@@ -1026,8 +1034,14 @@ class BaseMigracaoMovimento:
             prod_id_item = None
             
         else:
-            # Devolução, Substituição (e Avulso): exigem a máquina física exata (Equipment)
-            equip_id_mov_item = equipment_id_ref
+            # Devolução, Substituição (e Avulso): exigem a máquina física exata
+            # (Equipment). Na substituição unificada o item da requisição é o
+            # equipamento substituído (antigo) e o item do movimento é o
+            # substituto (novo).
+            equip_id_mov_item = (
+                equipment_id_item if equipment_id_item is not None
+                else equipment_id_ref
+            )
             type_mov_item = None
             prod_id_item = None
 
@@ -1142,6 +1156,22 @@ class BaseMigracaoMovimento:
             "reason": history_reason, 
             "user_id": usuario_seguro
         })
+
+        if historico_adicional is not None:
+            equipamento_extra, status_extra, motivo_extra = historico_adicional
+            if equipamento_extra is not None:
+                self.equipment_histories_mestre.append({
+                    "equipment_id": int(equipamento_extra),
+                    "status_id": int(status_extra),
+                    "occurred_at": mov_date,
+                    "movement_item_id": item_mov_id_atual,
+                    "service_order_item_id": item_servico_id_atual,
+                    "contract_item_id": contrato_item_id_resolvido,
+                    "shipment_item_id": shipment_item_id_atual,
+                    "is_conversion": 0,
+                    "reason": motivo_extra,
+                    "user_id": usuario_seguro,
+                })
 
         return id_capa_atual, item_servico_id_atual, item_mov_id_atual
 

@@ -243,18 +243,16 @@ def montar_presente_substituicao(df_devolucao, df_entrega):
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PASTA_PARQUETS = "./docs/parquets"
-ARQUIVO_TYPES = "./docs/types.csv"
 
 
-def parametros_envio_substituicao(is_avulso):
-    """Tipo/operação/motivo do envio do substituto (FASE 3).
+def parametros_substituicao_unificada():
+    """Tipo/operação/motivo do movimento único de substituição.
 
-    Equipamento sem contrato válido entra como AVULSO (tipo 7), igual à
-    migração de aluguel; com contrato, segue como ALUGUEL (tipo 1).
+    O legado separa a troca em duas capas (SD/SA), mas o refatorado registra
+    a substituição em um único movimento: o item do movimento é o substituto
+    e o item da requisição é o equipamento substituído.
     """
-    if is_avulso:
-        return 7, 'AVULSO', 'SHIPPING_CONFIRMED_SEPARATE'
-    return 1, 'ALUGUEL', 'SHIPPING_CONFIRMED_RENT'
+    return 2, 'SUBSTITUIÇÃO', 'SHIPPING_CONFIRMED_REPLACEMENT_RENTED'
 
 class MigracaoSubstituicao(BaseMigracaoMovimento):
 
@@ -296,6 +294,29 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
     def calcular_saldo(self, *args, **kwargs):
         """Dummy fantasma: A matemática do saldo ocorre na classe pai!"""
         return 0, None, int(args[0]) if pd.notna(args[0]) else None
+
+    def _atualizar_status_antigos(self, id_status_equipamento: int,
+                                  lista_dicionarios: list) -> None:
+        """Atualiza só o status dos equipamentos devolvidos na substituição.
+
+        Não mexe em ``last_movement_item_customer_id``: no movimento unificado
+        o item do movimento é o substituto, e apontar o antigo para ele
+        bagunçaria o relatório de "último movimento no cliente". O antigo
+        continua apontando para o aluguel histórico dele.
+        """
+        ids = [
+            {"e_id": int(e_id), "s_id": int(id_status_equipamento)}
+            for item in lista_dicionarios for e_id in item.keys()
+        ]
+        if not ids:
+            return
+        print(f"\n🚀 Atualizando status de {len(ids)} equipamento(s) antigo(s)...")
+        with self.engine_new.begin() as conn:
+            conn.execute(text("""
+                UPDATE equipments SET status_id = :s_id
+                WHERE id = :e_id AND deleted_at IS NULL
+            """), ids)
+        print("   ✅ Status dos equipamentos antigos atualizado.")
 
     def _atualizar_saldos_mysql(self):
         if getattr(self, 'consumir_saldos', None) is False or not self.saldos_modificados:
@@ -500,9 +521,21 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         print("=" * 70)
 
         # 1. Preparação de Dicionários Iniciais
-        if os.path.exists(ARQUIVO_TYPES):
-            self.dict_is_kit = {int(row['id']): int(row['is_kit']) for _, row in pd.read_csv(ARQUIVO_TYPES).iterrows() if pd.notna(row['id'])}
-        else:
+        # `is_kit` vem da tabela `types` do refatorado. O antigo
+        # docs/types.csv é de outro catálogo: 173 dos 174 ids têm nomes
+        # diferentes dos tipos do banco e 32 tipos apareciam como kit sem
+        # serem (ex.: id 48 = FRAGMENTADORA DE PAPEL no CSV, mas
+        # MULTIFUNCIONAL LASER MONO no banco). Isso jogava impressoras,
+        # thinkcentres e transformadores no primeiro item do contrato.
+        try:
+            with self.engine_new.connect() as conn:
+                self.dict_is_kit = {
+                    int(tipo_id): int(is_kit)
+                    for tipo_id, is_kit in conn.execute(text(
+                        "SELECT id, is_kit FROM types WHERE deleted_at IS NULL"
+                    ))
+                }
+        except Exception:
             self.dict_is_kit = {}
 
         df_parquet = self._carregar_itens_parquet()
@@ -575,6 +608,21 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             print("⚠️ Nenhuma Substituição válida encontrada no legado.")
             return
 
+        # Cada substituição vira UM movimento no refatorado. O número da capa
+        # é o id da devolução no legado (primeiro evento do ciclo); o id do
+        # envio continua no detalhe. O mapa é montado antes do loop para que
+        # um ciclo com item só do lado do envio não abra uma segunda capa.
+        ancora_mov = {}
+        for substituicao_id, grupo in df_subst.groupby("substituicao_id"):
+            devolucoes = [int(v) for v in grupo["MOV_DEV_ID"].dropna()]
+            envios = [int(v) for v in grupo["MOV_NOVO_ID"].dropna()]
+            if devolucoes:
+                ancora_mov[int(substituicao_id)] = devolucoes[0]
+            elif envios:
+                ancora_mov[int(substituicao_id)] = envios[0]
+
+        tipo_subst, operacao_subst, motivo_subst = parametros_substituicao_unificada()
+
         tombos_todos = list(set(df_subst['TOMBO_NOVO'].tolist() + df_subst['TOMBO_ANTIGO'].tolist()))
         dict_equip_novo = self.buscar_equipamentos_novo_por_tombo(tombos_todos)
         
@@ -582,7 +630,6 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         historicos_sem_destino = 0
         log_nao_match = []
         log_contrato_ajustado = []
-        eqs_antigos_alterar = []
         eqs_novos_alterar = []
         map_eqs_antigos = {} 
         eqs_antigos_alterar_8 = []
@@ -618,9 +665,13 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
             processar_envio = deve_processar_envio(
                 tombo_novo, dict_ultimo_mov_subst, eq_id_novo
             )
-            mov_novo_id = _int_ou_none(row.get('MOV_NOVO_ID'))
 
             if eq_id_antigo is None and not processar_envio:
+                rejeitados += 1
+                continue
+
+            id_mov_unico = ancora_mov.get(int(row['substituicao_id']))
+            if id_mov_unico is None:
                 rejeitados += 1
                 continue
 
@@ -797,15 +848,62 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                         migrated_item_ids.add(source_item_id)
 
             # =========================================================
-            # 📥 FASE 2: O PRESENTE (RECOLHEMOS A MÁQUINA ANTIGA)
+            # 🔁 FASE 2/3: O PRESENTE (A TROCA, EM UM ÚNICO MOVIMENTO)
             # =========================================================
-            # Só existe devolução quando o equipamento antigo foi migrado.
-            # Se ele foi excluído no legado, a fase é pulada e o envio do
-            # substituto (fase 3) segue normalmente.
-            if eq_id_antigo is not None:
-                id_mov_dev = int(row['MOV_DEV_ID'])
+            # O legado tem duas capas por substituição (devolução SD e envio
+            # SA), mas o refatorado registra a troca em um movimento só: o item
+            # do movimento guarda o substituto (novo) e o item da requisição
+            # guarda o equipamento substituído (antigo). É esse vínculo que a
+            # tela usa para mostrar "Equipamento para retorno".
+            ids_legado = []
+            if pd.notna(row.get('MOV_DEV_ID')):
+                ids_legado.append(f"devolução {int(row['MOV_DEV_ID'])}")
+            if pd.notna(row.get('MOV_NOVO_ID')):
+                ids_legado.append(f"envio {int(row['MOV_NOVO_ID'])}")
+            detalhe_subst = (
+                f"Substituição Legado: {int(row['substituicao_id'])}"
+                + (f" ({' / '.join(ids_legado)})" if ids_legado else "")
+            )
+
+            if eq_id_novo is not None and processar_envio:
+                _, _, id_mov_item_novo = self.registrar_movimento(
+                    id_final=id_mov_unico,
+                    recipient_id=recipient_id,
+                    cliente_final_address_id=cliente_final_address,
+                    usuario_id=int(row['USR_SUBST']),
+                    organization_id=int(org_aluguel),
+                    mov_date=row['DATA_SUBST'],
+                    deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
+                    contrato_id=contrato_id_res,
+                    contrato_item_id=item_id_res,
+                    equipment_id_ref=eq_id_novo,
+                    equipment_id_item=eq_id_antigo,
+                    status_shipment=2,
+                    tipo_movimento_id=tipo_subst,
+                    operation_type=operacao_subst,
+                    status_equipment_id=2,
+                    history_reason=motivo_subst,
+                    is_exchange=is_excedente,
+                    consumir_saldo=False,
+                    alias_movimento=row['NOME_NOVO'],
+                    details_capa=detalhe_subst,
+                    details_item=detalhe_subst,
+                    forcar_atualizacao_parque=True,
+                    # O antigo entra em EM DEVOLUÇÃO no histórico; o status
+                    # final vem da situação do legado logo abaixo.
+                    historico_adicional=(
+                        (eq_id_antigo, 8, 'SHIPPING_CONFIRMED_REPLACEMENT_RETURNING')
+                        if eq_id_antigo is not None else None
+                    ),
+                )
+                eqs_novos_alterar.append({int(eq_id_novo): int(id_mov_item_novo)})
+                if eq_id_antigo is not None:
+                    map_eqs_antigos[int(eq_id_antigo)] = int(id_mov_item_novo)
+            elif eq_id_antigo is not None:
+                # Substituto não migrável (fora do Parquet, em manutenção...):
+                # o que resta é a devolução do antigo, sem par para trocar.
                 _, _, id_mov_item_dev = self.registrar_movimento(
-                    id_final=id_mov_dev,
+                    id_final=id_mov_unico,
                     recipient_id=recipient_id,
                     cliente_final_address_id=cliente_final_address,
                     usuario_id=int(row['USR_SUBST']),
@@ -816,47 +914,17 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
                     contrato_item_id=item_id_res,
                     equipment_id_ref=eq_id_antigo,
                     status_shipment=2,
-                    tipo_movimento_id=2,
-                    operation_type='DEVOLUCAO',
+                    tipo_movimento_id=3,
+                    operation_type='DEVOLUÇÃO',
                     status_equipment_id=8,
                     history_reason='SHIPPING_CONFIRMED_DEVOLUTION',
                     is_exchange=False,
                     consumir_saldo=False,
                     alias_movimento=row['NOME_ANTIGO'],
-                    details_capa=f"Devolução da Substituição Legado: {row['substituicao_id']}",
-                    details_item=f"Devolução da Substituição Legado: {row['substituicao_id']}"
+                    details_capa=detalhe_subst,
+                    details_item=detalhe_subst,
                 )
                 map_eqs_antigos[int(eq_id_antigo)] = int(id_mov_item_dev)
-
-            # =========================================================
-            # 📤 FASE 3: O PRESENTE (ENVIAMOS A MÁQUINA NOVA)
-            # =========================================================
-            if processar_envio:
-                tipo_envio, operacao_envio, motivo_envio = parametros_envio_substituicao(is_avulso)
-                _, _, id_mov_item_novo = self.registrar_movimento(
-                    id_final=mov_novo_id,
-                    recipient_id=recipient_id,
-                    cliente_final_address_id=cliente_final_address,
-                    usuario_id=int(row['USR_SUBST']),
-                    organization_id=int(org_aluguel),
-                    mov_date=row['DATA_SUBST'],
-                    deleted_at_mov=row['DEL_SUBST'] if pd.notna(row['DEL_SUBST']) else None,
-                    contrato_id=contrato_id_res,
-                    contrato_item_id=item_id_res,
-                    equipment_id_ref=eq_id_novo, 
-                    status_shipment=2, 
-                    tipo_movimento_id=tipo_envio,
-                    operation_type=operacao_envio,
-                    status_equipment_id=2,
-                    history_reason=motivo_envio,
-                    is_exchange=is_excedente,
-                    consumir_saldo=False, 
-                    alias_movimento=row['NOME_NOVO'],
-                    details_capa=f"Envio da Substituição Legado: {row['substituicao_id']}",
-                    details_item=f"Envio da Substituição Legado: {row['substituicao_id']}",
-                    forcar_atualizacao_parque=True 
-                )
-                eqs_novos_alterar.append({int(eq_id_novo): int(id_mov_item_novo)})
 
         if rejeitados > 0:
             print(f"\n⚠️ Registros rejeitados (Sem equipamento, rejeitado pela CTE ou faltante no Parquet): {rejeitados}")
@@ -915,11 +983,11 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         
         # 👇 2. Atualiza os equipamentos velhos que continuam quebrados (14 vai pra 8)
         if eqs_antigos_alterar_8:
-            self.atualizar_equipamentos_banco(id_status_equipamento=8, lista_dicionarios=eqs_antigos_alterar_8)
-            
+            self._atualizar_status_antigos(8, eqs_antigos_alterar_8)
+
         # 👇 3. Atualiza os equipamentos velhos que já foram salvos/consertados (Qualquer outra vai pra 1)
         if eqs_antigos_alterar_1:
-            self.atualizar_equipamentos_banco(id_status_equipamento=1, lista_dicionarios=eqs_antigos_alterar_1)
+            self._atualizar_status_antigos(1, eqs_antigos_alterar_1)
             
         # 👇 4. Atualiza os equipamentos novos que foram alugados nesta substituição (vai pra 2)
         if eqs_novos_alterar:

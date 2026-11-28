@@ -19,7 +19,7 @@ import pandas as pd
 
 from movimentos.migracao_aluguel import MigracaoAluguel
 from movimentos.migracao_movimentos import liberar_equipamentos_clientes_estoque
-from movimentos.migracao_substituicao import parametros_envio_substituicao
+from movimentos.migracao_substituicao import parametros_substituicao_unificada
 
 
 class BuscarUltimosMovimentosAluguelTests(unittest.TestCase):
@@ -150,18 +150,20 @@ class LiberarEquipamentosEstoqueTests(unittest.TestCase):
         self.assertTrue(any('UPDATE equipments' in sql for sql in novo.sqls))
 
 
-class ParametrosEnvioSubstituicaoTests(unittest.TestCase):
-    def test_avulso_vira_tipo_7(self):
+class ParametrosSubstituicaoUnificadaTests(unittest.TestCase):
+    def test_movimento_unico_e_substituicao(self):
+        # O legado separa SD/SA, mas o refatorado registra um único movimento
+        # de SUBSTITUIÇÃO (tipo 2) com o substituto no item do movimento.
         self.assertEqual(
-            parametros_envio_substituicao(True),
-            (7, 'AVULSO', 'SHIPPING_CONFIRMED_SEPARATE'),
+            parametros_substituicao_unificada(),
+            (2, 'SUBSTITUIÇÃO', 'SHIPPING_CONFIRMED_REPLACEMENT_RENTED'),
         )
 
-    def test_com_contrato_segue_aluguel(self):
-        self.assertEqual(
-            parametros_envio_substituicao(False),
-            (1, 'ALUGUEL', 'SHIPPING_CONFIRMED_RENT'),
-        )
+    def test_nao_confunde_com_aluguel_ou_avulso(self):
+        tipo, operacao, motivo = parametros_substituicao_unificada()
+        self.assertNotIn(tipo, (1, 7))
+        self.assertNotEqual(operacao, 'ALUGUEL')
+        self.assertNotEqual(operacao, 'AVULSO')
 
 
 if __name__ == '__main__':
