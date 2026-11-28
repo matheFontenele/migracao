@@ -1,0 +1,690 @@
+{
+ "total": 91104,
+ "page": 1445,
+ "per_page": 24,
+ "paginas": 3796,
+ "ultimo_equipamento": 106611,
+ "filtros": {
+  "numero": null,
+  "orgao_id": null,
+  "tipo_id": null,
+  "situacao_id": null,
+  "descricao": null,
+  "somente_duplicados": false
+ },
+ "itens": [
+  {
+   "numero": 44217,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MICRO CORE I5 HP 3G MEMORIA 4GB HD SSD 120",
+   "nome": "MICRO CORE I5 HP 3G MEMORIA 4GB HD SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44218,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MICRO CORE I5 3ª GERAÇÃO HP 4GB SSD 120",
+   "nome": "MICRO CORE I5 3ª GERAÇÃO HP 4GB SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 3,
+     "situacao": "RESERVADO",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44219,
+   "copias": 3,
+   "ativas": 3,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MICRO I5, 4GB RAM, SSD 120GB NS 2718600052497",
+   "nome": "MICRO CORE I5 4GB HD 500",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    },
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44220,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "ESTABILIZADOR 500VA BEM LIGADO",
+   "nome": "ESTABILIZADOR 500VA BEM LIGADO",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "ESTABILIZADOR 500VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44221,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "ESTABILIZADOR 500VA BEM LIGADO",
+   "nome": "ESTABILIZADOR 500VA BEM LIGADO",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "ESTABILIZADOR 500VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44222,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "ESTABILIZADOR 500VA BEM LIGADO",
+   "nome": "ESTABILIZADOR 500VA BEM LIGADO",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "ESTABILIZADOR 500VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44223,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "ESTABILIZADOR 500VA BEM LIGADO",
+   "nome": "ESTABILIZADOR 500VA BEM LIGADO",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "ESTABILIZADOR 500VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44224,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "TRANSFORMADOR DE 2000 W TRANSFORMER",
+   "nome": "TRANSFORMADOR DE 2000 W TRANSFORMER",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "TRANSFORMADOR 2000VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44225,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "TRANSFORMADOR DE 2000 W TRANSFORMER",
+   "nome": "TRANSFORMADOR DE 2000 W TRANSFORMER",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "TRANSFORMADOR 2000VA",
+    "IMPRESSORA BROTHER DCP B-7535DW"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44226,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MONITOR LED 19,5 GOLDENTEC NS 3953110200058",
+   "nome": "MONITOR LED 19,5 GOLDENTEC NS 3953110200058",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MONITOR 19\"",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44227,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MONITOR LED 19,5 GOLDENTEC  SN 39531N0320201895",
+   "nome": "MONITOR LED 19,5 GOLDENTEC  SN 39531N0320201895",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MONITOR 19\"",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 3,
+     "situacao": "RESERVADO",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44228,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MONITOR LED 19\" GOLDENTEC SN 39531N0320200150",
+   "nome": "MONITOR LED 19\" GOLDENTEC SN 39531N0320200150",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MONITOR 19\"",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44229,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MONITOR LED 18,5\" PHILIPS NS AFCA2120053376",
+   "nome": "MONITOR LED 18,5\" PHILIPS NS AFCA2120053376",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MONITOR 18\"",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44230,
+   "copias": 2,
+   "ativas": 1,
+   "excluidas": 1,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ01K7UA",
+   "nome": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ01K7UA",
+   "orgaos": [
+    "TONER ADI"
+   ],
+   "tipos": [
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44231,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ03EDGY",
+   "nome": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ03EDGY",
+   "orgaos": [
+    "MOREIA",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "THINKCENTRE I3",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44232,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ02427R",
+   "nome": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ02427R",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "THINKCENTRE I3",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44233,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ00WTM4",
+   "nome": "THINKCENTRE CORE I3 4GB SSD 120 NS MJ00WTM4",
+   "orgaos": [
+    "MOREIA",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "THINKCENTRE I3",
+    "IMPRESSORA CANON LASER MF445"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44234,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "IMPRESSORA MULT. RICOH 3710SF NS 5171Z410634",
+   "nome": "IMPRESSORA MULT. RICOH 3710SF NS 5171Z410634",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MULTIFUNCIONAL LASER MONO A4",
+    "IMPRESSORA RICOH 377"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 14,
+     "situacao": "SEM CONSERTO",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44235,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "IMPRESSORA MULT. RICOH 3710SF NS 5171Z410652",
+   "nome": "IMPRESSORA MULT. RICOH 3710SF NS 5171Z410652",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MULTIFUNCIONAL LASER MONO A4",
+    "IMPRESSORA RICOH 377"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44236,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MICRO CORE I5 HP MEMORIA 4GB HD SSD 120",
+   "nome": "MICRO CORE I5 HP MEMORIA 4GB HD SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA RICOH 3710"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 3,
+     "situacao": "RESERVADO",
+     "qtd": 1
+    }
+   ]
+  },
+  {
+   "numero": 44237,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MICRO CORE I5 HP MEMORIA 4GB HD SSD 120",
+   "nome": "MICRO CORE I5 HP MEMORIA 4GB HD SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA RICOH 3710"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44238,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MICRO CORE I5 HP 4GB SSD 120",
+   "nome": "MICRO CORE I5 HP 4GB SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA RICOH 377"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44239,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 0,
+   "descricao": "MICRO CORE I5 HP 4GB SSD 120",
+   "nome": "MICRO CORE I5 HP 4GB SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA RICOH 377"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 2
+    }
+   ]
+  },
+  {
+   "numero": 44240,
+   "copias": 2,
+   "ativas": 2,
+   "excluidas": 0,
+   "duplicado": true,
+   "alugados": 1,
+   "descricao": "MICRO CORE I5 HP 4GB SSD 120",
+   "nome": "MICRO CORE I5 HP 4GB SSD 120",
+   "orgaos": [
+    "ALUCOM",
+    "TONER ADI"
+   ],
+   "tipos": [
+    "MICRO I5",
+    "IMPRESSORA RICOH 377"
+   ],
+   "situacoes": [
+    {
+     "situacao_id": 1,
+     "situacao": "LIBERADO P/ LOCACAO",
+     "qtd": 1
+    },
+    {
+     "situacao_id": 7,
+     "situacao": "NA GARANTIA",
+     "qtd": 1
+    }
+   ]
+  }
+ ]
+}

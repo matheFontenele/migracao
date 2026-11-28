@@ -1,0 +1,7021 @@
+{
+ "ultimo_equipamento": 106611,
+ "orgaos": [
+  {
+   "id": 533,
+   "nome": "CEO -ALMOXARIFADO  EXPEDIENTE"
+  },
+  {
+   "id": 948,
+   "nome": "BATURITE - ALMOXARIFADO POLICLINICA"
+  },
+  {
+   "id": 754,
+   "nome": "CAF BOA VIAGEM ODONTOLOGICO"
+  },
+  {
+   "id": 538,
+   "nome": "CENTRO DE ESPECIALIDADES ODONTOLOGICAS REGIONAL DR FRANCISCO MANSUETO DE SOUZA"
+  },
+  {
+   "id": 86,
+   "nome": "COMBUSTIVEL AÇÃO SOCIAL ARARIPINA"
+  },
+  {
+   "id": 525,
+   "nome": "PREFEITURA MUNICIPAL DE ALTO SANTO"
+  },
+  {
+   "id": 614,
+   "nome": "ABASTECIMENTOS ELEICOES 1 E 2 TURNO 2014 - BARROQUINHA"
+  },
+  {
+   "id": 1031,
+   "nome": "ACOPIARA - MERENDA ESCOLAR"
+  },
+  {
+   "id": 1032,
+   "nome": "ACOPIARA - SECRETARIA DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1030,
+   "nome": "ACOPIARA - SECRETARIA DE EDUCAÇÃO"
+  },
+  {
+   "id": 261,
+   "nome": "ACOPIARA-TREINAMENTO"
+  },
+  {
+   "id": 1264,
+   "nome": "ADI"
+  },
+  {
+   "id": 1005,
+   "nome": "ADMINISTRADOR GERAL DOS SISTEMAS"
+  },
+  {
+   "id": 279,
+   "nome": "ALM SEC MUN DE TRABALHO E DES SOCIAL - CRATO"
+  },
+  {
+   "id": 1106,
+   "nome": "ALMOX DA SEC DE MEIO AMBIENTE DE ITAPIUNA"
+  },
+  {
+   "id": 567,
+   "nome": "ALMOX. HOSP. J G COUTINHO INDEPENDENCIA"
+  },
+  {
+   "id": 297,
+   "nome": "ALMOX. HOSP. JOAO G. COUTINHO-INDEPENDENCIA"
+  },
+  {
+   "id": 566,
+   "nome": "ALMOXAR. HOSPT. J G COUTINHO"
+  },
+  {
+   "id": 83,
+   "nome": "ALMOXARIFADO  AGRICULTURA MILHA"
+  },
+  {
+   "id": 865,
+   "nome": "ALMOXARIFADO  CEO DE CAMOCIM"
+  },
+  {
+   "id": 858,
+   "nome": "ALMOXARIFADO  CONSORCIO MICRO REGIÃO DE CAMOCIM"
+  },
+  {
+   "id": 769,
+   "nome": "ALMOXARIFADO  DO HOSPITAL DE  ICO"
+  },
+  {
+   "id": 82,
+   "nome": "ALMOXARIFADO  MERENDA ESCOLAR MILHA"
+  },
+  {
+   "id": 206,
+   "nome": "ALMOXARIFADO  SAUDE MORADA NOVA"
+  },
+  {
+   "id": 253,
+   "nome": "ALMOXARIFADO - ACAO SOCIAL - GUAIUBA"
+  },
+  {
+   "id": 254,
+   "nome": "ALMOXARIFADO - EDUCACAO - GUAIUBA"
+  },
+  {
+   "id": 332,
+   "nome": "ALMOXARIFADO - HOSPITAL - GUAIUBA"
+  },
+  {
+   "id": 586,
+   "nome": "ALMOXARIFADO - SAUDE - FARMACIA - INDEPENDENCIA"
+  },
+  {
+   "id": 585,
+   "nome": "ALMOXARIFADO - SAUDE - ODONTOLOGICO - INDEPENDENCIA"
+  },
+  {
+   "id": 398,
+   "nome": "ALMOXARIFADO - SEC DE CULTURA - BARROQUINHA"
+  },
+  {
+   "id": 315,
+   "nome": "ALMOXARIFADO - SECRETARIA DE SAUDE - GUAIUBA"
+  },
+  {
+   "id": 493,
+   "nome": "ALMOXARIFADO 2014 MERENDA ESCOLAR BARROQUINHA"
+  },
+  {
+   "id": 534,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL - ARACOIABA"
+  },
+  {
+   "id": 193,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL - MORADA NOVA"
+  },
+  {
+   "id": 401,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL - MORADA NOVA (2013)"
+  },
+  {
+   "id": 245,
+   "nome": "ALMOXARIFADO ACAO SOCIAL - PACATUBA"
+  },
+  {
+   "id": 115,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL - SANTANA DO ACARAÚ"
+  },
+  {
+   "id": 494,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL 2014 BARRORROQUINHA"
+  },
+  {
+   "id": 87,
+   "nome": "ALMOXARIFADO AÇAÕ SOCIAL ARARIPINA"
+  },
+  {
+   "id": 74,
+   "nome": "ALMOXARIFADO ACAO SOCIAL DE MILHA"
+  },
+  {
+   "id": 874,
+   "nome": "ALMOXARIFADO AÇAO SOCIAL DE PAULINO NEVES"
+  },
+  {
+   "id": 471,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL DE PENTECOSTE"
+  },
+  {
+   "id": 325,
+   "nome": "ALMOXARIFADO AÇAO SOCIAL ITATIRA"
+  },
+  {
+   "id": 288,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL JAGUARIBARA"
+  },
+  {
+   "id": 350,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL REDENÇÃO"
+  },
+  {
+   "id": 121,
+   "nome": "ALMOXARIFADO AÇÃO SOCIAL SENADOR POMPEU"
+  },
+  {
+   "id": 296,
+   "nome": "ALMOXARIFADO AÇAO SOCIAL-INDEPENDENCIA"
+  },
+  {
+   "id": 59,
+   "nome": "ALMOXARIFADO ADMINISTRAÇAO  DE ITAPIUNA"
+  },
+  {
+   "id": 882,
+   "nome": "ALMOXARIFADO ALIMENTAÇÃO E LIMPEZA CSAM"
+  },
+  {
+   "id": 1374,
+   "nome": "ALMOXARIFADO ALUCOM SD"
+  },
+  {
+   "id": 932,
+   "nome": "ALMOXARIFADO ASSISTÊNCIA SOCIAL 2018"
+  },
+  {
+   "id": 400,
+   "nome": "ALMOXARIFADO CAF - OCARA"
+  },
+  {
+   "id": 779,
+   "nome": "ALMOXARIFADO CAF HOSPITALAR PACATUBA 2017"
+  },
+  {
+   "id": 71,
+   "nome": "ALMOXARIFADO CAF MORADA NOVA"
+  },
+  {
+   "id": 780,
+   "nome": "ALMOXARIFADO CAF ODONT. PACATUBA 2017"
+  },
+  {
+   "id": 1324,
+   "nome": "ALMOXARIFADO CAMARA DE GRANJA"
+  },
+  {
+   "id": 589,
+   "nome": "ALMOXARIFADO CAMARA DE PENTECOSTE"
+  },
+  {
+   "id": 1004,
+   "nome": "ALMOXARIFADO CÂMARA MUNICIPAL"
+  },
+  {
+   "id": 658,
+   "nome": "ALMOXARIFADO CAMARA MUNICIPAL ACOPIARA"
+  },
+  {
+   "id": 323,
+   "nome": "ALMOXARIFADO CAMARA MUNICIPAL DE BARROQUINHA"
+  },
+  {
+   "id": 805,
+   "nome": "ALMOXARIFADO CAMARA MUNICIPAL DE IRACEMA 2017"
+  },
+  {
+   "id": 43,
+   "nome": "ALMOXARIFADO CASA CIVIL"
+  },
+  {
+   "id": 474,
+   "nome": "ALMOXARIFADO CASA DE APOIO - SAÚDE"
+  },
+  {
+   "id": 46,
+   "nome": "ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 811,
+   "nome": "ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 1141,
+   "nome": "ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 1191,
+   "nome": "ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 244,
+   "nome": "ALMOXARIFADO CENTRAL  - PACATUBA"
+  },
+  {
+   "id": 543,
+   "nome": "ALMOXARIFADO CENTRAL - ARACOIABA"
+  },
+  {
+   "id": 157,
+   "nome": "ALMOXARIFADO CENTRAL - BARROQUINHA"
+  },
+  {
+   "id": 273,
+   "nome": "ALMOXARIFADO CENTRAL - CRATO"
+  },
+  {
+   "id": 496,
+   "nome": "ALMOXARIFADO CENTRAL - CRATO 2014"
+  },
+  {
+   "id": 179,
+   "nome": "ALMOXARIFADO CENTRAL - FUNDO GERAL - CARIRIACU"
+  },
+  {
+   "id": 326,
+   "nome": "ALMOXARIFADO CENTRAL - ITATIRA"
+  },
+  {
+   "id": 363,
+   "nome": "ALMOXARIFADO CENTRAL - MARCO"
+  },
+  {
+   "id": 230,
+   "nome": "ALMOXARIFADO CENTRAL - MUCAMBO"
+  },
+  {
+   "id": 134,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE AÇÃO SOCIAL - PALHANO"
+  },
+  {
+   "id": 140,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE ADMINSTRAÇÃO - PALHANO"
+  },
+  {
+   "id": 136,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE AGRICULTURA - PALHANO"
+  },
+  {
+   "id": 137,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE CULTURA - PALHANO"
+  },
+  {
+   "id": 132,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE EDUCAÇÃO - PALHANO"
+  },
+  {
+   "id": 138,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE FINANÇAS - PALHANO"
+  },
+  {
+   "id": 135,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE GABINETE - PALHANO"
+  },
+  {
+   "id": 139,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE INFRA-ESTRUTURA - PALHANO"
+  },
+  {
+   "id": 133,
+   "nome": "ALMOXARIFADO CENTRAL - SECRETARIA DE SAUDE - PALHANO"
+  },
+  {
+   "id": 489,
+   "nome": "ALMOXARIFADO CENTRAL 2014 JAGUARIBARA"
+  },
+  {
+   "id": 1024,
+   "nome": "ALMOXARIFADO CENTRAL ACOPIARA"
+  },
+  {
+   "id": 818,
+   "nome": "ALMOXARIFADO CENTRAL BARBALHA"
+  },
+  {
+   "id": 797,
+   "nome": "ALMOXARIFADO CENTRAL CRATO 2017"
+  },
+  {
+   "id": 1151,
+   "nome": "ALMOXARIFADO CENTRAL DA CÂMARA MUNICIPAL DE PENTECOSTE 2021"
+  },
+  {
+   "id": 1150,
+   "nome": "ALMOXARIFADO CENTRAL DA PREFEITURA DE PENTECOSTE 2021"
+  },
+  {
+   "id": 734,
+   "nome": "ALMOXARIFADO CENTRAL DE BOA VIAGEM"
+  },
+  {
+   "id": 446,
+   "nome": "ALMOXARIFADO CENTRAL DE CARIDADE- FUNDO GERAL"
+  },
+  {
+   "id": 1334,
+   "nome": "ALMOXARIFADO CENTRAL DE CHAVAL"
+  },
+  {
+   "id": 1039,
+   "nome": "ALMOXARIFADO CENTRAL DE EUSEBIO"
+  },
+  {
+   "id": 702,
+   "nome": "ALMOXARIFADO CENTRAL DE GRANJA"
+  },
+  {
+   "id": 247,
+   "nome": "ALMOXARIFADO CENTRAL DE GUAIUBA"
+  },
+  {
+   "id": 743,
+   "nome": "ALMOXARIFADO CENTRAL DE ICO"
+  },
+  {
+   "id": 910,
+   "nome": "ALMOXARIFADO CENTRAL DE ITAPIUNA"
+  },
+  {
+   "id": 717,
+   "nome": "ALMOXARIFADO CENTRAL DE JARDIM"
+  },
+  {
+   "id": 709,
+   "nome": "ALMOXARIFADO CENTRAL DE MARTINOPOLE"
+  },
+  {
+   "id": 77,
+   "nome": "ALMOXARIFADO CENTRAL DE MILHA"
+  },
+  {
+   "id": 726,
+   "nome": "ALMOXARIFADO CENTRAL DE PACATUBA 2017"
+  },
+  {
+   "id": 1080,
+   "nome": "ALMOXARIFADO CENTRAL DE PARAIPABA"
+  },
+  {
+   "id": 870,
+   "nome": "ALMOXARIFADO CENTRAL DE PAULINO NEVES"
+  },
+  {
+   "id": 1154,
+   "nome": "ALMOXARIFADO CENTRAL DE RERIUTABA"
+  },
+  {
+   "id": 569,
+   "nome": "ALMOXARIFADO CENTRAL DE SANTA QUITERIA"
+  },
+  {
+   "id": 122,
+   "nome": "ALMOXARIFADO CENTRAL DE SENADOR POMPEU"
+  },
+  {
+   "id": 850,
+   "nome": "ALMOXARIFADO CENTRAL DE STA QUITERIA 2017"
+  },
+  {
+   "id": 559,
+   "nome": "ALMOXARIFADO CENTRAL INDEPENDENCIA"
+  },
+  {
+   "id": 799,
+   "nome": "ALMOXARIFADO CENTRAL INDEPENDENCIA"
+  },
+  {
+   "id": 759,
+   "nome": "ALMOXARIFADO CENTRAL MULUNGU"
+  },
+  {
+   "id": 879,
+   "nome": "ALMOXARIFADO CENTRAL PAULINO NEVES 2017"
+  },
+  {
+   "id": 344,
+   "nome": "ALMOXARIFADO CENTRAL REDENÇÃO"
+  },
+  {
+   "id": 991,
+   "nome": "ALMOXARIFADO CENTRAL SAAEJ"
+  },
+  {
+   "id": 111,
+   "nome": "ALMOXARIFADO CENTRAL SANTANA ACARAU"
+  },
+  {
+   "id": 801,
+   "nome": "ALMOXARIFADO CENTRAL SENADOR SA 2017"
+  },
+  {
+   "id": 294,
+   "nome": "ALMOXARIFADO CENTRAL-INDEPENDENCIA TESTE 02"
+  },
+  {
+   "id": 950,
+   "nome": "ALMOXARIFADO CEO BATURITE"
+  },
+  {
+   "id": 1372,
+   "nome": "ALMOXARIFADO COMPILADO"
+  },
+  {
+   "id": 943,
+   "nome": "ALMOXARIFADO CONSORCIO DE SAÚDE  - CEO BATURITE"
+  },
+  {
+   "id": 894,
+   "nome": "ALMOXARIFADO CONTROLE DE DOAÇAO"
+  },
+  {
+   "id": 895,
+   "nome": "ALMOXARIFADO CONTROLE DE DOAÇAO"
+  },
+  {
+   "id": 1074,
+   "nome": "ALMOXARIFADO CONTROLE DE GARAGEM NA SAUDE - PACATUBA"
+  },
+  {
+   "id": 1271,
+   "nome": "ALMOXARIFADO CONTROLE DE OXIGENIO HOSPITALAR"
+  },
+  {
+   "id": 1343,
+   "nome": "ALMOXARIFADO CONTROLE DE PEÇAS DE CHAVAL"
+  },
+  {
+   "id": 1145,
+   "nome": "ALMOXARIFADO CONTROLE DE URNAS FUNERÁRIAS"
+  },
+  {
+   "id": 1270,
+   "nome": "ALMOXARIFADO CONTROLE ORDEM JUDICIAL DA SAUDE"
+  },
+  {
+   "id": 276,
+   "nome": "ALMOXARIFADO DA  EDUCAÇÃO DE INDEPENDENCIA"
+  },
+  {
+   "id": 370,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL - MARCO"
+  },
+  {
+   "id": 238,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL - MUCAMBO"
+  },
+  {
+   "id": 461,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL ACOPIARA"
+  },
+  {
+   "id": 160,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL CAMOCIM"
+  },
+  {
+   "id": 480,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL DE JAGUARIBARA 2014"
+  },
+  {
+   "id": 562,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL INDEPENDENCIA"
+  },
+  {
+   "id": 68,
+   "nome": "ALMOXARIFADO DA AÇÃO SOCIAL ITAPIUNA"
+  },
+  {
+   "id": 570,
+   "nome": "ALMOXARIFADO DA AÇAO SOCIAL SANTA QUITERIA"
+  },
+  {
+   "id": 63,
+   "nome": "ALMOXARIFADO DA AGRICULTURA"
+  },
+  {
+   "id": 152,
+   "nome": "ALMOXARIFADO DA ASSIST SOCIAL-BARROQUINHA"
+  },
+  {
+   "id": 1192,
+   "nome": "ALMOXARIFADO DA ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 687,
+   "nome": "ALMOXARIFADO DA ASSISTENCIA SOCIAL 2016 STA QUITERIA"
+  },
+  {
+   "id": 1335,
+   "nome": "ALMOXARIFADO DA ASSISTENCIA SOCIAL DE CHAVAL"
+  },
+  {
+   "id": 1081,
+   "nome": "ALMOXARIFADO DA ASSISTENCIA SOCIAL DE PARAIPABA"
+  },
+  {
+   "id": 504,
+   "nome": "ALMOXARIFADO DA AUDITORIA SEC DE SAUDE - CRATO"
+  },
+  {
+   "id": 808,
+   "nome": "ALMOXARIFADO DA CASA DE SAÚDE ADÍLIA MARIA"
+  },
+  {
+   "id": 65,
+   "nome": "ALMOXARIFADO DA CULTURA ITAPIUNA"
+  },
+  {
+   "id": 150,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - BARROQUINHA"
+  },
+  {
+   "id": 270,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - CRATO"
+  },
+  {
+   "id": 209,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - JAGUARETAMA"
+  },
+  {
+   "id": 286,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - JAGUARIBARA"
+  },
+  {
+   "id": 367,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - MARCO"
+  },
+  {
+   "id": 235,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO - MUCAMBO"
+  },
+  {
+   "id": 796,
+   "nome": "ALMOXARIFADO DA EDUCACAO CRATO 2017"
+  },
+  {
+   "id": 848,
+   "nome": "ALMOXARIFADO DA EDUCACAO DE STA QUITERIA 2017"
+  },
+  {
+   "id": 838,
+   "nome": "ALMOXARIFADO DA EDUCACAO INDEPENDENCIA"
+  },
+  {
+   "id": 872,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO MERENDA ESCOLAR PAULINO NEVES"
+  },
+  {
+   "id": 875,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO MERENDA ESCOLAR PAULINO NEVES"
+  },
+  {
+   "id": 217,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO MORADA NOVA"
+  },
+  {
+   "id": 871,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO PAULINO NEVES"
+  },
+  {
+   "id": 343,
+   "nome": "ALMOXARIFADO DA EDUCAÇÃO REDENÇÃO ."
+  },
+  {
+   "id": 800,
+   "nome": "ALMOXARIFADO DA EDUCACAO SENADOR SA 2017"
+  },
+  {
+   "id": 830,
+   "nome": "ALMOXARIFADO DA FARMACIA DE INDEPENDENCIA"
+  },
+  {
+   "id": 226,
+   "nome": "ALMOXARIFADO DA GRAFICA"
+  },
+  {
+   "id": 178,
+   "nome": "ALMOXARIFADO DA MERENDA ESCOLAR - CARIRIACU"
+  },
+  {
+   "id": 825,
+   "nome": "ALMOXARIFADO DA MERENDA ESCOLAR BARBALHA"
+  },
+  {
+   "id": 275,
+   "nome": "ALMOXARIFADO DA MERENDA ESCOLAR INDEPENDENCIA"
+  },
+  {
+   "id": 574,
+   "nome": "ALMOXARIFADO DA MERENDA ESCOLAR SANTA QUITERIA"
+  },
+  {
+   "id": 60,
+   "nome": "ALMOXARIFADO DA PROCURADORIA"
+  },
+  {
+   "id": 151,
+   "nome": "ALMOXARIFADO DA SAUDE - BARROQUINHA"
+  },
+  {
+   "id": 271,
+   "nome": "ALMOXARIFADO DA SAUDE - CRATO"
+  },
+  {
+   "id": 289,
+   "nome": "ALMOXARIFADO DA SAUDE - JAGUARIBARA"
+  },
+  {
+   "id": 368,
+   "nome": "ALMOXARIFADO DA SAUDE - MARCO"
+  },
+  {
+   "id": 194,
+   "nome": "ALMOXARIFADO DA SAÚDE - MORADA NOVA"
+  },
+  {
+   "id": 236,
+   "nome": "ALMOXARIFADO DA SAÚDE - MUCAMBO"
+  },
+  {
+   "id": 383,
+   "nome": "ALMOXARIFADO DA SAUDE 2013 - SENADOR POMPEU"
+  },
+  {
+   "id": 795,
+   "nome": "ALMOXARIFADO DA SAUDE DE CRATO 2017"
+  },
+  {
+   "id": 829,
+   "nome": "ALMOXARIFADO DA SAUDE DE INDEPENDENCIA"
+  },
+  {
+   "id": 79,
+   "nome": "ALMOXARIFADO DA SAÚDE DE MILHÃ"
+  },
+  {
+   "id": 66,
+   "nome": "ALMOXARIFADO DA SAUDE ITAPIUNA"
+  },
+  {
+   "id": 345,
+   "nome": "ALMOXARIFADO DA SAUDE REDENÇÃO"
+  },
+  {
+   "id": 708,
+   "nome": "ALMOXARIFADO DA SEC DE ACAO SOCIAL DE GRANJA"
+  },
+  {
+   "id": 716,
+   "nome": "ALMOXARIFADO DA SEC DE ACAO SOCIAL DE MARTINOPOLE"
+  },
+  {
+   "id": 804,
+   "nome": "ALMOXARIFADO DA SEC DE ACAO SOCIAL SENADOR SA 2017"
+  },
+  {
+   "id": 1157,
+   "nome": "ALMOXARIFADO DA SEC DE ASSISTENCIA  SOCIAL DE RERIUTABA"
+  },
+  {
+   "id": 497,
+   "nome": "ALMOXARIFADO DA SEC DE ASSISTENCIA SOCIAL - CRATO 2014"
+  },
+  {
+   "id": 478,
+   "nome": "ALMOXARIFADO DA SEC DE ASSISTENCIA SOCIAL - PACOTI 2014"
+  },
+  {
+   "id": 913,
+   "nome": "ALMOXARIFADO DA SEC DE ASSISTENCIA SOCIAL DE ITAPIUNA"
+  },
+  {
+   "id": 851,
+   "nome": "ALMOXARIFADO DA SEC DE ASSISTENCIA SOCIAL DE STA QUITERIA 2017"
+  },
+  {
+   "id": 499,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCAÇÃO - CRATO 2014"
+  },
+  {
+   "id": 1026,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCACAO ACOPIARA"
+  },
+  {
+   "id": 911,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCACAO DE ITAPIUNA"
+  },
+  {
+   "id": 718,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCACAO DE JARDIM"
+  },
+  {
+   "id": 1156,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCAÇÃO DE RERIUTABA"
+  },
+  {
+   "id": 491,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCACAO REDENCAO 2014"
+  },
+  {
+   "id": 846,
+   "nome": "ALMOXARIFADO DA SEC DE EDUCACAO STA QUITERIA 2017"
+  },
+  {
+   "id": 1042,
+   "nome": "ALMOXARIFADO DA SEC DE INFRA ESTRUTURA DE ITAPIUNA"
+  },
+  {
+   "id": 498,
+   "nome": "ALMOXARIFADO DA SEC DE SAÚDE - CRATO 2014"
+  },
+  {
+   "id": 912,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE DE ITAPIUNA"
+  },
+  {
+   "id": 719,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE DE JARDIM"
+  },
+  {
+   "id": 728,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE DE PACATUBA 2017"
+  },
+  {
+   "id": 1155,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE DE RERIUTABA"
+  },
+  {
+   "id": 849,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE STA QUITERIA 2017"
+  },
+  {
+   "id": 635,
+   "nome": "ALMOXARIFADO DA SEC DE SAUDE- ITATIRA"
+  },
+  {
+   "id": 1185,
+   "nome": "ALMOXARIFADO DA SEC DE TRABALHO E DES SOCIAL DE BARBALHA 2021"
+  },
+  {
+   "id": 477,
+   "nome": "ALMOXARIFADO DA SEC MUNICIPAL DE SAUDE - PACOTI 2014"
+  },
+  {
+   "id": 476,
+   "nome": "ALMOXARIFADO DA SEC.  MUNICIPAL DE EDUCACAO - PACOTI 2014"
+  },
+  {
+   "id": 1050,
+   "nome": "ALMOXARIFADO DA SEC. DESENVOLVIMENTO RURAL"
+  },
+  {
+   "id": 703,
+   "nome": "ALMOXARIFADO DA SECRETARIA DA EDUCACAO DE GRANJA"
+  },
+  {
+   "id": 727,
+   "nome": "ALMOXARIFADO DA SECRETARIA DA EDUCACAO DE PACATUBA 2017"
+  },
+  {
+   "id": 881,
+   "nome": "ALMOXARIFADO DA SECRETARIA DA EDUCACAO DE PAULINO NEVES 2017"
+  },
+  {
+   "id": 269,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE ACAO SOCIAL - JUCAS"
+  },
+  {
+   "id": 758,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE AÇÃO SOCIAL MULUNGU"
+  },
+  {
+   "id": 181,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE ASSITENCIA SOCIAL - CARIRIACU"
+  },
+  {
+   "id": 436,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE CULTURA"
+  },
+  {
+   "id": 177,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCACAO - CARIRIACU"
+  },
+  {
+   "id": 265,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCACAO - JUCAS"
+  },
+  {
+   "id": 1195,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCAÇÃO DE BARBALHA 2021"
+  },
+  {
+   "id": 735,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCACAO DE BOA VIAGEM"
+  },
+  {
+   "id": 1337,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCAÇÃO DE CHAVAL"
+  },
+  {
+   "id": 744,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCACAO DE ICO"
+  },
+  {
+   "id": 710,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCAÇÃO DE MARTINOPOLE"
+  },
+  {
+   "id": 573,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCAÇÃO DE SANTA QUITERIA"
+  },
+  {
+   "id": 1082,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE EDUCAÇÃO PARAIPABA"
+  },
+  {
+   "id": 1315,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE ESPORTE-ITAPIUNA"
+  },
+  {
+   "id": 1255,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE INFRAESTRUTURA"
+  },
+  {
+   "id": 263,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 465,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE - CARIDADE"
+  },
+  {
+   "id": 176,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAÚDE - CARIRIACU"
+  },
+  {
+   "id": 262,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE - JUCAS"
+  },
+  {
+   "id": 1027,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE ACOPIARA"
+  },
+  {
+   "id": 736,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE BOA VIAGEM"
+  },
+  {
+   "id": 1336,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE CHAVAL"
+  },
+  {
+   "id": 705,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE GRANJA"
+  },
+  {
+   "id": 745,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE ICO"
+  },
+  {
+   "id": 711,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE MARTINOPOLE"
+  },
+  {
+   "id": 1219,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE MARTINOPOLE 2021"
+  },
+  {
+   "id": 618,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE MORADA NOVA - PAB"
+  },
+  {
+   "id": 619,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE MORADA NOVA - RECURSO PRÓPRIO"
+  },
+  {
+   "id": 1090,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE PARAIPABA"
+  },
+  {
+   "id": 880,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE PAULINO NEVES 2017"
+  },
+  {
+   "id": 572,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE SANTA QUITERIA"
+  },
+  {
+   "id": 114,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE DE SANTANA DO ACARAU"
+  },
+  {
+   "id": 757,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE MULUNGU"
+  },
+  {
+   "id": 483,
+   "nome": "ALMOXARIFADO DA SECRETARIA DE SAUDE REDENCAO 2014"
+  },
+  {
+   "id": 756,
+   "nome": "ALMOXARIFADO DA SECRETARIA EDUCAÇÃO MULUNGU"
+  },
+  {
+   "id": 1167,
+   "nome": "ALMOXARIFADO DAS ESCOLAS DE RERIUTABA"
+  },
+  {
+   "id": 1142,
+   "nome": "ALMOXARIFADO DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1314,
+   "nome": "ALMOXARIFADO DE DOAÇÃO - AÇAO SOCIAL DE ITATIRA"
+  },
+  {
+   "id": 64,
+   "nome": "ALMOXARIFADO DE ESPORTE"
+  },
+  {
+   "id": 377,
+   "nome": "ALMOXARIFADO DE INSUMOS DE PACOTI"
+  },
+  {
+   "id": 1193,
+   "nome": "ALMOXARIFADO DE INSUMOS E PEÇAS"
+  },
+  {
+   "id": 686,
+   "nome": "ALMOXARIFADO DE LUBRIFICANTES STA QUITERAIA"
+  },
+  {
+   "id": 61,
+   "nome": "ALMOXARIFADO DE OBRAS"
+  },
+  {
+   "id": 900,
+   "nome": "ALMOXARIFADO DE OBRAS - MARTINIPOLE"
+  },
+  {
+   "id": 1033,
+   "nome": "ALMOXARIFADO DE PEÇAS ACOPIARA"
+  },
+  {
+   "id": 1248,
+   "nome": "ALMOXARIFADO DE PEÇAS CENTRAL BATURITÉ"
+  },
+  {
+   "id": 1257,
+   "nome": "ALMOXARIFADO DE PEÇAS DA SECRETARIA DE INFRAESTRUTURA"
+  },
+  {
+   "id": 1118,
+   "nome": "ALMOXARIFADO DE PEÇAS E INSUMOS DE ARACOIABA"
+  },
+  {
+   "id": 839,
+   "nome": "ALMOXARIFADO DE PECAS INDEPENDENCIA"
+  },
+  {
+   "id": 1098,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE AÇÃO SOCIAL DE PARAIPABA"
+  },
+  {
+   "id": 1099,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE AGRICULTURA DE PARAIPABA"
+  },
+  {
+   "id": 1249,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE ASSISTENCIA SOCIAL BATURITÉ"
+  },
+  {
+   "id": 1247,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE EDUCAÇÃO BATURITÉ"
+  },
+  {
+   "id": 1101,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE FINANÇAS DE PARAIPABA"
+  },
+  {
+   "id": 1100,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE INFRA ESTRUTURA DE PARAIPABA"
+  },
+  {
+   "id": 1246,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE SAUDE BATURITÉ"
+  },
+  {
+   "id": 1097,
+   "nome": "ALMOXARIFADO DE PEÇAS SEC DE SAUDE DE PARAIPABA"
+  },
+  {
+   "id": 802,
+   "nome": "ALMOXARIFADO DE PECAS SENADOR SA 2017"
+  },
+  {
+   "id": 1267,
+   "nome": "ALMOXARIFADO DE TRANSPORTE DA SEC DE EDUCAÇÃO DE PARAIPABA"
+  },
+  {
+   "id": 352,
+   "nome": "ALMOXARIFADO DO FORUM DE PACATUBA"
+  },
+  {
+   "id": 530,
+   "nome": "ALMOXARIFADO DO FUNDO GERAL - PACOTI"
+  },
+  {
+   "id": 307,
+   "nome": "ALMOXARIFADO DO GABINETE - BARROQUINHA"
+  },
+  {
+   "id": 404,
+   "nome": "ALMOXARIFADO DO HOSPITAL  DE MORADA NOVA"
+  },
+  {
+   "id": 153,
+   "nome": "ALMOXARIFADO DO HOSPITAL - BARROQUINHA"
+  },
+  {
+   "id": 317,
+   "nome": "ALMOXARIFADO DO HOSPITAL - JAGUARIBARA"
+  },
+  {
+   "id": 264,
+   "nome": "ALMOXARIFADO DO HOSPITAL - JUCAS"
+  },
+  {
+   "id": 366,
+   "nome": "ALMOXARIFADO DO HOSPITAL - MARCO"
+  },
+  {
+   "id": 232,
+   "nome": "ALMOXARIFADO DO HOSPITAL - MUCAMBO"
+  },
+  {
+   "id": 774,
+   "nome": "ALMOXARIFADO DO HOSPITAL DE GRANJA"
+  },
+  {
+   "id": 937,
+   "nome": "ALMOXARIFADO DO HOSPITAL DE JARDIM"
+  },
+  {
+   "id": 1322,
+   "nome": "ALMOXARIFADO DO HOSPITAL E MATERNIDADE PROFESSOR WALDEMAR DE ALCANTARA"
+  },
+  {
+   "id": 1345,
+   "nome": "ALMOXARIFADO DO HOSPITAL MUNICIPAL DE CHAVAL"
+  },
+  {
+   "id": 1266,
+   "nome": "ALMOXARIFADO DOAÇÃO E ORDEM JUDICIAL DE PARAIPABA"
+  },
+  {
+   "id": 362,
+   "nome": "ALMOXARIFADO DOS INSUMOS VEICULOS-PACTBA"
+  },
+  {
+   "id": 459,
+   "nome": "ALMOXARIFADO EDUCAÇÃO - CARIDADE"
+  },
+  {
+   "id": 241,
+   "nome": "ALMOXARIFADO EDUCACAO - PACATUBA"
+  },
+  {
+   "id": 492,
+   "nome": "ALMOXARIFADO EDUCAÇÃO 2014 BARROQUINHA"
+  },
+  {
+   "id": 488,
+   "nome": "ALMOXARIFADO EDUCAÇÃO 2014 JAGUARIBARA"
+  },
+  {
+   "id": 75,
+   "nome": "ALMOXARIFADO EDUCACAO DE MILHA"
+  },
+  {
+   "id": 110,
+   "nome": "ALMOXARIFADO EDUCACAO DE SATANA DO ACARAU"
+  },
+  {
+   "id": 45,
+   "nome": "ALMOXARIFADO EDUCAÇÃO PACAJUS"
+  },
+  {
+   "id": 119,
+   "nome": "ALMOXARIFADO EDUCACAO SENADOR POMPEU"
+  },
+  {
+   "id": 158,
+   "nome": "ALMOXARIFADO EDUCAÇÃO-CAMOCIM"
+  },
+  {
+   "id": 299,
+   "nome": "ALMOXARIFADO ESPORTE BARROQUINHA"
+  },
+  {
+   "id": 495,
+   "nome": "ALMOXARIFADO ESPORTES 2014 BARROQUINHA"
+  },
+  {
+   "id": 536,
+   "nome": "ALMOXARIFADO EXPEDIENTE 2014 CEO - REGINAL DR. FRANCISCO MANSUETO DE SOUZA"
+  },
+  {
+   "id": 1229,
+   "nome": "ALMOXARIFADO FARMACIA HOSPITALAR"
+  },
+  {
+   "id": 768,
+   "nome": "ALMOXARIFADO FARMACIA HOSPITALAR  ICO"
+  },
+  {
+   "id": 938,
+   "nome": "ALMOXARIFADO FARMACIA HOSPITALAR DE JARDIM"
+  },
+  {
+   "id": 292,
+   "nome": "ALMOXARIFADO FUNDO GERAL-JAGUARIBARA"
+  },
+  {
+   "id": 62,
+   "nome": "ALMOXARIFADO GABINETE DO PREFEITO"
+  },
+  {
+   "id": 161,
+   "nome": "ALMOXARIFADO GESTÃO - CAMOCIM"
+  },
+  {
+   "id": 834,
+   "nome": "ALMOXARIFADO HOSP J G COUTINHO INDEPENDENCIA"
+  },
+  {
+   "id": 857,
+   "nome": "ALMOXARIFADO HOSP MUNICIPAL DE PACATUBA 2017"
+  },
+  {
+   "id": 1094,
+   "nome": "ALMOXARIFADO HOSP MUNICIPAL DE PARAIPABA"
+  },
+  {
+   "id": 466,
+   "nome": "ALMOXARIFADO HOSPITAL - CARIDADE"
+  },
+  {
+   "id": 308,
+   "nome": "ALMOXARIFADO HOSPITAL DE PACATUBA- RAIMUNDO C. RODRIGUES"
+  },
+  {
+   "id": 771,
+   "nome": "ALMOXARIFADO HOSPITAL E MATERNIDADE WALDEMAR DE ALCANTARA MULUNGU"
+  },
+  {
+   "id": 920,
+   "nome": "ALMOXARIFADO HOSPITAL MUNICIPAL PROFº WALDEMAR ALCANTARA"
+  },
+  {
+   "id": 1228,
+   "nome": "ALMOXARIFADO HOSPITAL RITA VALE REGO"
+  },
+  {
+   "id": 330,
+   "nome": "ALMOXARIFADO HOSPITAL-GUAIUBA"
+  },
+  {
+   "id": 485,
+   "nome": "ALMOXARIFADO HOSPITALAR 2014 JAGUARIBARA"
+  },
+  {
+   "id": 1127,
+   "nome": "ALMOXARIFADO II DA SEC DE EDUCACAO DE JARDIM"
+  },
+  {
+   "id": 1131,
+   "nome": "ALMOXARIFADO II DA SEC DE SAUDE DE JARDIM"
+  },
+  {
+   "id": 1132,
+   "nome": "ALMOXARIFADO II DO HOSPITAL DE JARDIM"
+  },
+  {
+   "id": 301,
+   "nome": "ALMOXARIFADO INFRA ESTRUTURA BARROQUINHA"
+  },
+  {
+   "id": 790,
+   "nome": "ALMOXARIFADO MATERIAL ODONTOLOGICO CAF BOA VIAGEM"
+  },
+  {
+   "id": 853,
+   "nome": "ALMOXARIFADO MATERIAL ODONTOLOGICO CAF STA QUITERIA 2017"
+  },
+  {
+   "id": 1236,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR"
+  },
+  {
+   "id": 822,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR BARBALHA"
+  },
+  {
+   "id": 1238,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR BARBALHA 2021"
+  },
+  {
+   "id": 789,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR CAF BOA VIAGEM"
+  },
+  {
+   "id": 832,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR DE INDEPENDENCIA"
+  },
+  {
+   "id": 835,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR HOSP J G COUTINHO INDEPENDENCIA 2017"
+  },
+  {
+   "id": 764,
+   "nome": "ALMOXARIFADO MEDICO HOSPITALAR MULUNGU"
+  },
+  {
+   "id": 775,
+   "nome": "ALMOXARIFADO MERENDA ESCOLAR BARROQUINHA 2017"
+  },
+  {
+   "id": 650,
+   "nome": "ALMOXARIFADO MERENDA ESCOLAR IRACEMA"
+  },
+  {
+   "id": 346,
+   "nome": "ALMOXARIFADO MERENDA ESCOLAR REDENÇÃO"
+  },
+  {
+   "id": 490,
+   "nome": "ALMOXARIFADO MERENDA ESCOLAR REDENCAO 2014"
+  },
+  {
+   "id": 84,
+   "nome": "ALMOXARIFADO OBRAS MILHA"
+  },
+  {
+   "id": 700,
+   "nome": "ALMOXARIFADO OBRAS MN"
+  },
+  {
+   "id": 418,
+   "nome": "ALMOXARIFADO ODONTOLOGIA - SAUDE - GUAIUBA"
+  },
+  {
+   "id": 1237,
+   "nome": "ALMOXARIFADO ODONTOLÓGICO"
+  },
+  {
+   "id": 823,
+   "nome": "ALMOXARIFADO ODONTOLÕGICO  BARBALHA"
+  },
+  {
+   "id": 1242,
+   "nome": "ALMOXARIFADO ODONTOLÓGICO  BARBALHA 2021"
+  },
+  {
+   "id": 692,
+   "nome": "ALMOXARIFADO ODONTOLOGICO 2016 ST QUITERIA"
+  },
+  {
+   "id": 810,
+   "nome": "ALMOXARIFADO ODONTOLOGICO DE GRANJA"
+  },
+  {
+   "id": 831,
+   "nome": "ALMOXARIFADO ODONTOLOGICO DE INDEPENDENCIA"
+  },
+  {
+   "id": 854,
+   "nome": "ALMOXARIFADO ODONTOLOGICO DE STA QUITERIA 2017"
+  },
+  {
+   "id": 67,
+   "nome": "ALMOXARIFADO ODONTOLOGICO ITAPIUNA"
+  },
+  {
+   "id": 689,
+   "nome": "ALMOXARIFADO ODONTOLOGICO ITATIRA 2016"
+  },
+  {
+   "id": 765,
+   "nome": "ALMOXARIFADO ODONTOLOGICO MULUNGU"
+  },
+  {
+   "id": 892,
+   "nome": "ALMOXARIFADO PAB"
+  },
+  {
+   "id": 949,
+   "nome": "ALMOXARIFADO PACIENTE MULUNGU"
+  },
+  {
+   "id": 955,
+   "nome": "ALMOXARIFADO POLICLINICA DE BATURITE 2016"
+  },
+  {
+   "id": 954,
+   "nome": "ALMOXARIFADO POLICLINICA DE BATURITE 2017"
+  },
+  {
+   "id": 1182,
+   "nome": "ALMOXARIFADO POSTOS DE SAUDE DE RERIUTABA"
+  },
+  {
+   "id": 469,
+   "nome": "ALMOXARIFADO PREFEITURA DE CAPISTRANO"
+  },
+  {
+   "id": 309,
+   "nome": "ALMOXARIFADO PREFEITURA MUNICIPAL DE IRACEMA - CENTRAL"
+  },
+  {
+   "id": 681,
+   "nome": "ALMOXARIFADO PREVICRATO"
+  },
+  {
+   "id": 901,
+   "nome": "ALMOXARIFADO PREVICRATO 2014/2015"
+  },
+  {
+   "id": 788,
+   "nome": "ALMOXARIFADO SAAE DE BOA VIAGEM"
+  },
+  {
+   "id": 828,
+   "nome": "ALMOXARIFADO SAAE GRANJA"
+  },
+  {
+   "id": 781,
+   "nome": "ALMOXARIFADO SAAE ICO"
+  },
+  {
+   "id": 44,
+   "nome": "ALMOXARIFADO SAÚDE"
+  },
+  {
+   "id": 812,
+   "nome": "ALMOXARIFADO SAUDE"
+  },
+  {
+   "id": 540,
+   "nome": "ALMOXARIFADO SAUDE - ARACOIABA"
+  },
+  {
+   "id": 159,
+   "nome": "ALMOXARIFADO SAUDE - CAMOCIM"
+  },
+  {
+   "id": 243,
+   "nome": "ALMOXARIFADO SAUDE - PACATUBA"
+  },
+  {
+   "id": 482,
+   "nome": "ALMOXARIFADO SAUDE 2014 JAGUARIBARA"
+  },
+  {
+   "id": 691,
+   "nome": "ALMOXARIFADO SAUDE 2016 ST QUITERIA"
+  },
+  {
+   "id": 565,
+   "nome": "ALMOXARIFADO SAUDE DE INDEPENDENCIA"
+  },
+  {
+   "id": 873,
+   "nome": "ALMOXARIFADO SAUDE DE PAULINO NEVES"
+  },
+  {
+   "id": 283,
+   "nome": "ALMOXARIFADO SAUDE FARMACIA - INDEPENDENCIA"
+  },
+  {
+   "id": 216,
+   "nome": "ALMOXARIFADO SAUDE HOSPITAL MILHA"
+  },
+  {
+   "id": 282,
+   "nome": "ALMOXARIFADO SAUDE ODONTO- INDEPENDENCIA"
+  },
+  {
+   "id": 116,
+   "nome": "ALMOXARIFADO SAUDE SENADOR POMPEU"
+  },
+  {
+   "id": 281,
+   "nome": "ALMOXARIFADO SAUDE- INDEPENDENCIA"
+  },
+  {
+   "id": 486,
+   "nome": "ALMOXARIFADO SEC ASSISTENCIA SOCIAL REDENCAO 2014"
+  },
+  {
+   "id": 548,
+   "nome": "ALMOXARIFADO SEC DE ACÃO SOCIAL  - ARAPIRACA"
+  },
+  {
+   "id": 394,
+   "nome": "ALMOXARIFADO SEC DE ACAO SOCIAL-BANABUIU"
+  },
+  {
+   "id": 527,
+   "nome": "ALMOXARIFADO SEC DE ASSISTENCIA SOCIAL - PACOTI"
+  },
+  {
+   "id": 445,
+   "nome": "ALMOXARIFADO SEC DE ASSISTENCIA SOCIAL-CARIDADE"
+  },
+  {
+   "id": 335,
+   "nome": "ALMOXARIFADO SEC DE EDUCAÇAO - ITATIRA"
+  },
+  {
+   "id": 528,
+   "nome": "ALMOXARIFADO SEC DE EDUCACAO - PACOTI"
+  },
+  {
+   "id": 1088,
+   "nome": "ALMOXARIFADO SEC DE INFRA ESTRUTURA DE PARAIPABA"
+  },
+  {
+   "id": 334,
+   "nome": "ALMOXARIFADO SEC DE SAUDE - ITATIRA"
+  },
+  {
+   "id": 529,
+   "nome": "ALMOXARIFADO SEC DE SAUDE - PACOTI"
+  },
+  {
+   "id": 393,
+   "nome": "ALMOXARIFADO SEC DE SAUDE-BANABUIU"
+  },
+  {
+   "id": 541,
+   "nome": "ALMOXARIFADO SEC. EDUCAÇÃO - ARACOIABA"
+  },
+  {
+   "id": 826,
+   "nome": "ALMOXARIFADO SECRETARIA AÇÃO SOCIAL BARBALHA"
+  },
+  {
+   "id": 669,
+   "nome": "ALMOXARIFADO SECRETARIA DE AÇÃO SOCIAL IRACEMA"
+  },
+  {
+   "id": 1159,
+   "nome": "ALMOXARIFADO SECRETARIA DE CULTURA"
+  },
+  {
+   "id": 1136,
+   "nome": "ALMOXARIFADO SECRETARIA DE EDUCAÇAO"
+  },
+  {
+   "id": 1190,
+   "nome": "ALMOXARIFADO SECRETARIA DE EDUCAÇÃO"
+  },
+  {
+   "id": 324,
+   "nome": "ALMOXARIFADO SECRETARIA DE EDUCAÇÃO BARROQUINHA"
+  },
+  {
+   "id": 814,
+   "nome": "ALMOXARIFADO SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 1138,
+   "nome": "ALMOXARIFADO SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 462,
+   "nome": "ALMOXARIFADO SECRETARIA DE SAUDE - IRACEMA-CE"
+  },
+  {
+   "id": 815,
+   "nome": "ALMOXARIFADO SECRETARIA DE SAÚDE BARBALHA"
+  },
+  {
+   "id": 1241,
+   "nome": "ALMOXARIFADO SECRETARIA DE SAÚDE BARBALHA 2021"
+  },
+  {
+   "id": 813,
+   "nome": "ALMOXARIFADO SECRETARIA EDUCAÇÃO"
+  },
+  {
+   "id": 817,
+   "nome": "ALMOXARIFADO SECRETARIA EDUCAÇÃO BARBALHA"
+  },
+  {
+   "id": 1347,
+   "nome": "ALMOXARIFADO STEM KITS"
+  },
+  {
+   "id": 300,
+   "nome": "ALMOXARIFADO TURISMO BARROQUINHA"
+  },
+  {
+   "id": 1189,
+   "nome": "ALMOXARIFADO UPA DE PACATUBA"
+  },
+  {
+   "id": 885,
+   "nome": "ALMOXARIFADO VEICULOS - SAAE - BOA VIAGEM"
+  },
+  {
+   "id": 766,
+   "nome": "ALMOXARIFDO DO HOSPITAL E MATERNIDADE WALDEMAR DE ALCANTRA MULUNGU"
+  },
+  {
+   "id": 690,
+   "nome": "ALMOXARIFDO MEDICO HOSPITALAR 2016 ST QUITERIA"
+  },
+  {
+   "id": 1115,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1327,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1329,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1353,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1363,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1365,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1367,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1370,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1373,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1376,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1377,
+   "nome": "ALUCOM"
+  },
+  {
+   "id": 1316,
+   "nome": "ALUCOM EPP 2022"
+  },
+  {
+   "id": 1382,
+   "nome": "ALUCOM EXCLUIDOS"
+  },
+  {
+   "id": 1366,
+   "nome": "ALUCOM LOCAÇÕES - RIO DE JANEIRO"
+  },
+  {
+   "id": 1025,
+   "nome": "AMOXARIFADO SEC DE ACAO SOCIAL ACOPIARA"
+  },
+  {
+   "id": 867,
+   "nome": "AMT CONTROLE DE COMBUSTIVEL MORADA NOVA 2107"
+  },
+  {
+   "id": 869,
+   "nome": "AMT CONTROLE DE PATRIMONIO MORADA NOVA 2107"
+  },
+  {
+   "id": 221,
+   "nome": "AMT DE MORADA NOVA"
+  },
+  {
+   "id": 868,
+   "nome": "AMT MORADA NOVA 2017"
+  },
+  {
+   "id": 967,
+   "nome": "ARACOIABA - ALMOXARIFADO DA SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 1012,
+   "nome": "ARACOIABA - CULTURA"
+  },
+  {
+   "id": 1011,
+   "nome": "ARACOIABA - DESENVOLVIMENTO RURAL"
+  },
+  {
+   "id": 1007,
+   "nome": "ARACOIABA - GABINETE DO PREFEITO"
+  },
+  {
+   "id": 1010,
+   "nome": "ARACOIABA - PROCURADORIA"
+  },
+  {
+   "id": 1243,
+   "nome": "ARACOIABA - SEC. DE INFRAESTRUTURA"
+  },
+  {
+   "id": 989,
+   "nome": "ARACOIABA - SECRETARIA DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 987,
+   "nome": "ARACOIABA - SECRETARIA DE ESPORTES"
+  },
+  {
+   "id": 1009,
+   "nome": "ARACOIABA - SECRETARIA DE FINANCAS"
+  },
+  {
+   "id": 1021,
+   "nome": "ARACOIABA - SECRETARIA DE GOVERNO"
+  },
+  {
+   "id": 1008,
+   "nome": "ARACOIABA - SECRETARIA DE MEIO AMBIENTE"
+  },
+  {
+   "id": 988,
+   "nome": "ARACOIABA - SECRETARIA DE PLANEJAMENTO"
+  },
+  {
+   "id": 542,
+   "nome": "ARACOIABA - SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 57,
+   "nome": "ARARIPREV"
+  },
+  {
+   "id": 147,
+   "nome": "AS MUNICIPAL"
+  },
+  {
+   "id": 1378,
+   "nome": "AS SISTEMAS"
+  },
+  {
+   "id": 200,
+   "nome": "ASCORP - CÂMARA DE CAUCAIA"
+  },
+  {
+   "id": 1020,
+   "nome": "ASSISTÊNCIA SOCIAL"
+  },
+  {
+   "id": 776,
+   "nome": "ASSISTENCIA SOCIAL BARROQUINHA 2017"
+  },
+  {
+   "id": 640,
+   "nome": "ASSISTENCIA SOCIAL INDEPENDENCIA 2016"
+  },
+  {
+   "id": 19,
+   "nome": "Associação Cearense de Estudos e Pesquisa - ACEP"
+  },
+  {
+   "id": 976,
+   "nome": "BOA VIAGEM - ALMOXARIFADO DA ACAO SOCIAL"
+  },
+  {
+   "id": 978,
+   "nome": "BOA VIAGEM - ALMOXARIFADO DA SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 977,
+   "nome": "BOA VIAGEM - ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 1380,
+   "nome": "BRASILIA"
+  },
+  {
+   "id": 522,
+   "nome": "CAF  - ODONTOLOGICO - JUCAS"
+  },
+  {
+   "id": 836,
+   "nome": "CAF -  HOSP J G COUTINHO INDEPENDENCIA 2017"
+  },
+  {
+   "id": 521,
+   "nome": "CAF -  HOSPITALAR - JUCAS"
+  },
+  {
+   "id": 688,
+   "nome": "CAF - 2016 SANTA QUITERIA"
+  },
+  {
+   "id": 449,
+   "nome": "CAF - ACOPIARA - HOSPITALAR"
+  },
+  {
+   "id": 510,
+   "nome": "CAF - ACOPIARA - HOSPITALAR - 2014"
+  },
+  {
+   "id": 450,
+   "nome": "CAF - ACOPIARA - ODONTOLOGICO"
+  },
+  {
+   "id": 511,
+   "nome": "CAF - ACOPIARA - ODONTOLOGICO - 2014"
+  },
+  {
+   "id": 155,
+   "nome": "CAF - BARROQUINHA"
+  },
+  {
+   "id": 298,
+   "nome": "CAF - BARROQUINHA - HOSPITALAR"
+  },
+  {
+   "id": 322,
+   "nome": "CAF - BARROQUINHA - ODONTOLOGICO"
+  },
+  {
+   "id": 755,
+   "nome": "CAF - BOA VIAGEM MEDICO HOSPITALAR"
+  },
+  {
+   "id": 162,
+   "nome": "CAF - CAMOCIM"
+  },
+  {
+   "id": 878,
+   "nome": "CAF - CENTRAL ABASTECIMENTO FARMACEUTICO - PAULINO NEVES"
+  },
+  {
+   "id": 886,
+   "nome": "CAF - CENTRAL ABASTECIMENTO FARMACEUTICO- MULUNGU"
+  },
+  {
+   "id": 395,
+   "nome": "CAF - CENTRAL DE ABAST. FARMACEUTICA - BANABUIU"
+  },
+  {
+   "id": 396,
+   "nome": "CAF - CENTRAL DE ABAST. FARMACEUTICA - BANABUIU"
+  },
+  {
+   "id": 331,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - CARIRIAÇU"
+  },
+  {
+   "id": 655,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - CRATO"
+  },
+  {
+   "id": 616,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - CRATO - DOAÇÃO"
+  },
+  {
+   "id": 615,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - CRATO - FMS"
+  },
+  {
+   "id": 274,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - CRATO - PPI"
+  },
+  {
+   "id": 500,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACÊUTICO - CRATO 2014"
+  },
+  {
+   "id": 319,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - JAGUARIBARA"
+  },
+  {
+   "id": 364,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO - MARCO"
+  },
+  {
+   "id": 610,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACÊUTICO - PALMACIA"
+  },
+  {
+   "id": 821,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACÉUTICO BARBALHA"
+  },
+  {
+   "id": 240,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO- PACATUBA"
+  },
+  {
+   "id": 455,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO-JUCAS"
+  },
+  {
+   "id": 237,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO FARMACEUTICO-MUCAMBO"
+  },
+  {
+   "id": 840,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO HOSPITALAR INDEPENDENCIA 2017"
+  },
+  {
+   "id": 863,
+   "nome": "CAF - CENTRAL DE ABASTECIMENTO HOSPITALAR STA QUITERIA 2017"
+  },
+  {
+   "id": 302,
+   "nome": "CAF - CENTRAL DE ASSISTENCIA FARMACEUTICA - GUAIUBA"
+  },
+  {
+   "id": 783,
+   "nome": "CAF - CONTROLE DE MATERIAL ODONTOLOGICO - ICO"
+  },
+  {
+   "id": 1344,
+   "nome": "CAF - HOSPITAL DE CHAVAL"
+  },
+  {
+   "id": 787,
+   "nome": "CAF - HOSPITAL DE GRANJA"
+  },
+  {
+   "id": 1285,
+   "nome": "CAF - HOSPITAL DE GRANJA -2021_2022"
+  },
+  {
+   "id": 188,
+   "nome": "CAF - ICO EXPEDIENTE"
+  },
+  {
+   "id": 189,
+   "nome": "CAF - ICO HOSPITALAR"
+  },
+  {
+   "id": 187,
+   "nome": "CAF - ICO ODONTOLOGIA"
+  },
+  {
+   "id": 327,
+   "nome": "CAF - ITATIRA"
+  },
+  {
+   "id": 481,
+   "nome": "CAF - JAGUARIBARA 20014"
+  },
+  {
+   "id": 501,
+   "nome": "CAF - MATERIAL MEDICO HOSPITALAR - CRATO 2014"
+  },
+  {
+   "id": 549,
+   "nome": "CAF - MATERIAL MEDICO HOSPITALAR - PSF - ARACOIABA"
+  },
+  {
+   "id": 557,
+   "nome": "CAF - MATERIAL MEDICO HOSPITALAR SENADOR POMPEU"
+  },
+  {
+   "id": 909,
+   "nome": "CAF - MATERIAL ODONTOLOGICO  PACATUBA 2018"
+  },
+  {
+   "id": 673,
+   "nome": "CAF - MATERIAL ODONTOLOGICO - CRATO"
+  },
+  {
+   "id": 502,
+   "nome": "CAF - MATERIAL ODONTOLOGICO - CRATO 2014"
+  },
+  {
+   "id": 437,
+   "nome": "CAF - MEDICO HOSPITALAR-JUCAS"
+  },
+  {
+   "id": 552,
+   "nome": "CAF - ODONTOLÓGICO - ARACOIABA"
+  },
+  {
+   "id": 454,
+   "nome": "CAF - ODONTOLOGICO- JUCAS"
+  },
+  {
+   "id": 512,
+   "nome": "CAF - PPI - ACOPIARA - 2014"
+  },
+  {
+   "id": 513,
+   "nome": "CAF - PPI - ACOPIARA - 2014"
+  },
+  {
+   "id": 553,
+   "nome": "CAF - PPI - ARACOIABA"
+  },
+  {
+   "id": 520,
+   "nome": "CAF - PPI - JUCAS - 2014"
+  },
+  {
+   "id": 347,
+   "nome": "CAF - REDENÇÃO"
+  },
+  {
+   "id": 143,
+   "nome": "CAF - SECRETARIA DE SAUDE - PALHANO"
+  },
+  {
+   "id": 185,
+   "nome": "CAF - SECRETARIA DE SAUDE DE ICÓ (JUDICIAL)"
+  },
+  {
+   "id": 186,
+   "nome": "CAF - SECRETARIA DE SAUDE DE ICÓ (LICITADOS)"
+  },
+  {
+   "id": 183,
+   "nome": "CAF - SECRETARIA DE SAUDE DE ICÓ (PPI)"
+  },
+  {
+   "id": 184,
+   "nome": "CAF - SECRETARIA DE SAUDE ICÓ (LICITADOS)"
+  },
+  {
+   "id": 1128,
+   "nome": "CAF - SECRETARIA MUNICIPAL DE SAUDE - INDEPENDENCIA"
+  },
+  {
+   "id": 809,
+   "nome": "CAF CENTRAL DE MEDICAMENTOS BOA VIAGEM"
+  },
+  {
+   "id": 737,
+   "nome": "CAF DA SECRETARIA DE SAUDE DE BOA VIAGEM"
+  },
+  {
+   "id": 746,
+   "nome": "CAF DA SECRETARIA DE SAUDE DE ICO"
+  },
+  {
+   "id": 729,
+   "nome": "CAF DA SECRETARIA DE SAUDE DE PACATUBA 2017"
+  },
+  {
+   "id": 844,
+   "nome": "CAF FARMACIA HOSPITALAR  PACATUBA 2017"
+  },
+  {
+   "id": 1095,
+   "nome": "CAF FARMACIA HOSPITALAR DE PARAIPABA"
+  },
+  {
+   "id": 1265,
+   "nome": "CAF FARMACIA HOSPITALAR PACATUBA 2021"
+  },
+  {
+   "id": 1028,
+   "nome": "CAF MATERIAL MEDICO HOSPITALAR ACOPIARA"
+  },
+  {
+   "id": 634,
+   "nome": "CAF MATERIAL MEDICO HOSPITALAR E ODONTOLOGICO-ITATIRA"
+  },
+  {
+   "id": 1092,
+   "nome": "CAF MATERIAL MEDICO HOSPITALAR PARAIPABA"
+  },
+  {
+   "id": 1187,
+   "nome": "CAF MATERIAL ODONTOLOGICO BATURITÉ"
+  },
+  {
+   "id": 1093,
+   "nome": "CAF MATERIAL ODONTOLOGICO DE PARAIPABA"
+  },
+  {
+   "id": 918,
+   "nome": "CAF MEDICO HOSPITALAR DE ITAPIUNA"
+  },
+  {
+   "id": 843,
+   "nome": "CAF MEDICO HOSPITALAR PACATUBA 2018"
+  },
+  {
+   "id": 936,
+   "nome": "CAF MEDICO HOSPITALAR UPA ARACOIABA"
+  },
+  {
+   "id": 919,
+   "nome": "CAF ODONTOLOGICO DE ITAPIUNA"
+  },
+  {
+   "id": 939,
+   "nome": "CAF ODONTOLOGICO DE JARDIM"
+  },
+  {
+   "id": 1102,
+   "nome": "CAF PACIENTES DE PARAIPABA"
+  },
+  {
+   "id": 951,
+   "nome": "CAF PACIENTES MULUNGU"
+  },
+  {
+   "id": 947,
+   "nome": "CAF POLICLINICA DE BATURITE"
+  },
+  {
+   "id": 953,
+   "nome": "CAF POLICLINICA DE BATURITE 2016"
+  },
+  {
+   "id": 952,
+   "nome": "CAF POLICLINICA DE BATURITE 2017"
+  },
+  {
+   "id": 720,
+   "nome": "CAF SEC DE SAUDE DE JARDIM"
+  },
+  {
+   "id": 1139,
+   "nome": "CAF SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 1340,
+   "nome": "CAF SECRETARIA DE SAUDE DE CHAVAL"
+  },
+  {
+   "id": 706,
+   "nome": "CAF SECRETARIA DE SAUDE DE GRANJA"
+  },
+  {
+   "id": 1287,
+   "nome": "CAF SECRETARIA DE SAUDE DE GRANJA 2021-2022"
+  },
+  {
+   "id": 712,
+   "nome": "CAF SECRETARIA DE SAUDE DE MARTINOPOLE"
+  },
+  {
+   "id": 1183,
+   "nome": "CAF SECRETARIA DE SAUDE DE MARTINOPOLE 2021"
+  },
+  {
+   "id": 118,
+   "nome": "CAF SENADOR POMPEU"
+  },
+  {
+   "id": 1140,
+   "nome": "CAF UMPA"
+  },
+  {
+   "id": 1263,
+   "nome": "CAF UPA DE GRANJA"
+  },
+  {
+   "id": 1286,
+   "nome": "CAF UPA DE GRANJA 2021-2022"
+  },
+  {
+   "id": 280,
+   "nome": "CAF- CENTRAL DE ABASTECIMENTO FARMACEUTICO - INDEPENDENCIA"
+  },
+  {
+   "id": 1003,
+   "nome": "CÂMARA MUNICIPAL"
+  },
+  {
+   "id": 409,
+   "nome": "CAMARA MUNICIPAL - ACOPIARA"
+  },
+  {
+   "id": 601,
+   "nome": "CÂMARA MUNICIPAL DE ACOPIARA"
+  },
+  {
+   "id": 657,
+   "nome": "CAMARA MUNICIPAL DE ACOPIARA"
+  },
+  {
+   "id": 202,
+   "nome": "CAMARA MUNICIPAL DE ALTO SANTO"
+  },
+  {
+   "id": 475,
+   "nome": "CAMARA MUNICIPAL DE BANABUIU"
+  },
+  {
+   "id": 169,
+   "nome": "CAMARA MUNICIPAL DE BARROQUINHA"
+  },
+  {
+   "id": 201,
+   "nome": "CÂMARA MUNICIPAL DE CAUCAIA"
+  },
+  {
+   "id": 195,
+   "nome": "CAMARA MUNICIPAL DE ERERE"
+  },
+  {
+   "id": 668,
+   "nome": "CAMARA MUNICIPAL DE ERERE"
+  },
+  {
+   "id": 674,
+   "nome": "CAMARA MUNICIPAL DE ERERE"
+  },
+  {
+   "id": 47,
+   "nome": "CAMARA MUNICIPAL DE GUARAMIRANGA"
+  },
+  {
+   "id": 11,
+   "nome": "CAMARA MUNICIPAL DE MARACANAU"
+  },
+  {
+   "id": 12,
+   "nome": "CAMARA MUNICIPAL DE MARANGUAPE"
+  },
+  {
+   "id": 312,
+   "nome": "CAMARA MUNICIPAL DE MISSÃO VELHA"
+  },
+  {
+   "id": 413,
+   "nome": "CÂMARA MUNICIPAL DE MORADA NOVA"
+  },
+  {
+   "id": 284,
+   "nome": "CAMARA MUNICIPAL DE MUCAMBO"
+  },
+  {
+   "id": 337,
+   "nome": "CAMARA MUNICIPAL DE PACOTI"
+  },
+  {
+   "id": 338,
+   "nome": "CAMARA MUNICIPAL DE PACOTI"
+  },
+  {
+   "id": 1240,
+   "nome": "CAMARA MUNICIPAL DE PENTECOSTE"
+  },
+  {
+   "id": 463,
+   "nome": "CAMARA MUNICIPAL DE POTIRETAMA"
+  },
+  {
+   "id": 303,
+   "nome": "CAMARA MUNICIPAL DE SENADOR POMPEU"
+  },
+  {
+   "id": 304,
+   "nome": "CAMARA MUNICIPAL DE SENADOR POMPEU"
+  },
+  {
+   "id": 89,
+   "nome": "CAMARA MUNICIPAL DE SOBRAL"
+  },
+  {
+   "id": 70,
+   "nome": "CAMARA MUNICIPAL DE SOLONOPOLE"
+  },
+  {
+   "id": 107,
+   "nome": "CENTRAL ABASTECIMENTO SEINFRA ICÓ"
+  },
+  {
+   "id": 659,
+   "nome": "CENTRAL COMBUSTIVEL"
+  },
+  {
+   "id": 29,
+   "nome": "CENTRAL DE ABASTECIMENTO"
+  },
+  {
+   "id": 30,
+   "nome": "CENTRAL DE ABASTECIMENTO"
+  },
+  {
+   "id": 32,
+   "nome": "CENTRAL DE ABASTECIMENTO"
+  },
+  {
+   "id": 38,
+   "nome": "Central de abastecimento - Secretaria de Saude"
+  },
+  {
+   "id": 109,
+   "nome": "CENTRAL DE ABASTECIMENTO AÇÃO SOCIAL ICÓ"
+  },
+  {
+   "id": 85,
+   "nome": "CENTRAL DE ABASTECIMENTO ARARIPINA"
+  },
+  {
+   "id": 117,
+   "nome": "CENTRAL DE ABASTECIMENTO CASCAVEL"
+  },
+  {
+   "id": 697,
+   "nome": "CENTRAL DE ABASTECIMENTO DE BANABUIU 2015"
+  },
+  {
+   "id": 695,
+   "nome": "CENTRAL DE ABASTECIMENTO DE BANABUIU 2016"
+  },
+  {
+   "id": 411,
+   "nome": "CENTRAL DE ABASTECIMENTO DE MORADA NOVA - 2013"
+  },
+  {
+   "id": 108,
+   "nome": "CENTRAL DE ABASTECIMENTO EDUCAÇÃO ICÓ"
+  },
+  {
+   "id": 426,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO - CAF - ACOPIARA"
+  },
+  {
+   "id": 174,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO - CARIRIACU"
+  },
+  {
+   "id": 78,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO - MILHÃ"
+  },
+  {
+   "id": 192,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO - MORADA NOVA"
+  },
+  {
+   "id": 896,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO DE INDEPENDENCIA"
+  },
+  {
+   "id": 866,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACÊUTICO DE STA QUITERIA"
+  },
+  {
+   "id": 942,
+   "nome": "CENTRAL DE ABASTECIMENTO FARMACEUTICO UPA - ARACOIABA"
+  },
+  {
+   "id": 190,
+   "nome": "CENTRAL DE ABASTECIMENTO GABINETE ICO"
+  },
+  {
+   "id": 407,
+   "nome": "CENTRAL DE ABASTECIMENTO SAAE MORADA NOVA"
+  },
+  {
+   "id": 106,
+   "nome": "CENTRAL DE ABASTECIMENTO SAUDE ICÓ"
+  },
+  {
+   "id": 124,
+   "nome": "Central de Abastecimento Sec. Saude Iracema"
+  },
+  {
+   "id": 224,
+   "nome": "CENTRAL DE ABASTECIMENTO SECULT ICO"
+  },
+  {
+   "id": 128,
+   "nome": "CENTRAL DE ABASTECIMENTO SENADOR POMPEU"
+  },
+  {
+   "id": 28,
+   "nome": "CENTRAL DE COMBUSTIVEL"
+  },
+  {
+   "id": 31,
+   "nome": "CENTRAL DE COMBUSTIVEL"
+  },
+  {
+   "id": 1084,
+   "nome": "CENTRAL DE COMBUSTIVEL  - PARAIPABA 2020"
+  },
+  {
+   "id": 684,
+   "nome": "CENTRAL DE COMBUSTIVEL  2016 STA QUITERIA"
+  },
+  {
+   "id": 683,
+   "nome": "CENTRAL DE COMBUSTIVEL  INFRA 2016"
+  },
+  {
+   "id": 633,
+   "nome": "CENTRAL DE COMBUSTIVEL - INDEPENDENCIA - 2016"
+  },
+  {
+   "id": 606,
+   "nome": "CENTRAL DE COMBUSTIVEL - PALMACIA"
+  },
+  {
+   "id": 696,
+   "nome": "CENTRAL DE COMBUSTIVEL AÇAO SOCAIAL 2016"
+  },
+  {
+   "id": 1352,
+   "nome": "CENTRAL DE COMBUSTIVEL ACARAÚ 2023"
+  },
+  {
+   "id": 819,
+   "nome": "CENTRAL DE COMBUSTÍVEL BARBALHA"
+  },
+  {
+   "id": 639,
+   "nome": "CENTRAL DE COMBUSTIVEL BARROQUINHA"
+  },
+  {
+   "id": 833,
+   "nome": "CENTRAL DE COMBUSTIVEL DE INDEPENDENCIA"
+  },
+  {
+   "id": 876,
+   "nome": "CENTRAL DE COMBUSTIVEL PAULINO NEVES"
+  },
+  {
+   "id": 229,
+   "nome": "central de combustivel pindoretama"
+  },
+  {
+   "id": 348,
+   "nome": "CENTRAL DE COMBUSTIVEL REDENÇÃO"
+  },
+  {
+   "id": 42,
+   "nome": "CENTRAL DE CONTROLE DE PATRIMONIO"
+  },
+  {
+   "id": 665,
+   "nome": "CENTRAL DE PATRIMONIO CAMARA ACOPIARA"
+  },
+  {
+   "id": 820,
+   "nome": "CENTRAL DE PATRIMÔNIO DE BARBALHA"
+  },
+  {
+   "id": 762,
+   "nome": "CENTRAL DE PATRIMONIO DE MULUNGU"
+  },
+  {
+   "id": 884,
+   "nome": "CENTRAL DE PATRIMONIO DE PAULINO NEVES"
+  },
+  {
+   "id": 1234,
+   "nome": "CENTRAL DE PATRIMONIO DE RERIUTABA 2021"
+  },
+  {
+   "id": 877,
+   "nome": "CENTRAL DE PATRIMONIO PÁULINO NEVES"
+  },
+  {
+   "id": 693,
+   "nome": "CENTRAL DE PATRIMONIO PREVCRATO"
+  },
+  {
+   "id": 682,
+   "nome": "CENTRAL DE PATRIMONIO PREVICRATO"
+  },
+  {
+   "id": 349,
+   "nome": "CENTRAL DE PATRIMONIO REDENÇÃO"
+  },
+  {
+   "id": 827,
+   "nome": "CENTRAL DE PECAS  ÒLEOS E DERIVADOS BARBALHA"
+  },
+  {
+   "id": 685,
+   "nome": "CENTRAL DE PEÇAS 2016 STA QUITERIA"
+  },
+  {
+   "id": 824,
+   "nome": "CENTRAL DE PROTOCOLO BARBALHA"
+  },
+  {
+   "id": 772,
+   "nome": "CENTRAL DE PROTOCOLO CRATO 2017"
+  },
+  {
+   "id": 784,
+   "nome": "CENTRAL DE PROTOCOLO ICO 2017"
+  },
+  {
+   "id": 1288,
+   "nome": "CENTRO DE ATENÇÃO PSICOSOCIAL II"
+  },
+  {
+   "id": 1201,
+   "nome": "CENTRO DE EDUCAÇÃO RURAL"
+  },
+  {
+   "id": 535,
+   "nome": "CEO - ALMOXARIFADO LIMPEZA"
+  },
+  {
+   "id": 537,
+   "nome": "CEO - ALMOXARIFADO LIMPEZA 2014 REGIONAL DR. FRANCISCO MANSUETO DE SOUZA"
+  },
+  {
+   "id": 532,
+   "nome": "CEO - CENTRO DE ESPECIALIDADES ODONTOLOGICAS 2014 CASCAVEL"
+  },
+  {
+   "id": 203,
+   "nome": "CEO CENTRO ESPECIALIDADES ODONTOLOGICAS"
+  },
+  {
+   "id": 228,
+   "nome": "CEO REGIONAL DR. FRANCISCO MANSUETO DE SOUZA"
+  },
+  {
+   "id": 1013,
+   "nome": "CITRAN"
+  },
+  {
+   "id": 171,
+   "nome": "COMBUSTIVEL - CAMARA DE BARROQUINHA"
+  },
+  {
+   "id": 165,
+   "nome": "COMBUSTIVEL - CAMOCIM"
+  },
+  {
+   "id": 141,
+   "nome": "COMBUSTIVEL - PREFEITURA MUNICIPAL DE PALHANO"
+  },
+  {
+   "id": 460,
+   "nome": "COMBUSTIVEL - SAUDE - JAGUARIBARA"
+  },
+  {
+   "id": 212,
+   "nome": "COMBUSTIVEL DO IPREM"
+  },
+  {
+   "id": 167,
+   "nome": "COMBUSTIVEL DO SAAE - CAMOCIM"
+  },
+  {
+   "id": 52,
+   "nome": "COMBUSTIVEL EDUCAÇÃO DE ARARIPINA"
+  },
+  {
+   "id": 293,
+   "nome": "COMBUSTIVEL-INDEPENDENCIA"
+  },
+  {
+   "id": 222,
+   "nome": "CONSORCIO PUBLICO DE SAUDE"
+  },
+  {
+   "id": 1121,
+   "nome": "CONSORCIO PUBLICO DE SAUDE - MACIÇO DO BATURITÉ"
+  },
+  {
+   "id": 215,
+   "nome": "CONSORCIO PUBLICO DE SAUDE DA REGIÃO DE CASCAVEL"
+  },
+  {
+   "id": 39,
+   "nome": "CONTROLADORIA"
+  },
+  {
+   "id": 1043,
+   "nome": "CONTROLE COMBUSTIVEL CONS. PUBLICO SAUDE BATURITE"
+  },
+  {
+   "id": 739,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - BOA VIAGEM"
+  },
+  {
+   "id": 277,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - CRATO"
+  },
+  {
+   "id": 671,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - CRATO"
+  },
+  {
+   "id": 794,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - CRATO 2017"
+  },
+  {
+   "id": 928,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - CRATO 2018"
+  },
+  {
+   "id": 748,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - ICO"
+  },
+  {
+   "id": 930,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - ITATIRA"
+  },
+  {
+   "id": 361,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - JUCAS"
+  },
+  {
+   "id": 731,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE - PACATUBA 2017"
+  },
+  {
+   "id": 860,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE CONSORCIO MICRO REGIÃO DE CAMOCIM"
+  },
+  {
+   "id": 792,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE SAAE BOA VIAGEM"
+  },
+  {
+   "id": 856,
+   "nome": "CONTROLE DA GARAGEM DE TRANSPORTE STA QUITERIA 2017"
+  },
+  {
+   "id": 1077,
+   "nome": "CONTROLE DA MERENDA ESCOLAR - MULUNGU"
+  },
+  {
+   "id": 763,
+   "nome": "CONTROLE DA MERENDA ESCOLAR DE MULUNGU"
+  },
+  {
+   "id": 1076,
+   "nome": "CONTROLE DE ABASTECIMENTO 2020"
+  },
+  {
+   "id": 1135,
+   "nome": "CONTROLE DE ABASTECIMENTO MULUNGU 2021"
+  },
+  {
+   "id": 1282,
+   "nome": "CONTROLE DE ABASTECIMENTO MULUNGU 2022 - DIESEL"
+  },
+  {
+   "id": 1283,
+   "nome": "CONTROLE DE ABASTECIMENTO MULUNGU 2022 - GASOLINA"
+  },
+  {
+   "id": 1331,
+   "nome": "CONTROLE DE ABASTECIMENTO MULUNGU 2023 - DIESEL"
+  },
+  {
+   "id": 1332,
+   "nome": "CONTROLE DE ABASTECIMENTO MULUNGU 2023 - GASOLINA"
+  },
+  {
+   "id": 1375,
+   "nome": "CONTROLE DE ALMOXARIFADO - AS SISTEMAS"
+  },
+  {
+   "id": 340,
+   "nome": "CONTROLE DE ALMOXARIFADO FARMÁCIA"
+  },
+  {
+   "id": 933,
+   "nome": "CONTROLE DE ALMOXARIFADO PACATUBA PREV"
+  },
+  {
+   "id": 1254,
+   "nome": "CONTROLE DE ALMOXARIFADO PREFETURA"
+  },
+  {
+   "id": 940,
+   "nome": "CONTROLE DE ALMOXARIFADO UPA - GRANJA"
+  },
+  {
+   "id": 546,
+   "nome": "CONTROLE DE COMBUSTÍVEIS - ARACOIABA"
+  },
+  {
+   "id": 679,
+   "nome": "CONTROLE DE COMBUSTÍVEIS - ARACOIABA - 2016"
+  },
+  {
+   "id": 1143,
+   "nome": "CONTROLE DE COMBUSTIVEL"
+  },
+  {
+   "id": 929,
+   "nome": "CONTROLE DE COMBUSTIVEL  CAMARA DE ACOPIARA 2017"
+  },
+  {
+   "id": 678,
+   "nome": "CONTROLE DE COMBUSTIVEL - ACOPIARA - 2016"
+  },
+  {
+   "id": 660,
+   "nome": "CONTROLE DE COMBUSTÍVEL - AGRICULTURA - JAGUARIBARA - 2015"
+  },
+  {
+   "id": 753,
+   "nome": "CONTROLE DE COMBUSTIVEL - BOA VIAGEM 2017"
+  },
+  {
+   "id": 464,
+   "nome": "CONTROLE DE COMBUSTIVEL - CARIDADE"
+  },
+  {
+   "id": 180,
+   "nome": "CONTROLE DE COMBUSTÍVEL - CARIRIACU"
+  },
+  {
+   "id": 1073,
+   "nome": "CONTROLE DE COMBUSTIVEL - CPSMB BATURITE"
+  },
+  {
+   "id": 278,
+   "nome": "CONTROLE DE COMBUSTIVEL - CRATO"
+  },
+  {
+   "id": 670,
+   "nome": "CONTROLE DE COMBUSTIVEL - CRATO 2015"
+  },
+  {
+   "id": 662,
+   "nome": "CONTROLE DE COMBUSTÍVEL - EDUCACAO - JAGUARIBARA - 2016"
+  },
+  {
+   "id": 661,
+   "nome": "CONTROLE DE COMBUSTÍVEL - INFRAESTRUTURA - JAGUARIBARA - 2015"
+  },
+  {
+   "id": 342,
+   "nome": "CONTROLE DE COMBUSTIVEL - ITATIRA"
+  },
+  {
+   "id": 321,
+   "nome": "CONTROLE DE COMBUSTIVEL - JAGUARIBARA"
+  },
+  {
+   "id": 268,
+   "nome": "CONTROLE DE COMBUSTIVEL - JUCAS"
+  },
+  {
+   "id": 644,
+   "nome": "CONTROLE DE COMBUSTIVEL - MARCO 2015"
+  },
+  {
+   "id": 234,
+   "nome": "CONTROLE DE COMBUSTIVEL - MUCAMBO - 2013"
+  },
+  {
+   "id": 505,
+   "nome": "CONTROLE DE COMBUSTIVEL - MUCAMBO - 2014"
+  },
+  {
+   "id": 632,
+   "nome": "CONTROLE DE COMBUSTIVEL - MUCAMBO - 2015"
+  },
+  {
+   "id": 638,
+   "nome": "CONTROLE DE COMBUSTÍVEL - MUCAMBO - 2016"
+  },
+  {
+   "id": 677,
+   "nome": "CONTROLE DE COMBUSTIVEL - MUCAMBO - 2016"
+  },
+  {
+   "id": 390,
+   "nome": "CONTROLE DE COMBUSTIVEL - OCARA"
+  },
+  {
+   "id": 676,
+   "nome": "CONTROLE DE COMBUSTIVEL - PALMACIA - 2016"
+  },
+  {
+   "id": 642,
+   "nome": "CONTROLE DE COMBUSTÍVEL - PALMACIA 2015"
+  },
+  {
+   "id": 643,
+   "nome": "CONTROLE DE COMBUSTÍVEL - PALMACIA 2015"
+  },
+  {
+   "id": 647,
+   "nome": "CONTROLE DE COMBUSTIVEL - REDENÇÃO - 2015"
+  },
+  {
+   "id": 649,
+   "nome": "CONTROLE DE COMBUSTÍVEL - SAUDE - JAGUARIBARA - 2015"
+  },
+  {
+   "id": 547,
+   "nome": "CONTROLE DE COMBUSTIVEL - SEAGRI PACOTI"
+  },
+  {
+   "id": 531,
+   "nome": "CONTROLE DE COMBUSTIVEL 2014 - GUAIUBA"
+  },
+  {
+   "id": 1356,
+   "nome": "CONTROLE DE COMBUSTIVEL AGRICULTURA - PACATUBA 2023"
+  },
+  {
+   "id": 905,
+   "nome": "CONTROLE DE COMBUSTÍVEL ARACOIABA"
+  },
+  {
+   "id": 891,
+   "nome": "CONTROLE DE COMBUSTÍVEL ARACOIABA 2017"
+  },
+  {
+   "id": 1320,
+   "nome": "CONTROLE DE COMBUSTIVEL ASSISTÊNCIA SOCIAL - PACATUBA 2023"
+  },
+  {
+   "id": 914,
+   "nome": "CONTROLE DE COMBUSTIVEL ASSISTENCIA SOCIAL ITAPIUNA"
+  },
+  {
+   "id": 767,
+   "nome": "CONTROLE DE COMBUSTIVEL BOA VIAGEM"
+  },
+  {
+   "id": 925,
+   "nome": "CONTROLE DE COMBUSTIVEL BOA VIAGEM 2018"
+  },
+  {
+   "id": 664,
+   "nome": "CONTROLE DE COMBUSTIVEL CAMARA ACOPIARA"
+  },
+  {
+   "id": 773,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2017"
+  },
+  {
+   "id": 902,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2018/2020"
+  },
+  {
+   "id": 1134,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2021"
+  },
+  {
+   "id": 1279,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2022"
+  },
+  {
+   "id": 1280,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2022"
+  },
+  {
+   "id": 1330,
+   "nome": "CONTROLE DE COMBUSTIVEL CRATO 2023"
+  },
+  {
+   "id": 842,
+   "nome": "CONTROLE DE COMBUSTIVEL DA CAMARA MUNICIPAL DE BANABUIU 2017"
+  },
+  {
+   "id": 1276,
+   "nome": "CONTROLE DE COMBUSTIVEL DA CAMARA MUNICIPAL DE GRANJA"
+  },
+  {
+   "id": 807,
+   "nome": "CONTROLE DE COMBUSTIVEL DA CAMARA MUNICIPAL DE IRACEMA 2017"
+  },
+  {
+   "id": 295,
+   "nome": "CONTROLE DE COMBUSTIVEL DE ACOPIARA"
+  },
+  {
+   "id": 738,
+   "nome": "CONTROLE DE COMBUSTIVEL DE BOA VIAGEM"
+  },
+  {
+   "id": 707,
+   "nome": "CONTROLE DE COMBUSTIVEL DE GRANJA"
+  },
+  {
+   "id": 747,
+   "nome": "CONTROLE DE COMBUSTIVEL DE ICO"
+  },
+  {
+   "id": 721,
+   "nome": "CONTROLE DE COMBUSTIVEL DE JARDIM"
+  },
+  {
+   "id": 713,
+   "nome": "CONTROLE DE COMBUSTIVEL DE MARTINOPOLE"
+  },
+  {
+   "id": 1149,
+   "nome": "CONTROLE DE COMBUSTIVEL DE MARTINOPOLE 2021"
+  },
+  {
+   "id": 761,
+   "nome": "CONTROLE DE COMBUSTIVEL DE MULUNGU"
+  },
+  {
+   "id": 906,
+   "nome": "CONTROLE DE COMBUSTIVEL DE MULUNGU 2018"
+  },
+  {
+   "id": 1015,
+   "nome": "CONTROLE DE COMBUSTIVEL DE MULUNGU 2019"
+  },
+  {
+   "id": 1014,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PACATUBA"
+  },
+  {
+   "id": 730,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PACATUBA 2017"
+  },
+  {
+   "id": 904,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PACATUBA 2018"
+  },
+  {
+   "id": 1147,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PACATUBA 2021"
+  },
+  {
+   "id": 1281,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PACATUBA 2022"
+  },
+  {
+   "id": 1239,
+   "nome": "CONTROLE DE COMBUSTIVEL DE PARAIPABA"
+  },
+  {
+   "id": 1160,
+   "nome": "CONTROLE DE COMBUSTIVEL DE RERIUTABA"
+  },
+  {
+   "id": 1052,
+   "nome": "CONTROLE DE COMBUSTÍVEL DESENVOLVIMENTO RURAL"
+  },
+  {
+   "id": 927,
+   "nome": "CONTROLE DE COMBUSTIVEL DO SAAE GRANJA"
+  },
+  {
+   "id": 1318,
+   "nome": "CONTROLE DE COMBUSTIVEL EDUCAÇÃO - PACATUBA 2023"
+  },
+  {
+   "id": 923,
+   "nome": "CONTROLE DE COMBUSTIVEL EDUCAÇÃO ITAPIUNA"
+  },
+  {
+   "id": 1040,
+   "nome": "CONTROLE DE COMBUSTIVEL EUSEBIO 2019"
+  },
+  {
+   "id": 1348,
+   "nome": "CONTROLE DE COMBUSTIVEL FINANÇAS - PACATUBA 2023"
+  },
+  {
+   "id": 924,
+   "nome": "CONTROLE DE COMBUSTÍVEL FUNDO GERAL ITAPIÚNA"
+  },
+  {
+   "id": 1317,
+   "nome": "CONTROLE DE COMBUSTIVEL INFRAESTRUTURA - PACATUBA 2023"
+  },
+  {
+   "id": 922,
+   "nome": "CONTROLE DE COMBUSTÍVEL ITAPIUNA SAÚDE 2019"
+  },
+  {
+   "id": 353,
+   "nome": "CONTROLE DE COMBUSTIVEL JAGUARIBARA"
+  },
+  {
+   "id": 1146,
+   "nome": "CONTROLE DE COMBUSTIVEL JARDIM 2021"
+  },
+  {
+   "id": 675,
+   "nome": "CONTROLE DE COMBUSTÍVEL MUCAMBO - 2016"
+  },
+  {
+   "id": 1051,
+   "nome": "CONTROLE DE COMBUSTÍVEL OBRAS, INFRAESTRUTURA E CONTROLE URBANO"
+  },
+  {
+   "id": 55,
+   "nome": "CONTROLE DE COMBUSTIVEL P M IRACEMA"
+  },
+  {
+   "id": 934,
+   "nome": "CONTROLE DE COMBUSTIVEL PACATUBA PREV"
+  },
+  {
+   "id": 1342,
+   "nome": "CONTROLE DE COMBUSTIVEL PREFEITURA MUNICIPAL DE CHAVAL"
+  },
+  {
+   "id": 907,
+   "nome": "CONTROLE DE COMBUSTIVEL PREVICRATO 2018"
+  },
+  {
+   "id": 1362,
+   "nome": "CONTROLE DE COMBUSTIVEL PREVICRATO 2022"
+  },
+  {
+   "id": 1361,
+   "nome": "CONTROLE DE COMBUSTIVEL PREVICRATO 2023"
+  },
+  {
+   "id": 793,
+   "nome": "CONTROLE DE COMBUSTIVEL SAAE - BOA VIAGEM"
+  },
+  {
+   "id": 785,
+   "nome": "CONTROLE DE COMBUSTIVEL SAAE ICO"
+  },
+  {
+   "id": 1244,
+   "nome": "CONTROLE DE COMBUSTIVEL SAAE ITAPAJÉ"
+  },
+  {
+   "id": 1319,
+   "nome": "CONTROLE DE COMBUSTIVEL SAUDE - PACATUBA 2023"
+  },
+  {
+   "id": 1325,
+   "nome": "CONTROLE DE COMBUSTIVEL SECRETARIA DE SEGURANÇA - PACATUBA 2023"
+  },
+  {
+   "id": 583,
+   "nome": "CONTROLE DE COMBUSTIVEL- CRATO 2014"
+  },
+  {
+   "id": 931,
+   "nome": "CONTROLE DE ESTOQUE ALUCOM"
+  },
+  {
+   "id": 1130,
+   "nome": "CONTROLE DE ESTOQUE INATIVO"
+  },
+  {
+   "id": 915,
+   "nome": "CONTROLE DE GARAGEM DE ITAPIUNA"
+  },
+  {
+   "id": 725,
+   "nome": "CONTROLE DE GARAGEM DE JARDIM"
+  },
+  {
+   "id": 786,
+   "nome": "CONTROLE DE GARAGEM SAAE ICO"
+  },
+  {
+   "id": 803,
+   "nome": "CONTROLE DE GARAGEM SENADOR SA 2017"
+  },
+  {
+   "id": 1036,
+   "nome": "CONTROLE DE GRANJA"
+  },
+  {
+   "id": 612,
+   "nome": "CONTROLE DE MATERIAL ODONTOLOGICO E HOSPITALAR - PALMACIA"
+  },
+  {
+   "id": 1041,
+   "nome": "CONTROLE DE MERENDA ESCOLAR"
+  },
+  {
+   "id": 1067,
+   "nome": "CONTROLE DE MERENDA ESCOLAR - ACOPIARA"
+  },
+  {
+   "id": 1105,
+   "nome": "CONTROLE DE MERENDA ESCOLAR - ICÓ"
+  },
+  {
+   "id": 1354,
+   "nome": "CONTROLE DE MERENDA ESCOLAR - ITAREMA"
+  },
+  {
+   "id": 1109,
+   "nome": "CONTROLE DE MERENDA ESCOLAR - ITATIRA"
+  },
+  {
+   "id": 1029,
+   "nome": "CONTROLE DE MERENDA ESCOLAR ACOPIARA"
+  },
+  {
+   "id": 1196,
+   "nome": "CONTROLE DE MERENDA ESCOLAR DE BARBALHA 2021"
+  },
+  {
+   "id": 1038,
+   "nome": "CONTROLE DE PATRIMONIO"
+  },
+  {
+   "id": 1277,
+   "nome": "CONTROLE DE PATRIMONIO  - CAMARA MUNICIPAL DE GRANJA"
+  },
+  {
+   "id": 791,
+   "nome": "CONTROLE DE PATRIMONIO  SAAE BOA VIAGEM"
+  },
+  {
+   "id": 752,
+   "nome": "CONTROLE DE PATRIMONIO - BOA VIAGEM 2017"
+  },
+  {
+   "id": 1153,
+   "nome": "CONTROLE DE PATRIMONIO - CAMARA MUNICIPAL DE PENTECOSTE 2021"
+  },
+  {
+   "id": 351,
+   "nome": "CONTROLE DE PATRIMONIO - CRATO"
+  },
+  {
+   "id": 457,
+   "nome": "CONTROLE DE PATRIMONIO - CRATO"
+  },
+  {
+   "id": 701,
+   "nome": "CONTROLE DE PATRIMONIO - GRANJA"
+  },
+  {
+   "id": 1060,
+   "nome": "CONTROLE DE PATRIMONIO - LEVANTAMENTO CRATO 2019"
+  },
+  {
+   "id": 646,
+   "nome": "CONTROLE DE PATRIMONIO - MARCO"
+  },
+  {
+   "id": 714,
+   "nome": "CONTROLE DE PATRIMONIO - MARTINOPOLE"
+  },
+  {
+   "id": 233,
+   "nome": "CONTROLE DE PATRIMONIO - MUCAMBO"
+  },
+  {
+   "id": 328,
+   "nome": "CONTROLE DE PATRIMONIO - PACATUBA"
+  },
+  {
+   "id": 1152,
+   "nome": "CONTROLE DE PATRIMONIO - PREFEITURA DE PENTECOSTE 2021"
+  },
+  {
+   "id": 926,
+   "nome": "CONTROLE DE PATRIMONIO - SAAE GRANJA"
+  },
+  {
+   "id": 890,
+   "nome": "CONTROLE DE PATRIMÔNIO BOA VIAGEM"
+  },
+  {
+   "id": 806,
+   "nome": "CONTROLE DE PATRIMONIO CAMARA MUNICIPAL DE IRACEMA"
+  },
+  {
+   "id": 975,
+   "nome": "Controle de Patrimônio Consócio Publico de Baturite"
+  },
+  {
+   "id": 859,
+   "nome": "CONTROLE DE PATRIMONIO CONSORCIO MICRO REGIÃO DE CAMOCIM"
+  },
+  {
+   "id": 1186,
+   "nome": "CONTROLE DE PATRIMONIO DA PREFEITURA DE RERIUTABA"
+  },
+  {
+   "id": 740,
+   "nome": "CONTROLE DE PATRIMONIO DE BOA VIAGEM"
+  },
+  {
+   "id": 749,
+   "nome": "CONTROLE DE PATRIMONIO DE ICO"
+  },
+  {
+   "id": 916,
+   "nome": "CONTROLE DE PATRIMONIO DE ITAPIUNA"
+  },
+  {
+   "id": 722,
+   "nome": "CONTROLE DE PATRIMONIO DE JARDIM"
+  },
+  {
+   "id": 172,
+   "nome": "CONTROLE DE PATRIMONIO DE PARAMOTI"
+  },
+  {
+   "id": 144,
+   "nome": "CONTROLE DE PATRIMÔNIO DE SANTANA DO ACARAÚ"
+  },
+  {
+   "id": 266,
+   "nome": "CONTROLE DE PATRIMONIO E ALMOXARIFADO CENTRAL - JUCAS"
+  },
+  {
+   "id": 935,
+   "nome": "CONTROLE DE PATRIMONIO PACATUBA PREV"
+  },
+  {
+   "id": 1144,
+   "nome": "CONTROLE DE PATRIMONIO PREFEITURA DE BATURITE"
+  },
+  {
+   "id": 1341,
+   "nome": "CONTROLE DE PATRIMONIO PREFEITURA MUNICIPAL DE CHAVAL"
+  },
+  {
+   "id": 903,
+   "nome": "CONTROLE DE PATRIMONIO SAAE - BOA VIAGEM"
+  },
+  {
+   "id": 782,
+   "nome": "CONTROLE DE PATRIMONIO SAAE -ICO"
+  },
+  {
+   "id": 1253,
+   "nome": "CONTROLE DE PATRIMONIO SAAE ITAPAJÉ"
+  },
+  {
+   "id": 447,
+   "nome": "CONTROLE DE PATRIMONIO-CARIDADE"
+  },
+  {
+   "id": 590,
+   "nome": "CONTROLE DE PEÇAS - TRANSPORTE - INDEPENDENCIA"
+  },
+  {
+   "id": 654,
+   "nome": "CONTROLE DE PEÇAS E LUBRIFICANTES - OCARA"
+  },
+  {
+   "id": 861,
+   "nome": "CONTROLE DE PECAS GRANJA"
+  },
+  {
+   "id": 862,
+   "nome": "CONTROLE DE PECAS MARTINOPOLE"
+  },
+  {
+   "id": 897,
+   "nome": "CONTROLE DE PECAS SAAE -  ICO"
+  },
+  {
+   "id": 898,
+   "nome": "CONTROLE DE PECAS SAAE -  ICO"
+  },
+  {
+   "id": 1321,
+   "nome": "CONTROLE DE PEÇAS SEC DE ASSISTENCIA SOCIAL PACATUBA"
+  },
+  {
+   "id": 855,
+   "nome": "CONTROLE DE PECAS STA QUITERIA 2017"
+  },
+  {
+   "id": 887,
+   "nome": "CONTROLE DE PROTOCOLO - BOA VIAGEM 2017"
+  },
+  {
+   "id": 515,
+   "nome": "CONTROLE DE TRANSPORTE - ACOPIARA - 2014"
+  },
+  {
+   "id": 1275,
+   "nome": "CONTROLE INTERNO GRANJA"
+  },
+  {
+   "id": 656,
+   "nome": "CONTROLE INTERNO POTIRETAMA"
+  },
+  {
+   "id": 130,
+   "nome": "CONTROLE PATRIMONIAL IRACEMA"
+  },
+  {
+   "id": 287,
+   "nome": "CONTROLE PATRIMONIAL JAGUARIBARA"
+  },
+  {
+   "id": 760,
+   "nome": "CONTROLE PEÇAS DE MULUNGU"
+  },
+  {
+   "id": 596,
+   "nome": "COORDENAÇÃO ODONTOLOGICA"
+  },
+  {
+   "id": 76,
+   "nome": "COORDENADORIA DE CONTROLE DE COMBUSTIVEL - MILHA"
+  },
+  {
+   "id": 1123,
+   "nome": "COPLANA SERVIÇOS - CONTROLE DE PATRIMONIO"
+  },
+  {
+   "id": 123,
+   "nome": "CRAS - SECRETARIA DE AÇÃO SOCIAL DE MARCO"
+  },
+  {
+   "id": 1204,
+   "nome": "CRECHE  MARIA SINHÁ TAUMATURGO"
+  },
+  {
+   "id": 1205,
+   "nome": "CRECHE TIA EXPEDITA"
+  },
+  {
+   "id": 198,
+   "nome": "DELEG - CÂMARA DE CAUCAIA"
+  },
+  {
+   "id": 197,
+   "nome": "DEPAD - CÂMARA DE CAUCAIA"
+  },
+  {
+   "id": 412,
+   "nome": "DEPARTAMENTO CENTRAL DE TRANSPORTE"
+  },
+  {
+   "id": 405,
+   "nome": "Departamento de Gestão do Almoxarifado Central e Patrimônio"
+  },
+  {
+   "id": 653,
+   "nome": "Departamento de Gestão do Almoxarifado Central e Patrimônio 2015"
+  },
+  {
+   "id": 651,
+   "nome": "Departamento de Gestão do Almoxarifado Central e Patrimônio 2015/2016"
+  },
+  {
+   "id": 220,
+   "nome": "DEPARTAMENTO DE PROTOCOLO"
+  },
+  {
+   "id": 1111,
+   "nome": "DISPEM - CENTRAL"
+  },
+  {
+   "id": 1110,
+   "nome": "DISPEM - POSTO"
+  },
+  {
+   "id": 1125,
+   "nome": "DISPENSAÇÃO MEDICAMENTOS CRATO"
+  },
+  {
+   "id": 1126,
+   "nome": "DISPENSAÇÃO MEDICAMENTOS CRATO"
+  },
+  {
+   "id": 372,
+   "nome": "E.E.E.I.F MARIA GUIOMAR BASTOS CAVALCANTE"
+  },
+  {
+   "id": 373,
+   "nome": "E.E.I.E.F ANGELA COSTA CAMPOS"
+  },
+  {
+   "id": 356,
+   "nome": "E.E.I.E.F DR CARLOS A. DE ALMEIDA PONTES"
+  },
+  {
+   "id": 371,
+   "nome": "E.E.I.E.F GELIA DA SILVA CORREIA"
+  },
+  {
+   "id": 354,
+   "nome": "E.E.I.E.F JOANA VASCONCELOS DE OLIVEIRA"
+  },
+  {
+   "id": 376,
+   "nome": "E.E.I.E.F JOSE BATISTA DE OLIVEIRA"
+  },
+  {
+   "id": 382,
+   "nome": "E.E.I.E.F MAJOR MANOEL ASSIS NEPOMUCENO"
+  },
+  {
+   "id": 355,
+   "nome": "E.E.I.E.F MANOEL PONTES DE MEDEIROS"
+  },
+  {
+   "id": 374,
+   "nome": "E.E.I.E.F MANOEL ROSENDO FREIRE"
+  },
+  {
+   "id": 360,
+   "nome": "E.E.I.E.F MARIA DE SA RORIZ"
+  },
+  {
+   "id": 359,
+   "nome": "E.E.I.E.F MARIA MOCINHA ROCHA SA"
+  },
+  {
+   "id": 358,
+   "nome": "E.E.I.E.F VICENTE FERRER DE LIMA"
+  },
+  {
+   "id": 357,
+   "nome": "E.E.I.E.F WALNEY DO CARMO LOPES"
+  },
+  {
+   "id": 698,
+   "nome": "ELEIÇOES 2016 - JUSTIÇA ELEITORAL"
+  },
+  {
+   "id": 90,
+   "nome": "ENCAMINHAMENTO"
+  },
+  {
+   "id": 1197,
+   "nome": "ESCOLA ALEXANDRINA GOMES DE CARVALHO"
+  },
+  {
+   "id": 1198,
+   "nome": "ESCOLA ANTÔNIO AGAPITO FILHO"
+  },
+  {
+   "id": 1199,
+   "nome": "ESCOLA ANTÔNIO ALVES DE SOUSA"
+  },
+  {
+   "id": 1200,
+   "nome": "ESCOLA ANTÔNIO CARLOS DE MESQUITA"
+  },
+  {
+   "id": 1202,
+   "nome": "ESCOLA CLODOALDO RODRIGUES DA CUNHA"
+  },
+  {
+   "id": 1206,
+   "nome": "ESCOLA DEPUTADO MANOEL RODRIGUES"
+  },
+  {
+   "id": 1207,
+   "nome": "ESCOLA DOMINGOS ARAÚJO"
+  },
+  {
+   "id": 1208,
+   "nome": "ESCOLA FRANCISCO SILVEIRA"
+  },
+  {
+   "id": 1209,
+   "nome": "ESCOLA HERMÍNIO ALVES"
+  },
+  {
+   "id": 1210,
+   "nome": "ESCOLA HORIZONTE DO SABER"
+  },
+  {
+   "id": 1211,
+   "nome": "ESCOLA JOAO DA CUNHA SOBRINHO"
+  },
+  {
+   "id": 1212,
+   "nome": "ESCOLA MARCELO DA CUNHA ARAÚJO"
+  },
+  {
+   "id": 1213,
+   "nome": "ESCOLA MARIA DE LOURDES CASTRO E SILVA"
+  },
+  {
+   "id": 1214,
+   "nome": "ESCOLA NOSSA SENHORA DAS GRAÇAS"
+  },
+  {
+   "id": 1215,
+   "nome": "ESCOLA PROFESSOR ALAÍDE RAMOS"
+  },
+  {
+   "id": 1216,
+   "nome": "ESCOLA RAIMUNDO DORUTEUS PEREIRA"
+  },
+  {
+   "id": 1203,
+   "nome": "ESCOLA RAIMUNDO MESQUITA"
+  },
+  {
+   "id": 1217,
+   "nome": "ESCOLA SEVERIANO RODRIGUES DA ROCHA"
+  },
+  {
+   "id": 1218,
+   "nome": "ESCOLA ZACARIAS CORDEIRO DE PAULO"
+  },
+  {
+   "id": 1383,
+   "nome": "ESTOQUE CAUCAIA"
+  },
+  {
+   "id": 438,
+   "nome": "FADIRE"
+  },
+  {
+   "id": 1148,
+   "nome": "FARMÁCIA DA UNIDADE MUNICIPAL DE PRONTO ATENDIMENTO- UMPA"
+  },
+  {
+   "id": 318,
+   "nome": "FARMACIA DO HOSPITAL - JAGUARIBARA"
+  },
+  {
+   "id": 365,
+   "nome": "FARMACIA DO HOSPITAL - MARCO"
+  },
+  {
+   "id": 845,
+   "nome": "FARMACIA HOSP. CASA DE SAÚDE ADÍLIA MARIA"
+  },
+  {
+   "id": 1323,
+   "nome": "FARMACIA HOSPITAL E MATERNIDADE"
+  },
+  {
+   "id": 1357,
+   "nome": "FARMACIA HOSPITAL E MATERNIDADE 2023"
+  },
+  {
+   "id": 1184,
+   "nome": "FARMÁCIA HOSPITAL MARTINOPOLE 2021"
+  },
+  {
+   "id": 285,
+   "nome": "FARMACIA HOSPITALAR - HOSPITAL JOÃO GOMES COUTINHO"
+  },
+  {
+   "id": 231,
+   "nome": "FARMACIA HOSPITALAR - MUCAMBO"
+  },
+  {
+   "id": 314,
+   "nome": "FARMACIA HOSPITALAR - PACATUBA"
+  },
+  {
+   "id": 148,
+   "nome": "FÁRMACIA HOSPITALAR -AUTARQUIA MUNICIPAL DR. JOSÉ EVANGELISTA DE OLIVEIRA"
+  },
+  {
+   "id": 125,
+   "nome": "FARMÁCIA HOSPITALAR DE SANTANA DO ACARAÚ"
+  },
+  {
+   "id": 467,
+   "nome": "FARMACIA HOSPITALAR H. M. J."
+  },
+  {
+   "id": 484,
+   "nome": "FARMACIA HOSPITALAR JAGUARIBARA 2014"
+  },
+  {
+   "id": 770,
+   "nome": "FARMACIA HOSPITALAR MULUNGU"
+  },
+  {
+   "id": 921,
+   "nome": "FARMACIA HOSPITALAR- HOSP.  MUN. PROFº  WALDEMAR ALCANTARA"
+  },
+  {
+   "id": 944,
+   "nome": "FARMACIA ODONTOLOGICO - CEO BATURITE"
+  },
+  {
+   "id": 1079,
+   "nome": "FARMÁCIA SATÉLITE HOSPITAL SANTA ISABEL"
+  },
+  {
+   "id": 1129,
+   "nome": "FARMÁCIA SATÉLITE HRI"
+  },
+  {
+   "id": 21,
+   "nome": "FITEC - ALMOXARIFADO"
+  },
+  {
+   "id": 1124,
+   "nome": "FORTALEZA - TESTE"
+  },
+  {
+   "id": 1284,
+   "nome": "FUNDAÇÃO DE CULTURA E TURISMO"
+  },
+  {
+   "id": 15,
+   "nome": "Fundação Viva Mpe de Turismo Esp. e Cultura - Fitec"
+  },
+  {
+   "id": 96,
+   "nome": "FUNDEB - SECRETARIA DE EDUCAÇÃO DE MARCO"
+  },
+  {
+   "id": 420,
+   "nome": "FUNTELC"
+  },
+  {
+   "id": 419,
+   "nome": "FUNTELC  - TV CEARA"
+  },
+  {
+   "id": 34,
+   "nome": "GABINETE DO PREFEITO"
+  },
+  {
+   "id": 92,
+   "nome": "GABINETE DO PREFEITO DE MARCO"
+  },
+  {
+   "id": 33,
+   "nome": "GABINETE DO PREFEITO IGUATU"
+  },
+  {
+   "id": 971,
+   "nome": "GRANJA - ALMOXARIFADO ACAO SOCIAL"
+  },
+  {
+   "id": 968,
+   "nome": "GRANJA - ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 969,
+   "nome": "GRANJA - ALMOXARIFADO DA SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 970,
+   "nome": "GRANJA - ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 602,
+   "nome": "GUIMARAES DEPUTADO FEDERAL 1322"
+  },
+  {
+   "id": 329,
+   "nome": "HOSPITAL DOM ALUISIO LORCHEIDER - GUAIUBA"
+  },
+  {
+   "id": 558,
+   "nome": "HOSPITAL E MATERNIDADE DE SENADOR POMPEU"
+  },
+  {
+   "id": 1289,
+   "nome": "HOSPITAL E MATERNIDADE DR. VICENTE ARRUDA"
+  },
+  {
+   "id": 1272,
+   "nome": "HOSPITAL E MATERNIDADE RITA VALE DO REGO"
+  },
+  {
+   "id": 550,
+   "nome": "HOSPITAL E MATERNIDADE SANTA ISABEL 2015"
+  },
+  {
+   "id": 98,
+   "nome": "HOSPITAL MUNICIPAL - SEC. DE SAÚDE DE MARCO"
+  },
+  {
+   "id": 568,
+   "nome": "HOSPITAL MUNICIPAL CORONEL JOAO GOMES COUTINHO"
+  },
+  {
+   "id": 883,
+   "nome": "HOSPITAL MUNICIPAL DE MARTINOPOLE"
+  },
+  {
+   "id": 852,
+   "nome": "HOSPITAL MUNICIPAL DE STA QUITERIA 2017"
+  },
+  {
+   "id": 14,
+   "nome": "Hospital Municipal Doutor Herbster"
+  },
+  {
+   "id": 80,
+   "nome": "HOSPITAL MUNICIPAL JOÃO LEOPOLDO PINHEIRO LANDIM - MILHÃ"
+  },
+  {
+   "id": 524,
+   "nome": "HOSPITAL MUNICIPAL JOSE FACUNDO FILHO - 2014"
+  },
+  {
+   "id": 514,
+   "nome": "HOSPITAL MUNICIPAL JULIA BARRETO - ACOPIARA - 2014"
+  },
+  {
+   "id": 609,
+   "nome": "HOSPITAL VIRGINIA RODRIGUES SIMPLICIO - ALMOXARIFADO - PALMACIA"
+  },
+  {
+   "id": 611,
+   "nome": "HOSPITAL VIRGINIA RODRIGUES SIMPLICIO - FARMACIA - PALMACIA"
+  },
+  {
+   "id": 1307,
+   "nome": "ICGI-INSTITUTO DE CAPACIDADE E GESTAO INTEGRADA - CAF ODONTOLOGICO ARACOIABA"
+  },
+  {
+   "id": 1308,
+   "nome": "ICGI-INSTITUTO DE CAPACIDADE E GESTAO INTEGRADA - DE ARACOIABA"
+  },
+  {
+   "id": 1309,
+   "nome": "ICGI-INSTITUTO DE CAPACIDADE E GESTAO INTEGRADA - MEDICO HOSPITALAR ARACOIABA"
+  },
+  {
+   "id": 1333,
+   "nome": "ICGI-INSTITUTO DE CAPACIDADE E GESTAO INTEGRADA - UPA"
+  },
+  {
+   "id": 1310,
+   "nome": "ICGI-INSTITUTO DE CAPACIDADE E GESTAO INTEGRADA DE ARACOIABA"
+  },
+  {
+   "id": 1120,
+   "nome": "ICO HRI UTI ANEXO"
+  },
+  {
+   "id": 104,
+   "nome": "IGD - SEC. DE AÇÃO SOCIAL DE MARCO"
+  },
+  {
+   "id": 960,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DA ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1016,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DA PROCURADORIA JURÍDICA"
+  },
+  {
+   "id": 963,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DA SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 961,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 962,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 964,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DO  FUNDO GERAL"
+  },
+  {
+   "id": 965,
+   "nome": "INDEPENDENCIA - ALMOXARIFADO DO HOSPITAL"
+  },
+  {
+   "id": 982,
+   "nome": "INDEPENDENCIA - SECRETARIA DE ADM E FINANCAS"
+  },
+  {
+   "id": 985,
+   "nome": "INDEPENDENCIA - SECRETARIA DE AGRICULTURA E PECUARIA"
+  },
+  {
+   "id": 984,
+   "nome": "INDEPENDENCIA - SECRETARIA DE CULTURA E TURISMO"
+  },
+  {
+   "id": 983,
+   "nome": "INDEPENDENCIA - SECRETARIA DE ESPORTES"
+  },
+  {
+   "id": 986,
+   "nome": "INDEPENDENCIA - SECRETARIA DE INFRA-ESTRUTURA"
+  },
+  {
+   "id": 997,
+   "nome": "INDEPENDENCIA - SECRETARIA DO MEIO AMBIENTE"
+  },
+  {
+   "id": 1273,
+   "nome": "INSTITUTO DE GESTAO E CIDADANIA - CAF ODONTOLOGICO ARACOIABA"
+  },
+  {
+   "id": 1274,
+   "nome": "INSTITUTO DE GESTAO E CIDADANIA - MEDICO HOSPITALAR ARACOIABA"
+  },
+  {
+   "id": 1268,
+   "nome": "INSTITUTO DE GESTAO E CIDADANIA DE ARACOIABA"
+  },
+  {
+   "id": 1269,
+   "nome": "INSTITUTO DE GESTAO E CIDADANIA DE ARACOIABA"
+  },
+  {
+   "id": 211,
+   "nome": "INSTITUTO DE PREVIDÊNCIA DE MORADA NOVA"
+  },
+  {
+   "id": 617,
+   "nome": "INSTITUTO DO MEIO AMBINETE - MORADA NOVA"
+  },
+  {
+   "id": 1311,
+   "nome": "IP"
+  },
+  {
+   "id": 1346,
+   "nome": "IP"
+  },
+  {
+   "id": 1349,
+   "nome": "IP"
+  },
+  {
+   "id": 1350,
+   "nome": "IP"
+  },
+  {
+   "id": 1364,
+   "nome": "IP"
+  },
+  {
+   "id": 1368,
+   "nome": "IP"
+  },
+  {
+   "id": 1371,
+   "nome": "IP"
+  },
+  {
+   "id": 316,
+   "nome": "IPASA-INSTITUTO DE PREVIDENCIA  DOS SERVIDORES MUNICIPAIS DE ALTO SANTO"
+  },
+  {
+   "id": 259,
+   "nome": "IPMC - INSTITUTO DE PREVIDENCIA MUNICIPIO CAUCAIA"
+  },
+  {
+   "id": 13,
+   "nome": "IPMM"
+  },
+  {
+   "id": 408,
+   "nome": "IPREMN - INSTITUTO DE PREVIDENCIA DE MORADA NOVA"
+  },
+  {
+   "id": 980,
+   "nome": "ITAPIUNA - ALMOXARIFADO DO HOSPITAL"
+  },
+  {
+   "id": 998,
+   "nome": "ITAPIUNA - GABINETE DO PREFEITO"
+  },
+  {
+   "id": 973,
+   "nome": "ITAPIUNA - SECRETARIA DE ADMINISTRACAO"
+  },
+  {
+   "id": 981,
+   "nome": "ITAPIUNA - SECRETARIA DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1002,
+   "nome": "ITAPIUNA - SECRETARIA DE CULTURA"
+  },
+  {
+   "id": 972,
+   "nome": "ITAPIUNA - SECRETARIA DE DESENVOLVIMENTO RURAL"
+  },
+  {
+   "id": 958,
+   "nome": "ITAPIUNA - SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 1001,
+   "nome": "ITAPIUNA - SECRETARIA DE ESPORTE"
+  },
+  {
+   "id": 974,
+   "nome": "ITAPIUNA - SECRETARIA DE FINANCAS"
+  },
+  {
+   "id": 1000,
+   "nome": "ITAPIUNA - SECRETARIA DE MEIO AMBIENTE"
+  },
+  {
+   "id": 999,
+   "nome": "ITAPIUNA - SECRETARIA DE OBRAS"
+  },
+  {
+   "id": 979,
+   "nome": "ITAPIUNA - SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 957,
+   "nome": "ITATIRA - SECRETARIA DE ACAO SOCIAL"
+  },
+  {
+   "id": 956,
+   "nome": "ITATIRA - SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 1037,
+   "nome": "ITATIRA - SECRETARIA DE FINANÇAS"
+  },
+  {
+   "id": 992,
+   "nome": "ITATIRA - SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 1235,
+   "nome": "LEVANTAMENTO PATRIMONIAL BATURITÉ 2021"
+  },
+  {
+   "id": 1260,
+   "nome": "LEVANTAMENTO PATRIMONIAL RERIUTABA 2021"
+  },
+  {
+   "id": 582,
+   "nome": "MATERIAL MEDICO HOSPITALAR - SANTA QUITERIA"
+  },
+  {
+   "id": 1188,
+   "nome": "MATERIAL ODONTOLOGICO BATURITÉ"
+  },
+  {
+   "id": 175,
+   "nome": "MEDICAMENTO MEDICO HOSPITALAR - CARIRIACU"
+  },
+  {
+   "id": 149,
+   "nome": "MEDICO HOSPITALAR DE SENADOR POMPEU"
+  },
+  {
+   "id": 163,
+   "nome": "MERENDA - CAMOCIM"
+  },
+  {
+   "id": 1137,
+   "nome": "MERENDA ESCOLAR"
+  },
+  {
+   "id": 544,
+   "nome": "MERENDA ESCOLAR - ARACOIABA"
+  },
+  {
+   "id": 1068,
+   "nome": "MERENDA ESCOLAR - ARACOIABA"
+  },
+  {
+   "id": 1117,
+   "nome": "MERENDA ESCOLAR - BARBALHA"
+  },
+  {
+   "id": 154,
+   "nome": "MERENDA ESCOLAR - BARROQUINHA"
+  },
+  {
+   "id": 458,
+   "nome": "MERENDA ESCOLAR - CARIDADE"
+  },
+  {
+   "id": 1062,
+   "nome": "MERENDA ESCOLAR - GRANJA"
+  },
+  {
+   "id": 1103,
+   "nome": "MERENDA ESCOLAR - ICÓ"
+  },
+  {
+   "id": 1107,
+   "nome": "MERENDA ESCOLAR - INDEPENDÊNCIA"
+  },
+  {
+   "id": 1075,
+   "nome": "MERENDA ESCOLAR - ITAPIÚNA"
+  },
+  {
+   "id": 333,
+   "nome": "MERENDA ESCOLAR - ITATIRA"
+  },
+  {
+   "id": 210,
+   "nome": "MERENDA ESCOLAR - JAGUARETAMA"
+  },
+  {
+   "id": 1065,
+   "nome": "MERENDA ESCOLAR - JARDIM"
+  },
+  {
+   "id": 1066,
+   "nome": "MERENDA ESCOLAR - JARDIM 2018"
+  },
+  {
+   "id": 88,
+   "nome": "MERENDA ESCOLAR - MARANGUAPE"
+  },
+  {
+   "id": 645,
+   "nome": "MERENDA ESCOLAR - MARCO"
+  },
+  {
+   "id": 1063,
+   "nome": "MERENDA ESCOLAR - MARTINÓPOLE"
+  },
+  {
+   "id": 468,
+   "nome": "MERENDA ESCOLAR - MILHA"
+  },
+  {
+   "id": 214,
+   "nome": "MERENDA ESCOLAR - MORADA NOVA"
+  },
+  {
+   "id": 242,
+   "nome": "MERENDA ESCOLAR - MUCAMBO"
+  },
+  {
+   "id": 239,
+   "nome": "MERENDA ESCOLAR - PACATUBA"
+  },
+  {
+   "id": 1064,
+   "nome": "MERENDA ESCOLAR - PACATUBA"
+  },
+  {
+   "id": 680,
+   "nome": "MERENDA ESCOLAR - PIRES FERREIRA"
+  },
+  {
+   "id": 1108,
+   "nome": "MERENDA ESCOLAR - PREFEITURA EXEMPLO"
+  },
+  {
+   "id": 310,
+   "nome": "MERENDA ESCOLAR - SEDUC - GUAIUBA"
+  },
+  {
+   "id": 392,
+   "nome": "MERENDA ESCOLAR 2013 - SENADOR POMPEU"
+  },
+  {
+   "id": 487,
+   "nome": "MERENDA ESCOLAR 2014 JAGUARIBARA"
+  },
+  {
+   "id": 741,
+   "nome": "MERENDA ESCOLAR DE BOA VIAGEM"
+  },
+  {
+   "id": 704,
+   "nome": "MERENDA ESCOLAR DE GRANJA"
+  },
+  {
+   "id": 864,
+   "nome": "MERENDA ESCOLAR DE ICO"
+  },
+  {
+   "id": 1059,
+   "nome": "MERENDA ESCOLAR DE ICÓ"
+  },
+  {
+   "id": 917,
+   "nome": "MERENDA ESCOLAR DE ITAPIUNA"
+  },
+  {
+   "id": 723,
+   "nome": "MERENDA ESCOLAR DE JARDIM"
+  },
+  {
+   "id": 908,
+   "nome": "MERENDA ESCOLAR DE JARDIM 2018"
+  },
+  {
+   "id": 715,
+   "nome": "MERENDA ESCOLAR DE MARTINOPOLE"
+  },
+  {
+   "id": 732,
+   "nome": "MERENDA ESCOLAR DE PACATUBA 2017"
+  },
+  {
+   "id": 1083,
+   "nome": "MERENDA ESCOLAR DE PARAIPABA"
+  },
+  {
+   "id": 1104,
+   "nome": "MERENDA ESCOLAR DE PARAIPABA"
+  },
+  {
+   "id": 1133,
+   "nome": "MERENDA ESCOLAR DE PIRES FERREIRA"
+  },
+  {
+   "id": 1158,
+   "nome": "MERENDA ESCOLAR DE RERIUTABA"
+  },
+  {
+   "id": 847,
+   "nome": "MERENDA ESCOLAR DE STA QUITERIA 2017"
+  },
+  {
+   "id": 837,
+   "nome": "MERENDA ESCOLAR INDEPENDENCIA"
+  },
+  {
+   "id": 1061,
+   "nome": "MERENDA ESCOLAR INDEPENDÊNCIA"
+  },
+  {
+   "id": 1116,
+   "nome": "MERENDA ESCOLAR INDEPENDÊNCIA"
+  },
+  {
+   "id": 441,
+   "nome": "MERENDA ESCOLAR PACOTI 2013"
+  },
+  {
+   "id": 1359,
+   "nome": "MERENDA ESCOLAR PREFEITURA DE ACARAU"
+  },
+  {
+   "id": 1338,
+   "nome": "MERENDA ESCOLAR PREFEITURA MUNICIPAL DE CHAVAL"
+  },
+  {
+   "id": 112,
+   "nome": "MERENDA ESCOLAR SANTANA DO ACARAU"
+  },
+  {
+   "id": 120,
+   "nome": "MERENDA ESCOLAR SENADOR POMPEU"
+  },
+  {
+   "id": 526,
+   "nome": "MERENDA ESCOLAR- 2014"
+  },
+  {
+   "id": 191,
+   "nome": "MICRO 17ª REGIÃO ICÓ"
+  },
+  {
+   "id": 1122,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1313,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1326,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1328,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1358,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1369,
+   "nome": "MOREIA"
+  },
+  {
+   "id": 1312,
+   "nome": "NDEPENDENCIA - GABINETE DO PREFEITO"
+  },
+  {
+   "id": 58,
+   "nome": "Orgão para Demonstração - MARANGUAPE"
+  },
+  {
+   "id": 379,
+   "nome": "P M ACOPIARA ALMOXARIFADO HOSPITALAR"
+  },
+  {
+   "id": 380,
+   "nome": "P M ACOPIARA ALMOXARIFADO HOSPITALAR EXPEDIENTE"
+  },
+  {
+   "id": 378,
+   "nome": "P M ACOPIARA FARMACIA HOSPITALAR H.M.J.B"
+  },
+  {
+   "id": 53,
+   "nome": "P. M. DE ARARIPINA  - SEC. DE SAÚDE"
+  },
+  {
+   "id": 73,
+   "nome": "P. M. DE ARARIPINA - SEC. DE ACAO SOCIAL"
+  },
+  {
+   "id": 81,
+   "nome": "P. M. DE ARARIPINA - SEC. DE ADMINISTRAÇÃO"
+  },
+  {
+   "id": 54,
+   "nome": "P. M. DE ARARIPINA - SEC. EDUCAÇÃO"
+  },
+  {
+   "id": 637,
+   "nome": "P.M DE ACOPIARA GARAGEM - CONTROLE DE PEÇAS / INSUMOS"
+  },
+  {
+   "id": 1057,
+   "nome": "PACATUBA  ALMOXARIFADO SEC. DE JUVENTUDE E TRABALHO"
+  },
+  {
+   "id": 1072,
+   "nome": "PACATUBA - AGRICULTURA -SISANT"
+  },
+  {
+   "id": 1048,
+   "nome": "PACATUBA - ALMOX DA SEC DE DESENVOLVIMENTO ECONOMICO"
+  },
+  {
+   "id": 994,
+   "nome": "PACATUBA - ALMOXARIDADO DA ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1053,
+   "nome": "PACATUBA - ALMOXARIDADO DA SECRETARIA DE INFRA ESTRUTURA"
+  },
+  {
+   "id": 1054,
+   "nome": "PACATUBA - ALMOXARIDADO DA SECRETARIA DE SEGURANÇA"
+  },
+  {
+   "id": 1070,
+   "nome": "PACATUBA - ALMOXARIFADO DA PROCURADORIA"
+  },
+  {
+   "id": 1044,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DA MULHER"
+  },
+  {
+   "id": 1069,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE AGRICULTURA"
+  },
+  {
+   "id": 1047,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE CULTURA"
+  },
+  {
+   "id": 995,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 1113,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE MEIO AMBIENTE"
+  },
+  {
+   "id": 993,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 1049,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DE TURISMO"
+  },
+  {
+   "id": 1045,
+   "nome": "PACATUBA - ALMOXARIFADO DA SECRETARIA DO ESPORTE"
+  },
+  {
+   "id": 996,
+   "nome": "PACATUBA - ALMOXARIFADO DO HOSPITAL"
+  },
+  {
+   "id": 1046,
+   "nome": "PACATUBA - GABINETE DO PREFEITO"
+  },
+  {
+   "id": 1017,
+   "nome": "PACATUBA - INSTITUTO DE PREVIDENCIA"
+  },
+  {
+   "id": 1071,
+   "nome": "PACATUBA - PROCURADORIA - SISANT"
+  },
+  {
+   "id": 1018,
+   "nome": "PACATUBA - SEC DE ADM E FINANÇAS"
+  },
+  {
+   "id": 1056,
+   "nome": "PACATUBA CONTROLE DE GARAGEM SAUDE"
+  },
+  {
+   "id": 1055,
+   "nome": "PACATUBA CONTROLE DE REFEIÇÕES"
+  },
+  {
+   "id": 1085,
+   "nome": "PARAIPABA - ALMOX DA ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1087,
+   "nome": "PARAIPABA - ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 1096,
+   "nome": "PARAIPABA - HOSP MUNICIPAL DE PARAIPABA"
+  },
+  {
+   "id": 1086,
+   "nome": "PARAIPABA - SECRETARIA DE EDUCAÇÃO"
+  },
+  {
+   "id": 1089,
+   "nome": "PARAIPABA - SECRETARIA DE INFRA ESTRUTURA"
+  },
+  {
+   "id": 1091,
+   "nome": "PARAIPABA - SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 156,
+   "nome": "PATRIMÔNIO - BARROQUINHA"
+  },
+  {
+   "id": 170,
+   "nome": "PATRIMÔNIO - CAMARA DE BARROQUINHA"
+  },
+  {
+   "id": 173,
+   "nome": "PATRIMONIO - CAMARA DE BARROQUINHA"
+  },
+  {
+   "id": 164,
+   "nome": "PATRIMÔNIO - CAMOCIM"
+  },
+  {
+   "id": 267,
+   "nome": "PATRIMONIO - JUCAS"
+  },
+  {
+   "id": 145,
+   "nome": "PATRIMONIO - PREFEITURA MUNICIPAL DE CARIRIACU"
+  },
+  {
+   "id": 142,
+   "nome": "PATRIMÔNIO - PREFEITURA MUNICIPAL DE PALHANO"
+  },
+  {
+   "id": 313,
+   "nome": "PATRIMÔNIO - SEC. DE EDUCAÇÃO-GUAIUBA"
+  },
+  {
+   "id": 131,
+   "nome": "PATRIMONIO AÇÃO SOCIAL IRACEMA"
+  },
+  {
+   "id": 945,
+   "nome": "PATRIMONIO CEO BATURITE"
+  },
+  {
+   "id": 563,
+   "nome": "PATRIMONIO DE INDEPENDÊNCIA"
+  },
+  {
+   "id": 213,
+   "nome": "PATRIMÔNIO DO IPREM"
+  },
+  {
+   "id": 168,
+   "nome": "PATRIMONIO DO SAAE - CAMOCIM"
+  },
+  {
+   "id": 290,
+   "nome": "PATRIMONIO INDEPENDENCIA"
+  },
+  {
+   "id": 672,
+   "nome": "PATRIMONIO PALMACIA 2012"
+  },
+  {
+   "id": 56,
+   "nome": "PATRIMONIO PREFEITURA MUNICIPAL DE POTIRETAMA"
+  },
+  {
+   "id": 667,
+   "nome": "PATRIMONIO SAAE MORADA NOVA"
+  },
+  {
+   "id": 129,
+   "nome": "PATRIMONIO SENADOR POMPEU"
+  },
+  {
+   "id": 1360,
+   "nome": "PEÇAS ADI"
+  },
+  {
+   "id": 1078,
+   "nome": "PIRES FERREIRA - ALMOX SECRETARIA DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 966,
+   "nome": "PIRES FERREIRA - ALMOX SECRETARIA DE EDUCACAO"
+  },
+  {
+   "id": 959,
+   "nome": "PIRES FERREIRA - ALMOXARIFADO CENTRAL"
+  },
+  {
+   "id": 448,
+   "nome": "PM ACOPIARA ALMOX. PROCURADORIA GERAL DO MUNICIPIO"
+  },
+  {
+   "id": 252,
+   "nome": "PM ACOPIARA ALMOXARIFADO AÇÃO SOCIAL"
+  },
+  {
+   "id": 249,
+   "nome": "PM ACOPIARA ALMOXARIFADO ADM E FINANÇAS"
+  },
+  {
+   "id": 256,
+   "nome": "PM ACOPIARA ALMOXARIFADO AGRICULTURA"
+  },
+  {
+   "id": 251,
+   "nome": "PM ACOPIARA ALMOXARIFADO EDUCAÇÃO"
+  },
+  {
+   "id": 416,
+   "nome": "PM ACOPIARA ALMOXARIFADO GABINETE"
+  },
+  {
+   "id": 255,
+   "nome": "PM ACOPIARA ALMOXARIFADO INFRAESTRUTURA"
+  },
+  {
+   "id": 414,
+   "nome": "PM ACOPIARA ALMOXARIFADO MEIO AMBIENTE"
+  },
+  {
+   "id": 250,
+   "nome": "PM ACOPIARA ALMOXARIFADO SAUDE"
+  },
+  {
+   "id": 415,
+   "nome": "PM ACOPIARA ALMOXARIFADO TRANSPORTES E TRANSITO"
+  },
+  {
+   "id": 260,
+   "nome": "PM ACOPIARA CAF(PPI)"
+  },
+  {
+   "id": 257,
+   "nome": "PM ACOPIARA MERENDA ESCOLAR"
+  },
+  {
+   "id": 258,
+   "nome": "PM ACOPIARA PATRIMONIO MUNICIPAL"
+  },
+  {
+   "id": 545,
+   "nome": "PM ARACOIABA - PATRIMÔNIO MUNICIPAL"
+  },
+  {
+   "id": 218,
+   "nome": "PMM Almoxarifado da SEINFRA"
+  },
+  {
+   "id": 219,
+   "nome": "PMM ALMOXARIFADO DA SEMADE"
+  },
+  {
+   "id": 23,
+   "nome": "PMM GABINETE ALMOXARIFADO"
+  },
+  {
+   "id": 20,
+   "nome": "PMM SEC DE EDUCAÇÃO ALMOXARIFADO"
+  },
+  {
+   "id": 22,
+   "nome": "PMM SEC DE SAUDE ALMOXARIFADO"
+  },
+  {
+   "id": 25,
+   "nome": "PMM SEC DO TRABALHO E DESENVLVIMENTO SOCIAL ALMOXARIFADO"
+  },
+  {
+   "id": 24,
+   "nome": "PMM SEINFRA ALMOXARIFADO"
+  },
+  {
+   "id": 430,
+   "nome": "PMPF - CONTROLE DE PATRIMONIO"
+  },
+  {
+   "id": 444,
+   "nome": "PMPF - INSUMOS"
+  },
+  {
+   "id": 225,
+   "nome": "POLICLINICA REGIONAL DRA.MARCIA MOREIRA DE MENEZES"
+  },
+  {
+   "id": 1231,
+   "nome": "POSTO DE SAUDE"
+  },
+  {
+   "id": 1232,
+   "nome": "POSTO DE SAUDE"
+  },
+  {
+   "id": 427,
+   "nome": "POSTOS DE ATENDIMENTO - ACOPIARA"
+  },
+  {
+   "id": 146,
+   "nome": "POTIRETAMA CONTROLE INTERNO"
+  },
+  {
+   "id": 16,
+   "nome": "PREFEITURA DE MILHA"
+  },
+  {
+   "id": 227,
+   "nome": "PREFEITURA EXEMPLO"
+  },
+  {
+   "id": 48,
+   "nome": "PREFEITURA MUNICIPAL  DE ARARIPINA"
+  },
+  {
+   "id": 182,
+   "nome": "PREFEITURA MUNICIPAL DE  URUOCA"
+  },
+  {
+   "id": 248,
+   "nome": "PREFEITURA MUNICIPAL DE ACOPIARA"
+  },
+  {
+   "id": 41,
+   "nome": "PREFEITURA MUNICIPAL DE ALTO SANTO SEC ADM"
+  },
+  {
+   "id": 6,
+   "nome": "Prefeitura Municipal de Arapirica"
+  },
+  {
+   "id": 575,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA - ALMOX CENTRAL"
+  },
+  {
+   "id": 577,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA - SEC DE  EDUCAÇÃO"
+  },
+  {
+   "id": 580,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA -CONTROLE DE PATRIMONIO"
+  },
+  {
+   "id": 578,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA -SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 576,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA- AÇÃO SOCIAL"
+  },
+  {
+   "id": 579,
+   "nome": "PREFEITURA MUNICIPAL DE ARARIPINA-CONTROLE DE COMBUSTIVEL"
+  },
+  {
+   "id": 369,
+   "nome": "PREFEITURA MUNICIPAL DE BANABUIU"
+  },
+  {
+   "id": 127,
+   "nome": "PREFEITURA MUNICIPAL DE BARROQUINHA"
+  },
+  {
+   "id": 778,
+   "nome": "PREFEITURA MUNICIPAL DE BARROQUINHA 2017"
+  },
+  {
+   "id": 311,
+   "nome": "PREFEITURA MUNICIPAL DE BRASILIA - EXEMPLO"
+  },
+  {
+   "id": 17,
+   "nome": "Prefeitura Municipal de Camocim"
+  },
+  {
+   "id": 8,
+   "nome": "Prefeitura Municipal de Fortaleza"
+  },
+  {
+   "id": 246,
+   "nome": "PREFEITURA MUNICIPAL DE GUAIUBA"
+  },
+  {
+   "id": 631,
+   "nome": "PREFEITURA MUNICIPAL DE GUAIUBA - 2015"
+  },
+  {
+   "id": 5,
+   "nome": "Prefeitura Municipal de Icó"
+  },
+  {
+   "id": 35,
+   "nome": "PREFEITURA MUNICIPAL DE IGUATU"
+  },
+  {
+   "id": 641,
+   "nome": "PREFEITURA MUNICIPAL DE INDEPENDENCIA"
+  },
+  {
+   "id": 7,
+   "nome": "Prefeitura Municipal de Ipú"
+  },
+  {
+   "id": 36,
+   "nome": "PREFEITURA MUNICIPAL DE IRACEMA - SEC. DE SAÚDE"
+  },
+  {
+   "id": 37,
+   "nome": "Prefeitura Municipal de Iracema-Secretaria de Administração"
+  },
+  {
+   "id": 18,
+   "nome": "Prefeitura Municipal de Juazeiro"
+  },
+  {
+   "id": 9,
+   "nome": "PREFEITURA MUNICIPAL DE MARANGUAPE"
+  },
+  {
+   "id": 422,
+   "nome": "PREFEITURA MUNICIPAL DE MISSÃO VELHA"
+  },
+  {
+   "id": 439,
+   "nome": "PREFEITURA MUNICIPAL DE MISSÃO VELHA"
+  },
+  {
+   "id": 440,
+   "nome": "PREFEITURA MUNICIPAL DE MISSÃO VELHA"
+  },
+  {
+   "id": 336,
+   "nome": "PREFEITURA MUNICIPAL DE PACATUBA"
+  },
+  {
+   "id": 539,
+   "nome": "PREFEITURA MUNICIPAL DE PACOTI - CONTROLE DE COMBUSTIVEL"
+  },
+  {
+   "id": 470,
+   "nome": "PREFEITURA MUNICIPAL DE PENTECOSTE"
+  },
+  {
+   "id": 306,
+   "nome": "PREFEITURA MUNICIPAL DE PINDORETAMA"
+  },
+  {
+   "id": 429,
+   "nome": "PREFEITURA MUNICIPAL DE PIRES FERREIRA"
+  },
+  {
+   "id": 417,
+   "nome": "PREFEITURA MUNICIPAL DE REDENCAO"
+  },
+  {
+   "id": 113,
+   "nome": "PREFEITURA MUNICIPAL DE SANTANA DO ACARAU"
+  },
+  {
+   "id": 451,
+   "nome": "PREFEITURA MUNICIPAL DO AQUIRAZ"
+  },
+  {
+   "id": 91,
+   "nome": "PREFEITURA MUNICIPAL DO MARCO"
+  },
+  {
+   "id": 4,
+   "nome": "PREFEITURA MUNICIPAL EXEMPLO"
+  },
+  {
+   "id": 196,
+   "nome": "PREFEITURA MUNICIPAL EXEMPLO"
+  },
+  {
+   "id": 399,
+   "nome": "PREFEITURA MUNICIPAL EXEMPLO"
+  },
+  {
+   "id": 1,
+   "nome": "Procuradoria de Caucaia"
+  },
+  {
+   "id": 10,
+   "nome": "Procuradoria de IGUATU"
+  },
+  {
+   "id": 2,
+   "nome": "Procuradoria de Maracanaú"
+  },
+  {
+   "id": 26,
+   "nome": "Procuradoria Municipal de Independência"
+  },
+  {
+   "id": 27,
+   "nome": "Procuradoria Municipal de Independência"
+  },
+  {
+   "id": 1258,
+   "nome": "PROTOCOLO"
+  },
+  {
+   "id": 339,
+   "nome": "PROTOCOLO - GOVERNO MUNICIPAL DE PACATUBA"
+  },
+  {
+   "id": 1194,
+   "nome": "PROTOCOLO INTERNO ARACOIABA"
+  },
+  {
+   "id": 629,
+   "nome": "PROTOCOLO MORADA NOVA"
+  },
+  {
+   "id": 1119,
+   "nome": "PROTOCOLO PREFEITURA DE ICO"
+  },
+  {
+   "id": 899,
+   "nome": "PROTOCOLO PREFEITURA MUNICIPAL DE BOA VIAGEM"
+  },
+  {
+   "id": 893,
+   "nome": "PROTOCOLO PREFEITURA MUNICIPAL DO CRATO"
+  },
+  {
+   "id": 99,
+   "nome": "PSF - SEC. DE SAÚDE DE MARCO"
+  },
+  {
+   "id": 223,
+   "nome": "PSF SEDE - OCARA"
+  },
+  {
+   "id": 199,
+   "nome": "RH - CÂMARA DE CAUCAIA"
+  },
+  {
+   "id": 3,
+   "nome": "Ribeiro e Alencar Advogados Associados"
+  },
+  {
+   "id": 385,
+   "nome": "SAAE - SOLONOPOLE"
+  },
+  {
+   "id": 166,
+   "nome": "SAAE-CAMOCIM"
+  },
+  {
+   "id": 305,
+   "nome": "Santa Casa de Morada Nova"
+  },
+  {
+   "id": 1379,
+   "nome": "SANTA CATARINA"
+  },
+  {
+   "id": 126,
+   "nome": "SANTANA DO ACARAÚ"
+  },
+  {
+   "id": 1381,
+   "nome": "SÃO LUIS"
+  },
+  {
+   "id": 434,
+   "nome": "SAS PIRES FERREIRA - CRAS"
+  },
+  {
+   "id": 777,
+   "nome": "SAUDE BARROQUINHA 2017"
+  },
+  {
+   "id": 556,
+   "nome": "SEC MUNICIPAL DE EDUCACAO - CONTROLE DO GAS - PACOTI"
+  },
+  {
+   "id": 102,
+   "nome": "SEC. DE AGRIC. REC. HIDRICOS E M. AMBIENTE"
+  },
+  {
+   "id": 598,
+   "nome": "SECRETARIA - SAUDE - ALMOXARIFADO - 2013"
+  },
+  {
+   "id": 599,
+   "nome": "SECRETARIA - SAUDE - FARMACIA - 2013"
+  },
+  {
+   "id": 600,
+   "nome": "SECRETARIA - SAUDE - ODONTOLOGICO - 2013"
+  },
+  {
+   "id": 453,
+   "nome": "SECRETARIA DE  EDUCAÇAO DE AQUIRAZ"
+  },
+  {
+   "id": 425,
+   "nome": "SECRETARIA DE AÇÃO SOCIAL - MISSÃO VELHA"
+  },
+  {
+   "id": 724,
+   "nome": "SECRETARIA DE ACAO SOCIAL DE JARDIM"
+  },
+  {
+   "id": 100,
+   "nome": "SECRETARIA DE AÇÃO SOCIAL DE MARCO"
+  },
+  {
+   "id": 605,
+   "nome": "SECRETARIA DE ADMINISTRACÃO  - PALMACIA"
+  },
+  {
+   "id": 205,
+   "nome": "SECRETARIA DE ADMINISTRACAO - PACOTI"
+  },
+  {
+   "id": 479,
+   "nome": "SECRETARIA DE ADMINISTRACAO - PACOTI 2014"
+  },
+  {
+   "id": 607,
+   "nome": "SECRETARIA DE ADMINISTRACAO - PALMACIA"
+  },
+  {
+   "id": 93,
+   "nome": "SECRETARIA DE ADMINISTRAÇÃO DE MARCO"
+  },
+  {
+   "id": 507,
+   "nome": "SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS - ACOPIARA"
+  },
+  {
+   "id": 516,
+   "nome": "SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS - JUCAS - 2014"
+  },
+  {
+   "id": 523,
+   "nome": "SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS-JUCAS-2014"
+  },
+  {
+   "id": 508,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL - ACOPIARA"
+  },
+  {
+   "id": 291,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL - JAGUARIBARA"
+  },
+  {
+   "id": 518,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL - JUCAS - 2014"
+  },
+  {
+   "id": 389,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL - OCARA"
+  },
+  {
+   "id": 603,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL - PALMACIA"
+  },
+  {
+   "id": 742,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL DE BOA VIAGEM"
+  },
+  {
+   "id": 751,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL DE ICO"
+  },
+  {
+   "id": 733,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL DE PACATUBA"
+  },
+  {
+   "id": 1259,
+   "nome": "SECRETARIA DE ASSISTENCIA SOCIAL MARTINOPOLE 2021"
+  },
+  {
+   "id": 103,
+   "nome": "SECRETARIA DE CULTURA E DESPORTO DE MARCO"
+  },
+  {
+   "id": 40,
+   "nome": "SECRETARIA DE EDUCAÇÃO"
+  },
+  {
+   "id": 1019,
+   "nome": "SECRETARIA DE EDUCAÇÃO"
+  },
+  {
+   "id": 423,
+   "nome": "SECRETARIA DE EDUCAÇÃO - MISSÃO VELHA"
+  },
+  {
+   "id": 95,
+   "nome": "SECRETARIA DE EDUCAÇÃO DE MARCO"
+  },
+  {
+   "id": 472,
+   "nome": "SECRETARIA DE EDUCAÇÃO DE PENTECOSTE"
+  },
+  {
+   "id": 432,
+   "nome": "SECRETARIA DE EDUCAÇÃO DE PIRES FERREIRA"
+  },
+  {
+   "id": 50,
+   "nome": "SECRETARIA DE EDUCAÇÃO DEARARIPINA"
+  },
+  {
+   "id": 72,
+   "nome": "SECRETARIA DE EDUCAÇÃO FUNDEB ARARIPINA"
+  },
+  {
+   "id": 101,
+   "nome": "SECRETARIA DE OBRAS DE MARCO"
+  },
+  {
+   "id": 386,
+   "nome": "SECRETARIA DE PLANEJAMENTO E ADMINISTRAÇÃO - OCARA"
+  },
+  {
+   "id": 613,
+   "nome": "SECRETARIA DE PLANEJAMENTO E ADMINISTRAÇÃO PÚBLICA"
+  },
+  {
+   "id": 94,
+   "nome": "SECRETARIA DE PLANEJAMENTO E FINANÇAS DE MARCO"
+  },
+  {
+   "id": 1233,
+   "nome": "SECRETARIA DE SAUDE"
+  },
+  {
+   "id": 424,
+   "nome": "SECRETARIA DE SAUDE - MISSÃO VELHA"
+  },
+  {
+   "id": 627,
+   "nome": "SECRETARIA DE SAÚDE - PAB - 2015"
+  },
+  {
+   "id": 628,
+   "nome": "SECRETARIA DE SAÚDE - RP - 2015"
+  },
+  {
+   "id": 452,
+   "nome": "SECRETARIA DE SAUDE DE AQUIRAZ"
+  },
+  {
+   "id": 97,
+   "nome": "SECRETARIA DE SAÚDE DE MARCO"
+  },
+  {
+   "id": 473,
+   "nome": "SECRETARIA DE SAUDE DE PENTECOSTE"
+  },
+  {
+   "id": 435,
+   "nome": "SECRETARIA DE SAUDE DE PIRES FERREIRA"
+  },
+  {
+   "id": 1230,
+   "nome": "SECRETARIA DE SAUDE DE RERIUTABA"
+  },
+  {
+   "id": 443,
+   "nome": "SECRETARIA DE SAUDE PIRES FERREIRA- M. HOSPITALAR"
+  },
+  {
+   "id": 442,
+   "nome": "SECRETARIA DE SAUDE PIRES FERREIRA-ODONTOLOGICO"
+  },
+  {
+   "id": 626,
+   "nome": "SECRETARIA DE SAÚDE- MAC - 2015"
+  },
+  {
+   "id": 841,
+   "nome": "SECRETARIA DO TRABALHO E ASS SOCIAL DE INDEPENDENCIA"
+  },
+  {
+   "id": 433,
+   "nome": "SECRETARIA DO TRABALHO E ASSISTENCIA SOCIAL DE PIRES FERREIRA"
+  },
+  {
+   "id": 560,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - 2016"
+  },
+  {
+   "id": 561,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - 2016"
+  },
+  {
+   "id": 509,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCAÇÃO - ACOPIARA - 2016"
+  },
+  {
+   "id": 384,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCAÇAO - BANABUIU"
+  },
+  {
+   "id": 519,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - JUCAS - 2014"
+  },
+  {
+   "id": 630,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - MERENDA ESCOLAR"
+  },
+  {
+   "id": 1058,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - MERENDA ESCOLAR"
+  },
+  {
+   "id": 388,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCAÇÃO - OCARA"
+  },
+  {
+   "id": 208,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - PACOTI"
+  },
+  {
+   "id": 604,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCACAO - PALMACIA"
+  },
+  {
+   "id": 402,
+   "nome": "SECRETARIA MUNICIPAL DE EDUCAÇÃO MORADA NOVA"
+  },
+  {
+   "id": 594,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE - INDEPENDENCIA"
+  },
+  {
+   "id": 517,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE - JUCAS - 2014"
+  },
+  {
+   "id": 387,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE - OCARA"
+  },
+  {
+   "id": 608,
+   "nome": "SECRETARIA MUNICIPAL DE SAÚDE - PALMACIA"
+  },
+  {
+   "id": 49,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE ARARIPINA"
+  },
+  {
+   "id": 403,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE MORADA NOVA"
+  },
+  {
+   "id": 207,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI"
+  },
+  {
+   "id": 620,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - DOAÇÃO"
+  },
+  {
+   "id": 621,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - MAC"
+  },
+  {
+   "id": 622,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - PAB"
+  },
+  {
+   "id": 624,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - PPI"
+  },
+  {
+   "id": 625,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - PPI/MAC/MICRO/RP"
+  },
+  {
+   "id": 623,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE DE PACOTI - RECURSO PRÓPRIO"
+  },
+  {
+   "id": 428,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE FORTALEZA"
+  },
+  {
+   "id": 506,
+   "nome": "SECRETARIA MUNICIPAL DE SAÚDE- ACOPIARA - 2014"
+  },
+  {
+   "id": 588,
+   "nome": "SECRETARIA MUNICIPAL DE SAUDE-PACOTI 2012"
+  },
+  {
+   "id": 946,
+   "nome": "SECRETARIA TESTE - MUNICÍPIO AS SISTEMAS"
+  },
+  {
+   "id": 406,
+   "nome": "SERVICO AUTONOMO DE AGUA E ESGOTO - SAAE"
+  },
+  {
+   "id": 51,
+   "nome": "SETOR COMBUSTIVEL"
+  },
+  {
+   "id": 592,
+   "nome": "SETOR DA ALIMENTACAO ESCOLAR"
+  },
+  {
+   "id": 503,
+   "nome": "SETOR DA MERENDA ESCOLAR - CRATO 2014"
+  },
+  {
+   "id": 584,
+   "nome": "SETOR DA MERENDA ESCOLAR - CRATO 2014"
+  },
+  {
+   "id": 1023,
+   "nome": "SETOR DE COMBUSTIVEL ACOPIARA"
+  },
+  {
+   "id": 555,
+   "nome": "SETOR DE COMBUSTIVEL DA CAMARA MUNICIPAL BANABUIU"
+  },
+  {
+   "id": 636,
+   "nome": "SETOR DE COMBUSTIVEL DA CAMARA MUNICIPAL BANABUIU 2015"
+  },
+  {
+   "id": 564,
+   "nome": "SETOR DE COMBUSTIVEL DE INDEPENDENCIA"
+  },
+  {
+   "id": 375,
+   "nome": "SETOR DE COMBUSTÍVEL DE PACOTI"
+  },
+  {
+   "id": 581,
+   "nome": "SETOR DE COMBUSTIVEL DE SANTA QUITERIA"
+  },
+  {
+   "id": 587,
+   "nome": "SETOR DE CONTROLE DE PEÇAS E LUBRIFICANTES STA QUITERIA"
+  },
+  {
+   "id": 272,
+   "nome": "SETOR DE MERENDA ESCOLAR - CRATO"
+  },
+  {
+   "id": 320,
+   "nome": "SETOR DE MERENDA ESCOLAR - JAGUARIBARA"
+  },
+  {
+   "id": 798,
+   "nome": "SETOR DE MERENDA ESCOLAR CRATO 2017"
+  },
+  {
+   "id": 1022,
+   "nome": "SETOR DE PATRIMONIO ACOPIARA"
+  },
+  {
+   "id": 554,
+   "nome": "SETOR DE PATRIMONIO CAMARA MUNICIPAL DE BANABUIU"
+  },
+  {
+   "id": 397,
+   "nome": "SETOR DE PATRIMONIO DE DOIS RIACHOS"
+  },
+  {
+   "id": 571,
+   "nome": "SETOR DE PATRIMONIO DE SANTA QUITERIA"
+  },
+  {
+   "id": 1006,
+   "nome": "SETOR DE PATRIMÔNIO MOREIA TECNOLOGIA"
+  },
+  {
+   "id": 694,
+   "nome": "SETOR DE PATRIMONIO PREVCRATO"
+  },
+  {
+   "id": 699,
+   "nome": "SETOR DE PEÇAS STA QUITERIA 2016"
+  },
+  {
+   "id": 888,
+   "nome": "SETOR DE PROTOCOLO BOA VIAGEM"
+  },
+  {
+   "id": 456,
+   "nome": "SETOR DE PROTOCOLO CONSORCIO CASCAVEL"
+  },
+  {
+   "id": 431,
+   "nome": "SETOR DE PROTOCOLO DE MORADA NOVA"
+  },
+  {
+   "id": 1256,
+   "nome": "SISANT ALMOXARIFADO DA INFRAESTRUTURA"
+  },
+  {
+   "id": 1251,
+   "nome": "SISANT ALMOXARIFADO DE ASSISTENCIA SOCIAL"
+  },
+  {
+   "id": 1250,
+   "nome": "SISANT ALMOXARIFADO DE EDUCAÇÃO"
+  },
+  {
+   "id": 1278,
+   "nome": "SISANT ALMOXARIFADO DE ESPORTE E JUVENTUDE"
+  },
+  {
+   "id": 1245,
+   "nome": "SISANT ALMOXARIFADO DE SAUDE"
+  },
+  {
+   "id": 1261,
+   "nome": "SISANT GABINETE DO PREFEITO"
+  },
+  {
+   "id": 1262,
+   "nome": "SISANT SEC. DE AGRICULTURA"
+  },
+  {
+   "id": 1252,
+   "nome": "SISANT SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS"
+  },
+  {
+   "id": 941,
+   "nome": "SISAUT DEV"
+  },
+  {
+   "id": 341,
+   "nome": "SISTEMA DE FARMACIA"
+  },
+  {
+   "id": 1339,
+   "nome": "SISTEMA DE FARMACIA HOSPITALAR DE CHAVAL"
+  },
+  {
+   "id": 1114,
+   "nome": "TESTE"
+  },
+  {
+   "id": 990,
+   "nome": "TESTE ISTEMA SISANT"
+  },
+  {
+   "id": 889,
+   "nome": "TESTE PROTOCOLO DO CRATO"
+  },
+  {
+   "id": 105,
+   "nome": "TEXTANDO"
+  },
+  {
+   "id": 1351,
+   "nome": "TONER ADI"
+  },
+  {
+   "id": 381,
+   "nome": "TREINAMENTO GERAL - ALTO SANTO"
+  },
+  {
+   "id": 421,
+   "nome": "TUTZ STORE"
+  },
+  {
+   "id": 1220,
+   "nome": "UBS DR. OSVALDO HONÓRIO LEMOS"
+  },
+  {
+   "id": 1227,
+   "nome": "UBS LEONTINA VERAS"
+  },
+  {
+   "id": 1226,
+   "nome": "UBS LUCAS RODRIGUES DE BRITO"
+  },
+  {
+   "id": 1225,
+   "nome": "UBS MANOEL LOPES DE MEDEIROS"
+  },
+  {
+   "id": 1222,
+   "nome": "UBS MARIA DAS DORES MARTINS RÊGO MAGALHÃES"
+  },
+  {
+   "id": 1224,
+   "nome": "UBS PEDRO FORÊNCIO CARDOSO"
+  },
+  {
+   "id": 1221,
+   "nome": "UBS RAIMUNDO CAPISTRANO DE CASTRO"
+  },
+  {
+   "id": 1223,
+   "nome": "UBS SEBASTIÃO RODRIGUES DA SILVEIRA"
+  },
+  {
+   "id": 663,
+   "nome": "UMS VIRGINIA RODRIGUES SIMPLICIO"
+  },
+  {
+   "id": 1290,
+   "nome": "UNID BASICA DE SAUDE MANUEL GUILHERME VERAS - TIMONHA"
+  },
+  {
+   "id": 1291,
+   "nome": "UNIDADE BÁSICA DE SAÚDE CAETANO DIAS OLIVEIRA ? SÃO RAIMUNDO"
+  },
+  {
+   "id": 1292,
+   "nome": "UNIDADE BÁSICA DE SAÚDE CAIRO PESSOA MARTINS - PRIVAT"
+  },
+  {
+   "id": 1293,
+   "nome": "UNIDADE BÁSICA DE SAÚDE CORONEL INÁCIO TELES DE MENEZES ? SAMBAIBA"
+  },
+  {
+   "id": 1294,
+   "nome": "UNIDADE BÁSICA DE SAÚDE CORONEL RAIMUNDO DE OLIVEIRA- CENTRO"
+  },
+  {
+   "id": 1295,
+   "nome": "UNIDADE BÁSICA DE SAÚDE DÁRIO VERAS MAGALHÃES- UBATUBA"
+  },
+  {
+   "id": 1296,
+   "nome": "UNIDADE BÁSICA DE SAÚDE FRANCISCO CARNEIRO MAGALHÃES- PAULA PESSOA"
+  },
+  {
+   "id": 1297,
+   "nome": "UNIDADE BÁSICA DE SAÚDE FRANCISCO DAS CHAGAS RIBEIRO COELHO- SÃO PEDRO"
+  },
+  {
+   "id": 1298,
+   "nome": "UNIDADE BÁSICA DE SAÚDE FRANCISCO FONTENELE DE BRITO- IBUAÇU"
+  },
+  {
+   "id": 1299,
+   "nome": "UNIDADE BASICA DE SAUDE HUGO PORFIRIO DA MOTA- SÃO FRANCISCO"
+  },
+  {
+   "id": 1300,
+   "nome": "UNIDADE BÁSICA DE SAÚDE INÁCIO FELIX DOS SANTOS- SANTA TEREZINHA"
+  },
+  {
+   "id": 1301,
+   "nome": "UNIDADE BÁSICA DE SAÚDE MARIA ARAGÃO PEREIRA- ESTREITO"
+  },
+  {
+   "id": 1302,
+   "nome": "UNIDADE BÁSICA DE SAÚDE MARIA IRACY ARRUDA- TIAIA"
+  },
+  {
+   "id": 1303,
+   "nome": "UNIDADE BÁSICA DE SAÚDE MARIA IRENE DE SOUSA- ADRIANOPOLES"
+  },
+  {
+   "id": 1304,
+   "nome": "UNIDADE BÁSICA DE SAÚDE MONSENHOR MANOEL VITORINO DE OLIVEIRA- PARAZINHO"
+  },
+  {
+   "id": 1305,
+   "nome": "UNIDADE BÁSICA DE SAÚDE RAIMUNDO NONATO MOTA RAIMUNDO FORTUNA- PORTELINHA"
+  },
+  {
+   "id": 1306,
+   "nome": "UNIDADE DE PRONTO ATENDIMENTO ANTONIA COELHO DE OLIVEIRA- UPA 24 HORAS"
+  },
+  {
+   "id": 204,
+   "nome": "UPA - UNIDADE DE PRONTO ATENDIMENTO"
+  }
+ ],
+ "tipos": [
+  {
+   "id": 259,
+   "nome": "ACCESS POINT"
+  },
+  {
+   "id": 1005,
+   "nome": "ADAPTADOR HDMI PARA VGA"
+  },
+  {
+   "id": 1000,
+   "nome": "ALICATE"
+  },
+  {
+   "id": 1049,
+   "nome": "ALL IN ONE"
+  },
+  {
+   "id": 1276,
+   "nome": "ANTENA"
+  },
+  {
+   "id": 132,
+   "nome": "APARELHO DE DVD"
+  },
+  {
+   "id": 1354,
+   "nome": "APPLE TV"
+  },
+  {
+   "id": 428,
+   "nome": "APRESENTADOR DE SLIDES"
+  },
+  {
+   "id": 1208,
+   "nome": "ASPIRADOR DE PÓ"
+  },
+  {
+   "id": 4586,
+   "nome": "BALANÇA DIGITAL"
+  },
+  {
+   "id": 1365,
+   "nome": "BALANCEADOR DE INTERNET"
+  },
+  {
+   "id": 1342,
+   "nome": "BANDEJA FIXA"
+  },
+  {
+   "id": 4562,
+   "nome": "BANDEJA PARA IMPRESSORA"
+  },
+  {
+   "id": 162,
+   "nome": "BASE PARA MICROFONE"
+  },
+  {
+   "id": 109,
+   "nome": "BASE PARA RÁDIO COMUNICAÇÃO"
+  },
+  {
+   "id": 4561,
+   "nome": "BASTÃO DE LED"
+  },
+  {
+   "id": 4559,
+   "nome": "BEBEDOURO"
+  },
+  {
+   "id": 1015,
+   "nome": "BEBEDOURO INDUSTRIAL"
+  },
+  {
+   "id": 4450,
+   "nome": "CADEIRA DE ESCRITÓRIO"
+  },
+  {
+   "id": 319,
+   "nome": "CAIXA DE SOM"
+  },
+  {
+   "id": 442,
+   "nome": "CALCULADORA ELÉTRICA"
+  },
+  {
+   "id": 438,
+   "nome": "CAMERA"
+  },
+  {
+   "id": 1103,
+   "nome": "CANETA PARA ASSINATURA DIGITAL"
+  },
+  {
+   "id": 461,
+   "nome": "CARREGADOR DE PILHAS"
+  },
+  {
+   "id": 1065,
+   "nome": "CARRINHO PARA TRANSPORTE DE EQUIPAMENTOS"
+  },
+  {
+   "id": 4241,
+   "nome": "CARTUCHO IMPRESSORA HP 3535"
+  },
+  {
+   "id": 475,
+   "nome": "CASE PARA HD EXTERNO"
+  },
+  {
+   "id": 304,
+   "nome": "CELULAR"
+  },
+  {
+   "id": 4254,
+   "nome": "CILINDRO IMPRESSORA LEX MARK E120"
+  },
+  {
+   "id": 1288,
+   "nome": "COMPRESSOR"
+  },
+  {
+   "id": 3507,
+   "nome": "CONVERSOR DIGITAL"
+  },
+  {
+   "id": 477,
+   "nome": "CORTADOR DE CHIPS PARA CELULAR"
+  },
+  {
+   "id": 49,
+   "nome": "CPU CELERON"
+  },
+  {
+   "id": 199,
+   "nome": "DETECTOR DE METAL"
+  },
+  {
+   "id": 197,
+   "nome": "DISTRIBUIDOR DE SINAL"
+  },
+  {
+   "id": 414,
+   "nome": "DIVISOR DE SINAL"
+  },
+  {
+   "id": 280,
+   "nome": "DUPLICADOR"
+  },
+  {
+   "id": 4483,
+   "nome": "DVR"
+  },
+  {
+   "id": 402,
+   "nome": "ENCADERNADORA"
+  },
+  {
+   "id": 126,
+   "nome": "ESTABILIZADOR 1000VA"
+  },
+  {
+   "id": 4413,
+   "nome": "ESTABILIZADOR 1050VA"
+  },
+  {
+   "id": 123,
+   "nome": "ESTABILIZADOR 1500VA"
+  },
+  {
+   "id": 206,
+   "nome": "ESTABILIZADOR 2000VA"
+  },
+  {
+   "id": 1114,
+   "nome": "ESTABILIZADOR 300VA"
+  },
+  {
+   "id": 4589,
+   "nome": "ESTABILIZADOR 3200VA"
+  },
+  {
+   "id": 1229,
+   "nome": "ESTABILIZADOR 500VA"
+  },
+  {
+   "id": 1348,
+   "nome": "ESTABILIZADOR 500VA"
+  },
+  {
+   "id": 134,
+   "nome": "ESTABILIZADOR 600VA"
+  },
+  {
+   "id": 4522,
+   "nome": "ESTUFA/AQUECEDOR DE FOLHAS"
+  },
+  {
+   "id": 303,
+   "nome": "EXTENSOR PRA USB"
+  },
+  {
+   "id": 140,
+   "nome": "FAX"
+  },
+  {
+   "id": 155,
+   "nome": "FILMADORA SAMSUNG"
+  },
+  {
+   "id": 1327,
+   "nome": "FILTRO DE LINHA"
+  },
+  {
+   "id": 4466,
+   "nome": "FINALIZADOR DE DOCUMENTOS"
+  },
+  {
+   "id": 465,
+   "nome": "FLIP CHART"
+  },
+  {
+   "id": 250,
+   "nome": "FOGAO"
+  },
+  {
+   "id": 34,
+   "nome": "FONTE DE IMPRESSORA"
+  },
+  {
+   "id": 110,
+   "nome": "FONTE PARA RÁDIO COMUNICAÇÃO"
+  },
+  {
+   "id": 429,
+   "nome": "FONTE UNIVERSAL PARA NOTEBOOK"
+  },
+  {
+   "id": 77,
+   "nome": "FRAGMENTADORA DE PAPEL"
+  },
+  {
+   "id": 1353,
+   "nome": "FRIGOBAR"
+  },
+  {
+   "id": 297,
+   "nome": "FURADEIRA"
+  },
+  {
+   "id": 364,
+   "nome": "GABINETE PARA IMPRESSORAS"
+  },
+  {
+   "id": 318,
+   "nome": "GAVETA PARA HD"
+  },
+  {
+   "id": 366,
+   "nome": "GAVETA PARA IMPRESSORA"
+  },
+  {
+   "id": 262,
+   "nome": "GELAGUA"
+  },
+  {
+   "id": 460,
+   "nome": "GPS DE MAO"
+  },
+  {
+   "id": 341,
+   "nome": "GRAMPEADOR"
+  },
+  {
+   "id": 4571,
+   "nome": "GRAVADOR DIGITAL DE VIDEO NVD"
+  },
+  {
+   "id": 144,
+   "nome": "GRAVADORA DE DVD"
+  },
+  {
+   "id": 431,
+   "nome": "GUILHOTINA"
+  },
+  {
+   "id": 270,
+   "nome": "HD EXTERNO"
+  },
+  {
+   "id": 4261,
+   "nome": "HP LASER JET 2600N"
+  },
+  {
+   "id": 4252,
+   "nome": "HP PHOTOSMART A616"
+  },
+  {
+   "id": 60,
+   "nome": "HUB USB"
+  },
+  {
+   "id": 4286,
+   "nome": "IMPRESSORA  BROTHER MFC-9440CN"
+  },
+  {
+   "id": 4257,
+   "nome": "IMPRESSORA 2600 N"
+  },
+  {
+   "id": 4590,
+   "nome": "IMPRESSORA BRAILLE"
+  },
+  {
+   "id": 4327,
+   "nome": "IMPRESSORA BROTHER 2270"
+  },
+  {
+   "id": 4343,
+   "nome": "IMPRESSORA BROTHER 2340"
+  },
+  {
+   "id": 4354,
+   "nome": "IMPRESSORA BROTHER 3551"
+  },
+  {
+   "id": 4365,
+   "nome": "IMPRESSORA BROTHER 6902"
+  },
+  {
+   "id": 4350,
+   "nome": "IMPRESSORA BROTHER COLOR 8360"
+  },
+  {
+   "id": 4319,
+   "nome": "IMPRESSORA BROTHER DCP 1602"
+  },
+  {
+   "id": 4328,
+   "nome": "IMPRESSORA BROTHER DCP 2540DW"
+  },
+  {
+   "id": 4339,
+   "nome": "IMPRESSORA BROTHER DCP B-7535DW"
+  },
+  {
+   "id": 4315,
+   "nome": "IMPRESSORA BROTHER HL-2270DW"
+  },
+  {
+   "id": 4308,
+   "nome": "IMPRESSORA BROTHER HL-3140CW"
+  },
+  {
+   "id": 4329,
+   "nome": "IMPRESSORA BROTHER HL-3170"
+  },
+  {
+   "id": 4310,
+   "nome": "IMPRESSORA BROTHER HL-5452 DN"
+  },
+  {
+   "id": 4338,
+   "nome": "IMPRESSORA BROTHER LASER MFC L8610"
+  },
+  {
+   "id": 4290,
+   "nome": "IMPRESSORA BROTHER MFC 9460 CDN"
+  },
+  {
+   "id": 4330,
+   "nome": "IMPRESSORA BROTHER MFC L2740"
+  },
+  {
+   "id": 4359,
+   "nome": "IMPRESSORA CANON 1025"
+  },
+  {
+   "id": 4334,
+   "nome": "IMPRESSORA CANON LASER MF445"
+  },
+  {
+   "id": 4311,
+   "nome": "IMPRESSORA COLOR RICOH AFICIO SP-C242SF"
+  },
+  {
+   "id": 4269,
+   "nome": "IMPRESSORA COLORIDA SANSUNG CLP 315"
+  },
+  {
+   "id": 153,
+   "nome": "IMPRESSORA DE CARTÃO"
+  },
+  {
+   "id": 1069,
+   "nome": "IMPRESSORA DE CUPOM FISCAL"
+  },
+  {
+   "id": 1039,
+   "nome": "IMPRESSORA DE PULSEIRAS"
+  },
+  {
+   "id": 4337,
+   "nome": "IMPRESSORA ELGIN M6550"
+  },
+  {
+   "id": 4263,
+   "nome": "IMPRESSORA HP 12A 1020"
+  },
+  {
+   "id": 4248,
+   "nome": "IMPRESSORA HP 3920"
+  },
+  {
+   "id": 4246,
+   "nome": "IMPRESSORA HP 5650"
+  },
+  {
+   "id": 4242,
+   "nome": "IMPRESSORA HP 840"
+  },
+  {
+   "id": 4282,
+   "nome": "IMPRESSORA HP 9800"
+  },
+  {
+   "id": 4267,
+   "nome": "IMPRESSORA HP D1560"
+  },
+  {
+   "id": 4288,
+   "nome": "IMPRESSORA HP DESKJET 1000"
+  },
+  {
+   "id": 4272,
+   "nome": "IMPRESSORA HP LASER COLOR CM1312"
+  },
+  {
+   "id": 4355,
+   "nome": "IMPRESSORA HP M428FDW"
+  },
+  {
+   "id": 4356,
+   "nome": "IMPRESSORA HP M479"
+  },
+  {
+   "id": 4283,
+   "nome": "IMPRESSORA HP MULTIFUNCIONAL D-1660"
+  },
+  {
+   "id": 4275,
+   "nome": "IMPRESSORA HP PRO 8000"
+  },
+  {
+   "id": 4260,
+   "nome": "IMPRESSORA JATO DE TINTA HP 1460"
+  },
+  {
+   "id": 4363,
+   "nome": "IMPRESSORA KYOCERA 3655"
+  },
+  {
+   "id": 4296,
+   "nome": "IMPRESSORA KYOCERA 4500I"
+  },
+  {
+   "id": 4361,
+   "nome": "IMPRESSORA KYOCERA M2040"
+  },
+  {
+   "id": 4320,
+   "nome": "IMPRESSORA LASER BROTHER MFC 9330"
+  },
+  {
+   "id": 4344,
+   "nome": "IMPRESSORA LASER CANON 6030"
+  },
+  {
+   "id": 1316,
+   "nome": "IMPRESSORA LASER CANON LBP6030W"
+  },
+  {
+   "id": 1171,
+   "nome": "IMPRESSORA LASER COLOR A4"
+  },
+  {
+   "id": 4271,
+   "nome": "IMPRESSORA LASER HP CP-1215N"
+  },
+  {
+   "id": 4278,
+   "nome": "IMPRESSORA LASER HP P2035N"
+  },
+  {
+   "id": 4231,
+   "nome": "IMPRESSORA LASER LEXMARK OPTRA E210"
+  },
+  {
+   "id": 4234,
+   "nome": "IMPRESSORA LASER LEXMARK OPTRA S1250"
+  },
+  {
+   "id": 4235,
+   "nome": "IMPRESSORA LASER LEXMARK OPTRA S1255"
+  },
+  {
+   "id": 4236,
+   "nome": "IMPRESSORA LASER LEXMARK OPTRA T610"
+  },
+  {
+   "id": 1172,
+   "nome": "IMPRESSORA LASER MONO A4"
+  },
+  {
+   "id": 4249,
+   "nome": "IMPRESSORA LASER SAMSUNG ML 1610"
+  },
+  {
+   "id": 4250,
+   "nome": "IMPRESSORA LASER SAMSUNG ML 2010"
+  },
+  {
+   "id": 4291,
+   "nome": "IMPRESSORA LASERJET P1102"
+  },
+  {
+   "id": 4303,
+   "nome": "IMPRESSORA LEXMAR E-460"
+  },
+  {
+   "id": 4299,
+   "nome": "IMPRESSORA LEXMARK  X656"
+  },
+  {
+   "id": 4323,
+   "nome": "IMPRESSORA LEXMARK 264"
+  },
+  {
+   "id": 4302,
+   "nome": "IMPRESSORA LEXMARK E-360"
+  },
+  {
+   "id": 4265,
+   "nome": "IMPRESSORA LS MON.HP P 2015"
+  },
+  {
+   "id": 1199,
+   "nome": "IMPRESSORA MATRICIAL"
+  },
+  {
+   "id": 4358,
+   "nome": "IMPRESSORA MINOLTA C226"
+  },
+  {
+   "id": 4362,
+   "nome": "IMPRESSORA MULT A3 TASKALFA KYOCERA 2554CI"
+  },
+  {
+   "id": 1315,
+   "nome": "IMPRESSORA MULT BROTHER MFC L8610 COLOR"
+  },
+  {
+   "id": 4333,
+   "nome": "IMPRESSORA MULT. RICOH C2000 COLOR"
+  },
+  {
+   "id": 4332,
+   "nome": "IMPRESSORA MULT. RICOH SP3710SF"
+  },
+  {
+   "id": 4264,
+   "nome": "IMPRESSORA MULT.LS HP M1120"
+  },
+  {
+   "id": 4273,
+   "nome": "IMPRESSORA MULTIF.HP M1522NF"
+  },
+  {
+   "id": 4364,
+   "nome": "IMPRESSORA MULTIFUNCIONAL A3 COLOR CANON C322"
+  },
+  {
+   "id": 4322,
+   "nome": "IMPRESSORA MULTIFUNCIONAL BROTHER MFC 9130 CW"
+  },
+  {
+   "id": 4279,
+   "nome": "IMPRESSORA MULTIFUNCIONAL DCP 8085DN BROTHER"
+  },
+  {
+   "id": 4289,
+   "nome": "IMPRESSORA MULTIFUNCIONAL DESKJET 3050"
+  },
+  {
+   "id": 4281,
+   "nome": "IMPRESSORA MULTIFUNCIONAL F4480"
+  },
+  {
+   "id": 4258,
+   "nome": "IMPRESSORA MULTIFUNCIONAL HP OFFICE JET 6310"
+  },
+  {
+   "id": 4297,
+   "nome": "IMPRESSORA MULTIFUNCIONAL KYOCERA FS4020"
+  },
+  {
+   "id": 4266,
+   "nome": "IMPRESSORA MULTIFUNCIONAL SANSUNG SCX 4521F"
+  },
+  {
+   "id": 4335,
+   "nome": "IMPRESSORA PANTUM LASER"
+  },
+  {
+   "id": 470,
+   "nome": "IMPRESSORA PARA CHEQUE"
+  },
+  {
+   "id": 4353,
+   "nome": "IMPRESSORA RICOH 305"
+  },
+  {
+   "id": 4349,
+   "nome": "IMPRESSORA RICOH 320"
+  },
+  {
+   "id": 4331,
+   "nome": "IMPRESSORA RICOH 3710"
+  },
+  {
+   "id": 4325,
+   "nome": "IMPRESSORA RICOH 377"
+  },
+  {
+   "id": 4360,
+   "nome": "IMPRESSORA RICOH 430"
+  },
+  {
+   "id": 4316,
+   "nome": "IMPRESSORA RICOH AFICIO C2051"
+  },
+  {
+   "id": 4326,
+   "nome": "IMPRESSORA RICOH AFICIO SP 5210 DN"
+  },
+  {
+   "id": 4345,
+   "nome": "IMPRESSORA RICOH C2003 COLOR"
+  },
+  {
+   "id": 4321,
+   "nome": "IMPRESSORA RICOH C2004"
+  },
+  {
+   "id": 4324,
+   "nome": "IMPRESSORA RICOH MP-2001"
+  },
+  {
+   "id": 4317,
+   "nome": "IMPRESSORA RICOH SP-310"
+  },
+  {
+   "id": 4251,
+   "nome": "IMPRESSORA SAMSUNG 4100"
+  },
+  {
+   "id": 4287,
+   "nome": "IMPRESSORA SAMSUNG ML-3310"
+  },
+  {
+   "id": 4318,
+   "nome": "IMPRESSORA SAMSUNG SCX 3405"
+  },
+  {
+   "id": 4292,
+   "nome": "IMPRESSORA SAMSUNG SCX-3200"
+  },
+  {
+   "id": 1204,
+   "nome": "IMPRESSORA TERMICA"
+  },
+  {
+   "id": 4240,
+   "nome": "IMPRESSORA XEROX P8E"
+  },
+  {
+   "id": 4305,
+   "nome": "IMPRESSORA XEROX PHASER 3045"
+  },
+  {
+   "id": 4274,
+   "nome": "IMRPESSORA MULTIF.HP F 4480"
+  },
+  {
+   "id": 4531,
+   "nome": "INTERFACE DE COMUNICAÇÃO"
+  },
+  {
+   "id": 1368,
+   "nome": "JOGO DE LUZ"
+  },
+  {
+   "id": 4285,
+   "nome": "KIOCERA KM 2810"
+  },
+  {
+   "id": 4427,
+   "nome": "KIT CÂMERA GROUP"
+  },
+  {
+   "id": 4495,
+   "nome": "KIT DE INTERNET"
+  },
+  {
+   "id": 4294,
+   "nome": "KYOCERA FS3040 MFP"
+  },
+  {
+   "id": 4293,
+   "nome": "KYOCERA FS3041 MFP"
+  },
+  {
+   "id": 4295,
+   "nome": "KYOCERA TASKALFA 305"
+  },
+  {
+   "id": 4341,
+   "nome": "KYOCERA TASKALFA 358CI"
+  },
+  {
+   "id": 4340,
+   "nome": "KYOCERA TASKALFA M3145"
+  },
+  {
+   "id": 4256,
+   "nome": "LASER MULTIFUNCIONAL 4200"
+  },
+  {
+   "id": 1061,
+   "nome": "LAVADORA DE PRESSÂO"
+  },
+  {
+   "id": 278,
+   "nome": "LEITOR BIOMETRICO"
+  },
+  {
+   "id": 223,
+   "nome": "LEITOR CÓDIGO DE BARRAS"
+  },
+  {
+   "id": 4547,
+   "nome": "LEITOR DE CARTÃO"
+  },
+  {
+   "id": 1325,
+   "nome": "LEITOR DE DVD/CD"
+  },
+  {
+   "id": 4253,
+   "nome": "LEX MARK E120"
+  },
+  {
+   "id": 380,
+   "nome": "LOUSA DIGITAL"
+  },
+  {
+   "id": 369,
+   "nome": "LUMINARIA"
+  },
+  {
+   "id": 1045,
+   "nome": "LUPA"
+  },
+  {
+   "id": 4545,
+   "nome": "MAC MINI"
+  },
+  {
+   "id": 1111,
+   "nome": "MACACO HIDRAULICO"
+  },
+  {
+   "id": 3501,
+   "nome": "MACBOOK"
+  },
+  {
+   "id": 4585,
+   "nome": "MAQUINA DE CORTE"
+  },
+  {
+   "id": 422,
+   "nome": "MAQUINA DE FAZER ESPUMAS"
+  },
+  {
+   "id": 449,
+   "nome": "MAQUINA DE FAZER FUMACA"
+  },
+  {
+   "id": 1053,
+   "nome": "MÁQUINA DE SOLDA"
+  },
+  {
+   "id": 75,
+   "nome": "MAQUINA FOTOGRÁFICA DIGITAL"
+  },
+  {
+   "id": 1023,
+   "nome": "MAQUINA PARA ILHOS"
+  },
+  {
+   "id": 4521,
+   "nome": "MEDIDOR DE TEMPERATURA"
+  },
+  {
+   "id": 4543,
+   "nome": "MESA PARA IMPRESSORA"
+  },
+  {
+   "id": 224,
+   "nome": "MICRO AMD"
+  },
+  {
+   "id": 383,
+   "nome": "MICRO ATOM"
+  },
+  {
+   "id": 178,
+   "nome": "MICRO CELERON"
+  },
+  {
+   "id": 237,
+   "nome": "MICRO CORE 2  DUO"
+  },
+  {
+   "id": 294,
+   "nome": "MICRO CORE 2 QUAD"
+  },
+  {
+   "id": 228,
+   "nome": "MICRO DUAL CORE"
+  },
+  {
+   "id": 1945,
+   "nome": "MICRO I3"
+  },
+  {
+   "id": 1947,
+   "nome": "MICRO I5"
+  },
+  {
+   "id": 1115,
+   "nome": "MICRO I5"
+  },
+  {
+   "id": 1993,
+   "nome": "MICRO I7"
+  },
+  {
+   "id": 288,
+   "nome": "MICRO PENTIUM IV"
+  },
+  {
+   "id": 174,
+   "nome": "MICRO SEMPRON"
+  },
+  {
+   "id": 1163,
+   "nome": "MICRO XEON"
+  },
+  {
+   "id": 4560,
+   "nome": "MICRO-ONDAS"
+  },
+  {
+   "id": 157,
+   "nome": "MICROFONE"
+  },
+  {
+   "id": 4580,
+   "nome": "MINI RACK"
+  },
+  {
+   "id": 285,
+   "nome": "MODEM ADSL"
+  },
+  {
+   "id": 161,
+   "nome": "MODULO AMPLIFICADOR"
+  },
+  {
+   "id": 4573,
+   "nome": "MODULO INTERATIVO"
+  },
+  {
+   "id": 1153,
+   "nome": "MODULO ISOLADOR"
+  },
+  {
+   "id": 1,
+   "nome": "MONITOR 14\""
+  },
+  {
+   "id": 1124,
+   "nome": "MONITOR 15\""
+  },
+  {
+   "id": 1278,
+   "nome": "MONITOR 17\""
+  },
+  {
+   "id": 1120,
+   "nome": "MONITOR 18\""
+  },
+  {
+   "id": 4582,
+   "nome": "MONITOR 18,5\""
+  },
+  {
+   "id": 1252,
+   "nome": "MONITOR 19\""
+  },
+  {
+   "id": 4578,
+   "nome": "MONITOR 19.5\""
+  },
+  {
+   "id": 4555,
+   "nome": "MONITOR 20"
+  },
+  {
+   "id": 1309,
+   "nome": "MONITOR 20\""
+  },
+  {
+   "id": 1047,
+   "nome": "MONITOR 21\""
+  },
+  {
+   "id": 4546,
+   "nome": "MONITOR 21,5"
+  },
+  {
+   "id": 248,
+   "nome": "MONITOR 22\""
+  },
+  {
+   "id": 1217,
+   "nome": "MONITOR 23\""
+  },
+  {
+   "id": 4552,
+   "nome": "MONITOR 23,6\""
+  },
+  {
+   "id": 4554,
+   "nome": "MONITOR 23,8\""
+  },
+  {
+   "id": 4463,
+   "nome": "MONITOR 24\""
+  },
+  {
+   "id": 1369,
+   "nome": "MONITOR 27\""
+  },
+  {
+   "id": 4542,
+   "nome": "MONITOR CURVO"
+  },
+  {
+   "id": 1018,
+   "nome": "MONITOR DE CAMERAS"
+  },
+  {
+   "id": 4557,
+   "nome": "MONITOR TOUCH"
+  },
+  {
+   "id": 4255,
+   "nome": "MPRESSORA LASER HP P-2015"
+  },
+  {
+   "id": 3084,
+   "nome": "MULTIFUNCIONAL JATO DE TINTA"
+  },
+  {
+   "id": 4584,
+   "nome": "MULTIFUNCIONAL JATO DE TINTA A3"
+  },
+  {
+   "id": 4259,
+   "nome": "MULTIFUNCIONAL JT OFFICEJET 3680 HP"
+  },
+  {
+   "id": 4192,
+   "nome": "MULTIFUNCIONAL LASER COLOR A3"
+  },
+  {
+   "id": 1943,
+   "nome": "MULTIFUNCIONAL LASER COLOR A4"
+  },
+  {
+   "id": 1339,
+   "nome": "MULTIFUNCIONAL LASER MONO A3"
+  },
+  {
+   "id": 1249,
+   "nome": "MULTIFUNCIONAL LASER MONO A4"
+  },
+  {
+   "id": 413,
+   "nome": "MULTIMETRO"
+  },
+  {
+   "id": 367,
+   "nome": "NANO STATION"
+  },
+  {
+   "id": 33,
+   "nome": "NOBREAK 1200VA"
+  },
+  {
+   "id": 1312,
+   "nome": "NOBREAK 1300VA"
+  },
+  {
+   "id": 205,
+   "nome": "NOBREAK 1400VA"
+  },
+  {
+   "id": 1077,
+   "nome": "NOBREAK 1500VA"
+  },
+  {
+   "id": 257,
+   "nome": "NOBREAK 2000VA"
+  },
+  {
+   "id": 1079,
+   "nome": "NOBREAK 2200VA"
+  },
+  {
+   "id": 1338,
+   "nome": "NOBREAK 2400VA"
+  },
+  {
+   "id": 381,
+   "nome": "NOBREAK 3000VA"
+  },
+  {
+   "id": 1347,
+   "nome": "NOBREAK 3200VA"
+  },
+  {
+   "id": 4564,
+   "nome": "NOBREAK 40KVA"
+  },
+  {
+   "id": 32,
+   "nome": "NOBREAK 600VA"
+  },
+  {
+   "id": 124,
+   "nome": "NOBREAK 700VA"
+  },
+  {
+   "id": 4579,
+   "nome": "NOBREAK 800VA"
+  },
+  {
+   "id": 96,
+   "nome": "NOTEBOOK  CELERON"
+  },
+  {
+   "id": 1012,
+   "nome": "NOTEBOOK AMD"
+  },
+  {
+   "id": 305,
+   "nome": "NOTEBOOK ATOM"
+  },
+  {
+   "id": 302,
+   "nome": "NOTEBOOK CORE 2 DUO"
+  },
+  {
+   "id": 322,
+   "nome": "NOTEBOOK DUAL CORE"
+  },
+  {
+   "id": 1220,
+   "nome": "NOTEBOOK I3"
+  },
+  {
+   "id": 1116,
+   "nome": "NOTEBOOK I5"
+  },
+  {
+   "id": 1034,
+   "nome": "NOTEBOOK I7"
+  },
+  {
+   "id": 4550,
+   "nome": "NOTEBOOK I9"
+  },
+  {
+   "id": 195,
+   "nome": "NOTEBOOK PENTIUM 740"
+  },
+  {
+   "id": 4563,
+   "nome": "NOTEBOOK ULTRA"
+  },
+  {
+   "id": 1236,
+   "nome": "ORGANIZADOR DE CABOS"
+  },
+  {
+   "id": 1341,
+   "nome": "ORGANIZADOR DE CABOS"
+  },
+  {
+   "id": 394,
+   "nome": "ORGANIZADOR DE FILA"
+  },
+  {
+   "id": 1068,
+   "nome": "OSCILOSCÓPIO"
+  },
+  {
+   "id": 472,
+   "nome": "PARAFUSADEIRA"
+  },
+  {
+   "id": 1235,
+   "nome": "PATCH PANEL"
+  },
+  {
+   "id": 234,
+   "nome": "PEDESTAL PARA BANNER"
+  },
+  {
+   "id": 160,
+   "nome": "PEDESTRAL  MICROFONE"
+  },
+  {
+   "id": 401,
+   "nome": "PLASTIFICADORA"
+  },
+  {
+   "id": 4352,
+   "nome": "PLOTER HP T520"
+  },
+  {
+   "id": 4351,
+   "nome": "PLOTER HP T650"
+  },
+  {
+   "id": 1033,
+   "nome": "PLOTTER"
+  },
+  {
+   "id": 3519,
+   "nome": "PROCESSADOR DE DOCUMENTOS ADF"
+  },
+  {
+   "id": 1271,
+   "nome": "PROJETOR"
+  },
+  {
+   "id": 1323,
+   "nome": "PROJETOR 3600 LUMENS"
+  },
+  {
+   "id": 432,
+   "nome": "PULPITO EM ACRILICO"
+  },
+  {
+   "id": 444,
+   "nome": "PULVERIZADOR"
+  },
+  {
+   "id": 158,
+   "nome": "RACK PARA SOM"
+  },
+  {
+   "id": 69,
+   "nome": "RADIO COMUNICADOR"
+  },
+  {
+   "id": 154,
+   "nome": "RÁDIO GRAVADOR STEREO"
+  },
+  {
+   "id": 1066,
+   "nome": "REFILADORA"
+  },
+  {
+   "id": 1014,
+   "nome": "REFRIGERADOR"
+  },
+  {
+   "id": 1237,
+   "nome": "REGUA DE TOMADAS PARA RACK"
+  },
+  {
+   "id": 317,
+   "nome": "REMOTEPLAY"
+  },
+  {
+   "id": 1352,
+   "nome": "REPETIDOR WIFI"
+  },
+  {
+   "id": 1170,
+   "nome": "RESPIRADOR"
+  },
+  {
+   "id": 213,
+   "nome": "ROTEADOR"
+  },
+  {
+   "id": 1345,
+   "nome": "ROTULADOR"
+  },
+  {
+   "id": 4298,
+   "nome": "SAMSUNG SCX-3405W"
+  },
+  {
+   "id": 4300,
+   "nome": "SAMSUNG SCX-4729 FD"
+  },
+  {
+   "id": 63,
+   "nome": "SCANNER"
+  },
+  {
+   "id": 1104,
+   "nome": "SERVIDOR"
+  },
+  {
+   "id": 3506,
+   "nome": "SOPRADOR TERMICO"
+  },
+  {
+   "id": 1001,
+   "nome": "SPLITTER HDMI"
+  },
+  {
+   "id": 1340,
+   "nome": "STORAGE NAS"
+  },
+  {
+   "id": 4574,
+   "nome": "SUPORTE DE PROJETOR"
+  },
+  {
+   "id": 1361,
+   "nome": "SUPORTE PARA MONITOR"
+  },
+  {
+   "id": 4556,
+   "nome": "SUPORTE PARA NOTEBOOK"
+  },
+  {
+   "id": 419,
+   "nome": "SUPORTE PARA TV"
+  },
+  {
+   "id": 1205,
+   "nome": "SWITCH"
+  },
+  {
+   "id": 220,
+   "nome": "SWITCH  24 PORTAS"
+  },
+  {
+   "id": 1318,
+   "nome": "SWITCH 13 PORTAS"
+  },
+  {
+   "id": 283,
+   "nome": "SWITCH 16 PORTAS"
+  },
+  {
+   "id": 467,
+   "nome": "SWITCH 4 PORTAS"
+  },
+  {
+   "id": 1110,
+   "nome": "SWITCH 48 PORTAS"
+  },
+  {
+   "id": 1364,
+   "nome": "SWITCH 5 PORTAS"
+  },
+  {
+   "id": 4575,
+   "nome": "SWITCH 54 PORTAS"
+  },
+  {
+   "id": 281,
+   "nome": "SWITCH 8 PORTAS"
+  },
+  {
+   "id": 1221,
+   "nome": "SWITCH GERENCIAVEL"
+  },
+  {
+   "id": 1070,
+   "nome": "TABLET"
+  },
+  {
+   "id": 89,
+   "nome": "TELA DE PROJEÇÃO"
+  },
+  {
+   "id": 4568,
+   "nome": "TELA INTERATIVA"
+  },
+  {
+   "id": 298,
+   "nome": "TELEFONE"
+  },
+  {
+   "id": 90,
+   "nome": "TELEVISÃO DE 14\""
+  },
+  {
+   "id": 151,
+   "nome": "TESTADOR DE CABO DE REDE"
+  },
+  {
+   "id": 4544,
+   "nome": "TESTADOR E LOCALIZADOR DE CABO DE REDE"
+  },
+  {
+   "id": 4587,
+   "nome": "THINKBOOK I5"
+  },
+  {
+   "id": 4569,
+   "nome": "THINKCENTRE AMD"
+  },
+  {
+   "id": 1227,
+   "nome": "THINKCENTRE I3"
+  },
+  {
+   "id": 1320,
+   "nome": "THINKCENTRE I5"
+  },
+  {
+   "id": 4503,
+   "nome": "THINKCENTRE I7"
+  },
+  {
+   "id": 4565,
+   "nome": "THINKSMART HUB"
+  },
+  {
+   "id": 4570,
+   "nome": "THINKSTATION"
+  },
+  {
+   "id": 4536,
+   "nome": "TORRE DE CARREGADOR"
+  },
+  {
+   "id": 354,
+   "nome": "TORRE DE GRAVACAO DVD/CD"
+  },
+  {
+   "id": 1101,
+   "nome": "TOTEM MULTIMIDIA"
+  },
+  {
+   "id": 316,
+   "nome": "TRANSCORTEC"
+  },
+  {
+   "id": 1159,
+   "nome": "TRANSFORMADOR"
+  },
+  {
+   "id": 437,
+   "nome": "TRANSFORMADOR 1500VA"
+  },
+  {
+   "id": 360,
+   "nome": "TRANSFORMADOR 2000VA"
+  },
+  {
+   "id": 1083,
+   "nome": "TRANSFORMADOR 3000VA"
+  },
+  {
+   "id": 462,
+   "nome": "TRIPE PARA CAIXA DE SOM"
+  },
+  {
+   "id": 4583,
+   "nome": "TRIPÉ PARA CÂMERA"
+  },
+  {
+   "id": 4558,
+   "nome": "TRIPÉ PARA TV"
+  },
+  {
+   "id": 353,
+   "nome": "TV 32\""
+  },
+  {
+   "id": 1214,
+   "nome": "TV 39\""
+  },
+  {
+   "id": 474,
+   "nome": "TV 40\""
+  },
+  {
+   "id": 427,
+   "nome": "TV 42\""
+  },
+  {
+   "id": 4500,
+   "nome": "TV 43\""
+  },
+  {
+   "id": 1076,
+   "nome": "TV 49\""
+  },
+  {
+   "id": 1006,
+   "nome": "TV 50\""
+  },
+  {
+   "id": 1108,
+   "nome": "TV 55\""
+  },
+  {
+   "id": 1287,
+   "nome": "TV 58\""
+  },
+  {
+   "id": 1358,
+   "nome": "TV 60\""
+  },
+  {
+   "id": 1336,
+   "nome": "TV 65\""
+  },
+  {
+   "id": 1086,
+   "nome": "TV BOX"
+  },
+  {
+   "id": 1013,
+   "nome": "VENTILADOR"
+  },
+  {
+   "id": 91,
+   "nome": "VIDEO CASSETE"
+  },
+  {
+   "id": 1093,
+   "nome": "VIDEO WALL CONTROLLER"
+  },
+  {
+   "id": 141,
+   "nome": "WEBCAM"
+  },
+  {
+   "id": 4247,
+   "nome": "XEROX N32"
+  }
+ ],
+ "situacoes": [
+  {
+   "id": 10,
+   "nome": "AGUARDANDO CARREGAMENTO",
+   "qtd": 5
+  },
+  {
+   "id": 12,
+   "nome": "AGUARDANDO MOVIMENTAÇÃO",
+   "qtd": 0
+  },
+  {
+   "id": 13,
+   "nome": "AGUARDANDO SUBSTITUIÇÃO",
+   "qtd": 0
+  },
+  {
+   "id": 2,
+   "nome": "ALUGADO",
+   "qtd": 6
+  },
+  {
+   "id": 9,
+   "nome": "BAIXADO",
+   "qtd": 0
+  },
+  {
+   "id": 8,
+   "nome": "EM DEVOLUÇÃO",
+   "qtd": 0
+  },
+  {
+   "id": 6,
+   "nome": "EM MANUTENÇÃO",
+   "qtd": 17
+  },
+  {
+   "id": 11,
+   "nome": "EM ROTA",
+   "qtd": 0
+  },
+  {
+   "id": 4,
+   "nome": "EMPRESTADO",
+   "qtd": 1
+  },
+  {
+   "id": 16,
+   "nome": "LIBERADO",
+   "qtd": 17
+  },
+  {
+   "id": 1,
+   "nome": "LIBERADO P/ LOCACAO",
+   "qtd": 62718
+  },
+  {
+   "id": 7,
+   "nome": "NA GARANTIA",
+   "qtd": 44612
+  },
+  {
+   "id": 3,
+   "nome": "RESERVADO",
+   "qtd": 5150
+  },
+  {
+   "id": 15,
+   "nome": "RETIRADO DO CARREGAMENTO",
+   "qtd": 404
+  },
+  {
+   "id": 14,
+   "nome": "SEM CONSERTO",
+   "qtd": 2129
+  },
+  {
+   "id": 5,
+   "nome": "USO INTERNO",
+   "qtd": 0
+  }
+ ],
+ "chips": [
+  {
+   "chave": "alugados",
+   "rotulo": "Alugados",
+   "situacao_id": 2,
+   "tom": "verde",
+   "qtd": 6
+  },
+  {
+   "chave": "aguardando-devolucao",
+   "rotulo": "Aguardando Devolução",
+   "situacao_id": 8,
+   "tom": "laranja",
+   "qtd": 0
+  },
+  {
+   "chave": "reservado",
+   "rotulo": "Reservado",
+   "situacao_id": 3,
+   "tom": "azul",
+   "qtd": 5150
+  },
+  {
+   "chave": "uso-interno",
+   "rotulo": "Uso Interno",
+   "situacao_id": 5,
+   "tom": "roxo",
+   "qtd": 0
+  },
+  {
+   "chave": "emprestado",
+   "rotulo": "Emprestado",
+   "situacao_id": 4,
+   "tom": "amarelo",
+   "qtd": 1
+  },
+  {
+   "chave": "manutencao",
+   "rotulo": "Manutenção",
+   "situacao_id": 6,
+   "tom": "cinza",
+   "qtd": 17
+  },
+  {
+   "chave": "sem-conserto",
+   "rotulo": "Sem Conserto",
+   "situacao_id": 14,
+   "tom": "cinza-escuro",
+   "qtd": 2129
+  },
+  {
+   "chave": "garantia",
+   "rotulo": "Garantia",
+   "situacao_id": 7,
+   "tom": "agua",
+   "qtd": 44612
+  },
+  {
+   "chave": "liberado",
+   "rotulo": "Liberado Para Locação",
+   "situacao_id": 1,
+   "tom": "branco",
+   "qtd": 62718
+  },
+  {
+   "chave": "baixado",
+   "rotulo": "Baixado",
+   "situacao_id": 9,
+   "tom": "rosa",
+   "qtd": 0
+  }
+ ]
+}

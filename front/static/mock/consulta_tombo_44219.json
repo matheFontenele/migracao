@@ -1,0 +1,102 @@
+{
+ "numero": 44219,
+ "copias_total": 3,
+ "ativas": 3,
+ "excluidas": 0,
+ "situacoes": [
+  {
+   "situacao_id": 7,
+   "situacao": "NA GARANTIA",
+   "qtd": 2
+  },
+  {
+   "situacao_id": 1,
+   "situacao": "LIBERADO P/ LOCACAO",
+   "qtd": 1
+  }
+ ],
+ "orgaos": [
+  "ALUCOM",
+  "TONER ADI"
+ ],
+ "itens": [
+  {
+   "equipment_id": 54089,
+   "numero": 44219,
+   "numero_antigo": null,
+   "nome": "MICRO CORE I5 4GB HD 500",
+   "descricao": "MICRO I5, 4GB RAM, SSD 120GB NS 2718600052497",
+   "observacoes": "3* GERAÇÃO",
+   "tipo_id": 1947,
+   "tipo": "MICRO I5",
+   "orgao_id": 1115,
+   "orgao": "ALUCOM",
+   "uso_interno": false,
+   "situacao_id": 7,
+   "situacao": "NA GARANTIA",
+   "alugado": false,
+   "cliente": "",
+   "cliente_desde": "",
+   "movimento_id": 555702,
+   "movimentos_total": 11,
+   "data_locacao": "",
+   "data_garantia": "27/08/2022",
+   "data_aquisicao": "27/08/2021",
+   "deleted_at": "",
+   "ativo": true,
+   "situacao_divergente": false
+  },
+  {
+   "equipment_id": 104445,
+   "numero": 44219,
+   "numero_antigo": null,
+   "nome": "TONER BROTHER 7535",
+   "descricao": "TONER BROTHER 7535",
+   "observacoes": "",
+   "tipo_id": 4339,
+   "tipo": "IMPRESSORA BROTHER DCP B-7535DW",
+   "orgao_id": 1351,
+   "orgao": "TONER ADI",
+   "uso_interno": false,
+   "situacao_id": 7,
+   "situacao": "NA GARANTIA",
+   "alugado": false,
+   "cliente": "",
+   "cliente_desde": "",
+   "movimento_id": null,
+   "movimentos_total": 0,
+   "data_locacao": "",
+   "data_garantia": "04/05/2023",
+   "data_aquisicao": "04/05/2023",
+   "deleted_at": "",
+   "ativo": true,
+   "situacao_divergente": false
+  },
+  {
+   "equipment_id": 118545,
+   "numero": 44219,
+   "numero_antigo": null,
+   "nome": "MICRO CORE I5 4GB HD 500",
+   "descricao": "MICRO I5, 4GB RAM, SSD 120GB NS 2718600052497",
+   "observacoes": "3* GERAÇÃO",
+   "tipo_id": 1947,
+   "tipo": "MICRO I5",
+   "orgao_id": 1115,
+   "orgao": "ALUCOM",
+   "uso_interno": false,
+   "situacao_id": 1,
+   "situacao": "LIBERADO P/ LOCACAO",
+   "alugado": true,
+   "cliente": "3084 - P.M DE CAUCAIA - SAÚDE - UBS JULIA PESSOA DE ARAUJO",
+   "cliente_desde": "13/07/2026 09:56",
+   "movimento_id": 556875,
+   "movimentos_total": 4,
+   "data_locacao": "13/07/2026 09:56",
+   "data_garantia": "27/10/2022",
+   "data_aquisicao": "27/08/2021",
+   "deleted_at": "",
+   "ativo": true,
+   "situacao_divergente": true
+  }
+ ]
+}

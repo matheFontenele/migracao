@@ -1,0 +1,31 @@
+{
+ "movimento": {
+  "movimento_id": 556875,
+  "numero": 556873,
+  "tipo": "SA",
+  "tipo_id": 5,
+  "tipo_nome": "Substituição Alugado",
+  "data": "13/07/2026 09:56",
+  "cliente": "3084 - P.M DE CAUCAIA - SAÚDE - UBS JULIA PESSOA DE ARAUJO",
+  "orgao": "ALUCOM",
+  "status": "Ativo",
+  "observacoes": "",
+  "declaracao": "",
+  "par": {
+   "movimento_id": 556874,
+   "tipo": "SD",
+   "numero": 556873,
+   "data": "13/07/2026 09:56",
+   "cliente": "3084 - P.M DE CAUCAIA - SAÚDE - UBS JULIA PESSOA DE ARAUJO"
+  }
+ },
+ "itens": [
+  {
+   "equipment_id": 118545,
+   "numero": 44219,
+   "nome": "MICRO CORE I5 4GB HD 500",
+   "orgao_anterior": "",
+   "orgao_novo": ""
+  }
+ ]
+}
