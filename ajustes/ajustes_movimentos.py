@@ -567,6 +567,8 @@ class AjustesMovimentos:
             self.equipamentos_parquet, self.tombos_parquet = set(), set()
         # (numero_legado, movement_type_id) -> dados da capa criada/reutilizada
         self.cache_cabecalhos = {}
+        # capas reaproveitadas cujo cabeçalho tem tipo diferente do legado
+        self.capas_tipo_divergente = 0
         # movimento legado -> itens (ids de equipamento na ordem de inserção)
         self.cache_itens_legado = {}
         # (movimento SA, equipamento entregue) -> equipamento devolvido
@@ -1182,6 +1184,9 @@ class AjustesMovimentos:
         print("\n" + "-" * 78)
         print(f"✅ Corrigidos: {sucesso:,}")
         print(f"❌ Falhas:    {falha:,}")
+        if getattr(self, "capas_tipo_divergente", 0):
+            print(f"♻️ Capas reaproveitadas com tipo divergente do legado: "
+                  f"{self.capas_tipo_divergente:,}")
         print(f"📄 Resultado detalhado: {ARQ_RESULTADO}")
         if falha:
             print("\nPrimeiras falhas:")
@@ -1337,8 +1342,12 @@ class AjustesMovimentos:
 
         tipo_existente = _int_or_none(linha[2])
         if tipo_existente is not None and tipo_existente != int(movimento_tipo_id):
-            # Número reaproveitado para outro tipo de operação: não misturar.
-            return None
+            # O mesmo movimento do legado costuma misturar operações (aluguel +
+            # devolução) e a migração criou a capa com o tipo do primeiro item.
+            # Em vez de abrir uma SEGUNDA capa com o mesmo `number`, reaproveita
+            # a existente: o item entra com o tipo do legado e o cabeçalho
+            # mantém o tipo que a migração definiu.
+            self.capas_tipo_divergente += 1
 
         cabecalho = {
             "movement_id": int(linha[0]),

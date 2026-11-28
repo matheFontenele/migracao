@@ -15,7 +15,12 @@ from config.config import CLIENTES_ESTOQUE
 from config.parquet_excecoes import normalizar_tombo, tombos_priorizados
 
 TABELAS = [
-    "service_order_item_extra_equipments", "movement_items", "movements", "service_order_items", "service_orders"
+    "service_order_item_extra_equipments", "movement_items", "movements", "service_order_items", "service_orders",
+    # Tabelas derivadas dos movimentos: sem elas, cada reexecução da esteira
+    # acumula volumes/envios/histórico da execução anterior (ids de movimento
+    # diferentes), deixando órfãos no banco.
+    "volume_items", "volumes", "shipment_items", "shipment_movements", "shipments",
+    "equipment_history",
 ]
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -204,9 +209,142 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             ).fetchall()
         return {int(linha[0]): linha[1] for linha in linhas}
 
+    def _ignorados_entrega_substituicao(self, tombos_list):
+        """Tombos cujo ÚLTIMO movimento é a entrega de uma substituição.
+
+        Nesses casos o aluguel vigente é responsabilidade do módulo de
+        SUBSTITUIÇÃO (FASE 3). Se o ALUGUEL criasse a capa anterior, o
+        histórico do equipamento mostraria a locação antiga como se fosse a
+        vigente (ex.: tombo 48704 -> 562532 DR BRASIL, quando a última ação
+        real é o envio 563427 para CEDRO).
+
+        O critério é o mesmo "último movimento" do módulo: entre os tipos
+        (1, 2, 5), o mais recente por data/id — TR (6) não conta.
+        """
+        if not tombos_list:
+            return pd.DataFrame()
+
+        tombos_formatados = ",".join(f"'{str(t).strip()}'" for t in tombos_list)
+        query = f"""
+            SELECT
+                eq.id     AS equipamento_legado_id,
+                eq.numero AS tombo,
+                m_u.id    AS movimento_id,
+                m_u.tipo  AS tipo,
+                m_u.tipo_id AS tipo_id,
+                m_u.data  AS data_movimento,
+                m_u.cliente_id AS cliente_id
+            FROM aluguel_equipamentos eq
+            INNER JOIN aluguel_movimento_itens mi_u ON mi_u.equipamento_id = eq.id
+            INNER JOIN aluguel_movimento m_u       ON m_u.id = mi_u.movimento_id
+            WHERE eq.deleted_at IS NULL
+              AND eq.situacao_id = 1
+              AND eq.numero IN ({tombos_formatados})
+              AND mi_u.deleted_at IS NULL
+              AND m_u.deleted_at IS NULL
+              AND m_u.tipo_id IN (1, 2, 5)
+              -- É a entrega (lado novo) de um ciclo de substituição...
+              AND EXISTS (
+                  SELECT 1 FROM aluguel_substituicao sub_u
+                  WHERE sub_u.substituicao_devolucao_id = m_u.id
+              )
+              -- ...e não existe movimento posterior no equipamento.
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM aluguel_movimento_itens mi_n
+                  INNER JOIN aluguel_movimento m_n ON m_n.id = mi_n.movimento_id
+                  WHERE mi_n.equipamento_id = eq.id
+                    AND mi_n.deleted_at IS NULL
+                    AND m_n.deleted_at IS NULL
+                    AND m_n.tipo_id IN (1, 2, 5)
+                    AND (m_n.data > m_u.data
+                         OR (m_n.data = m_u.data AND m_n.id > m_u.id))
+              )
+        """
+        with self.engine_legado.connect() as conn:
+            df = pd.read_sql(text(query), conn)
+
+        if df.empty:
+            return df
+
+        # Um tombo pode ter mais de um cadastro de equipamento no legado:
+        # mantém a mesma escolha determinística do restante do módulo.
+        df = (
+            df.sort_values(["tombo", "equipamento_legado_id"])
+            .drop_duplicates(subset=["tombo"], keep="first")
+            .reset_index(drop=True)
+        )
+
+        # O ALUGUEL só pode abrir mão do equipamento se o módulo SUBSTITUIÇÃO
+        # realmente for gravar a entrega. `deve_processar_envio` exige o tombo
+        # no CTE de último movimento tipo 5; além disso, o ciclo é descartado
+        # quando o cliente do movimento não tem de/para no refatorado e o envio
+        # não roda se o equipamento não existe no destino. Sem esta checagem,
+        # 12 tombos (clientes base, ex.: 10662 ALUCOM SANTOS DUMONT) ficariam
+        # sem NENHUM movimento depois que o aluguel deixasse de criá-los.
+        entregas_subst = self.buscar_ultimo_movimento_cte(
+            list(df["tombo"].astype(str).str.strip().unique()),
+            tipos_permitidos=(5,),
+            situacoes_permitidas=(1, 15),
+        )
+        mapa_clientes = self.dados.get("dict_cliente_adress", {}) or {}
+        ids_ref = self.dados.get("ids_equipamentos_ref", set()) or set()
+
+        def substituicao_vai_migrar(linha):
+            tombo = str(linha["tombo"]).strip()
+            if tombo not in entregas_subst:
+                return False
+            cliente = linha["cliente_id"]
+            try:
+                cliente = int(cliente)
+            except (TypeError, ValueError):
+                return False
+            if cliente not in mapa_clientes:
+                return False
+            return int(linha["equipamento_legado_id"]) in ids_ref
+
+        antes = len(df)
+        df = df[df.apply(substituicao_vai_migrar, axis=1)].reset_index(drop=True)
+        if len(df) != antes:
+            print(
+                f"ℹ️ {antes - len(df)} tombo(s) mantidos no ALUGUEL: a "
+                f"SUBSTITUIÇÃO não migraria a entrega (cliente sem de/para "
+                f"ou equipamento ausente no refatorado)."
+            )
+        if df.empty:
+            return df
+
+        df["motivo"] = (
+            "Último movimento é entrega de substituição "
+            "(migrado pelo módulo SUBSTITUIÇÃO)"
+        )
+        pasta_ajustes = os.path.join(os.path.dirname(BASE_DIR), "ajustes")
+        os.makedirs(pasta_ajustes, exist_ok=True)
+        caminho = os.path.join(pasta_ajustes, "aluguel_ignorados_substituicao.csv")
+        df.to_csv(caminho, index=False, encoding="utf-8")
+        print(
+            f"⏭️ {len(df)} tombos ignorados no ALUGUEL: o último movimento é "
+            f"entrega de substituição (quem migra é o módulo SUBSTITUIÇÃO)."
+        )
+        print(f"   📄 Relatório: {caminho}")
+        return df
+
     def _buscar_ultimos_movimentos_aluguel(self, tombos_list):
         if not tombos_list: return {}
-        
+
+        ignorados = self._ignorados_entrega_substituicao(tombos_list)
+        self.tombos_ignorados_substituicao = (
+            set(ignorados["tombo"].astype(str).str.strip())
+            if not ignorados.empty else set()
+        )
+        if self.tombos_ignorados_substituicao:
+            tombos_list = [
+                t for t in tombos_list
+                if str(t).strip() not in self.tombos_ignorados_substituicao
+            ]
+        if not tombos_list:
+            return {}
+
         print(f"🔍 Buscando últimos movimentos no legado cruzando com {len(tombos_list)} tombos do Parquet...")
         
         # Formata a lista para '1234', '5678', etc. para o clause IN do SQL
@@ -249,17 +387,43 @@ class MigracaoAluguel(BaseMigracaoMovimento):
                 WHERE sub.substituicao_devolucao_id = mov.id
             )
             AND eq.numero IN ({tombos_formatados})
-            AND mov.id = (
+            AND mov.id = COALESCE(
                     -- 🆕 substitui o ROW_NUMBER() ... rn = 1:
-                    -- último movimento do equipamento (por data, desempate por id)
-                    SELECT mov_x.id
+                    -- último movimento ELEGÍVEL do equipamento (por data, desempate por id).
+                    -- Os mesmos filtros da query externa precisam valer aqui: se o
+                    -- último movimento for uma capa de substituição, antes ele era
+                    -- escolhido e depois descartado pelo NOT EXISTS externo, deixando
+                    -- o tombo sem candidato e sem aluguel (ex.: tombo 48704).
+                    -- Preferência por A (1) e SA (5): devolução (2) não é aluguel.
+                    -- Sem A/SA elegível, mantém o comportamento antigo (D).
+                    (SELECT mov_x.id
                     FROM aluguel_movimento_itens movi_x
                     INNER JOIN aluguel_movimento mov_x ON mov_x.id = movi_x.movimento_id
                     WHERE movi_x.equipamento_id = eq.id
                     AND mov_x.deleted_at IS NULL
                     AND movi_x.deleted_at IS NULL
+                    AND mov_x.tipo_id IN (1, 5)
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM aluguel_substituicao sub_x
+                        WHERE sub_x.substituicao_devolucao_id = mov_x.id
+                    )
                     ORDER BY mov_x.data DESC, mov_x.id DESC
-                    LIMIT 1
+                    LIMIT 1),
+                    (SELECT mov_x.id
+                    FROM aluguel_movimento_itens movi_x
+                    INNER JOIN aluguel_movimento mov_x ON mov_x.id = movi_x.movimento_id
+                    WHERE movi_x.equipamento_id = eq.id
+                    AND mov_x.deleted_at IS NULL
+                    AND movi_x.deleted_at IS NULL
+                    AND mov_x.tipo_id = 2
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM aluguel_substituicao sub_x
+                        WHERE sub_x.substituicao_devolucao_id = mov_x.id
+                    )
+                    ORDER BY mov_x.data DESC, mov_x.id DESC
+                    LIMIT 1)
             )
         """
         
@@ -389,8 +553,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
             ultimo_mov = dict_ultimo_mov.get(tombo)
 
             # O SQL já garante que se veio algo, é tipo 1 ou 2, com situação 1, e não deletado!
-            if not ultimo_mov: 
-                rejeitados += 1
+            if not ultimo_mov:
+                if tombo not in getattr(self, "tombos_ignorados_substituicao", set()):
+                    rejeitados += 1
                 continue
 
             row_mov = ultimo_mov['movimento']
@@ -590,7 +755,9 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         self._salvar_relatorio_clientes_sem_contrato(clientes_sem_contrato)
             
-        print(f"   ⏩ Ignorados (Sua última ação real foi Substituição, não Aluguel original): {rejeitados}")
+        print(f"   ⏭️ Ignorados por substituição (último movimento): "
+              f"{len(getattr(self, 'tombos_ignorados_substituicao', ()))}")
+        print(f"   ⏩ Ignorados por outros motivos: {rejeitados}")
 
         self.salvar_movimentos_banco()
         self.atualizar_equipamentos_banco(id_status_equipamento=2, lista_dicionarios=self.equipamentos_alterados)

@@ -1761,7 +1761,16 @@ def apply_scope(engine, planner, digest, ledger_path, commit=True):
                     if table == "volumes":
                         code = values.get("code")
                         if code in volume_codes:
-                            code = f"MIG-{values.get('movement_id')}"
+                            # Código do prod já existe localmente. O fallback
+                            # precisa ser único: dois volumes do MESMO
+                            # movimento gerariam `MIG-{movement_id}` repetido
+                            # e violariam volumes_code_unique.
+                            base = f"MIG-{values.get('movement_id')}-{source_id}"
+                            code = base
+                            contador = 1
+                            while code in volume_codes:
+                                contador += 1
+                                code = f"{base}-{contador}"
                             values["code"] = code
                         volume_codes.add(code)
                     columns = list(values)

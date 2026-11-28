@@ -577,6 +577,13 @@ class BaseMigracaoMovimento:
         
         # Dicionário para gerenciar os IDs gerados em memória
         self.mapa_ids_capa = {}
+        # Capas já criadas NESTA execução por qualquer módulo, por número do
+        # movimento legado (chave: int(id legado) -> id local da capa). O
+        # orquestrador injeta o mesmo `dados` em todos os módulos, então a
+        # substituição reaproveita a capa que o aluguel já criou.
+        self.mapa_capas_compartilhado = self.dados.setdefault(
+            "mapa_capas_por_numero", {})
+        self.capas_reaproveitadas = 0
         
         self.servicos_mestre = []
         self.service_itens_mestre = []
@@ -863,12 +870,31 @@ class BaseMigracaoMovimento:
         else:
             usuario_seguro = 1
         
+        # O `number` da capa é o id do movimento no legado. Dois módulos podem
+        # tratar o MESMO movimento legado (ex.: ALUGUEL e SUBSTITUIÇÃO FASE 1
+        # reconstruindo o aluguel histórico). Nesse caso a segunda chamada
+        # reaproveita a capa já criada em vez de gerar `movements.number`
+        # duplicado — os itens novos entram na capa existente.
+        criar_capa = (
+            id_final not in self.mapa_ids_capa
+            and int(id_final) not in self.mapa_capas_compartilhado
+        )
         if id_final not in self.mapa_ids_capa:
-            novo_id_capa = self.so_capa_id_counter
-            self.so_capa_id_counter += 1
-            self.mapa_ids_capa[id_final] = novo_id_capa
-        
-        # 1️⃣ CAPAS PAI (Service Order + Movement)
+            reaproveitada = self.mapa_capas_compartilhado.get(int(id_final))
+            if reaproveitada is not None:
+                self.mapa_ids_capa[id_final] = reaproveitada["id"]
+                self.capas_reaproveitadas += 1
+            else:
+                novo_id_capa = self.so_capa_id_counter
+                self.so_capa_id_counter += 1
+                self.mapa_ids_capa[id_final] = novo_id_capa
+                self.mapa_capas_compartilhado[int(id_final)] = {
+                    "id": novo_id_capa,
+                    "itens": {},
+                }
+
+        if criar_capa:
+            # 1️⃣ CAPAS PAI (Service Order + Movement)
             self.servicos_mestre.append({
                 "id": novo_id_capa,
                 "status_id": 3,
@@ -905,6 +931,18 @@ class BaseMigracaoMovimento:
             self.pedidos_pai_inseridos.add(id_final)
 
         id_capa_atual = self.mapa_ids_capa[id_final]
+
+        # Um equipamento aparece no máximo uma vez por capa (invariante do
+        # legado). Se a capa foi reaproveitada de outro módulo e este
+        # equipamento já tem item nela, devolve os ids existentes em vez de
+        # duplicar o item/o histórico.
+        registro_capa = self.mapa_capas_compartilhado.setdefault(
+            int(id_final), {"id": int(id_capa_atual), "itens": {}})
+        itens_da_capa = registro_capa.setdefault("itens", {})
+        if equipment_id_ref is not None:
+            existente = itens_da_capa.get(int(equipment_id_ref))
+            if existente is not None:
+                return int(id_capa_atual), existente[0], existente[1]
 
         # 2️⃣ GATILHO DE SALDO E EXTRAS
         item_servico_id_atual = self.so_item_id_counter
@@ -1038,6 +1076,9 @@ class BaseMigracaoMovimento:
             "updated_at": mov_date,
             "deleted_at": deleted_at_mov
         })
+        if equipment_id_ref is not None:
+            itens_da_capa[int(equipment_id_ref)] = (
+                item_servico_id_atual, item_mov_id_atual)
 
         # 5️⃣ SHIPMENTS
         ship_id_atual = self.shipment_id_counter
@@ -1177,7 +1218,7 @@ class BaseMigracaoMovimento:
             # ==========================================================================
             # CRIAÇÃO DE VOLUMES PARA MOVIMENTOS DE MIGRAÇÃO
             # ==========================================================================
-            if self.movimentos_mestre and self.movimento_itens_mestre:
+            if self.movimento_itens_mestre:
                 print("   📦 Criando volumes para movimentos de migração...")
                 # Mapear movement_id -> lista de movement_item_ids
                 mov_to_items = {}
@@ -1196,8 +1237,12 @@ class BaseMigracaoMovimento:
                 max_vol = conn.execute(text("SELECT COALESCE(MAX(id), 0) FROM volumes")).scalar()
                 volume_id_counter = max_vol + 1
 
+                capas_novas = set()
                 for mov in self.movimentos_mestre:
                     mov_id = mov.get('id')
+                    if mov_id is None:
+                        continue
+                    capas_novas.add(int(mov_id))
                     if mov_id in mov_to_items and mov_to_items[mov_id]:
                         volume_id = volume_id_counter
                         volume_id_counter += 1
@@ -1217,6 +1262,41 @@ class BaseMigracaoMovimento:
                                 "volume_id": volume_id,
                                 "movement_item_id": mi_id,
                                 "quantity": 1,  # Cada item de movimento = 1 unidade no volume
+                                "created_at": self.now,
+                                "updated_at": self.now
+                            })
+
+                # Itens que entraram em capas REAPROVEITADAS de outro módulo
+                # (ex.: aluguel histórico da substituição): a capa e o volume
+                # já existem, então só anexamos os itens novos ao volume dela.
+                reaproveitadas = [mid for mid in mov_to_items if mid not in capas_novas]
+                if reaproveitadas:
+                    volumes_existentes = {}
+                    consulta = text(
+                        "SELECT id, movement_id FROM volumes WHERE movement_id IN :ids"
+                    ).bindparams(sa.bindparam("ids", expanding=True))
+                    for vol_id, mov_id in conn.execute(consulta, {"ids": reaproveitadas}):
+                        volumes_existentes.setdefault(int(mov_id), int(vol_id))
+
+                    for mov_id in reaproveitadas:
+                        volume_id = volumes_existentes.get(mov_id)
+                        if volume_id is None:
+                            volume_id = volume_id_counter
+                            volume_id_counter += 1
+                            volumes_batch.append({
+                                "id": volume_id,
+                                "movement_id": int(mov_id),
+                                "name": f"MIGRACAO {mov_id}",
+                                "code": f"MIG-{mov_id}",
+                                "shipped": 0,
+                                "created_at": self.now,
+                                "updated_at": self.now
+                            })
+                        for mi_id in mov_to_items[mov_id]:
+                            volume_items_batch.append({
+                                "volume_id": volume_id,
+                                "movement_item_id": mi_id,
+                                "quantity": 1,
                                 "created_at": self.now,
                                 "updated_at": self.now
                             })
@@ -1241,6 +1321,8 @@ class BaseMigracaoMovimento:
 
         print(f"--- 🏁 Resumo {self.__class__.__name__} ---")
         print(f"📦 Capas Pais Criadas: {len(self.servicos_mestre)}")
+        if self.capas_reaproveitadas:
+            print(f"♻️ Capas reaproveitadas de outro módulo: {self.capas_reaproveitadas}")
         print(f"📦 Itens Criados: {len(self.service_itens_mestre)}")
         print(f"📦 Itens Extras Inseridos: {len(self.itens_extras_mestre)}")
         print(f"📦 Histórico do Equipamento Criado: {len(self.equipment_histories_mestre)}")

@@ -46,8 +46,21 @@ MARCADOR = "Migração REQUISIÇÃO 2026.csv"
 # Esse equipamento só existe em `prod_14_11` (id 168487, criado em 06/11/2026);
 # não há registro dele em `aluguel_legado` nem no parquet consolidado de 27/11,
 # então o PAT não resolve e a linha sai na auditoria como MOVIMENTO BLOQUEADO.
-# Quando o delta de produção for reaplicado, o valor volta a 429.
-ESPERADO = {"requisicoes": 471, "itens": 1147, "movimentos": 428, "itens_movimento": 1348}
+# A partir do run 20261127_1625 as regras de requisição mudaram (só Req
+# Separado/Parcial, movimento a partir do PAT, Parcial com equipamento
+# disponível, substituição só com tombo existente). Contagens do dry-run e do
+# --execute conferiram: 46/69/43/290.
+#
+# Em 2026-11-28 a esteira rodou com um parquet novo (MIGRACAO_20261128_1345,
+# 62.726 linhas). Dois equipamentos passaram a estar disponíveis para locação
+# (status 1) e duas linhas Parcial que antes ficavam de fora entraram:
+#   - SECRETARIA DE SAÚDE MUNICIPIO DE TIANGUÁ / 27-11 / separador 9683:
+#     PAT 98925 substituindo 67939 -> +1 movimento, +1 item de movimento;
+#   - BASE CAUCAIA - ROTA LITORAL NORTE / 27-11 / separador 9683:
+#     PAT 98879 passou a entrar no movimento já existente -> +1 item.
+# Nada mudou em requisições/itens (as linhas caíram em itens que já existiam),
+# então o resultado é 46/69/44/292.
+ESPERADO = {"requisicoes": 46, "itens": 69, "movimentos": 44, "itens_movimento": 292}
 
 
 def verificar(url: str, contagem_fixa: bool = True) -> int:

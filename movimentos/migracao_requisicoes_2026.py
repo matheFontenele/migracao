@@ -1,7 +1,21 @@
 """Importa as requisições de docs/requisicao2026.csv para o banco refatorado.
 
-Gera `service_orders` + `service_order_items` e, para as linhas que trazem
-`Data Separação`, `movements` + `movement_items`.
+Gera `service_orders` + `service_order_items` e, para as linhas separadas,
+`movements` + `movement_items`.
+
+Regras de entrada (pedido de 27/11/2026):
+
+- Só entram linhas com `Req` = **Separado** ou **Parcial**; ATENDIDA, Cancelada,
+  ENVIADO, Solicitado Envio, Sem estoque e vazio ficam de fora e vão para o
+  relatório de não migradas.
+- O movimento nasce apenas de linhas **Separado** cujo `PAT` aponta para um
+  equipamento existente (o PAT é o equipamento que atende a requisição).
+- Em linhas **Parcial**, só entram itens com `PAT` preenchido cujo equipamento
+  esteja **disponível para locação** (`equipments.status_id = 1`); os demais
+  itens ficam de fora da requisição.
+- Uma linha só é **substituição** quando `Substituição ou Novo` tem valor
+  numérico e o tombo existe em `equipments.number`; caso contrário é avulsa.
+- Linha cujo `Cliente` não é identificado no banco é ignorada.
 
 Este módulo é o ÚLTIMO passo da migração: depende de clientes, usuários,
 organizações, equipamentos, tipos e produtos já migrados.
@@ -30,6 +44,7 @@ from utils.clientes_requisicoes import IndiceClientes
 BASE_DIR = Path(__file__).resolve().parents[1]
 ARQUIVO_FONTE = BASE_DIR / "docs" / "requisicao2026.csv"
 ARQUIVO_AUDITORIA = BASE_DIR / "ajustes" / "auditoria_requisicoes_2026.csv"
+ARQUIVO_NAO_MIGRADAS = BASE_DIR / "ajustes" / "requisicoes_2026_nao_migradas.csv"
 ARQUIVO_MAPA_INSUMOS = BASE_DIR / "ajustes" / "insumos_para_produtos.csv"
 DIR_LOGS = BASE_DIR / "ajustes" / "logs_requisicoes_2026"
 MARCADOR = "Migração REQUISIÇÃO 2026.csv"
@@ -87,11 +102,15 @@ SEPARADORES = {
 
 TIPOS_MOVIMENTO = {"AVULSO": 7, "SUBSTITUICAO": 2}
 
+# Só estas linhas geram requisição/movimento nesta migração.
+REQS_MIGRADAS = frozenset({"SEPARADO", "PARCIAL"})
+# `equipments.status_id` de "DISPONÍVEL PARA LOCAÇÃO" (tabela `status`).
+STATUS_DISPONIVEL_LOCACAO = 1
+
 # Departamento do item em `service_order_departments`:
-# - equipamento -> EXPEDIÇÃO
-# - insumo do estoque Peças ADI -> ELISANGELA
-# - qualquer outro insumo/indefinido -> ALMOXARIFADO
-DEPARTAMENTO_PADRAO = "ALMOXARIFADO"
+# - item com patrimônio (PAT/tombo) -> EXPEDIÇÃO
+# - item sem patrimônio -> ELISANGELA
+# O ALMOXARIFADO não é usado na importação de requisições.
 DEPARTAMENTO_EQUIPAMENTO = "EXPEDIÇÃO"
 DEPARTAMENTO_PECAS_ADI = "ELISANGELA"
 
@@ -587,6 +606,37 @@ def filtrar_clientes_ignorados(
     return restantes
 
 
+def filtrar_req(df: pd.DataFrame, auditoria: list[dict]) -> pd.DataFrame:
+    """Mantém apenas as linhas de `Req` Separado e Parcial.
+
+    As demais situações (ATENDIDA, Cancelada, ENVIADO, Solicitado Envio,
+    Sem estoque e vazio) não geram requisição/movimento nesta migração e viram
+    registro IGNORADA na auditoria, com o valor original.
+    """
+    reqs = df["Req"].map(normalizar)
+    manter = reqs.isin(REQS_MIGRADAS)
+    for indice, row in df[~manter].iterrows():
+        valor = str(row["Req"]).strip() or "vazio"
+        auditoria.append({
+            "linha": indice + 2,
+            "resultado": "IGNORADA",
+            "motivo": f"Req «{valor}» fora da migração (só Separado e Parcial entram)",
+            "cliente": row["Cliente"],
+            "item": row["Equipamento | Insumos"],
+            "pat": row["PAT"],
+            "req": row["Req"],
+        })
+
+    restantes = df[manter].copy()
+    removidas = int((~manter).sum())
+    if removidas:
+        por_req = reqs[~manter].fillna("VAZIO").replace("", "VAZIO").value_counts()
+        detalhe = " | ".join(f"{k or 'VAZIO'}: {v}" for k, v in por_req.items())
+        print(f"   Linhas fora por Req: {removidas:,} ({detalhe}) "
+              f"(restam {len(restantes):,})")
+    return restantes
+
+
 def texto_substituicao(valor: object) -> str:
     """Texto descritivo da coluna `Substituição ou Novo` (ex.: REVISADO).
 
@@ -838,27 +888,53 @@ def montar_linha(row, indice: int, refs: Referencias,
         avisos.append("item sem tipo/produto correspondente")
 
     substituicao = row["Substituição ou Novo"]
-    antigos = numeros_substituicao(substituicao)
+    antigos_brutos = numeros_substituicao(substituicao)
+    antigos: tuple[int, ...] = ()
     antigos_ids: list[int] = []
-    for numero_antigo in antigos:
-        candidatos = refs.equipamentos.get(numero_antigo, [])
-        if not candidatos:
-            avisos.append(f"equipamento substituído {numero_antigo} não encontrado")
-            continue
-        escolhido = next((c for c in candidatos if c["organizacao"] == organizacao),
-                         candidatos[0])
-        antigos_ids.append(escolhido["id"])
+    if antigos_brutos:
+        # Só é substituição quando TODOS os números existem em equipments.number.
+        encontrados: list[int] = []
+        faltando: list[int] = []
+        for numero_antigo in antigos_brutos:
+            candidatos = refs.equipamentos.get(numero_antigo, [])
+            if not candidatos:
+                faltando.append(numero_antigo)
+                continue
+            escolhido = next((c for c in candidatos if c["organizacao"] == organizacao),
+                             candidatos[0])
+            encontrados.append(escolhido["id"])
+        if faltando:
+            avisos.append(
+                "substituição ignorada: tombo(s) "
+                + ", ".join(str(n) for n in faltando)
+                + " não encontrado(s) em equipments.number")
+        else:
+            antigos = antigos_brutos
+            antigos_ids = encontrados
 
     pat_numero = numero_pat(row["PAT"])
     pat_id = None
+    pat_status_id = None
     if pat_numero:
         candidatos = refs.equipamentos.get(pat_numero, [])
         if candidatos:
             escolhido = next((c for c in candidatos if c["organizacao"] == organizacao),
                              candidatos[0])
             pat_id = escolhido["id"]
+            pat_status_id = escolhido["status_id"]
         else:
             avisos.append(f"PAT {pat_numero} não encontrado em equipments")
+
+    req_normalizada = normalizar(row["Req"])
+    if req_normalizada == "PARCIAL":
+        # Parcial só entra com o equipamento do PAT disponível para locação.
+        if not pat_id:
+            return ignorar(
+                f"Parcial sem equipamento: PAT «{row['PAT']}» não localizado")
+        if pat_status_id != STATUS_DISPONIVEL_LOCACAO:
+            return ignorar(
+                f"Parcial: equipamento {pat_numero} indisponível para locação "
+                f"(status_id {pat_status_id})")
 
     separador_nome = row["Separado por"]
     separador_username = SEPARADORES.get(normalizar(separador_nome)) if separador_nome else None
@@ -866,11 +942,12 @@ def montar_linha(row, indice: int, refs: Referencias,
 
     separado_em = data_planilha(row["Data Separação"])
     motivo_movimento = ""
-    if separado_em:
-        if not pat_id:
-            motivo_movimento = "PAT ausente ou não encontrado"
-        elif not separador_id:
-            motivo_movimento = f"separador sem usuário: {separador_nome or 'vazio'}"
+    if not separado_em:
+        motivo_movimento = "Data Separação ausente"
+    elif not pat_id:
+        motivo_movimento = "PAT ausente ou não encontrado"
+    elif not separador_id:
+        motivo_movimento = f"separador sem usuário: {separador_nome or 'vazio'}"
 
     quantidade = numero(row["Qtd Sol"]) or 0
     entregue = numero(row["Qtd Entregue"]) or 0
@@ -934,6 +1011,7 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
     print(f"   Linhas carregadas: {len(df):,}")
     auditoria: list[dict] = []
     df = filtrar_clientes_ignorados(df, auditoria)
+    df = filtrar_req(df, auditoria)
 
     numeros_necessarios: set[int] = set()
     for valor in df["PAT"]:
@@ -970,13 +1048,14 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
 # ---------------------------------------------------------------------------
 # Gravação
 # ---------------------------------------------------------------------------
-def departamento_do_item(tipo: str, produto_pecas_adi: bool) -> str:
-    """Departamento do item de requisição pela natureza do item."""
-    if str(tipo or "").upper() == "EQUIPAMENTO":
-        return DEPARTAMENTO_EQUIPAMENTO
-    if produto_pecas_adi:
-        return DEPARTAMENTO_PECAS_ADI
-    return DEPARTAMENTO_PADRAO
+def departamento_do_item(tem_patrimonio: bool) -> str:
+    """Departamento pela presença de patrimônio no item.
+
+    Item com PAT (tombo) é separado na EXPEDIÇÃO; item sem patrimônio
+    (insumo/avulso) fica com a ELISANGELA. O ALMOXARIFADO não é usado na
+    importação de requisições.
+    """
+    return DEPARTAMENTO_EQUIPAMENTO if tem_patrimonio else DEPARTAMENTO_PECAS_ADI
 
 
 def carregar_departamentos(conn) -> dict[str, int]:
@@ -987,22 +1066,13 @@ def carregar_departamentos(conn) -> dict[str, int]:
             "SELECT `name`, `id` FROM `service_order_departments` "
             "WHERE `deleted_at` IS NULL"))
     }
-    faltando = [nome for nome in (DEPARTAMENTO_PADRAO, DEPARTAMENTO_EQUIPAMENTO,
+    faltando = [nome for nome in (DEPARTAMENTO_EQUIPAMENTO,
                                   DEPARTAMENTO_PECAS_ADI) if nome not in mapa]
     if faltando:
         raise RuntimeError(
             "Departamentos ausentes em service_order_departments: "
             + ", ".join(faltando))
     return mapa
-
-
-def carregar_produtos_pecas_adi(conn) -> set[int]:
-    """Produtos cujo estoque a migração de insumos classificou como Peças ADI."""
-    return {int(produto_id) for produto_id in conn.execute(text(
-        "SELECT DISTINCT pi.`product_id` FROM `product_items` pi "
-        "JOIN `locations` l ON l.`id` = pi.`location_id` "
-        "WHERE l.`area` = 'Peças ADI' AND pi.`deleted_at` IS NULL "
-        "AND pi.`product_id` IS NOT NULL")).scalars()}
 
 
 def proximos_numeros(base: int, quantidade: int) -> list[int]:
@@ -1066,7 +1136,6 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
     print(f"\n📝 Gravando {len(cabecalhos):,} requisições em transação única...")
     with engine.begin() as conn:
         departamentos = carregar_departamentos(conn)
-        produtos_pecas_adi = carregar_produtos_pecas_adi(conn)
         for cabecalho in tqdm(cabecalhos, desc="Gravando requisições", unit="req"):
             ordem = conn.execute(text("""
                 INSERT INTO service_orders
@@ -1097,9 +1166,10 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
             item_ids: dict[str, int] = {}
             for item in cabecalho.itens:
                 classificacao = item.classificacao
-                departamento = departamento_do_item(
-                    classificacao.tipo,
-                    classificacao.product_id in produtos_pecas_adi)
+                # Departamento pela presença de patrimônio (PAT) na linha:
+                # com tombo -> EXPEDIÇÃO; sem tombo -> ELISANGELA.
+                tem_patrimonio = any(linha.pat_numero for linha in item.linhas)
+                departamento = departamento_do_item(tem_patrimonio)
                 insumo = classificacao.tipo == "INSUMO"
                 sem_estoque = any(l.req == "SEM ESTOQUE" for l in item.linhas)
                 partes_detalhe = [classificacao.tipo.title(), classificacao.metodo]
@@ -1130,7 +1200,11 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                     "status_id": cabecalho.status_id,
                     "ordem_id": ordem_id,
                     "departamento": departamentos[departamento],
-                    "movement_type": cabecalho.movement_type_id,
+                    # Tipo por item: substituição só quando o tombo da coluna
+                    # "Substituição ou Novo" existe em equipments.number.
+                    "movement_type": (TIPOS_MOVIMENTO["SUBSTITUICAO"]
+                                      if item.is_exchange
+                                      else TIPOS_MOVIMENTO["AVULSO"]),
                     "address_id": item.address_id,
                     "alias": item.alias[:255],
                     "equipment_id": (item.equipment_id
@@ -1189,6 +1263,9 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                         continue
                     vistos.add(chave)
                     operacao = "SUBSTITUIÇÃO" if linha.antigos else "AVULSO"
+                    tipo_linha = (TIPOS_MOVIMENTO["SUBSTITUICAO"]
+                                  if linha.antigos
+                                  else TIPOS_MOVIMENTO["AVULSO"])
                     conn.execute(text("""
                         INSERT INTO movement_items
                             (movement_id, movement_type_id, service_order_item_id,
@@ -1199,7 +1276,7 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                              3, :alias, NULL, :organizacao, :operacao, :data, :data)
                     """), {
                         "movimento_id": movimento_id,
-                        "movement_type": cabecalho.movement_type_id,
+                        "movement_type": tipo_linha,
                         "item_id": item_id,
                         "equipment_id": linha.pat_id,
                         "alias": linha.alias[:255],
@@ -1246,6 +1323,39 @@ def salvar_auditoria(auditoria: list[dict], destino: Path) -> Path:
     return destino
 
 
+COLUNAS_NAO_MIGRADAS = (
+    "linha", "resultado", "motivo", "req", "cliente", "item", "pat",
+    "pat_id", "data_separacao",
+)
+
+
+def salvar_relatorio_nao_migradas(
+        auditoria: list[dict], destino: Path = ARQUIVO_NAO_MIGRADAS) -> Path:
+    """Relatório do que ficou de fora da migração e por quê.
+
+    Inclui linhas ignoradas (Req fora, cliente sem match, Parcial sem
+    equipamento disponível, dados obrigatórios ausentes) e itens cujo movimento
+    não pôde ser criado (PAT ausente, data de separação, separador sem usuário).
+    """
+    linhas = [registro for registro in auditoria
+              if registro.get("resultado") != "OK"]
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    with destino.open("w", newline="", encoding="utf-8-sig") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=COLUNAS_NAO_MIGRADAS,
+                                  extrasaction="ignore")
+        escritor.writeheader()
+        escritor.writerows(linhas)
+
+    print(f"\n📄 Não migradas: {len(linhas):,} linha(s) -> {destino}")
+    if linhas:
+        motivos = defaultdict(int)
+        for registro in linhas:
+            motivos[re.sub(r"\d+", "N", registro["motivo"])[:90]] += 1
+        for motivo, total in sorted(motivos.items(), key=lambda kv: -kv[1])[:12]:
+            print(f"      {total:>5,}  {motivo}")
+    return destino
+
+
 def salvar_log(log_rows: list[dict]) -> Path:
     DIR_LOGS.mkdir(parents=True, exist_ok=True)
     destino = DIR_LOGS / f"requisicoes_2026_criadas_{datetime.now():%Y%m%d_%H%M%S_%f}.csv"
@@ -1268,12 +1378,15 @@ def imprimir_resumo(cabecalhos: list[Cabecalho], auditoria: list[dict]) -> None:
     for cab in cabecalhos:
         grupos: dict[tuple, set] = defaultdict(set)
         for linha in cab.linhas:
-            if linha.separado_em and linha.separador_id and linha.pat_id:
+            if (linha.separado_em and linha.separador_id and linha.pat_id
+                    and not linha.motivo_movimento):
                 grupos[(linha.separado_em, linha.separador_id)].add(
                     (normalizar(linha.alias), linha.pat_id))
         movimentos += len(grupos)
         itens_movimento += sum(len(v) for v in grupos.values())
 
+    substituicoes = sum(1 for l in (l for c in cabecalhos for l in c.linhas)
+                        if l.antigos)
     bloqueios = [a for a in auditoria if a["resultado"] == "MOVIMENTO BLOQUEADO"]
     ignoradas = [a for a in auditoria if a["resultado"] == "IGNORADA"]
     a_confirmar = [a for a in auditoria
@@ -1285,7 +1398,16 @@ def imprimir_resumo(cabecalhos: list[Cabecalho], auditoria: list[dict]) -> None:
     print(f"   Requisições (cabeçalhos): {len(cabecalhos):,}")
     print(f"   Itens: {len(itens):,}  (equipamento {por_tipo['EQUIPAMENTO']:,} | "
           f"insumo {por_tipo['INSUMO']:,} | indefinido {por_tipo['INDEFINIDO']:,})")
+    por_departamento: dict[str, int] = defaultdict(int)
+    for item in itens:
+        tem_patrimonio = any(linha.pat_numero for linha in item.linhas)
+        por_departamento[
+            DEPARTAMENTO_EQUIPAMENTO if tem_patrimonio
+            else DEPARTAMENTO_PECAS_ADI] += 1
+    print("   Itens por departamento: " + " | ".join(
+        f"{nome} {total:,}" for nome, total in sorted(por_departamento.items())))
     print(f"   Movimentos previstos: {movimentos:,} ({itens_movimento:,} itens)")
+    print(f"   Linhas de substituição válida: {substituicoes:,}")
     print(f"   Linhas com separação bloqueada: {len(bloqueios):,}")
     print(f"   Linhas ignoradas: {len(ignoradas):,}")
     print(f"   Clientes com match < 0.85 (revisar): {len(a_confirmar):,}")
@@ -1434,6 +1556,7 @@ def main(argv=None, engine_new=None, engine_legado=None):
     destino = salvar_auditoria(auditoria, args.auditoria)
     print(f"\n📄 Auditoria: {destino}")
     imprimir_resumo(cabecalhos, auditoria)
+    salvar_relatorio_nao_migradas(auditoria)
 
     if not args.execute or args.dry_run:
         print("\n🔒 Dry-run: nada foi gravado. Use --execute para gravar.")
@@ -1462,8 +1585,7 @@ def main(argv=None, engine_new=None, engine_legado=None):
     print(f"   Itens de movimento: {stats.get('movimentos_itens', 0):,}")
     por_departamento = " | ".join(
         f"{nome} {stats.get('itens_departamento_' + nome.lower(), 0):,}"
-        for nome in (DEPARTAMENTO_PADRAO, DEPARTAMENTO_EQUIPAMENTO,
-                     DEPARTAMENTO_PECAS_ADI))
+        for nome in (DEPARTAMENTO_EQUIPAMENTO, DEPARTAMENTO_PECAS_ADI))
     print(f"   Itens por departamento: {por_departamento}")
     print(f"📄 Log: {log}")
 
