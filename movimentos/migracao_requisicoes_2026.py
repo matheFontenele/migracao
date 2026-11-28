@@ -584,6 +584,7 @@ def filtrar_clientes_ignorados(
             "cliente": row["Cliente"],
             "item": row["Equipamento | Insumos"],
             "req": row["Req"],
+            "requisicao": str(row.get("Coluna 2", "") or "").strip(),
         })
 
     restantes = df[~alvo].copy()
@@ -612,6 +613,7 @@ def filtrar_req(df: pd.DataFrame, auditoria: list[dict]) -> pd.DataFrame:
             "item": row["Equipamento | Insumos"],
             "pat": row["PAT"],
             "req": row["Req"],
+            "requisicao": str(row.get("Coluna 2", "") or "").strip(),
         })
 
     restantes = df[manter].copy()
@@ -671,6 +673,7 @@ class Linha:
     envio: int
     data: datetime
     previsao: datetime
+    numero: str
     req: str
     oficio: str
     observacao: str
@@ -770,9 +773,15 @@ def status_do_cabecalho(linhas: list[Linha],
 
 def detalhes_cabecalho(linhas: list[Linha]) -> str:
     partes = [MARCADOR]
-    reqs = sorted({linha.req for linha in linhas if linha.req})
-    if reqs:
-        partes.append("Req: " + " / ".join(reqs))
+    # Número da requisição + status da planilha (ex.: "461: Separado"). Antes
+    # gravava só o status ("Req: Separado"), que se confundia com o número.
+    pares = sorted({(linha.numero, linha.req) for linha in linhas
+                    if linha.numero or linha.req})
+    if pares:
+        partes.append("Req " + " / ".join(
+            f"{numero}: {status.title()}".strip(": ") if numero
+            else status.title()
+            for numero, status in pares))
     oficios = sorted({linha.oficio for linha in linhas if linha.oficio})
     if oficios:
         partes.append("Ofício: " + " / ".join(oficios[:5]))
@@ -843,7 +852,7 @@ COLUNAS_AUDITORIA = (
     "etiqueta", "organizacao_id", "solicitante", "usuario_id", "item", "tipo_item",
     "produto_id", "type_id", "similaridade_item", "metodo_item", "categoria",
     "equipamentos_antigos", "pat", "pat_id", "separador", "separador_id",
-    "data_separacao", "req", "status_id", "situacao", "observacao",
+    "data_separacao", "req", "status_id", "situacao", "observacao", "requisicao",
 )
 
 
@@ -856,6 +865,9 @@ def montar_linha(row, indice: int, refs: Referencias,
         "solicitante": row["Solicitado Por"], "item": row["Equipamento | Insumos"],
         "req": row["Req"], "pat": row["PAT"], "separador": row["Separado por"],
         "observacao": row["Observação"],
+        # Número da requisição na planilha (coluna "Coluna 2"): é o que a
+        # operação usa para localizar o pedido (ex.: 461).
+        "requisicao": str(row.get("Coluna 2", "") or "").strip(),
     }
 
     def ignorar(motivo: str):
@@ -1028,6 +1040,7 @@ def montar_linha(row, indice: int, refs: Referencias,
         usuario_id=usuario_id, solicitante=username,
         organizacao=organizacao, etiqueta=row["Etiquetas"], envio=envio,
         data=data, previsao=data_planilha(row["Previsão"]) or data,
+        numero=str(row.get("Coluna 2", "") or "").strip(),
         req=normalizar(row["Req"]), oficio=row["Ofício"],
         observacao=row["Observação"],
         alias=row["Equipamento | Insumos"], classificacao=classificacao,
@@ -1382,7 +1395,7 @@ def salvar_auditoria(auditoria: list[dict], destino: Path) -> Path:
 
 COLUNAS_NAO_MIGRADAS = (
     "linha", "resultado", "motivo", "req", "cliente", "item", "pat",
-    "pat_id", "data_separacao",
+    "pat_id", "data_separacao", "requisicao",
 )
 
 
