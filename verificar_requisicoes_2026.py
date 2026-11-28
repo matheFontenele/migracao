@@ -172,6 +172,26 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
                     SELECT COUNT(*) FROM movement_items mi
                     WHERE mi.service_order_item_id = soi.id)) < soi.quantity
         """), {"m": f"%{MARCADOR}%"}).scalar_one()
+        itens_por_status = dict(c.execute(text("""
+            SELECT soi.status_id, COUNT(*) FROM service_order_items soi
+            JOIN service_orders so ON so.id = soi.service_order_id
+            WHERE so.details LIKE :m GROUP BY soi.status_id ORDER BY soi.status_id
+        """), {"m": f"%{MARCADOR}%"}).fetchall())
+        item3_incompleto = status3_incompleto
+        item1_com_movimento = c.execute(text("""
+            SELECT COUNT(*) FROM service_order_items soi
+            JOIN service_orders so ON so.id = soi.service_order_id
+            WHERE so.details LIKE :m AND soi.status_id = 1
+              AND EXISTS (SELECT 1 FROM movement_items mi
+                          WHERE mi.service_order_item_id = soi.id)
+        """), {"m": f"%{MARCADOR}%"}).scalar_one()
+        item2_sem_movimento = c.execute(text("""
+            SELECT COUNT(*) FROM service_order_items soi
+            JOIN service_orders so ON so.id = soi.service_order_id
+            WHERE so.details LIKE :m AND soi.status_id = 2
+              AND NOT EXISTS (SELECT 1 FROM movement_items mi
+                              WHERE mi.service_order_item_id = soi.id)
+        """), {"m": f"%{MARCADOR}%"}).scalar_one()
 
     print("requisicoes:", {k: f"{v:,}" for k, v in total.items()})
     print("cabecalhos duplicados:", duplicados, "| itens orfaos:", orfaos,
@@ -188,6 +208,11 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
     print("status 1 com movimento:", status1_com_movimento,
           "| status 2 sem movimento:", status2_sem_movimento,
           "| itens incompletos em status 3:", status3_incompleto)
+    print("itens por status:", " | ".join(
+        f"{sid} {itens_por_status.get(sid, 0):,}" for sid in (1, 2, 3)))
+    print("item 1 com movimento:", item1_com_movimento,
+          "| item 2 sem movimento:", item2_sem_movimento,
+          "| itens 3 incompletos:", item3_incompleto)
 
     divergentes = []
     if contagem_fixa:
@@ -199,6 +224,8 @@ def verificar(url: str, contagem_fixa: bool = True) -> int:
         problemas.append("status")
     if status1_com_movimento or status2_sem_movimento or status3_incompleto:
         problemas.append("status incoerente com movimentos")
+    if item1_com_movimento or item2_sem_movimento or item3_incompleto:
+        problemas.append("status do item incoerente com movimentos")
     if duplicados or orfaos or sem_item:
         problemas.append("integridade")
     if sem_protocolo:

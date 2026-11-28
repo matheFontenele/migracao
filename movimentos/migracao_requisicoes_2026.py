@@ -1230,6 +1230,10 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
             stats["requisicoes"] += 1
 
             item_ids: dict[str, int] = {}
+            # Entrega por item para o `status_id` do item: a produção marca
+            # cada item como 1/2/3 conforme o quanto foi entregue (uma ordem
+            # parcial tem itens 1, 2 e 3 convivendo).
+            entregas = entregas_por_item(cabecalho.linhas)
             for item in cabecalho.itens:
                 classificacao = item.classificacao
                 # Departamento pelo tipo do item (nome), não pela presença de
@@ -1250,6 +1254,15 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                     partes_detalhe.append(
                         "Substituição informada: " + ", ".join(textos_substituicao))
                 detalhe_item = " | ".join(p for p in partes_detalhe if p)
+                quantidade_item = int(item.quantidade or 0)
+                entregue_item = min(
+                    entregas.get(normalizar(item.alias), 0), quantidade_item)
+                if quantidade_item and entregue_item >= quantidade_item:
+                    status_item = 3        # TOTALMENTE ATENDIDA
+                elif entregue_item > 0:
+                    status_item = 2        # PARCIALMENTE ATENDIDA
+                else:
+                    status_item = 1        # NÃO ATENDIDA
                 criado = conn.execute(text("""
                     INSERT INTO service_order_items
                         (status_id, service_order_id, department_id, movement_type_id,
@@ -1264,7 +1277,7 @@ def criar(engine, cabecalhos: list[Cabecalho]) -> tuple[dict, Path]:
                          :entregue_produto, :quantity, :fulfilled,
                          :details, :stock_status, :created, :created)
                 """), {
-                    "status_id": cabecalho.status_id,
+                    "status_id": status_item,
                     "ordem_id": ordem_id,
                     "departamento": departamentos[departamento],
                     # Tipo por item: substituição só quando o tombo da coluna
