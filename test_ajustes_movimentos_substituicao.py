@@ -261,5 +261,122 @@ class EquipamentoRetornoTest(unittest.TestCase):
         self.assertEqual(equipamento_os, 5555)
 
 
+class ReconhecerSubstituicaoUnificadaTests(unittest.TestCase):
+    """Ajuste não deve reinserir a devolução dentro da capa unificada.
+
+    Na substituição unificada o equipamento antigo vai no item da requisição e
+    o substituto no item do movimento. Comparar só por
+    ``movement_items.equipment_id`` fazia o antigo parecer sem movimento e o
+    ajuste reinseria a devolução como item solto na mesma capa (3.550 itens
+    duplicados na recarga de 2026-11-28).
+    """
+
+    SD = 561564
+    SA = 561565
+    ANTIGO = 57351
+    NOVO = 54020
+
+    def _df(self, linhas):
+        return pd.DataFrame(linhas)
+
+    def _capas(self):
+        return pd.DataFrame(
+            [
+                {
+                    "id_movimento": 299276,
+                    "numero": str(self.SD),
+                    "data_mov": "2026-11-28 16:24:00",
+                    "id_customer": 2453,
+                    "cliente": "SECRETARIA DE EDUCACAO",
+                    "tipo": "SUBSTITUIÇÃO",
+                    "id_mov_item": 704037,
+                    "id_equipamento_entregue": self.NOVO,
+                    "id_equipamento_retorno": self.ANTIGO,
+                }
+            ]
+        )
+
+    def _pares(self):
+        return pd.DataFrame([{"id_sd": self.SD, "id_sa": self.SA}])
+
+    def test_devolucao_aponta_para_a_capa_pelo_id_sd(self):
+        df = self._df(
+            [
+                {
+                    "id_equipamento": self.ANTIGO,
+                    "id_movimento_legado": self.SD,
+                    "numero_movimento_novo": None,
+                    "numero_movimento_novo_int": float("nan"),
+                    "movimento_equivalente_int": float("nan"),
+                    "substituicao_retorno": False,
+                }
+            ]
+        )
+        resultado = AjustesMovimentos._reconhecer_substituicao_unificada(
+            df, self._capas(), self._pares()
+        )
+        self.assertEqual(resultado.loc[0, "movimento_equivalente_int"], self.SD)
+        self.assertTrue(bool(resultado.loc[0, "substituicao_retorno"]))
+        self.assertEqual(resultado.loc[0, "id_movimento_novo"], 299276)
+
+    def test_envio_aponta_para_a_capa_pelo_id_sa(self):
+        df = self._df(
+            [
+                {
+                    "id_equipamento": self.NOVO,
+                    "id_movimento_legado": self.SA,
+                    "numero_movimento_novo": str(self.SD),
+                    "numero_movimento_novo_int": self.SD,
+                    "movimento_equivalente_int": self.SD,
+                    "substituicao_retorno": False,
+                }
+            ]
+        )
+        resultado = AjustesMovimentos._reconhecer_substituicao_unificada(
+            df, self._capas(), self._pares()
+        )
+        self.assertEqual(resultado.loc[0, "movimento_equivalente_int"], self.SA)
+        self.assertFalse(bool(resultado.loc[0, "substituicao_retorno"]))
+
+    def test_movimento_divergente_nao_e_reescrito(self):
+        df = self._df(
+            [
+                {
+                    "id_equipamento": self.ANTIGO,
+                    "id_movimento_legado": 999999,
+                    "numero_movimento_novo": "48390",
+                    "numero_movimento_novo_int": 48390,
+                    "movimento_equivalente_int": 48390,
+                    "substituicao_retorno": False,
+                }
+            ]
+        )
+        resultado = AjustesMovimentos._reconhecer_substituicao_unificada(
+            df, self._capas(), self._pares()
+        )
+        self.assertEqual(resultado.loc[0, "movimento_equivalente_int"], 48390)
+        self.assertFalse(bool(resultado.loc[0, "substituicao_retorno"]))
+
+    def test_sem_capas_nao_altera_nada(self):
+        df = self._df(
+            [
+                {
+                    "id_equipamento": self.ANTIGO,
+                    "id_movimento_legado": self.SD,
+                    "numero_movimento_novo": None,
+                    "numero_movimento_novo_int": float("nan"),
+                    "movimento_equivalente_int": float("nan"),
+                    "substituicao_retorno": False,
+                }
+            ]
+        )
+        vazio = pd.DataFrame(columns=self._capas().columns)
+        resultado = AjustesMovimentos._reconhecer_substituicao_unificada(
+            df, vazio, self._pares()
+        )
+        self.assertTrue(pd.isna(resultado.loc[0, "movimento_equivalente_int"]))
+        self.assertFalse(bool(resultado.loc[0, "substituicao_retorno"]))
+
+
 if __name__ == "__main__":
     unittest.main()

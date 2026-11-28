@@ -239,6 +239,47 @@ WHERE eqp.deleted_at IS NULL
 ORDER BY eqp.number, eqp.id
 """
 
+# No legado a troca ocupa duas capas (SD = devolução, SA = envio). No
+# refatorado ela é UM movimento: o item da requisição guarda o equipamento
+# devolvido (o "Equipamento para retorno") e o item do movimento guarda o
+# substituto. Sem ler as duas pontas, o ajuste considera o antigo sem
+# movimento e reinsere a devolução como item solto — duplicando o par dentro
+# da mesma capa.
+QUERY_PARES_SUBSTITUICAO = """
+SELECT
+    substituicao_aluguel_id AS id_sd,
+    substituicao_devolucao_id AS id_sa
+FROM aluguel_substituicao
+WHERE substituicao_aluguel_id IS NOT NULL
+  AND substituicao_devolucao_id IS NOT NULL
+"""
+
+QUERY_SUBSTITUICAO_CAPAS = """
+SELECT
+    mov.id AS id_movimento,
+    mov.number AS numero,
+    mov.updated_at AS data_mov,
+    mov.recipient_customer_id AS id_customer,
+    cus.name AS cliente,
+    mov_types.name AS tipo,
+    movi.id AS id_mov_item,
+    movi.equipment_id AS id_equipamento_entregue,
+    soi.equipment_id AS id_equipamento_retorno
+FROM movements mov
+INNER JOIN movement_items movi
+    ON movi.movement_id = mov.id
+   AND movi.deleted_at IS NULL
+LEFT JOIN service_order_items soi
+    ON soi.id = movi.service_order_item_id
+   AND soi.deleted_at IS NULL
+INNER JOIN movement_types mov_types
+    ON mov_types.id = movi.movement_type_id
+LEFT JOIN customers cus
+    ON mov.recipient_customer_id = cus.id
+WHERE movi.movement_type_id = 2
+  AND mov.deleted_at IS NULL
+"""
+
 # endereço/legacy_customer_id -> customer_id e address_id (mesmo de/para usado
 # pela migração de movimentos).
 QUERY_MAPA_CLIENTES = """
@@ -686,10 +727,12 @@ class AjustesMovimentos:
         print("📖 Lendo último movimento/status no LEGADO...")
         with self.engine_legado.connect() as conn:
             df_legado = pd.read_sql(text(QUERY_LEGADO), conn)
+            pares_substituicao = pd.read_sql(text(QUERY_PARES_SUBSTITUICAO), conn)
 
         print("📖 Lendo último movimento/status no REFATORADO...")
         with self.engine_new.connect() as conn:
             df_novo = pd.read_sql(text(QUERY_NOVO), conn)
+            df_substituicao = pd.read_sql(text(QUERY_SUBSTITUICAO_CAPAS), conn)
             mapa_customer, mapa_address, mapa_reservas, mapa_address_reservas = (
                 self._carregar_mapas_clientes(conn)
             )
@@ -763,6 +806,15 @@ class AjustesMovimentos:
         df["numero_movimento_novo_int"] = pd.to_numeric(
             df["numero_movimento_novo"], errors="coerce"
         )
+        # Número do movimento do legado que a capa do refatorado representa.
+        # Normalmente é o próprio `number`; na substituição unificada o legado
+        # usa dois ids (SD/SA) para a mesma troca, então cada ponta é
+        # comparada com o id que ela realmente representa.
+        df["movimento_equivalente_int"] = df["numero_movimento_novo_int"]
+        df["substituicao_retorno"] = False
+        df = self._reconhecer_substituicao_unificada(
+            df, df_substituicao, pares_substituicao
+        )
 
         # ------------------------------------------------------------------
         # Flags de divergência
@@ -774,8 +826,8 @@ class AjustesMovimentos:
 
         df["mesmo_movimento"] = (
             df["id_movimento_legado"].notna()
-            & df["numero_movimento_novo_int"].notna()
-            & (df["numero_movimento_novo_int"] == df["id_movimento_legado"])
+            & df["movimento_equivalente_int"].notna()
+            & (df["movimento_equivalente_int"] == df["id_movimento_legado"])
         )
 
         df["div_movimento"] = (
@@ -816,7 +868,7 @@ class AjustesMovimentos:
             if mov_novo is None:
                 return "REINSERIR_MOVIMENTO"
 
-            if _int_or_none(row["numero_movimento_novo_int"]) == mov_legado:
+            if _int_or_none(row["movimento_equivalente_int"]) == mov_legado:
                 if bool(row["cliente_sem_mapa"]):
                     return "REVISAR_CLIENTE"
                 if bool(row["div_status"]) or bool(row["div_cliente"]):
@@ -1195,6 +1247,78 @@ class AjustesMovimentos:
         print("-" * 78)
         return df_resultado
 
+    @staticmethod
+    def _reconhecer_substituicao_unificada(df, df_capas, pares_substituicao):
+        """Liga as duas pontas da substituição unificada ao id do legado.
+
+        O legado registra SD (devolução) e SA (envio) como movimentos
+        distintos, e a migração os unificou em uma capa só, numerada com o id
+        da devolução. Assim:
+
+        - o equipamento antigo aparece no item da requisição (não em
+          ``movement_items.equipment_id``) e corresponde ao SD;
+        - o substituto aparece no item do movimento e corresponde ao SA.
+
+        Só marca a equivalência quando o último movimento do legado é
+        exatamente a outra ponta do ciclo; qualquer divergência real continua
+        sendo reportada.
+        """
+        if df.empty or df_capas.empty:
+            return df
+
+        mapa_sa = {
+            int(sd): int(sa)
+            for sd, sa in zip(
+                pares_substituicao["id_sd"], pares_substituicao["id_sa"]
+            )
+            if pd.notna(sd) and pd.notna(sa)
+        }
+
+        retorno = df_capas[df_capas["id_equipamento_retorno"].notna()].copy()
+        retorno["id_equipamento"] = retorno["id_equipamento_retorno"].astype(int)
+        retorno["movimento_equivalente"] = retorno["numero"].astype(int)
+        retorno["substituicao_retorno"] = True
+
+        entregue = df_capas[df_capas["id_equipamento_entregue"].notna()].copy()
+        entregue["id_equipamento"] = entregue["id_equipamento_entregue"].astype(int)
+        entregue["numero_int"] = entregue["numero"].astype(int)
+        entregue["movimento_equivalente"] = entregue["numero_int"].map(mapa_sa)
+        entregue["substituicao_retorno"] = False
+        entregue = entregue[entregue["movimento_equivalente"].notna()]
+
+        capas = pd.concat([retorno, entregue], ignore_index=True)
+        capas["movimento_equivalente"] = capas["movimento_equivalente"].astype(int)
+        capas["_chave"] = (
+            capas["id_equipamento"].astype(str)
+            + "|"
+            + capas["movimento_equivalente"].astype(str)
+        )
+        capas = capas.drop_duplicates("_chave", keep="first").set_index("_chave")
+
+        chave = (
+            df["id_equipamento"].astype("Int64").astype(str)
+            + "|"
+            + df["id_movimento_legado"].astype("Int64").astype(str)
+        )
+        casou = chave.isin(capas.index)
+        if not casou.any():
+            return df
+
+        alvo = chave[casou]
+        df.loc[casou, "movimento_equivalente_int"] = capas.loc[
+            alvo, "movimento_equivalente"
+        ].values
+        df.loc[casou, "id_movimento_novo"] = capas.loc[alvo, "id_movimento"].values
+        df.loc[casou, "id_mov_item_novo"] = capas.loc[alvo, "id_mov_item"].values
+        df.loc[casou, "data_novo"] = capas.loc[alvo, "data_mov"].values
+        df.loc[casou, "tipo_novo"] = capas.loc[alvo, "tipo"].values
+        df.loc[casou, "id_customer_novo"] = capas.loc[alvo, "id_customer"].values
+        df.loc[casou, "cliente_novo"] = capas.loc[alvo, "cliente"].values
+        df.loc[casou, "substituicao_retorno"] = capas.loc[
+            alvo, "substituicao_retorno"
+        ].values
+        return df
+
     def _corrigir_uma_linha(self, row, forcar_status_legado):
         id_equipamento = _int_or_none(row["id_equipamento"])
         tombo = _str_or_none(row["tombo_novo"])
@@ -1218,14 +1342,25 @@ class AjustesMovimentos:
         }
 
         try:
+            devolucao_substituicao = bool(row.get("substituicao_retorno"))
             with self.engine_new.begin() as conn:
-                mov_id, item_id, modo = self._garantir_movimento(conn, row)
+                if devolucao_substituicao:
+                    # O antigo já está representado na capa unificada (item da
+                    # requisição). Não inserir item nem apontar o último
+                    # movimento do cliente para o item do substituto: aqui só
+                    # cabe ajustar status/endereço.
+                    mov_id = _int_or_none(row["id_movimento_novo"])
+                    item_id, modo = None, "SUBSTITUICAO_UNIFICADA"
+                else:
+                    mov_id, item_id, modo = self._garantir_movimento(conn, row)
 
                 status_depois, cliente_depois = self._atualizar_equipamento(
-                    conn, row, item_id, forcar_status_legado
+                    conn, row, item_id, forcar_status_legado,
+                    apenas_status=devolucao_substituicao,
                 )
 
-                self._gravar_historico(conn, row, mov_id, item_id, status_depois)
+                if not devolucao_substituicao:
+                    self._gravar_historico(conn, row, mov_id, item_id, status_depois)
 
             resultado.update(
                 {
@@ -1743,7 +1878,8 @@ class AjustesMovimentos:
         row["_service_order_item_id"] = service_order_item_id
         return movement_item_id
 
-    def _atualizar_equipamento(self, conn, row, item_id, forcar_status_legado):
+    def _atualizar_equipamento(self, conn, row, item_id, forcar_status_legado,
+                               apenas_status=False):
         id_equipamento = int(row["id_equipamento"])
 
         # Equipamento baixado/excluido no banco novo nao pode ter status,
@@ -1769,26 +1905,41 @@ class AjustesMovimentos:
         if address_id is None:
             address_id = _int_or_none(row["address_id_novo"])
 
-        conn.execute(
-            text(
-                """
-                UPDATE equipments
-                SET status_id = :status_id,
-                    address_id = COALESCE(:address_id, address_id),
-                    last_movement_item_customer_id = COALESCE(
-                        :item_id, last_movement_item_customer_id
-                    )
-                WHERE id = :equipment_id
-                  AND deleted_at IS NULL
-                """
-            ),
-            {
-                "status_id": status_depois,
-                "address_id": address_id,
-                "item_id": item_id,
-                "equipment_id": id_equipamento,
-            },
-        )
+        if apenas_status:
+            # Devolução de substituição: o endereço e o último movimento do
+            # cliente continuam sendo os do aluguel do equipamento antigo.
+            conn.execute(
+                text(
+                    """
+                    UPDATE equipments
+                    SET status_id = :status_id
+                    WHERE id = :equipment_id
+                      AND deleted_at IS NULL
+                    """
+                ),
+                {"status_id": status_depois, "equipment_id": id_equipamento},
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    UPDATE equipments
+                    SET status_id = :status_id,
+                        address_id = COALESCE(:address_id, address_id),
+                        last_movement_item_customer_id = COALESCE(
+                            :item_id, last_movement_item_customer_id
+                        )
+                    WHERE id = :equipment_id
+                      AND deleted_at IS NULL
+                    """
+                ),
+                {
+                    "status_id": status_depois,
+                    "address_id": address_id,
+                    "item_id": item_id,
+                    "equipment_id": id_equipamento,
+                },
+            )
 
         # Cliente efetivo depois da correção: o do movimento que ficou como
         # último (se houve inserção/reutilização) ou o cliente atual.
