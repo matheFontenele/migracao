@@ -88,7 +88,7 @@ class LadosCicloSubstituicaoTests(unittest.TestCase):
 
 
 class MontarPresenteSubstituicaoTests(unittest.TestCase):
-    """Pareamento por posição não pode duplicar nem descartar itens.
+    """Pareamento por tipo (posição como reserva) não pode duplicar itens.
 
     Diagnóstico de 2026-11-14: o pareamento por tipo/quantidade gerava produto
     cartesiano quando o movimento tinha itens excluídos (sub 4454: 3×3 = 9
@@ -148,6 +148,51 @@ class MontarPresenteSubstituicaoTests(unittest.TestCase):
     def test_lados_vazios(self):
         vazio = self._lado([])
         self.assertTrue(montar_presente_substituicao(vazio, vazio).empty)
+
+    def test_mesmo_tipo_tem_prioridade_sobre_a_posicao(self):
+        # Devolve nobreak e monitor; recebe monitor e nobreak na mesma ordem
+        # de tipo_id do outro lado. Casar por posição trocaria as categorias
+        # (caso real do ciclo 14634, seq 12-15).
+        devolucao = self._lado([
+            [7, 1, 10, 1, 1, '2025-01-01', None, 510, 900, '900', 'nobreak', 124],
+            [7, 2, 10, 1, 1, '2025-01-01', None, 510, 901, '901', 'monitor', 1252],
+        ])
+        entrega = self._lado([
+            [7, 1, 10, 2, 1, '2025-01-02', None, 511, 800, '800', 'monitor', 1252],
+            [7, 2, 10, 2, 1, '2025-01-02', None, 511, 801, '801', 'nobreak', 124],
+        ])
+        presente = montar_presente_substituicao(devolucao, entrega)
+        self.assertEqual(
+            presente[['EQUIPAMENTO_ID_ANTIGO', 'EQUIPAMENTO_ID_NOVO']].values.tolist(),
+            [[900, 801], [901, 800]],
+        )
+
+    def test_tipo_diferente_dos_dois_lados_cai_na_posicao(self):
+        # Troca real de categoria: nenhum par do mesmo tipo, mantém a ordem.
+        devolucao = self._lado([
+            [8, 1, 10, 1, 1, '2025-01-01', None, 512, 910, '910', 'nobreak', 124],
+        ])
+        entrega = self._lado([
+            [8, 1, 10, 2, 1, '2025-01-02', None, 513, 810, '810', 'monitor', 1252],
+        ])
+        presente = montar_presente_substituicao(devolucao, entrega)
+        self.assertEqual(presente.loc[0, 'EQUIPAMENTO_ID_ANTIGO'], 910)
+        self.assertEqual(presente.loc[0, 'EQUIPAMENTO_ID_NOVO'], 810)
+
+    def test_tipo_repetido_mantem_ordem_de_insercao(self):
+        devolucao = self._lado([
+            [9, 1, 10, 1, 1, '2025-01-01', None, 514, 920, '920', 'a', 124],
+            [9, 2, 10, 1, 1, '2025-01-01', None, 514, 921, '921', 'b', 124],
+        ])
+        entrega = self._lado([
+            [9, 1, 10, 2, 1, '2025-01-02', None, 515, 820, '820', 'c', 124],
+            [9, 2, 10, 2, 1, '2025-01-02', None, 515, 821, '821', 'd', 124],
+        ])
+        presente = montar_presente_substituicao(devolucao, entrega)
+        self.assertEqual(
+            presente[['EQUIPAMENTO_ID_ANTIGO', 'EQUIPAMENTO_ID_NOVO']].values.tolist(),
+            [[920, 820], [921, 821]],
+        )
 
 
 class MapaClientesDiagnosticoTests(unittest.TestCase):

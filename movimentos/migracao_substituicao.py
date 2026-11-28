@@ -197,48 +197,109 @@ def deve_processar_envio(tombo_novo, tombos_com_substituicao, equipamento_novo_i
     )
 
 
+def parear_ciclo_substituicao(itens_devolucao, itens_entrega):
+    """Pareia devolução x entrega de um ciclo, priorizando o mesmo tipo.
+
+    O legado só liga as capas; a ordem de inserção e o ``tipo_id`` são os
+    únicos indícios do par. Casar primeiro o mesmo tipo evita trocas cruzadas
+    (nobreak devolvido pareado com monitor entregue) quando a composição do
+    ciclo é assimétrica. Sem par do mesmo tipo, cai na posição — é o caso de
+    uma troca real de categoria.
+    """
+    pendentes = list(itens_entrega)
+    pares = []
+    for devolucao in itens_devolucao:
+        tipo = devolucao.get('TIPO_ID')
+        escolha = None
+        if pd.notna(tipo):
+            escolha = next(
+                (
+                    posicao
+                    for posicao, entrega in enumerate(pendentes)
+                    if pd.notna(entrega.get('TIPO_ID'))
+                    and entrega.get('TIPO_ID') == tipo
+                ),
+                None,
+            )
+        if escolha is None and pendentes:
+            escolha = 0
+        pares.append(
+            (devolucao, pendentes.pop(escolha) if escolha is not None else None)
+        )
+    pares.extend((None, entrega) for entrega in pendentes)
+    return pares
+
+
 def montar_presente_substituicao(df_devolucao, df_entrega):
     """Combina os dois lados do ciclo, preservando cada item uma única vez.
 
-    Os DataFrames vêm pareados por ``(substituicao_id, seq)``. O merge é
-    externo porque um lado pode ter mais itens que o outro (composição de kit
-    diferente, item excluído, equipamento em manutenção): o item sem par não
-    pode ser descartado, só a fase do lado ausente é pulada no loop.
+    O pareamento é feito por ciclo: primeiro mesmo ``tipo_id``, depois posição
+    (ver ``parear_ciclo_substituicao``). Um lado pode ter mais itens que o
+    outro (composição de kit diferente, item excluído, equipamento em
+    manutenção): o item sem par não é descartado, só a fase do lado ausente é
+    pulada no loop.
     """
     if df_devolucao.empty and df_entrega.empty:
         return pd.DataFrame()
 
-    df = pd.merge(
-        df_devolucao,
-        df_entrega,
-        on=['substituicao_id', 'seq'],
-        how='outer',
-        suffixes=('_DEV', '_ENT'),
-    )
+    def pegar(devolucao, entrega, coluna):
+        if devolucao is not None and pd.notna(devolucao.get(coluna)):
+            return devolucao[coluna]
+        if entrega is not None and pd.notna(entrega.get(coluna)):
+            return entrega[coluna]
+        return None
 
-    presente = pd.DataFrame({
-        'substituicao_id': df['substituicao_id'],
-        'seq': df['seq'],
-        'CLIENTE_ID': df['CLIENTE_ID_DEV'].combine_first(df['CLIENTE_ID_ENT']),
-        'ORGAO_DEV': df['ORGAO_ID_DEV'],
-        'USR_SUBST': df['USUARIO_ID_DEV'].combine_first(df['USUARIO_ID_ENT']),
-        'DATA_DEVOLUCAO': df['DATA_MOV_DEV'],
-        'DATA_ALUGUEL': df['DATA_MOV_ENT'],
-        'ORGAO_ALUGUEL': df['ORGAO_ID_ENT'],
-        'DATA_SUBST': df['DATA_MOV_ENT'].combine_first(df['DATA_MOV_DEV']),
-        'DEL_SUBST': df['DELETED_AT_DEV'],
-        'MOV_DEV_ID': df['MOVIMENTO_ID_DEV'],
-        'EQUIPAMENTO_ID_ANTIGO': df['EQUIPAMENTO_ID_DEV'],
-        'TOMBO_ANTIGO': df['TOMBO_DEV'],
-        'NOME_ANTIGO': df['NOME_DEV'],
-        'TIPO_ANTIGO': df['TIPO_ID_DEV'],
-        'MOV_NOVO_ID': df['MOVIMENTO_ID_ENT'],
-        'EQUIPAMENTO_ID_NOVO': df['EQUIPAMENTO_ID_ENT'],
-        'TOMBO_NOVO': df['TOMBO_ENT'],
-        'NOME_NOVO': df['NOME_ENT'],
-        'TIPO_NOVO': df['TIPO_ID_ENT'],
-    })
-    return presente.sort_values(['substituicao_id', 'seq']).reset_index(drop=True)
+    linhas = []
+    ciclos = sorted(
+        set(df_devolucao['substituicao_id']) | set(df_entrega['substituicao_id'])
+    )
+    for substituicao_id in ciclos:
+        devolucoes = df_devolucao[
+            df_devolucao['substituicao_id'] == substituicao_id
+        ].sort_values('seq')
+        entregas = df_entrega[
+            df_entrega['substituicao_id'] == substituicao_id
+        ].sort_values('seq')
+
+        for devolucao, entrega in parear_ciclo_substituicao(
+            devolucoes.to_dict('records'), entregas.to_dict('records')
+        ):
+            linhas.append({
+                'substituicao_id': substituicao_id,
+                'seq': (devolucao or entrega)['seq'],
+                'CLIENTE_ID': pegar(devolucao, entrega, 'CLIENTE_ID'),
+                'ORGAO_DEV': devolucao['ORGAO_ID'] if devolucao else None,
+                'USR_SUBST': pegar(devolucao, entrega, 'USUARIO_ID'),
+                'DATA_DEVOLUCAO': devolucao['DATA_MOV'] if devolucao else None,
+                'DATA_ALUGUEL': entrega['DATA_MOV'] if entrega else None,
+                'ORGAO_ALUGUEL': entrega['ORGAO_ID'] if entrega else None,
+                'DATA_SUBST': (
+                    entrega['DATA_MOV'] if entrega else devolucao['DATA_MOV']
+                ),
+                'DEL_SUBST': devolucao['DELETED_AT'] if devolucao else None,
+                'MOV_DEV_ID': devolucao['MOVIMENTO_ID'] if devolucao else None,
+                'EQUIPAMENTO_ID_ANTIGO': (
+                    devolucao['EQUIPAMENTO_ID'] if devolucao else None
+                ),
+                'TOMBO_ANTIGO': devolucao['TOMBO'] if devolucao else None,
+                'NOME_ANTIGO': devolucao['NOME'] if devolucao else None,
+                'TIPO_ANTIGO': devolucao['TIPO_ID'] if devolucao else None,
+                'MOV_NOVO_ID': entrega['MOVIMENTO_ID'] if entrega else None,
+                'EQUIPAMENTO_ID_NOVO': (
+                    entrega['EQUIPAMENTO_ID'] if entrega else None
+                ),
+                'TOMBO_NOVO': entrega['TOMBO'] if entrega else None,
+                'NOME_NOVO': entrega['NOME'] if entrega else None,
+                'TIPO_NOVO': entrega['TIPO_ID'] if entrega else None,
+            })
+
+    if not linhas:
+        return pd.DataFrame()
+    return (
+        pd.DataFrame(linhas)
+        .sort_values(['substituicao_id', 'seq'])
+        .reset_index(drop=True)
+    )
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -352,18 +413,19 @@ class MigracaoSubstituicao(BaseMigracaoMovimento):
         return df_itens
 
     def _extrair_dados_substituicao(self):
-        print("   📖 Extraindo O PRESENTE (Pareamento por posição no ciclo)...")
+        print("   📖 Extraindo O PRESENTE (Pareamento por tipo, posição como reserva)...")
 
         # O legado NÃO guarda o vínculo item a item da substituição:
         # aluguel_substituicao relaciona apenas as duas capas de movimento.
-        # Cada lado é lido por inteiro e os itens são pareados pela posição
-        # (SEQ). Assim cada item aparece uma única vez (sem produto
-        # cartesiano) e um item sem par no outro lado não é descartado.
+        # Cada lado é lido por inteiro (ordenado por tipo e número) e o
+        # pareamento prioriza o mesmo tipo_id, caindo na posição quando não
+        # há par do mesmo tipo. Assim cada item aparece uma única vez (sem
+        # produto cartesiano) e um item sem par no outro lado não é
+        # descartado.
         #
         # No lado devolvido os equipamentos ainda existentes vêm primeiro,
         # para que a posição não seja gasta com sucata (que não tem fase a
-        # registrar). A ordenação por tipo e número mantém o pareamento
-        # alinhado quando a composição dos kits é a mesma.
+        # registrar).
         seq_devolucao = """
             (
                 SELECT COUNT(*) + 1

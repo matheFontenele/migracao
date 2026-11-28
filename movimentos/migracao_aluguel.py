@@ -456,12 +456,23 @@ class MigracaoAluguel(BaseMigracaoMovimento):
 
         self.limpar_tabelas_movimento()
         
-        caminho_types = "./docs/types.csv"
-        if os.path.exists(caminho_types):
-            print("📖 Carregando mapeamento de Tipos e Kits (types.csv)...")
-            self.dict_is_kit = {int(row['id']): int(row['is_kit']) for _, row in pd.read_csv(caminho_types).iterrows() if pd.notna(row['id'])}
-        else:
-            print("⚠️ Arquivo types.csv não encontrado. Todos os equipamentos assumirão is_kit = 0.")
+        # `is_kit` vem da tabela `types` do refatorado. O docs/types.csv é de
+        # outro catálogo: 173 dos 174 ids têm nomes diferentes dos tipos do
+        # banco e 32 tipos apareciam como kit sem serem (ex.: id 48 =
+        # FRAGMENTADORA DE PAPEL no CSV, mas MULTIFUNCIONAL LASER MONO no
+        # banco). Isso prendia impressoras, thinkcentres e transformadores no
+        # primeiro item do contrato (o "NOTEBOOK TIPO I").
+        try:
+            with self.engine_new.connect() as conn:
+                self.dict_is_kit = {
+                    int(tipo_id): int(is_kit)
+                    for tipo_id, is_kit in conn.execute(
+                        text("SELECT id, is_kit FROM types WHERE deleted_at IS NULL")
+                    )
+                }
+            print(f"📖 Mapeamento de Tipos/Kits lido do banco: {len(self.dict_is_kit)} tipos.")
+        except Exception as erro:
+            print(f"⚠️ Não foi possível ler types.is_kit ({erro}). Todos assumirão is_kit = 0.")
             self.dict_is_kit = {}
 
         print(f"📖 Lendo dados de {len(arquivos_parquet)} arquivos Parquet...")
