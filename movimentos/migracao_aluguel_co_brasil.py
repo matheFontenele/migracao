@@ -282,7 +282,9 @@ def apply_groups(engine, groups, lookups) -> dict[str, int]:
                 totals["shipment_items"] += 1
 
                 insert_row(conn, "volume_items", {
-                    "volume_id": volume_id, "movement_item_id": movement_item_id,
+                    "volume_id": volume_id, "equipment_id": equipment["id"],
+                    "product_item_id": None,
+                    "movement_item_id": movement_item_id,
                     "quantity": 1, "created_at": stamp, "updated_at": stamp,
                 })
                 totals["volume_items"] += 1

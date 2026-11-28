@@ -144,6 +144,34 @@ def descobrir_id_organizacao_destino(id_legado):
         return 1378
     return id_legado_int
 
+def montar_item_volume(volume_id, item_movimento, movement_item_id, agora):
+    """Item de volume com o equipamento/insumo do item de movimento.
+
+    A UI lê ``volume_items.equipment_id``/``product_item_id`` (não o item de
+    movimento) e a conferência por scanner filtra por essas colunas; sem elas
+    o volume mostra "undefined - undefined". Os campos vêm do PRÓPRIO item de
+    movimento escolhido, nunca de uma nova busca por equipamento — o mesmo
+    equipamento pode aparecer mais de uma vez no movimento.
+    """
+    equipment_id = item_movimento.get("equipment_id")
+    product_item_id = item_movimento.get("product_item_id")
+    return {
+        "volume_id": volume_id,
+        "equipment_id": (
+            None if equipment_id is None or pd.isna(equipment_id) else int(equipment_id)
+        ),
+        "product_item_id": (
+            None
+            if product_item_id is None or pd.isna(product_item_id)
+            else int(product_item_id)
+        ),
+        "movement_item_id": movement_item_id,
+        "quantity": 1,
+        "created_at": agora,
+        "updated_at": agora,
+    }
+
+
 def resetar_saldo_contract_items(engine):
     print("🔄 Resetando available_quantity de contract_items para o valor original (quantity)...")
     with engine.begin() as conn:
@@ -1250,13 +1278,25 @@ class BaseMigracaoMovimento:
             # ==========================================================================
             if self.movimento_itens_mestre:
                 print("   📦 Criando volumes para movimentos de migração...")
-                # Mapear movement_id -> lista de movement_item_ids
+                # Mapear movement_id -> lista de movement_item_ids e
+                # movement_item_id -> item (para replicar o equipamento/insumo
+                # no item do volume).
                 mov_to_items = {}
+                itens_por_id = {}
                 for item in self.movimento_itens_mestre:
                     mov_id = item.get('movement_id')
                     item_id = item.get('id')
                     if mov_id and item_id:
                         mov_to_items.setdefault(int(mov_id), []).append(int(item_id))
+                        itens_por_id[int(item_id)] = item
+
+                def item_de_volume(volume_id, movement_item_id):
+                    return montar_item_volume(
+                        volume_id,
+                        itens_por_id.get(int(movement_item_id), {}),
+                        movement_item_id,
+                        self.now,
+                    )
 
                 # Criar volumes
                 volumes_batch = []
@@ -1288,13 +1328,9 @@ class BaseMigracaoMovimento:
                         })
 
                         for mi_id in mov_to_items[mov_id]:
-                            volume_items_batch.append({
-                                "volume_id": volume_id,
-                                "movement_item_id": mi_id,
-                                "quantity": 1,  # Cada item de movimento = 1 unidade no volume
-                                "created_at": self.now,
-                                "updated_at": self.now
-                            })
+                            volume_items_batch.append(
+                                item_de_volume(volume_id, mi_id)
+                            )
 
                 # Itens que entraram em capas REAPROVEITADAS de outro módulo
                 # (ex.: aluguel histórico da substituição): a capa e o volume
@@ -1323,13 +1359,9 @@ class BaseMigracaoMovimento:
                                 "updated_at": self.now
                             })
                         for mi_id in mov_to_items[mov_id]:
-                            volume_items_batch.append({
-                                "volume_id": volume_id,
-                                "movement_item_id": mi_id,
-                                "quantity": 1,
-                                "created_at": self.now,
-                                "updated_at": self.now
-                            })
+                            volume_items_batch.append(
+                                item_de_volume(volume_id, mi_id)
+                            )
 
                 if volumes_batch:
                     conn.execute(text("""
@@ -1340,8 +1372,8 @@ class BaseMigracaoMovimento:
 
                 if volume_items_batch:
                     conn.execute(text("""
-                        INSERT INTO volume_items (volume_id, movement_item_id, quantity, created_at, updated_at)
-                        VALUES (:volume_id, :movement_item_id, :quantity, :created_at, :updated_at)
+                        INSERT INTO volume_items (volume_id, equipment_id, product_item_id, movement_item_id, quantity, created_at, updated_at)
+                        VALUES (:volume_id, :equipment_id, :product_item_id, :movement_item_id, :quantity, :created_at, :updated_at)
                     """), volume_items_batch)
                     print(f"      ✅ {len(volume_items_batch)} itens de volume criados")
 
