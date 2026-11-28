@@ -76,22 +76,9 @@ ORGANIZACOES = {
 
 TRANSPORTES = {"ROTA": 1, "RETIRADA": 2, "TRANSPORTADORA": 3}
 
-# (status_id, situation) por valor da coluna `Req`.
-# As nao atendidas mantem o status 1 (NAO ATENDIDA), mas entram ja aprovadas:
-# a regra de avulso do destino deixava a requisicao pendente de aprovacao.
-STATUS_REQ = {
-    "PARCIAL": (2, "approved"),
-    "SEPARADO": (3, "approved"),
-    "ENVIADO": (3, "approved"),
-    "ATENDIDA": (3, "approved"),
-    "SOLICITADO ENVIO": (1, "approved"),
-    "SEM ESTOQUE": (1, "approved"),
-    "CANCELADA": (4, "cancelled"),
-    "": (1, "approved"),
-}
-
-# `Separado por` -> username no destino. `Neto`, `Logística` e `Emanuel SAC BR`
-# não têm usuário inequívoco e por isso não geram movimento (vão para auditoria).
+# `Separado por` -> username no destino. Nome fora deste mapa (ex.: Bruno,
+# Logística, Neto) cai no usuário padrão (admin) em vez de bloquear o
+# movimento; o fallback fica registrado na auditoria.
 SEPARADORES = {
     "MARCELO": "Marcelo",
     "ROBERTO": "Roberto",
@@ -1030,8 +1017,6 @@ def montar_linha(row, indice: int, refs: Referencias,
         "equipamentos_antigos": ",".join(str(n) for n in antigos),
         "pat_id": pat_id, "separador_id": separador_id,
         "data_separacao": separado_em.date().isoformat() if separado_em else "",
-        "status_id": STATUS_REQ.get(normalizar(row["Req"]), (None, ""))[0],
-        "situacao": STATUS_REQ.get(normalizar(row["Req"]), (None, ""))[1],
     })
 
     return Linha(
@@ -1098,7 +1083,20 @@ def preparar(engine, arquivo: Path = ARQUIVO_FONTE,
 
     print(f"\n   ✅ Linhas elegíveis: {len(linhas):,}")
     print(f"   ⚠️ Linhas ignoradas/bloqueadas: {sum(1 for a in auditoria if a['resultado'] != 'OK'):,}")
-    return agrupar(linhas), auditoria
+
+    cabecalhos = agrupar(linhas)
+    # A auditoria nasce por linha, antes do agrupamento; o status final é do
+    # cabeçalho (calculado pelo atendimento real). Propaga para as linhas para
+    # que o relatório não mostre um status que a requisição não recebeu.
+    status_por_linha = {
+        linha.planilha: (cabecalho.status_id, cabecalho.situation)
+        for cabecalho in cabecalhos for linha in cabecalho.linhas
+    }
+    for registro in auditoria:
+        final = status_por_linha.get(registro.get("linha"))
+        if final:
+            registro["status_id"], registro["situacao"] = final
+    return cabecalhos, auditoria
 
 # ---------------------------------------------------------------------------
 # Gravação
